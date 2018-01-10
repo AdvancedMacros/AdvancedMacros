@@ -1,0 +1,3 @@
+math.random([Number:a [, Number:b]])
+returns a pseudo-random number between a & b
+a & b default to 0 thru 1

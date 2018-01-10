@@ -1,0 +1,2 @@
+math.floor(Number:n)
+Returns the largest integer smaller than or equal to n.

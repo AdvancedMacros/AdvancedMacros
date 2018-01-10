@@ -1,0 +1,19 @@
+filesystem library
+File IO tools like make folders, rename, delete,
+copy, list. etc. 
+
+Note: File access is limited to the macros folder with this library
+      *A feature may be added to disable the path checking for advanced users.
+Another Note: This means you can read and write to the settings file and your scripts too.
+    
+Functions:
+  open
+  exists
+  copy
+  delete
+  rename
+  mkDir
+  mkDirs
+  isDir
+  list
+See function help docs for more info

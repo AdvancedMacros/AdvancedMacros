@@ -1,0 +1,3 @@
+Math library
+All sorts of handy math
+functions. Mathematical!

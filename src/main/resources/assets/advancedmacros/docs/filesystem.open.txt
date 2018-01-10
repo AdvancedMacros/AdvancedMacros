@@ -1,0 +1,63 @@
+open(String:file, String:mode)
+files will go into the mods folder
+Modes: r-read, w-write, a-append, raf-Random access file
+
+
+Note: File access is limited to the macros folder with this library
+      *A feature may be added to disable the path checking for advanced users.
+Another Note: This means you can read and write to the settings file and your scripts too.
+
+Read:
+  readByte() - read the next byte and return it as a number
+  readLine() - read the next line and return it as is.
+  read()     - reads the next word seperated by a space or newline.
+  readAll()  - read the whole file, and return it as a string
+  available()- returns the number of bytes that are unread
+  close()    - close the file and release system resources
+Write/Append:
+  write(Value:v) - writes v as a string
+  writeLine(Value:V - same as write, but includes a newline char at the end
+  writeByte(Integer:i) - write the lowest 1 byte from i to file
+  close()    - close the file and release system resources
+Random Access File:
+    Notes: Random Access Files can both read and write
+          They can also skip to anywhere in the file.
+          (including backwards)
+          To people who know java, all the read/write methods are syncronized
+          
+    seek(Integer:position) - jump to this pos in the file (0 is the first byte)
+    getLength() - returns the length of the file
+    setLength(Integer:size) - change the file size to the new size (careful not to make it too large)
+    pos() - Get the current position in the file
+    readByte() - read a singal SIGNED byte -128 thru 127
+    readUByte() - read a singal UNSIGNED byte 0 thru 255
+    readInt() - read an integer (4 bytes) -2,147,483,648 thru 2,147,483,647
+    readChar() - read a char (2 bytes) 
+    readUTF() - read a string in UTF-8
+    readBoolean() - reads a byte but returns false if 0 true otherwise
+    readDouble() - reads a double (8 bytes)
+    readFloat() - read a float (4 bytes)
+    readLong() - read a long (8 bytes) -9,223,372,036,854,775,808 thru 9,223,372,036,854,775,807
+    readShort() - read a short (2 bytes) -32,768 to 32,767
+    readUShort() - read UNSIGNED short 0 to 65,535
+    readLine() - read a line of text or until end of file, whichever is first
+    writeString(String:string) - You guessed it! Write a string into file at your current pos.
+    writeBoolean(Boolean:b) - write a boolean into file as a byte, 0 or 1
+    writeByte(Integer:byte) - write a byte to file (only the lowest byte of a larger number is written)
+    writeDouble(Number:n) - write a double to file.
+    writeFloat(Number:n) - write a less accurate number to file.
+    writeInt(Integer:i) - write an int to file (only 4 lowest bytes used if it is outside int range)
+    writeLong("Integer":l) - write a long to file 
+    writeShort(Integer:s) - write a short to file(lowest 2 bytes used)
+    writeUTF(String s) - write a string in UTF-8 format to file
+    force(Boolean:metaData) - From the javaDoc:
+                              Forces any updates to this channel's file to be written to the storage device that contains it.
+                              The metaData parameter can be used to limit the number of I/O operations that this method is required 
+                              to perform. Passing false for this parameter indicates that only updates to the file's content need be 
+                              written to storage; passing true indicates that updates to both the file's content and metadata must 
+                              be written, which generally requires at least one more I/O operation. 
+                              Whether this parameter actually has any effect is dependent upon the underlying operating system and 
+                              is therefore unspecified.  
+    skip(Integer:byteCount) - returns number of bytes skipped. Will not go past end of file.
+                              Negative numbers do nothing 
+    close() - closes the file and releases system resources

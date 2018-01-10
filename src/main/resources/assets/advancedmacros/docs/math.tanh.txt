@@ -1,0 +1,2 @@
+math.tanh (Number:n)
+Returns the hyperbolic tangent of n

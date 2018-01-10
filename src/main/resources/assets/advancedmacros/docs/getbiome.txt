@@ -1,0 +1,3 @@
+getBiome(Number:x, Number:z)
+Returns the biome name and some details in a table
+(String, Table) 

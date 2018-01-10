@@ -1,0 +1,2 @@
+math.abs(Number:n)
+returns a positive version of n

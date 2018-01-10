@@ -1,0 +1,11 @@
+collectgarbage ([String:opt [, arg]])
+collect, stop, restart, count, step, setpause, setstepmul
+https://www.lua.org/manual/5.1/manual.html#pdf-collectgarbage
+
+"collect": performs a full garbage-collection cycle. This is the default option.
+"stop": stops the garbage collector.
+"restart": restarts the garbage collector.
+"count": returns the total memory in use by Lua (in Kbytes).
+"step": performs a garbage-collection step. The step "size" is controlled by arg (larger values mean more steps) in a non-specified way. If you want to control the step size you must experimentally tune the value of arg. Returns true if the step finished a collection cycle.
+"setpause": sets arg as the new value for the pause of the collector (see §2.10). Returns the previous value for pause.
+"setstepmul"

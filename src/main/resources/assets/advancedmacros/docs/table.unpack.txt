@@ -1,0 +1,3 @@
+table.unpack(Table:sTable)
+Expand the table into multiple arguments
+Example: a,b,c = table.unpack({1,2,3}) 

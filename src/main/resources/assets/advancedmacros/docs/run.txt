@@ -1,0 +1,3 @@
+run(String:macroName)
+Run another macro like a function
+Example: results = {run("doThing.lua")}

@@ -1,0 +1,3 @@
+string.byte(String:ss [, Number:i [, Number:j]]) s:byte([Number:i [, Number:j]])
+Return the numerical code the i-th through j-th character of the string passed.
+http://lua-users.org/wiki/StringLibraryTutorial for examples

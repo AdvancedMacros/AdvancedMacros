@@ -1,0 +1,3 @@
+stopAllScripts()
+Stop all currently running scripts.
+(This one too)

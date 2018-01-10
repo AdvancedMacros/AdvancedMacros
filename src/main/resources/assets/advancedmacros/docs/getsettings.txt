@@ -1,0 +1,7 @@
+getSettings()
+Returns a table with many of the settings
+for this mod.
+
+Widget settings are can be used to customize some of the gui's color themes.
+
+Profile details can also be found here.

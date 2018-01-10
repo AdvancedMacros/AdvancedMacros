@@ -1,0 +1,2 @@
+setmetatable(Table:t, table:m)
+Set t's metatable to m.

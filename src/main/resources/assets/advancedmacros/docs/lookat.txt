@@ -1,0 +1,3 @@
+look(Number:x, Number:y, Number:z [, Number:time])
+Make the player look at the coordinates x,y,z in the world. If time is given it
+will interpolate the values with a curve function for that long.

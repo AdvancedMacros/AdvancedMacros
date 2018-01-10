@@ -1,0 +1,2 @@
+math.sqrt(Number:n)
+Returns the square root of n

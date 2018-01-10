@@ -1,0 +1,3 @@
+filesystem.rename(String:oldName, String:newName)
+Renames a file or folder.
+Returns true if it worked, false otherwise.

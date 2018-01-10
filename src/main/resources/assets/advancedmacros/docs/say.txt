@@ -1,0 +1,9 @@
+say(String:sText)
+Make the player say something
+
+The player will send the chat message given
+as an argument.
+Color codes will be ignored (example: &a)
+
+Commands will also work.
+(example: say("/weather rain 1") )

@@ -1,0 +1,6 @@
+error (String:message [, Integer:lvl])
+lvl 1 (default), the error position is where the error function was called.
+Lvl 2 where the function that called error was called; and so on.
+Passing a level 0 avoids the addition of error position information to the message
+
+https://www.lua.org/manual/5.1/manual.html#pdf-error

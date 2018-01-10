@@ -1,0 +1,3 @@
+math.modf(Number:n)
+returns the integer and decimal portions of the number n.
+Example: math.modf(32.748) -> 32, .748

@@ -1,0 +1,3 @@
+@echooff
+gradlew build
+pause

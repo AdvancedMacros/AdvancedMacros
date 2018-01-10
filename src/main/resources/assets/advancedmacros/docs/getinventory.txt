@@ -1,0 +1,3 @@
+getInventory([String:playerName])
+Get a table with inventory contents. Only
+visible items can be accesed on other players.

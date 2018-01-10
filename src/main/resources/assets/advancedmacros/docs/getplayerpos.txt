@@ -1,0 +1,3 @@
+getPlayerPos([String:playerName])
+Returns the player position (default: you)
+Example: x,y,z = getPlayerPos()

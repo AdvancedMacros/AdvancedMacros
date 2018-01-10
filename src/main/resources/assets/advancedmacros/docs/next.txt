@@ -1,0 +1,3 @@
+next(Table:t [, Value:from])
+Gets the next element from a table.
+nil is end, from=nil gives first element.

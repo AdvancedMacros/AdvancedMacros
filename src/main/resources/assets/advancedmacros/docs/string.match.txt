@@ -1,0 +1,3 @@
+string.match (String:s, String:pattern [, Number:index]) 
+Extract substrings by matching patterns.
+http://lua-users.org/wiki/StringLibraryTutorial

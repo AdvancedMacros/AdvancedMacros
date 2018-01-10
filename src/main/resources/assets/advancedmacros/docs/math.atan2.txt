@@ -1,0 +1,3 @@
+math.atan2 (Number:y, Number:x)
+returns atan, cases for x==0 are covered
+such that it it will not yield NAN.

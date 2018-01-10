@@ -1,0 +1,3 @@
+setHotbar(Integer:slot)
+Changes the selected
+slot in your hotbar.

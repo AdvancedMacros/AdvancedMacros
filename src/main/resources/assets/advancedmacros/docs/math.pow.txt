@@ -1,0 +1,3 @@
+Math.pow(a,b)
+returns a raised to the power of b
+(a^b)

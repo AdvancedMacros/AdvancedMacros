@@ -1,0 +1,17 @@
+log(String/Table/Number)
+Puts stuff into the chat
+(Only for the client)
+
+&0-9 and &a-f are color codes when in a string
+&& will be a normal &
+&B Bold
+&I Italics
+&O Obfuscated
+&S Strikethrough
+&U Underlined
+Applying a color code will remove any formating
+
+Multiple arguments may be passed to log. Example:
+log("Hello", "world!")
+  Chat:
+  ->  (Hello, world!)

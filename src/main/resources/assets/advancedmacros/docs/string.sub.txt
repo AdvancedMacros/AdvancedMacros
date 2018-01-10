@@ -1,0 +1,3 @@
+string.sub(sString, i [, j]) sString:sub(i [,j])
+returns substring in given range (both inclusive).
+http://lua-users.org/wiki/StringLibraryTutorial for more.

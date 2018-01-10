@@ -1,0 +1,3 @@
+filesystem.isDir(String:path)
+Return true if the path is a folder,
+false otherwise.

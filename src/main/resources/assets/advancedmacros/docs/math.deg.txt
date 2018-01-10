@@ -1,0 +1,2 @@
+math.deg (Number:r)
+Returns the angle r (radians) in degrees.

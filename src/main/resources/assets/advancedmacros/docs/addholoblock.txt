@@ -1,0 +1,62 @@
+addHoloBlock([String:Texture/Texture:texture])
+Draws a ghost block in your world!
+See the full help doc for examples.
+
+WorldHudItem functions:
+    destroy()  --stops it from drawing, also replaces all the controls with false
+    setPos(Number:x, Number:y, Number:z) --move the item
+    setX(Number:x)  --set the items's x pos
+    setY(Number:y)  --set the items's y pos
+    setZ(Number:z)  --set the items's z pos
+    setRot(Number:yaw, Number:pitch, Number:roll)  --this one doesnt work for holoBlock yet D:
+    setOpacity(Number:amount)  --set the items's opacity
+    getOpacity()    --get the current opacity
+    getPos()        --returns the pos of the item (x,y,z = hb.getPos())
+    getRot()        --like getPos(), but for rotation
+    enableDraw([Boolean:state]) --set weather or not to draw this item
+    disableDraw()   --basicly just enableDraw(false)
+    isDrawing()     --checks if enableDraw is true
+    xray([Boolean:state])   --Set weather or not to use xray mode when drawing
+Block functions:
+    setWidth(Number:width)  change the size of the holoBlock
+    changeTexture(String:texture)  change the texture of the holoBlock
+    setUV(Number:uMin, Number:vMin, Number:uMax, Number:vMax) change where
+                the texture is sampled from in the picture, these are always 0 thru 1
+                textures will tile outside those ranges
+    overlay()   quickly sets the width to about 1.0001 so its just larger than a block
+
+Texture types:
+    starts with
+      "web:" followed by the url to an image, this isn't set up yet
+      "resource:" uses a resource from this mod
+      "minecraft:blocks" the texture with most of the items crammed onto it 
+      (256x256 pixels and 32x32 items/blocks)
+      ""  starts with nothing, this will use a file address anywhere 
+          on your computer (like "C://users/username/pictures/untitled.png")
+Tips:
+    if you want to make a guide block, use set the width slightly
+    smaller than the block, otherwise they may render with the textures
+    overlapping
+    (Example: hb.setWidth(.999))
+    
+    You can make an animated texture by putting all the frames in one image
+    and using the UV coordinates to change which frame is being shown
+    
+Example:
+  local x,y,z = player.getBlockPos()
+  clearWorldHud()               --remove any existing worldHudItems
+  local hb = addHoloBlock()     --create the holoblock
+  hb.setPos(x,y,z)              --move where the holoblock will be drawn
+  hb.setOpacity(.7)             --can make it a bit transparent
+  hb.xray()                     --make it so it is rendered over everything
+  --hb.xray(false) to disable
+  --hb.xray(true) also works to enable it
+  
+  --**IMPORTANT**
+  hb.enableDraw()               --allow this hudItem to be drawn
+  --hb.enableDraw(true) is the same
+  --hb.enableDraw(false) will hide the holoBlock
+
+Planed features:
+  setColor(Int/RGB) tint the block to some color, like the grass does
+  setRot() this isn't setup yet 

@@ -1,0 +1,3 @@
+math.sin(Number:n)
+return sine of n in RADIANS
+(n should also be in radians)

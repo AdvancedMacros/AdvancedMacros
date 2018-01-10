@@ -1,0 +1,3 @@
+getSkyLight(Number:x, Number:y, Number:z)
+Returns the amount of sky light at x,y,z
+Tip: 7 and darker mobs can spawn

@@ -1,0 +1,3 @@
+key(String:keyName, Integer:millis)
+For all the keybinds I can't cover in advanced. Use this to trigger
+any key for some number of milliseconds. (-1 is endless, 0 to cancel)

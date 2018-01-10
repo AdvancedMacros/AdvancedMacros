@@ -1,0 +1,3 @@
+_VERSION
+Returns the version of LuaJ being used.
+Luaj is a Lua interpreter based on 5.2.x

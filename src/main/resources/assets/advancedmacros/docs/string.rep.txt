@@ -1,0 +1,2 @@
+string.rep(String:s, Number:times) s:rep(Number:times)
+Generate a string which is n copies of the string passed concatenated together.

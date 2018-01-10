@@ -1,0 +1,3 @@
+os.time([table])
+Given a formatted date table, as used by os.date() return the time in system seconds.
+http://lua-users.org/wiki/OsLibraryTutorial for more help

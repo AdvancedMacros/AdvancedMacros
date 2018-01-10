@@ -1,0 +1,2 @@
+math.rad(Number:n)
+convert n (degrees) to radians

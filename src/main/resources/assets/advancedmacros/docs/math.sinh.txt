@@ -1,0 +1,2 @@
+math.sinh (Number:n)
+Returns the hyperbolic sine of n

@@ -1,0 +1,3 @@
+customizeSkin(String:part, Boolean:show)
+Toggle parts on the second layer of your player's skin.
+Parts: hat,chest, left/right leg, left/right arm, cape

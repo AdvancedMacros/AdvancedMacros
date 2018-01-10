@@ -1,0 +1,3 @@
+string.gmatch(String:s, String:pat) or s:gmatch(String:pattern)
+This returns a pattern finding iterator. 
+http://lua-users.org/wiki/PatternsTutorial for help.

@@ -1,0 +1,3 @@
+table.sort(Table:table [, Function:comp])
+Sort the elements of a table in-place (i.e. alter the table).
+http://lua-users.org/wiki/TableLibraryTutorial for more help.

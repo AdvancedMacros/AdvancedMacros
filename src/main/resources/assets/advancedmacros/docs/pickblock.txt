@@ -1,0 +1,3 @@
+pickBlock()
+Basically what happens when you hit your middle mouse button.
+Selects the block you are looking at in your hotbar.

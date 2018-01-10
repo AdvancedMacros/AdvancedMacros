@@ -1,0 +1,3 @@
+string.dump(Function:f) *Not recommended
+Returns a binary representation of the given function, 
+so that a later loadstring on that string returns a copy of the function. 

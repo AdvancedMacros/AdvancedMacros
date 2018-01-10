@@ -1,0 +1,25 @@
+getWorld()
+Get info about the world you are in.
+See docs for a list of items
+
+isRemote
+isDaytime
+worldTime
+weather - thunder/rain/only thunder/clear
+moonPhase
+cleanWeatherTime
+rainTime
+gameType
+seed
+difficulty
+name
+spawn
+border
+    centerX
+    centerZ
+    warningDist
+    dmgAmount
+    radius
+    size
+isHardcore
+isDifficultyLocked 

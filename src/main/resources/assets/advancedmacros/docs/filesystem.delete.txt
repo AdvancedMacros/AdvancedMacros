@@ -1,0 +1,3 @@
+filesystem.delete(String:path)
+Delete the file or folder at path.
+Returns true if successful, false otherwise.

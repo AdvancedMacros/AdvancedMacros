@@ -1,0 +1,21 @@
+openInventory()
+"opens" your inventory so you can move items around.
+Returns a table with controls. See full doc for help.
+
+Controls:
+  swapStack(slot1, slot2) simulates clicking slot1, then 2 than 1 again
+  splitStack(slot1, slot2, amount) takes the stack, places *amount* in slot2 and puts stack1 back
+  close() tell the server you "closed your inventory", things may act weird if you don't
+  mapping - A table that tells you what all the slots are
+    hotbar
+    main
+    boots
+    leggings
+    chestplate
+    helmet
+    offHand
+    craftingIn
+    craftingOut
+  
+You can craft in your 2x2 crafting like this
+it's also possible to leave items in it as of now.

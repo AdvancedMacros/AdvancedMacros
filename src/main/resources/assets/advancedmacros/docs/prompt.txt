@@ -1,0 +1,18 @@
+prompt(String:promptMsg, [String:type [, ...]])
+Return user input (nil if canceled). Supported types are: text, choice, item. 
+For choice pass each option in the '...' section or unpack a table.
+
+
+
+Examples:
+  text = prompt("Type something")
+  choice = prompt("Choose a player:", "choice", table.unpack(getPlayerList()))
+  item = prompt("Choose an item","item")
+  
+Planned modes:
+  number
+  location
+  player (with faces!)
+  time (with a clock and calendar)
+  file
+  itemChoice (because that list is loooooooooooonnnnnng)

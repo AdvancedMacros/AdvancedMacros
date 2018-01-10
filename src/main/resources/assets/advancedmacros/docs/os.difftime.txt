@@ -1,0 +1,3 @@
+os.difftime(t2, t1)
+Calculate the number of seconds between time t1 to time t2.
+http://lua-users.org/wiki/OsLibraryTutorial for more help.

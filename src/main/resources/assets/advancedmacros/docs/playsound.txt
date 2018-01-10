@@ -1,0 +1,3 @@
+playSound(String:fileName)
+Play a sound in the advancedMacros/sounds folder
+Returns a table with controls. .wav recommended

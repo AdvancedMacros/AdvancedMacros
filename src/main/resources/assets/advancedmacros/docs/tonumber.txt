@@ -1,0 +1,3 @@
+tonumber(String:s [,Number:base])
+Turn strings into numbers! "123" -> 123
+The base may be any integer between 2 and 36, inclusive

@@ -1,0 +1,3 @@
+runThread(String: file [,args ...]) or runThread(Function:f [,args ...])
+Run the function or file on a new thread.
+Returns a table with controls for the thread. 

@@ -1,0 +1,3 @@
+string.find(String:s, String:pattern [, Number:index [, Boolean:plain]]) or
+s:find(String:pattern [, Number:index [, Boolean:plain]])
+http://lua-users.org/wiki/StringLibraryTutorial for more.

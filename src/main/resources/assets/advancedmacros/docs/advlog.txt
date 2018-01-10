@@ -1,0 +1,37 @@
+advLog(table:params)
+Log with clickable text and tooltips.
+See detailed doc for help.
+
+Example:
+msg = {
+  {
+    text="Tooltip only",
+    color="&a&B", --& is not needed, color is optional argument
+    tooltip="Tooltip!"
+  },{
+    text=" runCommand",
+    color="&b",
+    tooltip="Another tooltip!",
+    click={
+      type="runCommand",
+      value="CLICKED!"
+    }
+  },{
+    text=" suggestCommand",
+    color="&c",
+    tooltip="Click me!",
+    click={
+      type="suggestCommand",
+      value="/say It works!"
+    }
+  },{
+    text=" URL",
+    color="&d",
+    tooltip="Google.com",
+    click={
+      type="url",
+      value="https://www.google.com"
+    }
+  }
+}
+advLog(msg)

@@ -1,0 +1,3 @@
+getmetatable(Table:t)
+Return the metatable
+attached to table t.

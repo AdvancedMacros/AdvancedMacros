@@ -1,0 +1,2 @@
+string.upper(String:sString) or sString:upper()
+returns an uppercase version of the string

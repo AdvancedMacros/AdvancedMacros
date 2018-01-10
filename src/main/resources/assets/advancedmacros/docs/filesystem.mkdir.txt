@@ -1,0 +1,3 @@
+filesytem.mkDir(String:path)
+Create a directory with the given path name. Only creates
+the one folder. Returns true if it worked, false otherwise.

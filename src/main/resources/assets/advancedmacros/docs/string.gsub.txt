@@ -1,0 +1,3 @@
+string.gsub(s, pattern, replace [, n]) or s:gsub(pattern, replace [,n])
+replace text in string s matching a given pattern up to n times.
+http://lua-users.org/wiki/PatternsTutorial for help making patterns

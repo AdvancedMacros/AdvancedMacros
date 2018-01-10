@@ -1,0 +1,3 @@
+assert(Value:v, String:errorMsg)
+throws an error if v equates to false
+Example: f = assert(filesystem.open("moo",'r'), "couldn't open")

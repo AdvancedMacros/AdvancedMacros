@@ -1,0 +1,3 @@
+drop([Boolean:dropStack])
+Makes the player drop the held item.
+Stack is dropped if dropStack is true.

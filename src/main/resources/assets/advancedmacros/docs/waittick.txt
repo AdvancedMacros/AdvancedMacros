@@ -1,0 +1,2 @@
+waitTick()
+Wait for exactly one game tick to pass.

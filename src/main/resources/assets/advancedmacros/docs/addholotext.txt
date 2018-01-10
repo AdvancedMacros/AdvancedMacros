@@ -1,0 +1,44 @@
+addHoloText()
+Draws some floating text in your world!
+See the full help doc for examples.
+
+WorldHudItem functions:
+    destroy()  --stops it from drawing, also replaces all the controls with false
+    setPos(Number:x, Number:y, Number:z) --move the item
+    setX(Number:x)  --set the items's x pos
+    setY(Number:y)  --set the items's y pos
+    setZ(Number:z)  --set the items's z pos
+    setRot(Number:yaw, Number:pitch, Number:roll)  --this works for holoText
+    setOpacity(Number:amount)  --set the items's opacity
+    getOpacity()    --get the current opacity
+    getPos()        --returns the pos of the item (x,y,z = hb.getPos())
+    getRot()        --like getPos(), but for rotation
+    enableDraw([Boolean:state]) --set weather or not to draw this item
+    disableDraw()   --basicly just enableDraw(false)
+    isDrawing()     --checks if enableDraw is true
+    xray([Boolean:state])   --Set weather or not to use xray mode when drawing
+Text functions:
+    getText() returns your current text
+    setText(String:text) Currently suppports color codes, bold, italics, and bold with italics
+
+    
+Example:
+  local x,y,z = player.getBlockPos()
+  clearWorldHud()               --remove any existing worldHudItems
+  local ht = addHoloText()     --create the holoText
+  ht.setPos(x,y,z)              --move where the holoText will be drawn
+  ht.setOpacity(.7)             --can make it a bit transparent
+  ht.xray()                     --make it so it is rendered over everything
+  --hb.xray(false) to disable
+  --hb.xray(true) also works to enable it
+  ht.setText("&aHello &b&BWORLD!")
+  --**IMPORTANT**
+  ht.enableDraw()               --allow this hudItem to be drawn
+  --ht.enableDraw(true) is the same
+  --ht.enableDraw(false) will hide the holoText
+
+Planed features:
+    - Underlined text
+    - Strikethrough text
+    - Custom font resources
+    - Obfuscated text

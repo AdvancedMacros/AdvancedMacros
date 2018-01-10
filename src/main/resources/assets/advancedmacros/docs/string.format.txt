@@ -1,0 +1,21 @@
+string.format(String:pat, Value:v1, Value:v2, ...) or pat:format(Value:v1, Value:v2, ...)
+Create a formatted string from the format and arguments provided.
+See full doc for examples.
+
+This is similar to the printf("format",...) function in C. 
+An additional option %q puts quotes around a string argument's value.
+
+c, d, E, e, f, g, G, i, o, u, X, and x all expect a number as argument.
+q and s expect a string.
+> = string.format("%s %q", "Hello", "Lua user!")   -- string and quoted string
+Hello "Lua user!"
+> = string.format("%c%c%c", 76,117,97)             -- char
+Lua
+> = string.format("%e, %E", math.pi,math.pi)       -- exponent
+3.141593e+000, 3.141593E+000
+> = string.format("%f, %g", math.pi,math.pi)       -- float and compact float
+3.141593, 3.14159
+> = string.format("%d, %i, %u", -100,-100,-100)    -- signed, signed, unsigned integer
+-100, -100, 4294967196
+> = string.format("%o, %x, %X", -100,-100,-100)    -- octal, hex, hex
+37777777634, ffffff9c, FFFFFF9C

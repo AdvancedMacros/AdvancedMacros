@@ -1,0 +1,2 @@
+string.len(String:s) or s:len() or #s
+returns the length of the string

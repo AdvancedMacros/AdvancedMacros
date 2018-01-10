@@ -1,0 +1,2 @@
+math.ldexp (m, e)
+Returns m2e (e should be an integer).

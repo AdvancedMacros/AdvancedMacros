@@ -1,0 +1,35 @@
+getEntity(Integer:entityID)
+Returns a hoard of data about the entity
+use getEntityList() to find out the ID's to use.
+
+String: name
+String: class
+Table:  pos   {x,y,z}
+Int:    dimension
+Number: pitch
+Number: yaw
+Number: fallDist
+Number: height (hitbox related)
+Number: width (hitbox related)
+Number: hurtResTime
+Boolean:isCollidedHorz
+Boolean:isCollidedVert
+Boolean:isNoClip
+Boolean:onGround
+Boolean:isInvlnerable
+String: team
+Number: health
+Boolean:isOnLadder
+Table:  potionEffects 
+  { String:id, Int:strength, Int:duration, 
+    Boolean:showsParticles, Boolean:isAmbient }
+Int:    air (for when underwater)
+Boolean:isInWater
+Boolean:isInLava
+Boolean:immuneToFire
+Boolean:isImmuneToExplosion
+Boolean:isOnFire
+Boolean:isSprinting
+Boolean:isInvisible
+String: uuid
+Table:  lookingAt {x,y,z}

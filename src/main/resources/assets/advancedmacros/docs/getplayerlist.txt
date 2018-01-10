@@ -1,0 +1,3 @@
+getPlayerList()
+Return a table of players on
+the current server like [TAB].

@@ -1,0 +1,3 @@
+math.atan(Number:n)
+Return the inverse tangent in RADIANS
+(n should also be radians)

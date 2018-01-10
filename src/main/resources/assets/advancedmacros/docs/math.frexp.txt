@@ -1,0 +1,3 @@
+math.frexp(Number:x)
+Returns m and e such that x = m2e, e is an integer and the 
+absolute value of m is in the range [0.5, 1) (or zero when x is zero).

@@ -1,0 +1,2 @@
+os.clock()
+Return CPU time since Lua started in seconds.

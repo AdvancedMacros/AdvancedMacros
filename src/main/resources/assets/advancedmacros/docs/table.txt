@@ -1,0 +1,3 @@
+Table library
+Includes tools to work with tables.
+Complete documentation: http://lua-users.org/wiki/TableLibraryTutorial

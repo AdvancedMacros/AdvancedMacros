@@ -1,0 +1,3 @@
+setProfile(String:profileName)
+Returns true if the profile existed and is set
+false otherwise/
