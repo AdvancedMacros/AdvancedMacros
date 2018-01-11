@@ -71,7 +71,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "3.8.0"; //${version} ??
+	public static final String VERSION = "3.8.1"; //${version} ??
 	public static final File macrosRootFolder = new File(Minecraft.getMinecraft().mcDataDir,"mods/advancedMacros");
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -96,6 +96,7 @@ public class AdvancedMacros {
 	
 	@EventHandler @SideOnly(Side.CLIENT)//skipped the proxy system, this is only client side
 	public void init(FMLInitializationEvent event){
+		try {
 		if(event.getSide().isServer()){return;}
 		macrosRootFolder.mkdirs();
 		macrosFolder.mkdirs();
@@ -103,6 +104,7 @@ public class AdvancedMacros {
 		customDocsFolder.mkdirs();
 		modKeybind = new KeyBinding("Bindings Menu", Keyboard.KEY_L, "AdvancedMacros");
 		MinecraftForge.EVENT_BUS.register(forgeEventHandler = new ForgeEventHandler());
+		
 		ClientRegistry.registerKeyBinding(modKeybind);
 			try {
 				Settings.load();
@@ -120,14 +122,17 @@ public class AdvancedMacros {
 			loadFunctions();
 		macroMenuGui.loadProfile("DEFAULT");
 		
-		HudText text = new HudText(true);
-		text.setDrawType(DrawType.XRAY);
-		text.setPos(0, 5, 0);
-		forgeEventHandler.addWorldHudItem(text);
-		
+//		HudText text = new HudText(true);
+//		text.setDrawType(DrawType.XRAY);
+//		text.setPos(0, 5, 0);
+//		forgeEventHandler.addWorldHudItem(text);
+		}catch (Throwable t) {
+			t.printStackTrace();
+		}
 	}
 	@SideOnly(Side.CLIENT)
 	public void postInit(FMLPostInitializationEvent event) {
+		editorGUI.postInit();
 		forgeEventHandler.fireEvent(EventName.Startup,ForgeEventHandler.createEvent(EventName.Startup));
 	}
 

@@ -21,12 +21,15 @@ public class EditorGUI extends Gui{
 	
 	
 	//TODO Help bar
+	public void postInit() {
+		gtf.setFocused(false); //FIXME somehow this causes an error with inventory tweaks.... idk how
+	}
 	
 	public EditorGUI() {
 		inputSubscribers.add(cta);
 		gtf = new GuiTextField(0, getFontRend(), 6, 2, width/3, 20);
 		gtf.setCanLoseFocus(true);
-		gtf.setFocused(false);
+		
 		cta.setFocused(true);
 		save = new GuiButton(new WidgetID(301), 7+width/3, 2, width/4, 10, LuaValue.NIL, LuaValue.valueOf("Save"), "editor.save", Color.BLACK, Color.TEXT_8, Color.WHITE);
 		exit = new GuiButton(new WidgetID(302), 7+width/3, 12, width/4, 10, LuaValue.NIL, LuaValue.valueOf("Exit"), "editor.exit", Color.BLACK, Color.TEXT_8, Color.WHITE);
