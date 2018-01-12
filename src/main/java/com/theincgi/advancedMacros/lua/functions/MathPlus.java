@@ -1,7 +1,7 @@
 package com.theincgi.advancedMacros.lua.functions;
 
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.TwoArgFunction;
+import org.luaj.vm2_v3_0_1.LuaValue;
+import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 
 public class MathPlus {
 	public static LuaValue const_e = LuaValue.valueOf(Math.E);

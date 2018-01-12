@@ -15,9 +15,9 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.ZeroArgFunction;
+import org.luaj.vm2_v3_0_1.LuaTable;
+import org.luaj.vm2_v3_0_1.LuaValue;
+import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.lua.LuaValTexture;

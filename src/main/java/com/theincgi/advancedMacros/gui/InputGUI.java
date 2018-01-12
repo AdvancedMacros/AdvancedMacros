@@ -3,9 +3,9 @@ package com.theincgi.advancedMacros.gui;
 import java.io.IOException;
 import java.util.List;
 
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.Varargs;
-import org.luaj.vm2.lib.VarArgFunction;
+import org.luaj.vm2_v3_0_1.LuaValue;
+import org.luaj.vm2_v3_0_1.Varargs;
+import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 

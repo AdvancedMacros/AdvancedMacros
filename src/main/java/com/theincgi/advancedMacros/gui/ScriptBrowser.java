@@ -3,7 +3,7 @@ package com.theincgi.advancedMacros.gui;
 import java.io.File;
 import java.io.IOException;
 
-import org.luaj.vm2.LuaValue;
+import org.luaj.vm2_v3_0_1.LuaValue;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.ForgeEventHandler;

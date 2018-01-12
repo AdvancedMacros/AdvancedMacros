@@ -4,11 +4,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.Varargs;
-import org.luaj.vm2.lib.OneArgFunction;
-import org.luaj.vm2.lib.VarArgFunction;
+import org.luaj.vm2_v3_0_1.LuaTable;
+import org.luaj.vm2_v3_0_1.LuaValue;
+import org.luaj.vm2_v3_0_1.Varargs;
+import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
+import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.ForgeEventHandler;

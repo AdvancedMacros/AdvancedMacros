@@ -3,10 +3,10 @@ package com.theincgi.advancedMacros;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import org.luaj.vm2.Globals;
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.jse.JsePlatform;
+import org.luaj.vm2_v3_0_1.Globals;
+import org.luaj.vm2_v3_0_1.LuaTable;
+import org.luaj.vm2_v3_0_1.LuaValue;
+import org.luaj.vm2_v3_0_1.lib.jse.JsePlatform;
 import org.lwjgl.input.Keyboard;
 
 import com.theincgi.advancedMacros.ForgeEventHandler.EventName;
@@ -71,7 +71,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "3.8.1"; //${version} ??
+	public static final String VERSION = "3.8.2"; //${version} ??
 	public static final File macrosRootFolder = new File(Minecraft.getMinecraft().mcDataDir,"mods/advancedMacros");
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");

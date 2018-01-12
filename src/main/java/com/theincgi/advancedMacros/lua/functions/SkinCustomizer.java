@@ -1,8 +1,8 @@
 package com.theincgi.advancedMacros.lua.functions;
 
-import org.luaj.vm2.LuaError;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.TwoArgFunction;
+import org.luaj.vm2_v3_0_1.LuaError;
+import org.luaj.vm2_v3_0_1.LuaValue;
+import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;

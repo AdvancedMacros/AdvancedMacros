@@ -1,12 +1,12 @@
 package com.theincgi.advancedMacros.hud.hud3D;
 
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.Varargs;
-import org.luaj.vm2.lib.OneArgFunction;
-import org.luaj.vm2.lib.ThreeArgFunction;
-import org.luaj.vm2.lib.VarArgFunction;
-import org.luaj.vm2.lib.ZeroArgFunction;
+import org.luaj.vm2_v3_0_1.LuaTable;
+import org.luaj.vm2_v3_0_1.LuaValue;
+import org.luaj.vm2_v3_0_1.Varargs;
+import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
+import org.luaj.vm2_v3_0_1.lib.ThreeArgFunction;
+import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
+import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.hud.hud3D.HoloBlock.DrawType;

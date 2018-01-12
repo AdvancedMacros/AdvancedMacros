@@ -11,7 +11,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 
-version = "3.8.1"
+version = "3.8.2"
 group = "com.theincgi.advancedMacros" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "advancedmacros"
 
@@ -54,7 +54,9 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    compile files("lib/luaj-jse-3.0.1.jar")
+    
+    //compile files("lib/luaj-jse-3.0.1.jar")
+    
 }
 
 processResources {

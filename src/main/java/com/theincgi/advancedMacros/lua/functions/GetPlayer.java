@@ -1,8 +1,8 @@
 package com.theincgi.advancedMacros.lua.functions;
 
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.OneArgFunction;
+import org.luaj.vm2_v3_0_1.LuaTable;
+import org.luaj.vm2_v3_0_1.LuaValue;
+import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 
 import com.theincgi.advancedMacros.misc.Utils;
 

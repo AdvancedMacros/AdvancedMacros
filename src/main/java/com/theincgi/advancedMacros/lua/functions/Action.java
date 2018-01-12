@@ -3,14 +3,14 @@ package com.theincgi.advancedMacros.lua.functions;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.luaj.vm2.LuaError;
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.Varargs;
-import org.luaj.vm2.lib.OneArgFunction;
-import org.luaj.vm2.lib.TwoArgFunction;
-import org.luaj.vm2.lib.VarArgFunction;
-import org.luaj.vm2.lib.ZeroArgFunction;
+import org.luaj.vm2_v3_0_1.LuaError;
+import org.luaj.vm2_v3_0_1.LuaTable;
+import org.luaj.vm2_v3_0_1.LuaValue;
+import org.luaj.vm2_v3_0_1.Varargs;
+import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
+import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
+import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
+import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import org.lwjgl.input.Keyboard;
 
 import com.theincgi.advancedMacros.AdvancedMacros;

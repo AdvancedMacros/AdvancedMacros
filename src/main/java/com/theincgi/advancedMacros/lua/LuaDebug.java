@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.luaj.vm2.LuaError;
-import org.luaj.vm2.LuaFunction;
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.Varargs;
-import org.luaj.vm2.lib.DebugLib;
-import org.luaj.vm2.lib.ZeroArgFunction;
+import org.luaj.vm2_v3_0_1.LuaError;
+import org.luaj.vm2_v3_0_1.LuaFunction;
+import org.luaj.vm2_v3_0_1.LuaTable;
+import org.luaj.vm2_v3_0_1.LuaValue;
+import org.luaj.vm2_v3_0_1.Varargs;
+import org.luaj.vm2_v3_0_1.lib.DebugLib;
+import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.misc.Utils;

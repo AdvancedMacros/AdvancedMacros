@@ -2,7 +2,7 @@ package com.theincgi.advancedMacros.gui;
 
 import java.util.HashMap;
 
-import org.luaj.vm2.LuaValue;
+import org.luaj.vm2_v3_0_1.LuaValue;
 
 import com.theincgi.advancedMacros.gui.elements.Drawable;
 import com.theincgi.advancedMacros.gui.elements.GuiButton;

@@ -13,8 +13,8 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
+import org.luaj.vm2_v3_0_1.LuaTable;
+import org.luaj.vm2_v3_0_1.LuaValue;
 import org.lwjgl.input.Keyboard;
 
 import com.theincgi.advancedMacros.AdvancedMacros;

@@ -3,8 +3,8 @@ package com.theincgi.advancedMacros.gui.elements;
 import java.io.File;
 import java.util.LinkedList;
 
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
+import org.luaj.vm2_v3_0_1.LuaTable;
+import org.luaj.vm2_v3_0_1.LuaValue;
 import org.lwjgl.input.Keyboard;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
@@ -205,7 +205,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 	}
 	@Override
 	public int getItemHeight() {
-		return 12;
+		return 24;
 	}
 	@Override
 	public int getItemWidth() {
@@ -310,10 +310,11 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 
 	@Override
 	public void setWidth(int i) {
+		int fullWid = i;
 		i -= removeButton.getWid() + enableButton.getWid() + modeButton.getWid() + editButton.getWid() + moveButton.getWid();
 		eventSelector.setWidth(i/2);
 		i/=2;
-		scriptSelector.setWidth(i);
+		scriptSelector.setWidth(fullWid);
 		//System.out.println("Resized to "+i);
 		sWid = i;
 		updatePos(x, y);
@@ -330,8 +331,9 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		enableButton.setPos(uw+=removeButton.getWid(), y);
 		modeButton.setPos(  uw+=enableButton.getWid(), y);
 		eventSelector.setPos(uw+=modeButton.getWid(), y);
-		scriptSelector.setPos(uw+=eventSelector.getItemWidth(), y);
-		editButton.setPos(uw+=scriptSelector.getItemWidth(), y);
+		scriptSelector.setPos(x, y+12);
+		uw=scriptSelector.getItemWidth()-editButton.getWid()-moveButton.getWid()+5;
+		editButton.setPos(uw, y);
 		moveButton.setPos(uw+=editButton.getWid(), y);
 	}
 	@Override

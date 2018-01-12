@@ -3,9 +3,9 @@ package com.theincgi.advancedMacros.lua.functions;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.luaj.vm2.LuaError;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.OneArgFunction;
+import org.luaj.vm2_v3_0_1.LuaError;
+import org.luaj.vm2_v3_0_1.LuaValue;
+import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.lwjgl.input.Keyboard;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
