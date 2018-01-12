@@ -11,6 +11,7 @@ import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.elements.ColorTextArea;
+import com.theincgi.advancedMacros.gui.elements.Drawable;
 import com.theincgi.advancedMacros.gui.elements.GuiButton;
 import com.theincgi.advancedMacros.gui.elements.GuiRect;
 import com.theincgi.advancedMacros.gui.elements.ListManager;
@@ -45,8 +46,9 @@ public class ScriptBrowser2 extends Gui{
 	private File activePath=AdvancedMacros.macrosFolder;
 
 	public ScriptBrowser2() {
-		int defWid = 17;
-		int defHei = 17;
+		super();
+		int defWid = 12;
+		int defHei = 12;
 		returnButton = new GuiButton(new WidgetID(600), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitereturn.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.WHITE);
 		backButton = new GuiButton(new WidgetID(601), 5, 5, defWid, defHei, Settings.getTextureID("resource:whiteback.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.WHITE);
 		forwardButton = new GuiButton(new WidgetID(602), 5, 5, defWid, defHei, Settings.getTextureID("resource:whiteforward.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.WHITE);
@@ -59,6 +61,10 @@ public class ScriptBrowser2 extends Gui{
 		popupPrompt = new PopupPrompt(new WidgetID(404), width/3, 36, width/3, height/3,this);
 
 		filePreview = new ColorTextArea(new WidgetID(300), this);
+		filePreview.setEditable(false);
+		filePreview.setFocused(true);
+		
+		listManager = new ListManager(5, 5, 5, 5, new WidgetID(607), "scriptBrowser.list");
 
 		drawables.add(returnButton);
 		drawables.add(backButton);
@@ -79,7 +85,9 @@ public class ScriptBrowser2 extends Gui{
 		inputSubscribers.add(listManager);
 		inputSubscribers.add(filePreview);
 		//no popupPrompt, it gives itself the firstListener prop
-
+		
+		setWorldAndResolution(Minecraft.getMinecraft(), width, height);
+		
 		popupPrompt.setOnAns(()->{
 			Answer answer = popupPrompt.checkAns();
 			switch (promptType) {
@@ -126,6 +134,8 @@ public class ScriptBrowser2 extends Gui{
 				System.err.println("Unknown enum ("+promptType+") in com.theincgi.gui2.ScriptBrowser2#ScriptBrowser2");;
 			}
 		});
+		
+		populateList(AdvancedMacros.macrosFolder);
 	}
 
 	private String splice(String name, int i) {
@@ -156,9 +166,8 @@ public class ScriptBrowser2 extends Gui{
 
 		listManager.setWidth(width-10);
 		listManager.setHeight((int) Math.ceil(heiAvail*2/3f));
-
-		filePreview.setWidth(width-10);
-		filePreview.setHeight((int) Math.floor(heiAvail/3f));
+		
+		filePreview.resize(width-10, (int) Math.floor(heiAvail/3f));
 
 		//update positions
 
@@ -176,7 +185,7 @@ public class ScriptBrowser2 extends Gui{
 	public void populateList(File folder) {
 		if(folder.isDirectory()) {
 			File[] files = folder.listFiles();
-			int needed = (int)Math.ceil(files.length/3f);
+			int needed = (files.length+2)/FileRow.SIZE;
 			int has = listManager.getItems().size();
 
 			for(int i = 0; i < has-needed; i++) {//has more than needs
@@ -187,15 +196,15 @@ public class ScriptBrowser2 extends Gui{
 			}
 
 			for (int i = 0; i < files.length; i+=FileRow.SIZE) {
-				((FileRow)listManager.getItem(i)).populate(files, i);
+				((FileRow)listManager.getItem(i/FileRow.SIZE)).populate(files, i);
 			}
 		}
 	}
 
-	public class FileRow implements Moveable{
+	public class FileRow implements Moveable, Drawable, InputSubscriber{
 		final static int SIZE = 3;
 		final static int bufferSize = 5;
-		int elementWidth = 0;
+		float elementWidth = 0;
 		int x,y;
 		FileElement[] fileElements = new FileElement[SIZE];
 		public FileRow() {
@@ -216,13 +225,16 @@ public class ScriptBrowser2 extends Gui{
 			this.x = x;
 			this.y = y;
 			for (int i = 0; i < fileElements.length; i++) {
-				fileElements[i].button.setPos(x + (elementWidth+bufferSize)*i, y); 
+				if(i==0)
+					fileElements[i].button.setPos(x, y);
+				else
+					fileElements[i].button.setPos((int) (x + Math.floor(elementWidth+bufferSize)*i), y);
 			}
 		}
 		@Override
 		public void setVisible(boolean b) {
 			for (int i = 0; i < fileElements.length; i++) {
-				fileElements[i].button.setVisible(b);
+				fileElements[i].setVisible(b);
 			}
 		}
 		@Override
@@ -237,6 +249,7 @@ public class ScriptBrowser2 extends Gui{
 		public void setWidth(int i) {
 			int spacing = bufferSize*(fileElements.length-1);
 			float indiv = i/((float)fileElements.length);
+			elementWidth = indiv;
 			for (int j = 0; j < fileElements.length; j++) {
 				fileElements[j].button.setWidth((int) (j==0?Math.ceil(indiv):Math.floor(indiv)));
 			}
@@ -256,6 +269,52 @@ public class ScriptBrowser2 extends Gui{
 		public int getY() {
 			return y;
 		}
+		@Override
+		public void onDraw(Gui g, int mouseX, int mouseY, float partialTicks) {
+			for (int i = 0; i < fileElements.length; i++) {
+				fileElements[i].button.onDraw(g, mouseX, mouseY, partialTicks);
+			}
+		}
+		@Override
+		public boolean onScroll(Gui gui, int i) {
+			return false;
+		}
+		@Override
+		public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
+			for (int i = 0; i < fileElements.length; i++) {
+				if(fileElements[i].button.onMouseClick(gui, x, y, buttonNum))
+					return true;
+			};
+			return false;
+		}
+		@Override
+		public boolean onMouseRelease(Gui gui, int x, int y, int state) {
+			for (int i = 0; i < fileElements.length; i++) {
+				if(fileElements[i].button.onMouseRelease(gui, x, y, state))
+					return true;
+			};
+			return false;
+		}
+		@Override
+		public boolean onMouseClickMove(Gui gui, int x, int y, int buttonNum, long timeSinceClick) {
+			for (int i = 0; i < fileElements.length; i++) {
+				if(fileElements[i].button.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))
+					return true;
+			};
+			return false;
+		}
+		@Override
+		public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
+			return false;
+		}
+		@Override
+		public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
+			return false;
+		}
+		@Override
+		public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
+			return false;
+		}
 	}
 
 	public class FileElement {
@@ -267,14 +326,14 @@ public class ScriptBrowser2 extends Gui{
 		File filePath;
 		GuiButton button;
 		public FileElement() {
-			button = new GuiButton(widgetID, 5, 5, 17, 17, LuaValue.NIL, LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.WHITE);
+			button = new GuiButton(widgetID, 5, 5, 12, 12, LuaValue.NIL, LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.WHITE);
 			button.setOnClick((int mouseButton, GuiButton b)->{
 				if(mouseButton == OnClickHandler.LMB) {
-					if(ScriptBrowser2.this.selectedFile.equals(filePath)) {
+					if(ScriptBrowser2.this.selectedFile!=null && ScriptBrowser2.this.selectedFile.equals(filePath)) {
 						//TODO open file in browser
 					}else {
 						ScriptBrowser2.this.selectedFile = filePath;
-						//TODO show preview
+						filePreview.openScript(selectedFile.toString());  //FIXME Still not right, also prompt size
 					}
 				}else if(mouseButton == OnClickHandler.RMB) {
 					if(ScriptBrowser2.this.promptType==null) {
@@ -298,6 +357,10 @@ public class ScriptBrowser2 extends Gui{
 				button.setTextColor(Utils.parseColor(fileColorProp.getPropValue()));
 			}
 			button.setText(f.getName());
+		}
+		
+		public void setVisible(boolean b) {
+			button.setVisible(b && filePath!=null);
 		}
 
 		public GuiButton getButton() {

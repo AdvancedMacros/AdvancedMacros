@@ -16,6 +16,7 @@ import com.theincgi.advancedMacros.gui.InputGUI;
 import com.theincgi.advancedMacros.gui.MacroMenuGui;
 import com.theincgi.advancedMacros.gui.RunningScriptsGui;
 import com.theincgi.advancedMacros.gui.ScriptBrowser;
+import com.theincgi.advancedMacros.gui2.ScriptBrowser2;
 import com.theincgi.advancedMacros.hud.hud3D.HoloBlock.DrawType;
 import com.theincgi.advancedMacros.hud.hud3D.HudText;
 import com.theincgi.advancedMacros.lua.DocumentationManager;
@@ -80,6 +81,7 @@ public class AdvancedMacros {
 	public static MacroMenuGui macroMenuGui;
 	public static EditorGUI editorGUI;
 	public static ScriptBrowser scriptBrowser;
+	public static ScriptBrowser2 scriptBrowser2;
 	public static RunningScriptsGui runningScriptsGui;
 	public static Gui lastGui;
 	public static Gui prevGui;
@@ -115,6 +117,7 @@ public class AdvancedMacros {
 		macroMenuGui = new MacroMenuGui();
 		editorGUI = new EditorGUI();
 		scriptBrowser = new ScriptBrowser();
+		scriptBrowser2 = new ScriptBrowser2();
 		inputGUI = new InputGUI(debug);
 		runningScriptsGui = new RunningScriptsGui(debug);
 		Settings.getProfileList();//generate DEFAULT 
