@@ -63,7 +63,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		modeButton   = new GuiButton(wID, x, y, 12, 12, LuaValue.NIL, LuaValue.NIL, "colors.binding", Color.BLACK, Color.WHITE, Color.WHITE);
 		moveButton   = new GuiButton(wID, x, y, 12, 12, LuaValue.NIL, LuaValue.NIL, "colors.binding", Color.BLACK, Color.WHITE, Color.WHITE);
 
-		removeButton.setEnabled(ColorTextArea.isCTRLDown());
+		removeButton.setEnabled(true);
 
 		removeButton.changeTexture(Utils.checkTexture(trashTexture));
 		editButton.changeTexture(Utils.checkTexture(editTexture));
@@ -276,11 +276,11 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 			eventSelector.dispText = Keyboard.getKeyName(keyCode);
 			return true;
 		}
-		if(ColorTextArea.isCTRLDown()){
-			removeButton.setEnabled(true);
-		}else{
-			removeButton.setEnabled(false);
-		}
+//		if(ColorTextArea.isCTRLDown()){
+//			removeButton.setEnabled(true);
+//		}else{
+//			removeButton.setEnabled(false);
+//		}
 		return false;
 	}
 	
@@ -316,7 +316,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		i/=2;
 		scriptSelector.setWidth(fullWid);
 		//System.out.println("Resized to "+i);
-		sWid = i;
+		sWid = i;  //TODO this is the reason it makes grab'd bindings look tiny, keeping it though
 		updatePos(x, y);
 	}
 	@Override

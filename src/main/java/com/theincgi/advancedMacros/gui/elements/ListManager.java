@@ -320,6 +320,11 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 			items.remove(obj);
 		}
 	}
+	public void remove(int index) {
+		synchronized(this){
+			items.remove(index);
+		}
+	}
 
 	public void setSpacing(int i) {
 		spacing = i;

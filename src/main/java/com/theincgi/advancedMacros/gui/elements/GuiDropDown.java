@@ -313,8 +313,9 @@ public class GuiDropDown implements Drawable, InputSubscriber, Moveable{
 		listManager.scrollBar.setScrollMagnifier(i);
 	}
 
-
-
+	
+	//TODO select by int
+	
 	public void select(String string) {
 		for(int i = 0; i<listManager.getItems().size(); i++){
 			if(getText(i).equals(string)){

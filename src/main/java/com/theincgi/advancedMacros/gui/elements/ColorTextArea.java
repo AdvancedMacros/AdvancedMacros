@@ -64,6 +64,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 
 	Property bgColor, frameColor, defaultTextColor, keywordColor, commentColor, variableColor,tableColor,
 	stringBoxFill, stringBoxFrame, functionColor, selectionFillColor, selectionFrameColor;
+	Property tabCount;
 	Property cursorOnColor/*,cursorOffColor*/;
 	final int charWid = 7;
 	final int charHei = 12;
@@ -98,7 +99,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 		selectionFrameColor=new Property(propAddress+"selectionFrame",     new Color(       0, 132,  79).toLuaValue(), "selectionColor" , 	wID);
 		selectionFillColor=new Property(propAddress+"selectionFill",       new Color(      57, 206, 146).toLuaValue(), "selectionFrame", 	wID);
 		//cursorOffColor   = new Property(propAddress+"cursorOff", 	 new Color(     178, 208, 232).toLuaValue(), "cursorOff", 		wID);
-
+		tabCount         = new Property(propAddress+"tabCount", LuaValue.valueOf(2), "tabCount", wID);
 		this.g= g;
 
 		hBar = new GuiScrollBar(wID, 0, 0, 0, 0, Orientation.LEFTRIGHT, "colors.cta.scrollbar");
@@ -889,8 +890,8 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 			break;
 		case Keyboard.KEY_TAB:
 			if(!isEditable){return false;}
-			onKeyPressed(gui, ' ', Keyboard.KEY_SPACE);
-			onKeyPressed(gui, ' ', Keyboard.KEY_SPACE);
+			for(int i = 0; i<tabCount.getPropValue().checkint(); i++)
+				onKeyPressed(gui, ' ', Keyboard.KEY_SPACE);
 			setNeedsSaveFlag(true);
 			break;
 		case Keyboard.KEY_APPS:

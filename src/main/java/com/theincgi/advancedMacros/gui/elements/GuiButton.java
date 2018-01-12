@@ -146,7 +146,12 @@ public class GuiButton extends GuiRect implements InputSubscriber, Focusable{
 //		GlStateManager.popAttrib();
 	}
 	
-	
+	public void setTextColor(Color textColor) {
+		this.textColor = textColor;
+	}
+	public Color getTextColor() {
+		return textColor;
+	}
 	
 	private boolean wasInBox = false;
 	@Override

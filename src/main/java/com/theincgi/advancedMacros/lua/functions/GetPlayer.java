@@ -39,6 +39,11 @@ public class GetPlayer extends OneArgFunction {
 			pos.set(3, LuaValue.valueOf(player.posZ));
 			t.set("pos", pos);
 		}
+		t.set("mainHand", Utils.itemStackToLuatable(player.getHeldItemMainhand()));
+		t.set("offHand", Utils.itemStackToLuatable(player.getHeldItemMainhand()));
+		if(player instanceof EntityPlayerSP)
+			t.set("invSlot", ((EntityPlayerSP)player).inventory.currentItem+1);
+		
 		t.set("dimension", LuaValue.valueOf(player.dimension));
 		t.set("pitch", player.rotationPitch);
 		t.set("yaw", player.rotationYawHead);

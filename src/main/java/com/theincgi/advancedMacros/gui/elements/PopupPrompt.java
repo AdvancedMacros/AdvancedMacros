@@ -20,6 +20,9 @@ public class PopupPrompt implements InputSubscriber, Drawable{
 	private int okFill = new Color(166, 226, 158).toInt();
 	private int okFrame = new Color(226, 163, 158).toInt();
 	private int textColor = Color.WHITE.toInt();
+	
+	private GuiDropDown choicePicker;
+	
 	private WidgetID wID;
 	private Gui gui;
 	public PopupPrompt(WidgetID wID, int x, int y, int width, int height, final Gui gui) {
@@ -29,8 +32,11 @@ public class PopupPrompt implements InputSubscriber, Drawable{
 		this.y = y;
 		this.width = width;
 		this.height = height;
-		ok = new GuiButton(wID, x, y+height*2/3, width/2, 12, LuaValue.NIL, LuaValue.NIL, "colors.popup", Color.BLACK, Color.WHITE, Color.WHITE);
-		cancel = new GuiButton(wID, x+width/2, y+height*2/3, width/2, 12, LuaValue.NIL, LuaValue.NIL, "colors.popup", Color.BLACK, Color.WHITE, Color.WHITE);
+		ok = new GuiButton(wID, x, y+height*2/3, width/2, 12, LuaValue.NIL, LuaValue.NIL, "colors.popup.ok", Color.BLACK, Color.WHITE, Color.WHITE);
+		cancel = new GuiButton(wID, x+width/2, y+height*2/3, width/2, 12, LuaValue.NIL, LuaValue.NIL, "colors.popup.cancel", Color.BLACK, Color.WHITE, Color.WHITE);
+		
+		choicePicker = new GuiDropDown(wID, x+1, ok.getY()-12, width-2, 12, gui.height-15-(ok.getY()-12), "colors.popup.dropdown");
+		
 		ok.setText("Ok");
 		cancel.setText("Cancel");
 		inputBox = new GuiTextField(0, gui.getFontRend(), x+1, ok.getY()-12, width-2, 12);
@@ -60,6 +66,7 @@ public class PopupPrompt implements InputSubscriber, Drawable{
 				}
 			}
 		});
+		
 	}
 	
 	private Runnable onAns;
@@ -101,6 +108,7 @@ public class PopupPrompt implements InputSubscriber, Drawable{
 		gui.firstSubsciber = this;
 		inputBox.setVisible(true);
 		cancel.setVisible(true);
+		choicePicker.setVisible(false);
 	}
 	public void promptError(String string) {
 			this.msg = string;
@@ -114,6 +122,7 @@ public class PopupPrompt implements InputSubscriber, Drawable{
 			gui.firstSubsciber = this;
 			inputBox.setVisible(false);
 			cancel.setVisible(false);
+			choicePicker.setVisible(false);
 	}
 	public void promptConfirm(String string) {
 		this.msg = string;
@@ -127,7 +136,27 @@ public class PopupPrompt implements InputSubscriber, Drawable{
 		gui.firstSubsciber = this;
 		inputBox.setVisible(false);
 		cancel.setVisible(true);
-}
+		choicePicker.setVisible(false);
+	}
+	public void promptChoice(String msg, String... options) {
+		this.msg = msg;
+		isVisible = true;
+		ans = null;
+		inputBox.setText("");
+		inputBox.setCursorPosition(0);
+		inputBox.setFocused(false);
+		gui.drawLast = this;
+		//gui.nextKeyListen=null;
+		gui.firstSubsciber = this;
+		inputBox.setVisible(false);
+		cancel.setVisible(true);
+		choicePicker.setVisible(true);
+		choicePicker.clear(false);
+		for(String c : options)
+			choicePicker.addOption(c);
+		choicePicker.select(options[0]); //TODO Select by int
+	}
+	
 	@Override
 	public void onDraw(Gui gui, int mouseX, int mouseY, float partialTicks){
 		if(isVisible){
