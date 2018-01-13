@@ -220,9 +220,15 @@ public class PopupPrompt2 extends Gui{
 			textField.textboxKeyTyped(typedChar, keyCode);
 	}
 
-	public class Result{
+	public static class Result{
 		String result;
 		boolean canceled = false;
+		public String getResult() {
+			return result;
+		}
+		public boolean isCanceled() {
+			return canceled;
+		}
 	}
 	private static enum Type{
 		Notification,

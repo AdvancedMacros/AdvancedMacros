@@ -14,6 +14,9 @@ import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
 import com.theincgi.advancedMacros.gui.MacroMenuGui;
+import com.theincgi.advancedMacros.gui2.PopupPrompt2;
+import com.theincgi.advancedMacros.gui2.PopupPrompt2.Result;
+import com.theincgi.advancedMacros.gui2.PopupPrompt2.ResultHandler;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -42,7 +45,9 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 	private Gui gui;
 	
 	GuiButton enableButton, modeButton, editButton, moveButton, removeButton;
-	GuiDropDown eventSelector, scriptSelector;
+	GuiDropDown eventSelector/*, scriptSelector*/;
+	String script;
+	GuiButton pickScript;
 	
 	private boolean isVisible = false;
 	private boolean enable = true;
@@ -76,10 +81,12 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		int remaining = guiWid - 12*7;
 		eventSelector = new GuiDropDown(wID, x, y, remaining/3, 12, 12*5, "colors.binding.event");
 		remaining/=2;
-		scriptSelector = new GuiDropDown(wID, x, y, remaining, 12, 12*5, "colors.binding.script");
+//		scriptSelector = new GuiDropDown(wID, x, y, remaining, 12, 12*5, "colors.binding.script");
+		pickScript     = new GuiButton(new WidgetID(77), x, y, 12, 12, Settings.getTextureID("resource:whitedowntri.png"), LuaValue.NIL, "colors.binding", Color.BLACK, Color.WHITE, Color.WHITE);
+		
 		
 		eventSelector.setScrollSpeed(6);
-		scriptSelector.setScrollSpeed(6);
+		//scriptSelector.setScrollSpeed(6);
 		
 		setWidth(sWid);
 		setPos(x, y);
@@ -97,7 +104,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 					updateEnableButton();
 				}else if(sButton.equals(editButton)){
 					AdvancedMacros.editorGUI.updateKeywords();
-					AdvancedMacros.editorGUI.openScript(scriptSelector.dispText);
+					AdvancedMacros.editorGUI.openScript(script);
 					ForgeEventHandler.showMenu(AdvancedMacros.editorGUI, AdvancedMacros.macroMenuGui);
 				}else if(sButton.equals(moveButton)){
 					container.grab(GuiBinding.this);
@@ -119,7 +126,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		eventSelector.setOnOpen(new OnClickHandler() {
 			@Override
 			public void onClick(int button, GuiButton sButton) {
-				if(scriptSelector.isOpen()){return;}
+				//if(scriptSelector.isOpen()){return;}
 				if(eventMode.isKeyType()){
 					if(gui.nextKeyListen==null){
 						eventSelector.dispText = "-Press Key-";
@@ -141,24 +148,38 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 				}
 			}
 		});
-		scriptSelector.setOnOpen(new OnClickHandler() {
-			@Override
-			public void onClick(int button, GuiButton sButton) {
-				if(eventSelector.isOpen()){return;}
-				if(scriptSelector.isOpen()){
-					scriptSelector.close();
-				}else{
-					scripts.clear();
-					for(File f : AdvancedMacros.getScriptList()){
-						GuiBinding.addScriptName(f.getName());
-					}
-					scriptSelector.clear(true);
-					for (String string : scripts) {
-						scriptSelector.addOption(string);
-					}
-					scriptSelector.open();
-				}
-			}
+//		scriptSelector.setOnOpen(new OnClickHandler() {
+//			@Override
+//			public void onClick(int button, GuiButton sButton) {
+//				if(eventSelector.isOpen()){return;}
+////				if(scriptSelector.isOpen()){
+////					scriptSelector.close();
+////				}else{
+////					scripts.clear();
+////					for(File f : AdvancedMacros.getScriptList()){
+////						GuiBinding.addScriptName(f.getName());
+////					}
+////					scriptSelector.clear(true);
+////					for (String string : scripts) {
+////						scriptSelector.addOption(string);
+////					}
+////					scriptSelector.open();
+////				}
+//				AdvancedMacros.scriptBrowser2.getSelection(GuiBinding.this.gui, (result)->{
+//					if(result.isCanceled()) return true;
+//					scriptSelector.set
+//				});
+//			}
+//		});
+		pickScript.setOnClick((int mb, GuiButton button)->{
+			AdvancedMacros.scriptBrowser2.setActivePath(scriptHome(script));
+			AdvancedMacros.scriptBrowser2.setSelectedFile(script);
+			AdvancedMacros.scriptBrowser2.getSelection(AdvancedMacros.macroMenuGui, new ResultHandler() {
+				@Override public boolean onResult(Result r) {
+					if(r.isCanceled()) return true;
+					script = r.getResult();
+					return true;
+			}});
 		});
 		updateEnableButton();
 		updateModeButton();
@@ -167,6 +188,17 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		//get values for ddb's
 		//get enable/disable
 		//get mode
+	}
+
+	/**
+	 * "folder/macro.lua" - > [mods]/advancedMacros/macros/folder
+	 * */
+	private File scriptHome(String script2) {
+		if(script2==null)return AdvancedMacros.macrosFolder;
+		if(script2.contains("/")) {
+			return new File(AdvancedMacros.macrosFolder, script.substring(0, script2.lastIndexOf('/')));
+		}
+		return AdvancedMacros.macrosFolder;
 	}
 
 	private void updateEnableButton() {
@@ -200,7 +232,8 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		moveButton.setVisible(b);
 		editButton.setVisible(b);
 		eventSelector.setVisible(b);
-		scriptSelector.setVisible(b);
+		//scriptSelector.setVisible(b);
+		pickScript.setVisible(b);
 		isVisible = b;
 	}
 	@Override
@@ -213,7 +246,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 	}
 	@Override
 	public boolean onScroll(Gui gui, int i) {
-		if(scriptSelector.onScroll(gui, i))return true;
+		//if(scriptSelector.onScroll(gui, i))return true;
 		if(eventSelector.onScroll(gui, i))return true;
 		return false;
 	}
@@ -238,12 +271,13 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		}
 		
 		if(eventSelector.isOpen() && !eventSelector.isInBounds(x, y)){eventSelector.close(); return true;}
-		if(scriptSelector.isOpen() && !scriptSelector.isInBounds(x, y)){scriptSelector.close(); return true;}
+		//if(scriptSelector.isOpen() && !scriptSelector.isInBounds(x, y)){scriptSelector.close(); return true;}
+		if(pickScript       .onMouseClick(gui, x, y, buttonNum))return true;
 		if(removeButton		.onMouseClick(gui, x, y, buttonNum))return true;
 		if(enableButton		.onMouseClick(gui, x, y, buttonNum))return true;
 		if(modeButton		.onMouseClick(gui, x, y, buttonNum))return true;
 		if(eventSelector	.onMouseClick(gui, x, y, buttonNum))return true;
-		if(scriptSelector	.onMouseClick(gui, x, y, buttonNum))return true;
+		//if(scriptSelector	.onMouseClick(gui, x, y, buttonNum))return true;
 		if(editButton		.onMouseClick(gui, x, y, buttonNum))return true;
 		if(moveButton		.onMouseClick(gui, x, y, buttonNum))return true;
 		return false;
@@ -254,7 +288,8 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		if(enableButton		.onMouseRelease(gui, x, y, state))return true;
 		if(modeButton		.onMouseRelease(gui, x, y, state))return true;
 		if(eventSelector	.onMouseRelease(gui, x, y, state))return true;
-		if(scriptSelector	.onMouseRelease(gui, x, y, state))return true;
+		//if(scriptSelector	.onMouseRelease(gui, x, y, state))return true;
+		if(pickScript		.onMouseRelease(gui, x, y, state))return true;
 		if(editButton		.onMouseRelease(gui, x, y, state))return true;
 		if(moveButton		.onMouseRelease(gui, x, y, state))return true;
 		return false;
@@ -265,7 +300,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		if(enableButton		.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))return true;
 		if(modeButton		.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))return true;
 		if(eventSelector	.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))return true;
-		if(scriptSelector	.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))return true;
+		if(pickScript		.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))return true;
 		if(editButton		.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))return true;
 		if(moveButton		.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))return true;
 		return false;
@@ -290,31 +325,45 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 	}
 	@Override
 	public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
-		if(ColorTextArea.isCTRLDown()){
-			removeButton.setEnabled(true);
-		}else{
-			removeButton.setEnabled(false);
-		}
+//		if(ColorTextArea.isCTRLDown()){
+//			removeButton.setEnabled(true);
+//		}else{
+//			removeButton.setEnabled(false);
+//		}
 		return false;
 	}
 	@Override
 	public void onDraw(Gui gui, int mouseX, int mouseY, float partialTicks) {
+		gui.drawRect(x, y, x+fullWid, y+12, Color.BLACK.toInt());
 		removeButton.onDraw(gui, mouseX, mouseY, partialTicks);
 		enableButton.onDraw(gui, mouseX, mouseY, partialTicks);
 		modeButton.onDraw(gui, mouseX, mouseY, partialTicks);
 		eventSelector.onDraw(gui, mouseX, mouseY, partialTicks);
-		scriptSelector.onDraw(gui, mouseX, mouseY, partialTicks);
+		pickScript.onDraw(gui, mouseX, mouseY, partialTicks);
 		editButton.onDraw(gui, mouseX, mouseY, partialTicks);
 		moveButton.onDraw(gui, mouseX, mouseY, partialTicks);
+		
+		gui.drawString(gui.getFontRend(), shortScriptName(script), eventSelector.getX()+eventSelector.getItemWidth()+2, eventSelector.getY()+3, Color.WHITE.toInt());//TODO customizeable color
+		gui.drawHorizontalLine(x, x+fullWid, y, Color.WHITE.toInt());
+		gui.drawHorizontalLine(x, x+fullWid, y+12, Color.WHITE.toInt());
 	}
 
+	private String shortScriptName(String script2) {
+		if(script2==null)return "";
+		if(script2.contains("/")) {
+			return script2.substring(script2.lastIndexOf('/')+1);
+		}
+		return script2;
+	}
+
+	int fullWid;
 	@Override
 	public void setWidth(int i) {
-		int fullWid = i;
+		fullWid = i;
 		i -= removeButton.getWid() + enableButton.getWid() + modeButton.getWid() + editButton.getWid() + moveButton.getWid();
 		eventSelector.setWidth(i/2);
 		i/=2;
-		scriptSelector.setWidth(eventSelector.getItemWidth());
+		//scriptSelector.setWidth(eventSelector.getItemWidth());
 		//System.out.println("Resized to "+i);
 		sWid = i;  //TODO this is the reason it makes grab'd bindings look tiny, keeping it though
 		updatePos(x, y);
@@ -331,9 +380,11 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		enableButton.setPos(uw+=removeButton.getWid(), y);
 		modeButton.setPos(  uw+=enableButton.getWid(), y);
 		eventSelector.setPos(uw+=modeButton.getWid(), y);
-		scriptSelector.setPos(uw+=eventSelector.getItemWidth(), y);
+		
+		uw = fullWid-pickScript.getItemWidth() - editButton.getItemWidth() - moveButton.getItemWidth()+5;
+		pickScript.setPos(uw, y);
 		//uw=scriptSelector.getItemWidth()-editButton.getWid()-moveButton.getWid()+5;
-		editButton.setPos(uw+=scriptSelector.getItemWidth(), y);
+		editButton.setPos(uw+=pickScript.getItemWidth(), y);
 		moveButton.setPos(uw+=editButton.getWid(), y);
 	}
 	@Override
@@ -369,7 +420,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 	
 	@Override
 	public String toString(){
-		return enable + ":" + (eventMode) + ":" + eventSelector.dispText + ":" + scriptSelector.dispText;
+		return enable + ":" + (eventMode) + ":" + eventSelector.dispText + ":" + script;
 	}
 
 	@Override
@@ -399,7 +450,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 	}
 
 	public String getScriptName() {
-		return scriptSelector.dispText;
+		return script;
 	}
 	
 	
@@ -409,7 +460,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 //			System.out.printf("Heigh will be set to %s of %s\n",height - (scriptSelector.getY()+scriptSelector.getItemHeight()), height);
 //++++++++++++++++++++		}
 		//System.out.println("2:"+(height - (scriptSelector.getY()+scriptSelector.getItemHeight())));
-		scriptSelector.setMaxHeight(height - (scriptSelector.getY()+scriptSelector.getItemHeight()));
+		//scriptSelector.setMaxHeight(height - (scriptSelector.getY()+scriptSelector.getItemHeight()));
 		eventSelector.setMaxHeight(height - (eventSelector.getY()+eventSelector.getItemHeight()));
 	};
 	
@@ -419,7 +470,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		//t.set("mode", LuaValue.valueOf(isKey?"key":"event"));
 		t.set("mode", LuaValue.valueOf(eventMode.name()));
 		t.set("event", eventSelector.dispText);
-		t.set("script", LuaValue.valueOf(scriptSelector.dispText));
+		t.set("script", LuaValue.valueOf(script==null?"":script));
 		return t;
 	}
 	
@@ -482,15 +533,15 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 	}
 
 	public void setScript(String tojstring) {
-		scriptSelector.dispText = tojstring;
+		script = tojstring;
 	}
 	
-	public void updateScripts(){
-		scriptSelector.clear(true);
-		for (String string : scripts) {
-			scriptSelector.addOption(string);
-		}
-	}
+//	public void updateScripts(){
+//		scriptSelector.clear(true);
+//		for (String string : scripts) {
+//			scriptSelector.addOption(string);
+//		}
+//	}
 //	public void updateEvents(){
 //		eventSelector.clear(true);
 //		for (String string : events) {

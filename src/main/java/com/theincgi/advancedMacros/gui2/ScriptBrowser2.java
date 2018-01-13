@@ -24,6 +24,7 @@ import com.theincgi.advancedMacros.gui.elements.PopupPrompt;
 import com.theincgi.advancedMacros.gui.elements.PopupPrompt.Answer;
 import com.theincgi.advancedMacros.gui.elements.WidgetID;
 import com.theincgi.advancedMacros.gui2.PopupPrompt2.Result;
+import com.theincgi.advancedMacros.gui2.PopupPrompt2.ResultHandler;
 import com.theincgi.advancedMacros.misc.Property;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
@@ -89,7 +90,7 @@ public class ScriptBrowser2 extends Gui{
 		drawables.add(forwardButton);
 		drawables.add(createFolderButton);
 		drawables.add(createFileButton);
-		drawables.add(searchButton);
+		//drawables.add(searchButton);
 		
 		drawables.add(listManager);
 		drawables.add(filePreview);
@@ -102,7 +103,7 @@ public class ScriptBrowser2 extends Gui{
 		inputSubscribers.add(forwardButton);
 		inputSubscribers.add(createFolderButton);
 		inputSubscribers.add(createFileButton);
-		inputSubscribers.add(searchButton);
+		//inputSubscribers.add(searchButton);
 		inputSubscribers.add(listManager);
 		inputSubscribers.add(filePreview);
 		inputSubscribers.add(pasteButton);
@@ -226,7 +227,7 @@ public class ScriptBrowser2 extends Gui{
 		populateList(AdvancedMacros.macrosFolder);
 	}
 	
-	private String getScriptPath(File filePath) {
+	public static String getScriptPath(File filePath) {
 		//System.out.println("This: ");
 		try {
 			String tmp = filePath.getCanonicalPath().substring(AdvancedMacros.macrosFolder.getCanonicalPath().length()+1); 
@@ -350,6 +351,8 @@ public class ScriptBrowser2 extends Gui{
 			for (int i = 0; i < files.length; i+=ROW_SIZE) {
 				((FileRow)listManager.getItem(i/ROW_SIZE)).populate(files, i);
 			}
+			
+			backButton.setEnabled(canGoBackMore());
 		}
 	}
 	
@@ -523,7 +526,16 @@ public class ScriptBrowser2 extends Gui{
 							forwardButton.setEnabled(false);
 						}else {
 							if(isSelectionMode()) {
-								Minecraft.getMinecraft().displayGuiScreen(requester);
+								selectionMode = false;
+								if(requester==null) {//FIXME
+									Minecraft.getMinecraft().displayGuiScreen(AdvancedMacros.macroMenuGui);
+								}else {
+									Minecraft.getMinecraft().displayGuiScreen(requester);
+								}
+								Result r = new PopupPrompt2.Result();
+								r.canceled = false;
+								r.result = ScriptBrowser2.getScriptPath(selectedFile).replace('\\', '/');
+								rh.onResult(r);
 							}else{
 								ForgeEventHandler.showMenu(AdvancedMacros.editorGUI, ScriptBrowser2.this);
 								AdvancedMacros.editorGUI.openScript(getScriptPath());
@@ -615,5 +627,27 @@ public class ScriptBrowser2 extends Gui{
 		public static String[] getActionList() {
 			return nameArray;
 		}
+	}
+	
+	private ResultHandler rh;
+	public void getSelection(Gui gui, ResultHandler rh) {
+		setSelectionMode(requester, true);
+		this.rh = rh;
+		Minecraft.getMinecraft().displayGuiScreen(this);
+	}
+
+	public void setSelectedFile(String script) {
+		if(script == null) {selectedFile=null; return;}
+		selectedFile = new File(AdvancedMacros.macrosFolder, script);
+	}
+	public File getSelectedFile() {
+		return selectedFile;
+	}
+	public void setActivePath(File activePath) {
+		this.activePath = activePath;
+		populateList(activePath);
+	}
+	public File getActivePath() {
+		return activePath;
 	}
 }

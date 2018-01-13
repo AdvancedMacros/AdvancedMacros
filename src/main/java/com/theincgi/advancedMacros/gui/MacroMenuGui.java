@@ -114,10 +114,10 @@ public class MacroMenuGui extends Gui{
 		showScriptManager.setOnClick(new OnClickHandler() {
 			@Override
 			public void onClick(int button, GuiButton sButton) {
-				if(Gui.isAltKeyDown())
+				//if(Gui.isAltKeyDown())
 					ForgeEventHandler.showMenu(AdvancedMacros.scriptBrowser2);
-				else
-					ForgeEventHandler.showMenu(AdvancedMacros.scriptBrowser);
+				//else
+				//	ForgeEventHandler.showMenu(AdvancedMacros.scriptBrowser);
 				//Minecraft.getMinecraft().displayGuiScreen(AdvancedMacros.scriptBrowser);
 			}
 		});
@@ -285,7 +285,7 @@ public class MacroMenuGui extends Gui{
 				GuiBinding g;
 				g=new GuiBinding(bindingID, 5, 5, 300, bindingsList, MacroMenuGui.this);
 				//g.updateEvents();
-				g.updateScripts();
+				//g.updateScripts();
 				g.loadFromLuaTable(t);
 				//				g.setEnabled(t.get("enabled").checkboolean());
 				//				
