@@ -215,7 +215,12 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 			return h+(hand==null?0:hand.getItemHeight());
 		}
 	}
-
+	
+	boolean modeFullBox = false;
+	public void setModeFullBox(boolean modeFullBox) {
+		this.modeFullBox = modeFullBox;
+	}
+	
 	@Override
 	public void onDraw(Gui gui, int mouseX, int mouseY, float partialTicks) {
 		if(!isVisible){return;}
@@ -224,7 +229,7 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 			
 			if(drawBG){
 				//System.out.println(("Box: HEI "+ Math.min(hei, getTotalHeight())));
-				gui.drawBoxedRectangle(x, y, wid-scrollBar.getItemWidth(), Math.min(hei, getTotalHeight()), Utils.parseColor(colorBGFrame.getPropValue()).toInt(), Utils.parseColor(colorBGFill.getPropValue()).toInt());
+				gui.drawBoxedRectangle(x, y, wid-scrollBar.getItemWidth(), modeFullBox? hei:Math.min(hei, getTotalHeight()), Utils.parseColor(colorBGFrame.getPropValue()).toInt(), Utils.parseColor(colorBGFill.getPropValue()).toInt());
 			}
 			Iterator<Moveable> moveables = items.iterator();
 			int heightUsed = 0;
@@ -268,8 +273,8 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 			}
 			if(forceFrame) {
 				gui.drawVerticalLine(getX(), getY(), getY()+getItemHeight(), Utils.parseColor(colorBGFrame.getPropValue()).toInt());
-				gui.drawHorizontalLine(getX(), getX()+getItemWidth()-scrollBar.getItemWidth(), getY(), Utils.parseColor(colorBGFrame.getPropValue()).toInt());
-				gui.drawHorizontalLine(getX(), getX()+getItemWidth()-scrollBar.getItemWidth(), getY()+getItemHeight(), Utils.parseColor(colorBGFrame.getPropValue()).toInt());
+				gui.drawHorizontalLine(getX(), getX()+getItemWidth()-scrollBar.getItemWidth()-1, getY(), Utils.parseColor(colorBGFrame.getPropValue()).toInt());
+				gui.drawHorizontalLine(getX(), getX()+getItemWidth()-scrollBar.getItemWidth()-1, getY()+getItemHeight(), Utils.parseColor(colorBGFrame.getPropValue()).toInt());
 			}
 		}
 	}

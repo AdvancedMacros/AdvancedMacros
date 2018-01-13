@@ -305,4 +305,10 @@ public class GuiRect implements Drawable, Moveable{
 	public void setHeight(int newHei) {
 		hei = newHei;
 	}
+	public Color getFrame() {
+		return frame;
+	}
+	public Color getFill() {
+		return fill;
+	}
 }

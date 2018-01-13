@@ -205,7 +205,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 	}
 	@Override
 	public int getItemHeight() {
-		return 24;
+		return 12;
 	}
 	@Override
 	public int getItemWidth() {
@@ -314,7 +314,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		i -= removeButton.getWid() + enableButton.getWid() + modeButton.getWid() + editButton.getWid() + moveButton.getWid();
 		eventSelector.setWidth(i/2);
 		i/=2;
-		scriptSelector.setWidth(fullWid);
+		scriptSelector.setWidth(eventSelector.getItemWidth());
 		//System.out.println("Resized to "+i);
 		sWid = i;  //TODO this is the reason it makes grab'd bindings look tiny, keeping it though
 		updatePos(x, y);
@@ -331,9 +331,9 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		enableButton.setPos(uw+=removeButton.getWid(), y);
 		modeButton.setPos(  uw+=enableButton.getWid(), y);
 		eventSelector.setPos(uw+=modeButton.getWid(), y);
-		scriptSelector.setPos(x, y+12);
-		uw=scriptSelector.getItemWidth()-editButton.getWid()-moveButton.getWid()+5;
-		editButton.setPos(uw, y);
+		scriptSelector.setPos(uw+=eventSelector.getItemWidth(), y);
+		//uw=scriptSelector.getItemWidth()-editButton.getWid()-moveButton.getWid()+5;
+		editButton.setPos(uw+=scriptSelector.getItemWidth(), y);
 		moveButton.setPos(uw+=editButton.getWid(), y);
 	}
 	@Override

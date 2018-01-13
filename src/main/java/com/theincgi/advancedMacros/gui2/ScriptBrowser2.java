@@ -23,21 +23,27 @@ import com.theincgi.advancedMacros.gui.elements.OnClickHandler;
 import com.theincgi.advancedMacros.gui.elements.PopupPrompt;
 import com.theincgi.advancedMacros.gui.elements.PopupPrompt.Answer;
 import com.theincgi.advancedMacros.gui.elements.WidgetID;
+import com.theincgi.advancedMacros.gui2.PopupPrompt2.Result;
 import com.theincgi.advancedMacros.misc.Property;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
+import scala.tools.util.PathResolver.MkLines;
 
 public class ScriptBrowser2 extends Gui{
 
 	GuiButton returnButton;
 	GuiButton backButton, forwardButton;
 	GuiButton createFolderButton, createFileButton;
-	GuiButton searchButton;
+	GuiButton searchButton, pasteButton;
 
 	GuiRect addressBackdrop;
-
+	
+	/**Active when picking a script, not browsing*/
+	boolean selectionMode = false;
+	
+	
 	ListManager listManager;
 	ColorTextArea filePreview;
 
@@ -48,6 +54,8 @@ public class ScriptBrowser2 extends Gui{
 
 	private File selectedFile;
 	private File activePath=AdvancedMacros.macrosFolder;
+	
+	boolean cutMode;
 
 	Stack<String> history = new Stack<>();
 	private String pathText;
@@ -62,7 +70,9 @@ public class ScriptBrowser2 extends Gui{
 		createFolderButton = new GuiButton(new WidgetID(603), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitecreatefolder.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.WHITE);
 		createFileButton = new GuiButton(new WidgetID(604), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitecreatefile.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.WHITE);
 		searchButton = new GuiButton(new WidgetID(605), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitesearch.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.WHITE);
-
+		pasteButton = new GuiButton(new WidgetID(635), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitepaste.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.WHITE);
+		
+		
 		addressBackdrop = new GuiRect(new WidgetID(606), 5, 5, defWid, defHei, "scriptBrowser.addressBackground", Color.BLACK, Color.WHITE);
 
 		//		popupPrompt = new PopupPrompt(new WidgetID(404), width/3, 36, width/3, height/3,this);
@@ -80,10 +90,12 @@ public class ScriptBrowser2 extends Gui{
 		drawables.add(createFolderButton);
 		drawables.add(createFileButton);
 		drawables.add(searchButton);
+		
 		drawables.add(listManager);
 		drawables.add(filePreview);
 		//drawables.add(popupPrompt);
 		drawables.add(addressBackdrop);
+		drawables.add(pasteButton);
 
 		inputSubscribers.add(returnButton);
 		inputSubscribers.add(backButton);
@@ -93,8 +105,11 @@ public class ScriptBrowser2 extends Gui{
 		inputSubscribers.add(searchButton);
 		inputSubscribers.add(listManager);
 		inputSubscribers.add(filePreview);
+		inputSubscribers.add(pasteButton);
 		//no popupPrompt, it gives itself the firstListener prop
-
+		
+		listManager.setModeFullBox(true);
+		
 		setWorldAndResolution(Minecraft.getMinecraft(), width, height);
 		
 		returnButton.setOnClick((int mouseButton, GuiButton b)->{
@@ -102,64 +117,84 @@ public class ScriptBrowser2 extends Gui{
 		});
 		
 		createFileButton.setOnClick((int mouseButton, GuiButton b)->{
-			promptType = PromptType.FileName;
+			promptType = PromptType.FILE_NAME;
 			popupPrompt2.prompt("File name:");
 		});
 		createFolderButton.setOnClick((int mouseButton, GuiButton b)->{
-			promptType = PromptType.FolderName;
+			promptType = PromptType.FOLDER_NAME;
 			popupPrompt2.prompt("Folder name:");
 		});
 		
 		popupPrompt2.setResultHandler((result)->{
-			if(result.canceled) return;
+			if(result.canceled || promptType == null) return true; //done
 			switch (promptType) {
 			case FileAction:{
 				switch (FileActions.valueOf(result.result)) {
+				case Cut:{
+					clipboardFile = selectedFile;
+					cutMode = true;
+					return true;
+				}
 				case Copy:{
 					clipboardFile = selectedFile;
-					break;
+					cutMode = false;
+					return true;
 				}
 				case DELETE:{
 					if(selectedFile!=null && selectedFile.exists())
 						selectedFile.delete(); 
-					break;
+					populateList(activePath);
+					return true;
 				}
-				case Paste:{
-					File temp = new File(activePath, clipboardFile.getName());
-					{
-						int i = 1;
-						while(temp.exists()) {
-							temp = new File(activePath, splice(clipboardFile.getName(), i));
-						}
-					}
-					System.out.println("Copy from "+clipboardFile.toString()+" to "+temp.toString());
-					try {
-						Files.copy(clipboardFile.toPath(), temp.toPath(), new CopyOption[]{});
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					break;
-				}
+				
 				case Rename:{
-					//TODO //BOOKMARK  another popup thing
-					break;
+					promptType = PromptType.RENAME;
+					popupPrompt2.prompt("Rename to:");
+					return false; //not done, keep it open
+				}
+				case Run:{
+					if(selectedFile.isFile())
+						AdvancedMacros.runScript(getScriptPath(selectedFile));
+					return true;
 				}
 				default:
 					break;
 				}
-				break;
+				return true;
 			}
-			case FileName:
-				break;
+			
+			case FILE_NAME:{
+				File f = new File(activePath, result.result);
+				try {
+					f.createNewFile();
+				} catch (IOException e) {
+					//TODO log to world
+					e.printStackTrace();
+				}
+				populateList(activePath);
+				return true;
+			}
+			case FOLDER_NAME:{
+				File f = new File(activePath, result.result);
+				f.mkdir();
+				populateList(activePath);
+				return true;
+			}
+			case RENAME:{
+				selectedFile.renameTo(new File(activePath, result.result));
+				populateList(activePath);
+				return true;
+			}
 			default:
-				System.err.println("Unknown enum ("+promptType+") in com.theincgi.gui2.ScriptBrowser2#ScriptBrowser2");;
+				System.err.println("Unknown enum ("+promptType+") in com.theincgi.gui2.ScriptBrowser2#ScriptBrowser2");
 			}
 			promptType = null;
+			return true;
 		});
 
 		backButton.setEnabled(false);
 		forwardButton.setEnabled(false);
-
+		
 		backButton.setOnClick((int mouseNum, GuiButton b)->{
 			if(canGoBackMore()) {
 				history.push(activePath.getName());
@@ -177,6 +212,12 @@ public class ScriptBrowser2 extends Gui{
 			}
 			forwardButton.setEnabled(!history.isEmpty());
 		});
+		pasteButton.setOnClick((int mouseNum, GuiButton b)->{
+			pasteAction();
+		});
+		searchButton.setOnClick((int mouseNum, GuiButton b)->{
+			popupPrompt2.showNotification("Sorry, this one\nisn't ready yet!");
+		});
 
 		listManager.setScrollSpeed(5);
 		listManager.setForceFrame(true);
@@ -184,7 +225,18 @@ public class ScriptBrowser2 extends Gui{
 		listManager.setDrawBG(true);
 		populateList(AdvancedMacros.macrosFolder);
 	}
-
+	
+	private String getScriptPath(File filePath) {
+		//System.out.println("This: ");
+		try {
+			String tmp = filePath.getCanonicalPath().substring(AdvancedMacros.macrosFolder.getCanonicalPath().length()+1); 
+			//System.out.println(tmp+"\n"+AdvancedMacros.macrosFolder);
+			return tmp;
+		} catch (IOException e) {
+			return filePath.toString().substring(AdvancedMacros.macrosFolder.toString().length()+1);
+		}
+	}
+	
 	private boolean canGoBackMore() {
 		try {
 			return activePath.getParentFile().getCanonicalPath().startsWith(AdvancedMacros.macrosFolder.getCanonicalPath());
@@ -192,7 +244,31 @@ public class ScriptBrowser2 extends Gui{
 			return false;
 		}
 	}
-
+	
+	private void pasteAction() {
+		if(clipboardFile==null) return;
+		File temp = new File(activePath, clipboardFile.getName());
+		{
+			int i = 1;
+			while(temp.exists()) {
+				temp = new File(activePath, splice(clipboardFile.getName(), i));
+			}
+		}
+		System.out.println("Copy from "+clipboardFile.toString()+" to "+temp.toString());
+		try {
+			if(cutMode) {
+				clipboardFile.renameTo(temp);
+			}else{
+				Files.copy(clipboardFile.toPath(), temp.toPath(), new CopyOption[]{});
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		populateList(activePath);
+	}
+	
+	
 	private String splice(String name, int i) {
 		int m = name.lastIndexOf('.');
 		String a = name.substring(0, m);
@@ -215,6 +291,7 @@ public class ScriptBrowser2 extends Gui{
 		//	forwardButton.setWidth((int) Math.floor(returnButton.getWid()/2f));
 		createFolderButton.setWidth(73);
 		createFileButton.setWidth(60);
+		pasteButton.setWidth(33);
 
 		addressBackdrop.setWidth(width-10-returnButton.getItemWidth());
 		//addressBackdrop.setHeight(12);
@@ -235,6 +312,7 @@ public class ScriptBrowser2 extends Gui{
 		forwardButton.setPos(backButton.getX()+backButton.getItemWidth(), backButton.getY());
 		createFolderButton.setPos(forwardButton.getX()+forwardButton.getItemWidth(), forwardButton.getY());
 		createFileButton.setPos(createFolderButton.getX()+createFolderButton.getItemWidth(), createFolderButton.getY());
+		pasteButton.setPos(createFileButton.getX()+createFileButton.getItemWidth(), createFileButton.getY());
 		searchButton.setPos(width - 5 - searchButton.getItemWidth(), backButton.getY());
 
 		listManager.setPos(5, backButton.getY()+backButton.getItemHeight()+5);
@@ -253,7 +331,13 @@ public class ScriptBrowser2 extends Gui{
 				pathText = pathText.substring(1);
 			}
 			File[] files = folder.listFiles();
-			int needed = (files.length+2)/FileRow.SIZE;
+			int needed = (files.length+2)/ROW_SIZE;
+			
+			if(ROW_SIZE!=columnCount.getPropValue().checkint()) {
+				ROW_SIZE=columnCount.getPropValue().checkint();
+				listManager.clear();
+			}
+			
 			int has = listManager.getItems().size();
 
 			for(int i = 0; i < has-needed; i++) {//has more than needs
@@ -263,18 +347,22 @@ public class ScriptBrowser2 extends Gui{
 				listManager.add(new FileRow());
 			}
 
-			for (int i = 0; i < files.length; i+=FileRow.SIZE) {
-				((FileRow)listManager.getItem(i/FileRow.SIZE)).populate(files, i);
+			for (int i = 0; i < files.length; i+=ROW_SIZE) {
+				((FileRow)listManager.getItem(i/ROW_SIZE)).populate(files, i);
 			}
 		}
 	}
-
+	
+	Property columnCount = new Property("scriptBrowser.columns", LuaValue.valueOf(3), "columnCount", new WidgetID(650));
+	int ROW_SIZE = columnCount.getPropValue().checkint();
+	
 	public class FileRow implements Moveable, Drawable, InputSubscriber{
-		final static int SIZE = 3;
+		//final static int SIZE = 3;
+		
 		final static int bufferSize = 5;
 		float elementWidth = 0;
 		int x,y;
-		FileElement[] fileElements = new FileElement[SIZE];
+		FileElement[] fileElements = new FileElement[ROW_SIZE];
 		public FileRow() {
 			for (int i = 0; i < fileElements.length; i++) {
 				fileElements[i] = new FileElement();
@@ -434,8 +522,13 @@ public class ScriptBrowser2 extends Gui{
 							history.clear();
 							forwardButton.setEnabled(false);
 						}else {
-							ForgeEventHandler.showMenu(AdvancedMacros.editorGUI, ScriptBrowser2.this);
-							AdvancedMacros.editorGUI.openScript(getScriptPath());
+							if(isSelectionMode()) {
+								Minecraft.getMinecraft().displayGuiScreen(requester);
+							}else{
+								ForgeEventHandler.showMenu(AdvancedMacros.editorGUI, ScriptBrowser2.this);
+								AdvancedMacros.editorGUI.openScript(getScriptPath());
+								selectedFile = null; //unselect so when you go back if you click it the file preview updates //FIXME detect return to gui
+							}
 						}
 					}else {
 						ScriptBrowser2.this.selectedFile = filePath;
@@ -443,6 +536,7 @@ public class ScriptBrowser2 extends Gui{
 						System.out.println("File selected: "+selectedFile);
 					}
 				}else if(mouseButton == OnClickHandler.RMB) {
+					ScriptBrowser2.this.selectedFile = filePath;
 					//if(ScriptBrowser2.this.promptType==null) {
 					ScriptBrowser2.this.promptType=PromptType.FileAction;
 					//ScriptBrowser2.this.popupPrompt.promptChoice("Action:", FileActions.getActionList());
@@ -492,13 +586,24 @@ public class ScriptBrowser2 extends Gui{
 		}
 	}
 
+	
+	private Gui requester;
+	public void setSelectionMode(Gui requester, boolean selectionMode) {
+		this.requester = requester;
+		this.selectionMode = selectionMode;
+	}
+	public boolean isSelectionMode() {
+		return selectionMode;
+	}
+	
 	private static enum PromptType {
 		FileAction,
-		FileName,
-		FolderName;
+		FILE_NAME,
+		FOLDER_NAME,
+		RENAME;
 	}
 	private static enum FileActions{
-		Rename,Copy,Paste,Run,DELETE;
+		Rename,Cut,Copy,Run,DELETE;
 		private static String[] nameArray;
 		static {
 			nameArray = new String[FileActions.values().length];

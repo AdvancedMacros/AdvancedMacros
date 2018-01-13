@@ -2,8 +2,10 @@ package com.theincgi.advancedMacros;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 
 import org.luaj.vm2_v3_0_1.Globals;
+import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.jse.JsePlatform;
@@ -226,7 +228,25 @@ public class AdvancedMacros {
 	public static DocumentationManager getDocumentationManager() {
 		return documentationManager;
 	}
-
-
+	
+	
+	/**Run any script with a generic 'manual' argument, used in scriptBrowser 2*/
+	public static void runScript(String scriptName) {
+		File f = new File(AdvancedMacros.macrosFolder, scriptName);
+		LuaTable args = new LuaTable();
+		args.set(1, "manual");
+		try {
+			FileReader fr = new FileReader(f);
+			LuaValue function = AdvancedMacros.globals.load(fr, scriptName);
+			LuaDebug.LuaThread t = new LuaDebug.LuaThread(function, args, scriptName);
+			t.start();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}catch (LuaError le){
+			//TODO allow for option to not log error to chat
+			le.printStackTrace();
+			AdvancedMacros.logFunc.call(LuaValue.valueOf("&c"+le.toString()));
+		}
+	}
 	
 }

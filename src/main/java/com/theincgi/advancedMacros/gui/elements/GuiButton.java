@@ -72,7 +72,8 @@ public class GuiButton extends GuiRect implements InputSubscriber, Focusable{
 	}
 	
 	public GuiButton setImg(String img){
-		texture.deleteTex();
+		if(texture!=null)
+			texture.deleteTex();
 		if(img!=null){
 			LuaValue v = Settings.getTextureID(img);
 			if(v instanceof LuaValTexture){
