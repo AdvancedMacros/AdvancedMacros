@@ -30,6 +30,7 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	public InputSubscriber firstSubsciber;
 
 	private int repeatMod = 0;
+	private boolean drawDefaultBackground = true;
 
 	@Override
 	public void drawHorizontalLine(int startX, int endX, int y, int color) {
@@ -88,8 +89,8 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	}
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-
-		drawDefaultBackground();
+		if(drawDefaultBackground)
+			drawDefaultBackground();
 
 		int i = Mouse.getDWheel();
 		mouseScroll((int) Math.signum(i));
@@ -276,5 +277,12 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	}
 	public int getUnscaledWindowHeight(){
 		return Minecraft.getMinecraft().displayHeight;
+	}
+	
+	public void setDrawDefaultBackground(boolean drawDefaultBackground) {
+		this.drawDefaultBackground = drawDefaultBackground;
+	}
+	public boolean getDrawDefaultBackground() {
+		return drawDefaultBackground;
 	}
 }

@@ -143,6 +143,7 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 	}
 
 	private int hoverslot = 0;
+	private boolean forceFrame = false;
 	private int getHoverSlot(int y) {
 		return hoverslot;
 	}
@@ -220,6 +221,7 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 		if(!isVisible){return;}
 		synchronized(this){
 			//System.out.println(String.format("Items: %s, Hei is %s for drawing", items.size(), hei));
+			
 			if(drawBG){
 				//System.out.println(("Box: HEI "+ Math.min(hei, getTotalHeight())));
 				gui.drawBoxedRectangle(x, y, wid-scrollBar.getItemWidth(), Math.min(hei, getTotalHeight()), Utils.parseColor(colorBGFrame.getPropValue()).toInt(), Utils.parseColor(colorBGFill.getPropValue()).toInt());
@@ -264,9 +266,19 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 					((Drawable) hand).onDraw(gui, mouseX, mouseY, partialTicks);
 				}
 			}
+			if(forceFrame) {
+				gui.drawVerticalLine(getX(), getY(), getY()+getItemHeight(), Utils.parseColor(colorBGFrame.getPropValue()).toInt());
+				gui.drawHorizontalLine(getX(), getX()+getItemWidth()-scrollBar.getItemWidth(), getY(), Utils.parseColor(colorBGFrame.getPropValue()).toInt());
+				gui.drawHorizontalLine(getX(), getX()+getItemWidth()-scrollBar.getItemWidth(), getY()+getItemHeight(), Utils.parseColor(colorBGFrame.getPropValue()).toInt());
+			}
 		}
 	}
-
+	
+	/**Draw a frame outline over all the elements*/
+	public void setForceFrame(boolean forceFrame) {
+		this.forceFrame = forceFrame;
+	}
+	
 	@Override
 	public void setPos(int x, int y) {
 		this.x = x;
