@@ -53,6 +53,8 @@ public class ScriptBrowser2 extends Gui{
 	private PromptType promptType = null;
 	private File clipboardFile = null;
 
+	private String propAddress = "colors.scriptBrowser2";
+	
 	private File selectedFile;
 	private File activePath=AdvancedMacros.macrosFolder;
 	
@@ -65,16 +67,16 @@ public class ScriptBrowser2 extends Gui{
 		super();
 		int defWid = 12;
 		int defHei = 12;
-		returnButton = new GuiButton(new WidgetID(600), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitereturn.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.WHITE);
-		backButton = new GuiButton(new WidgetID(601), 5, 5, defWid, defHei, Settings.getTextureID("resource:whiteback.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.WHITE);
-		forwardButton = new GuiButton(new WidgetID(602), 5, 5, defWid, defHei, Settings.getTextureID("resource:whiteforward.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.WHITE);
-		createFolderButton = new GuiButton(new WidgetID(603), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitecreatefolder.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.WHITE);
-		createFileButton = new GuiButton(new WidgetID(604), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitecreatefile.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.WHITE);
-		searchButton = new GuiButton(new WidgetID(605), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitesearch.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.WHITE);
-		pasteButton = new GuiButton(new WidgetID(635), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitepaste.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.WHITE);
+		returnButton = new GuiButton(new WidgetID(600), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitereturn.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
+		backButton = new GuiButton(new WidgetID(601), 5, 5, defWid, defHei, Settings.getTextureID("resource:whiteback.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
+		forwardButton = new GuiButton(new WidgetID(602), 5, 5, defWid, defHei, Settings.getTextureID("resource:whiteforward.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
+		createFolderButton = new GuiButton(new WidgetID(603), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitecreatefolder.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
+		createFileButton = new GuiButton(new WidgetID(604), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitecreatefile.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
+		searchButton = new GuiButton(new WidgetID(605), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitesearch.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
+		pasteButton = new GuiButton(new WidgetID(635), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitepaste.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
 		
 		
-		addressBackdrop = new GuiRect(new WidgetID(606), 5, 5, defWid, defHei, "scriptBrowser.addressBackground", Color.BLACK, Color.WHITE);
+		addressBackdrop = new GuiRect(new WidgetID(606), 5, 5, defWid, defHei, propAddress+".addressBackground", Color.BLACK, Color.WHITE);
 
 		//		popupPrompt = new PopupPrompt(new WidgetID(404), width/3, 36, width/3, height/3,this);
 		popupPrompt2 = new PopupPrompt2(this);
@@ -83,7 +85,7 @@ public class ScriptBrowser2 extends Gui{
 		filePreview.setEditable(false);
 		filePreview.setFocused(true);
 
-		listManager = new ListManager(5, 5, 5, 5, new WidgetID(607), "scriptBrowser.list");
+		listManager = new ListManager(5, 5, 5, 5, new WidgetID(607), propAddress+".list");
 
 		drawables.add(returnButton);
 		drawables.add(backButton);
@@ -351,7 +353,7 @@ public class ScriptBrowser2 extends Gui{
 			for (int i = 0; i < files.length; i+=ROW_SIZE) {
 				((FileRow)listManager.getItem(i/ROW_SIZE)).populate(files, i);
 			}
-			
+			listManager.scrollTop();
 			backButton.setEnabled(canGoBackMore());
 		}
 	}

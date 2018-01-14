@@ -35,11 +35,11 @@ public class PopupPrompt2 extends Gui{
 
 	public PopupPrompt2(Gui owner) {
 		this.owner = owner;
-		background = new GuiRect(new WidgetID(500), 5, 5, 12, 12, "popupPrompt2", Color.BLACK, Color.WHITE);
+		background = new GuiRect(new WidgetID(500), 5, 5, 12, 12, "colors.popupPrompt2.background", Color.BLACK, Color.WHITE);
 		textField = new GuiTextField(1, getFontRend(), 5, 5, 12, 12);
-		choiceBox = new GuiDropDown(new WidgetID(501), 5, 5, 12, 12, 36, "popupPrompt2");
-		ok = new GuiButton(new WidgetID(502), 5, 5, 12, 12, LuaValue.NIL, LuaValue.valueOf("Ok"), "popupPrompt2");
-		cancel = new GuiButton(new WidgetID(503), 5, 5, 12, 12, LuaValue.NIL, LuaValue.valueOf("Cancel"), "popupPrompt2");
+		choiceBox = new GuiDropDown(new WidgetID(501), 5, 5, 12, 12, 36, "colors.popupPrompt2");
+		ok = new GuiButton(new WidgetID(502), 5, 5, 12, 12, LuaValue.NIL, LuaValue.valueOf("Ok"), "colors.popupPrompt2.ok");
+		cancel = new GuiButton(new WidgetID(503), 5, 5, 12, 12, LuaValue.NIL, LuaValue.valueOf("Cancel"), "colors.popupPrompt2.cancel");
 
 		ok.setOnClick((int mouseButton, GuiButton button)->{
 			result = new Result();
@@ -144,7 +144,7 @@ public class PopupPrompt2 extends Gui{
 		textField.setVisible(true);
 
 		textField.setFocused(true);
-		
+		textField.setText("");
 	//	System.out.println(background.getFrame());
 		
 		type = Type.Prompt;
@@ -217,6 +217,12 @@ public class PopupPrompt2 extends Gui{
 	protected void keyTyped(char typedChar, int keyCode) throws IOException {
 		super.keyTyped(typedChar, keyCode);
 		if(textField.isFocused())
+			textField.textboxKeyTyped(typedChar, keyCode);
+	}
+	@Override
+	public void keyRepeated(char typedChar, int keyCode, int mod) {
+		super.keyRepeated(typedChar, keyCode, mod);
+		if(mod%5==0 && textField.isFocused())
 			textField.textboxKeyTyped(typedChar, keyCode);
 	}
 

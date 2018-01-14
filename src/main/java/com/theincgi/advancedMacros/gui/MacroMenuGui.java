@@ -35,19 +35,21 @@ import net.minecraft.client.Minecraft;
 public class MacroMenuGui extends Gui{
 	//BufferedImage img = null;
 	//GuiDropDown guiDropDown = new GuiDropDown(new WidgetID(10), 5, 5, 150, 12, 150, null);
+	
+	private String propAddress = "colors.bindingsMenu";
 
-	GuiDropDown profileSelect = new GuiDropDown(new WidgetID(1), 5, 5, width-23, 12, 12*7, null);
-	GuiButton   addProifle    = new GuiButton(new WidgetID(2),   width-22, 5, 12, 12, Settings.getTextureID("resource:whiteplus.png"), LuaValue.NIL, null, Color.BLACK, com.theincgi.advancedMacros.gui.Color.WHITE, Color.WHITE);
-	GuiButton removeProifle   = new GuiButton(new WidgetID(3),   width-22, 5, 12, 12, Settings.getTextureID("resource:trashcan.png"), LuaValue.NIL, null, Color.BLACK, com.theincgi.advancedMacros.gui.Color.WHITE, Color.WHITE);
-	GuiButton addBinding       = new GuiButton(new WidgetID(4),   5, 17, 36, 12, Settings.getTextureID("resource:whitenewbinding.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.WHITE);
-	GuiButton showScriptManager=new GuiButton(new WidgetID(5), 41, 17, 36, 12, Settings.getTextureID("resource:whitescripts.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.WHITE); //file browser thing, no folders tho, all macros are in /macros, this will be sepereate gui housing the script manager
+	GuiDropDown profileSelect = new GuiDropDown(new WidgetID(1), 5, 5, width-23, 12, 12*7, propAddress);
+	GuiButton   addProifle    = new GuiButton(new WidgetID(2),   width-22, 5, 12, 12, Settings.getTextureID("resource:whiteplus.png"), LuaValue.NIL, propAddress, Color.BLACK, com.theincgi.advancedMacros.gui.Color.WHITE, Color.WHITE);
+	GuiButton removeProifle   = new GuiButton(new WidgetID(3),   width-22, 5, 12, 12, Settings.getTextureID("resource:trashcan.png"), LuaValue.NIL, propAddress, Color.BLACK, com.theincgi.advancedMacros.gui.Color.WHITE, Color.WHITE);
+	GuiButton addBinding       = new GuiButton(new WidgetID(4),   5, 17, 36, 12, Settings.getTextureID("resource:whitenewbinding.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
+	GuiButton showScriptManager=new GuiButton(new WidgetID(5), 41, 17, 36, 12, Settings.getTextureID("resource:whitescripts.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE); //file browser thing, no folders tho, all macros are in /macros, this will be sepereate gui housing the script manager
 	//GuiButton gotoSettings	  = new GuiButton(new WidgetID(6), width-5-36, 17, 36, 12, Settings.getTextureID("resource:whitesettings.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.BLACK);
 	Prompting prompting;
 	PopupPrompt prompt;
 
 
 
-	ListManager bindingsList = new ListManager(5, 33, 100, 12*10, new WidgetID(33), null);
+	ListManager bindingsList = new ListManager(5, 33, 100, 12*10, new WidgetID(33), propAddress);
 	//	GuiBinding gb = new GuiBinding(new WidgetID(11), 5, 5, 300, bindingsList, this);
 	//	GuiBinding gb2 = new GuiBinding(new WidgetID(11), 5, 5, 300, bindingsList, this);
 	//	GuiBinding gb3 = new GuiBinding(new WidgetID(11), 5, 5, 300, bindingsList, this);

@@ -390,4 +390,8 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 			return (LinkedList<Moveable>) items.clone();
 		}
 	}
+
+	public void scrollTop() {
+		//TODO make it so it scrolls to top, for scriptBrowser2
+	}
 }

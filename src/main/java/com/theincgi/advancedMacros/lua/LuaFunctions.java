@@ -112,7 +112,8 @@ public class LuaFunctions {
 				toParse = formatTableForLog(arg0.arg(1).checktable());
 				toParse = "&f"+toParse.replace("\"", "\\\"");
 			}else{
-				toParse = "&f"+arg0.tojstring().replace("\"", "\\\"");
+				toParse = arg0.tojstring().replace("\\", "\\\\");
+				toParse = "&f"+toParse.replace("\"", "\\\"");
 			}
 			toParse+="&f";
 			fragment = "";

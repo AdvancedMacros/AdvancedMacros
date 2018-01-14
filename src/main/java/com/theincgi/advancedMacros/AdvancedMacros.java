@@ -74,7 +74,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "3.9.0"; //${version} ??
+	public static final String VERSION = "3.9.2"; //${version} ??
 	public static final File macrosRootFolder = new File(Minecraft.getMinecraft().mcDataDir,"mods/advancedMacros");
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -82,7 +82,7 @@ public class AdvancedMacros {
 	public static KeyBinding modKeybind;
 	public static MacroMenuGui macroMenuGui;
 	public static EditorGUI editorGUI;
-	public static ScriptBrowser scriptBrowser;
+	//public static ScriptBrowser scriptBrowser;
 	public static ScriptBrowser2 scriptBrowser2;
 	public static RunningScriptsGui runningScriptsGui;
 	public static Gui lastGui;
@@ -118,7 +118,7 @@ public class AdvancedMacros {
 		//Utils.loadTextCodes();
 		macroMenuGui = new MacroMenuGui();
 		editorGUI = new EditorGUI();
-		scriptBrowser = new ScriptBrowser();
+		//scriptBrowser = new ScriptBrowser();
 		scriptBrowser2 = new ScriptBrowser2();
 		inputGUI = new InputGUI(debug);
 		runningScriptsGui = new RunningScriptsGui(debug);
@@ -241,11 +241,14 @@ public class AdvancedMacros {
 			LuaDebug.LuaThread t = new LuaDebug.LuaThread(function, args, scriptName);
 			t.start();
 		} catch (FileNotFoundException e) {
+			AdvancedMacros.logFunc.call(LuaValue.valueOf("&c"+"Could not find script '"+scriptName+"'"));
 			e.printStackTrace();
 		}catch (LuaError le){
 			//TODO allow for option to not log error to chat
 			le.printStackTrace();
 			AdvancedMacros.logFunc.call(LuaValue.valueOf("&c"+le.toString()));
+		}catch (Throwable e) {
+			AdvancedMacros.logFunc.call(LuaValue.valueOf("&c"+e.toString()));
 		}
 	}
 	

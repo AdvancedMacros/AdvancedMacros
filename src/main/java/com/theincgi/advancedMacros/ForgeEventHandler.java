@@ -132,7 +132,7 @@ public class ForgeEventHandler {
 					Minecraft.getMinecraft().displayGuiScreen(AdvancedMacros.runningScriptsGui);
 				}
 			}else if(ColorTextArea.isShiftDown()){
-				showMenu(AdvancedMacros.scriptBrowser, AdvancedMacros.macroMenuGui);
+				showMenu(AdvancedMacros.scriptBrowser2, AdvancedMacros.macroMenuGui);
 			}else{
 				if(AdvancedMacros.lastGui!=null){
 					AdvancedMacros.lastGui.showGui();

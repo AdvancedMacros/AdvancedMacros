@@ -131,7 +131,7 @@ public class LuaDebug extends DebugLib{
 							if(onScriptFinish!=null){onScriptFinish.onFinish(retValues);}
 							status = Status.DONE;
 							notifyStatusListeners(thread, Status.DONE);
-						}catch (Exception e) {
+						}catch (Throwable e) {
 							status = Status.CRASH;
 							notifyStatusListeners(thread, Status.CRASH);
 							e.printStackTrace();
