@@ -1,0 +1,1 @@
+toast(String:Title, String:details)

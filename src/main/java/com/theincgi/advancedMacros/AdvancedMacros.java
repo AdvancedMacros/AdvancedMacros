@@ -55,6 +55,7 @@ import com.theincgi.advancedMacros.lua.functions.RunThread;
 import com.theincgi.advancedMacros.lua.functions.SetProfile;
 import com.theincgi.advancedMacros.lua.functions.SkinCustomizer;
 import com.theincgi.advancedMacros.lua.functions.StopAllScripts;
+import com.theincgi.advancedMacros.lua.functions.Toast;
 import com.theincgi.advancedMacros.misc.CustomFontRenderer;
 import com.theincgi.advancedMacros.misc.Settings;
 
@@ -74,7 +75,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "3.9.2"; //${version} ??
+	public static final String VERSION = "3.9.3"; //${version} ??
 	public static final File macrosRootFolder = new File(Minecraft.getMinecraft().mcDataDir,"mods/advancedMacros");
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -167,6 +168,7 @@ public class AdvancedMacros {
 		globals.set("log", logFunc = new LuaFunctions.Log());
 		globals.set("advLog", new AdvLog());
 		globals.set("say", sayFunc = new LuaFunctions.Say());
+		globals.set("toast", new Toast());
 		globals.set("sleep", sleepFunc = new LuaFunctions.Sleep());
 		//globals.set("debug", debugFunc = new LuaFunctions.Debug());
 		globals.set("print", LuaValue.NIL);

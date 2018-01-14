@@ -108,6 +108,7 @@ public class LuaFunctions {
 		}
 		public synchronized ITextComponent formatString(Varargs arg0){
 			String toParse;
+			
 			if(arg0.arg(1).istable()){
 				toParse = formatTableForLog(arg0.arg(1).checktable());
 				toParse = "&f"+toParse.replace("\"", "\\\"");
