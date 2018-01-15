@@ -1,0 +1,3 @@
+addRectangle()
+Create a 2D rectangle for your HUD.
+Returns a table with controls.

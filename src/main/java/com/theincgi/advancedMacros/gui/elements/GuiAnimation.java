@@ -1,7 +1,5 @@
 package com.theincgi.advancedMacros.gui.elements;
 
-import com.theincgi.advancedMacros.AdvancedMacros;
-
 public class GuiAnimation {
 	Interpolator interpolator;
 	private long start = -1;

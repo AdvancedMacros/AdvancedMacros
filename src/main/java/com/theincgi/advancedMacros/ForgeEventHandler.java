@@ -10,10 +10,12 @@ import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
 
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.MacroMenuGui;
 import com.theincgi.advancedMacros.gui.elements.ColorTextArea;
+import com.theincgi.advancedMacros.hud.hud2D.Hud2DItem;
 import com.theincgi.advancedMacros.hud.hud3D.WorldHudItem;
 import com.theincgi.advancedMacros.lua.LuaDebug.OnScriptFinish;
 import com.theincgi.advancedMacros.misc.Utils;
@@ -28,18 +30,15 @@ import net.minecraft.client.renderer.GlStateManager.DestFactor;
 import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -57,6 +56,7 @@ public class ForgeEventHandler {
 	boolean wasRaining, wasThundering;
 	/**Keeping this syncronized!*/
 	private LinkedList<WorldHudItem> worldHudItems = new LinkedList<>();
+	private LinkedList<Hud2DItem> hud2DItems = new LinkedList<>();
 	int sTick = 0;
 	private ConcurrentHashMap<String, Boolean> lastPlayerList;
 	private ConcurrentHashMap<String, Boolean> nowPlayerList = new ConcurrentHashMap<>();
@@ -543,11 +543,52 @@ public class ForgeEventHandler {
 		GlStateManager.disableBlend();//F1 is black otherwise
 		GlStateManager.popAttrib();
 	}
-	//	@SubscribeEvent
-	//	public void afterOverlay(RenderGameOverlayEvent.Post event) {
-	//		GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, AdvancedMacros.modelView2d);
-	//		GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, AdvancedMacros.projView2d);
-	//	}
+	
+	@SubscribeEvent
+	public void afterOverlay(RenderGameOverlayEvent.Post event) {
+		
+		float p = Minecraft.getMinecraft().getRenderPartialTicks();
+		//Entity player = Minecraft.getMinecraft().player;
+
+		GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+//		GlStateManager.enableCull();
+////		GlStateManager.cullFace(CullFace.BACK);
+		//GlStateManager.enableBlend();
+		//GlStateManager.enableAlpha();
+//		//GlStateManager.disableAlpha();
+//		//GlStateManager.disableBlend();
+//		//GlStateManager.enableLighting();
+//		//GlStateManager.enableColorLogic();
+//		//GlStateManager.disableColorLogic();
+//		//src color -> src color?
+//		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+
+		 //GL11.glDisable(GL11.GL_DEPTH_TEST);
+        // GL11.glDepthMask(false);
+        // GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        // GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+         //GL11.glEnable(GL11.GL_ALPHA_TEST);
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        //GlStateManager.enableBlend();
+        //GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 1);
+       // GlStateManager.disableAlpha();
+		GlStateManager.bindTexture(0);
+		//GlStateManager.enableLighting();
+
+		synchronized (hud2DItems) {
+			for (Hud2DItem hudItem : hud2DItems) {
+				//System.out.println(worldHudItem);
+				GlStateManager.color(1, 1, 1, hudItem.getOpacity());
+				hudItem.render(p);
+			}
+		}
+		//GlStateManager.disableBlend();//F1 is black otherwise
+		GL11.glPopAttrib();
+		//GlStateManager.color(0, 0, 0, 0);
+		
+	}
+	
 	public static double accuPlayerX(float pTick, Entity e){
 		return e.posX*pTick + e.lastTickPosX*(1-pTick);
 	}
@@ -618,11 +659,31 @@ public class ForgeEventHandler {
 	public void clearWorldHud(){
 		synchronized (worldHudItems) {
 			while(!worldHudItems.isEmpty()){
-				worldHudItems.getFirst().destroy();
+				worldHudItems.getFirst().destroy(); //removed when disable draw is called
 			}
 			worldHudItems.clear();
 		}
 	}
+	
+	public void addHud2DItem(Hud2DItem item) {
+		synchronized (hud2DItems) {
+			hud2DItems.add(item);
+		}
+	}
+	public void removeHud2DItem(Hud2DItem item) {
+		synchronized (hud2DItems) {
+			hud2DItems.remove(item);
+		}
+	}
+	public void clear2DHud() {
+		synchronized (hud2DItems) {
+			while(!hud2DItems.isEmpty()) {
+				hud2DItems.getLast().destroy();
+			}
+			hud2DItems.clear();
+		}
+	}
+	
 	public int getSTick() {
 		return sTick;
 	}

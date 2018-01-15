@@ -1,6 +1,5 @@
 package com.theincgi.advancedMacros.lua.functions;
 
-import java.util.Collection;
 import java.util.Iterator;
 
 import org.luaj.vm2_v3_0_1.LuaError;

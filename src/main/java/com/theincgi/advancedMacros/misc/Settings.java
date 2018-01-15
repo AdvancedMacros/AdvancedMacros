@@ -6,12 +6,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Scanner;
-import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import javax.imageio.ImageIO;
 
@@ -19,21 +18,17 @@ import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
 import com.theincgi.advancedMacros.lua.ProtectedLuaTable;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class Settings {
@@ -41,7 +36,7 @@ public class Settings {
 	public static LuaTable settings = new LuaTable();
 	private static ProtectedLuaTable textures = new ProtectedLuaTable();
 
-
+	private static Thread minecraftThread = Thread.currentThread();//should be anyway
 
 	public static void load() throws FileNotFoundException{
 		settings = new LuaTable(); //wipe everything out then read from file
@@ -97,6 +92,31 @@ public class Settings {
 	 * use "resource:" at the beginning to specify something in the mod<br>
 	 * use "web:" prefix to load from a URL [not implemented] */
 	public static LuaValue getTextureID(String file){
+		
+		if(Thread.currentThread()!=minecraftThread) {
+			final String file2 = file;
+			ListenableFuture<LuaValue> future = Minecraft.getMinecraft().addScheduledTask(new Callable<LuaValue>() {
+				
+				@Override
+				public LuaValue call() throws Exception {
+					return getTextureID(file2);
+				}
+			});
+			while(!future.isDone()) {
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {break;}
+				
+			}
+			if(!future.isCancelled())
+				try {
+					return future.get();
+				} catch (InterruptedException e) {
+				} catch (ExecutionException e) {
+				}
+			return null;
+		}
+		
 		if(settings.get("textures").isnil()){
 			settings.set("textures", textures); //keep it available, no excuses
 		}

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileReader;
 
 import org.luaj.vm2_v3_0_1.LuaError;
-import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;

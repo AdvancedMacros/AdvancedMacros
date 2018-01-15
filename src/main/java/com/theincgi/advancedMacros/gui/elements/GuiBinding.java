@@ -14,7 +14,6 @@ import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
 import com.theincgi.advancedMacros.gui.MacroMenuGui;
-import com.theincgi.advancedMacros.gui2.PopupPrompt2;
 import com.theincgi.advancedMacros.gui2.PopupPrompt2.Result;
 import com.theincgi.advancedMacros.gui2.PopupPrompt2.ResultHandler;
 import com.theincgi.advancedMacros.misc.Settings;
@@ -172,7 +171,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 //			}
 //		});
 		pickScript.setOnClick((int mb, GuiButton button)->{
-			AdvancedMacros.scriptBrowser2.setActivePath(scriptHome(script));
+			AdvancedMacros.scriptBrowser2.setActivePath(scriptHome(script));  //FIXME NullPointerException
 			AdvancedMacros.scriptBrowser2.setSelectedFile(script);
 			AdvancedMacros.scriptBrowser2.getSelection(AdvancedMacros.macroMenuGui, new ResultHandler() {
 				@Override public boolean onResult(Result r) {

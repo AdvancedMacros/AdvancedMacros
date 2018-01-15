@@ -21,8 +21,6 @@
 ******************************************************************************/
 package org.luaj.vm2_v3_0_1;
 
-import org.luaj.vm2_v3_0_1.Varargs;
-
 /**
  * Base class for all concrete lua type values.  
  * <p>

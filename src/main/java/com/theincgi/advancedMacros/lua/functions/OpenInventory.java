@@ -17,7 +17,6 @@ import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.ContainerPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.CPacketClickWindow;
-import net.minecraft.network.play.client.CPacketClientStatus;
 
 public class OpenInventory extends ZeroArgFunction{
 	private static LuaValue mapping = LuaValue.FALSE;

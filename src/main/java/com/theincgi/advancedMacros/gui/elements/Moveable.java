@@ -1,7 +1,5 @@
 package com.theincgi.advancedMacros.gui.elements;
 
-import com.theincgi.advancedMacros.AdvancedMacros;
-
 public interface Moveable {
 
 	void setPos(int x, int y);

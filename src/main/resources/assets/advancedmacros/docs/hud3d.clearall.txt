@@ -1,0 +1,2 @@
+clearAll()
+Remove all items from the 3D HUD.

@@ -7,10 +7,8 @@ import com.theincgi.advancedMacros.misc.Matrix.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
 
 public class CustomFontRenderer {
 	static LuaValTexture consolas = Utils.checkTexture(Settings.getTextureID("resource:consolas.png"));
@@ -191,33 +189,148 @@ public class CustomFontRenderer {
 	private void setColor(Color color, float opaicty) {
 		GlStateManager.color(color.getR()/255f, color.getG()/255f, color.getB()/255f, opaicty);
 	}
-	public void renderText(double x, double y, String text) {
-		double ox=x, oy=y;
-		float ratio = charWid/charHei;
-		for(char c : text.toCharArray()) {
+	public void renderText(double x, double y, String text, float opacity) {
+		boolean bold = false, italics = false;
+		double tx = x;
+		double ty = y;
+
+		float ratio = charWid/(float)charHei;
+		Matrix upVect = Matrix.vector(0, textSize2d, 0);
+		Matrix rightVect = Matrix.vector(-textSize2d*ratio, 0 , 0);
+		Matrix offset = Matrix.vector(0, 0, 0);
+		
+		double dx=tx,dy=ty;
+		int lineNum = 0;
+		mc.getTextureManager().bindTexture(consolas.getResourceLocation());
+		//System.out.printf("TX: %5.2f TY: %5.2f TZ: %5.2f   UP: %s RIGHT: %s\n",tx,ty,tz,upVect,rightVect);
+		for(int i = 0; i<text.length(); i++) {
+			char c = text.charAt(i);
+			//System.out.println(c);
 			if(c=='\n') {
-				ox = x;
-				oy+=textSize2d;
-			}else{
-				drawChar2D(ox, oy, c);
-				ox+=ratio*textSize2d;
+				dx=tx;
+				dy=ty;
+				lineNum++;
+				Matrix down = upVect.scalar(-lineNum);
+				dx+=down.vectorX();
+				dy+=down.vectorY();
+			}else if(c=='&' && i<text.length()-1 && (Utils.isTextColorCode(text.charAt(i+1))||Utils.isTextStyleCode(text.charAt(i+1)))) {
+				if(Utils.isTextColorCode(text.charAt(i+1))) //reset to normal text
+					mc.getTextureManager().bindTexture(consolas.getResourceLocation());
+				char code = text.charAt(i+1);
+				//System.out.println(code);
+				switch (code) {
+				case '0':
+					italics=false;
+					bold=false;
+					setColor(Color.TEXT_0, opacity);
+					break;
+				case '1':
+					italics=false;
+					bold=false;
+					setColor(Color.TEXT_1, opacity);
+					break;
+				case '2':
+					italics=false;
+					bold=false;
+					setColor(Color.TEXT_2, opacity);
+					break;
+				case '3':
+					italics=false;
+					bold=false;
+					setColor(Color.TEXT_3, opacity);
+					break;
+				case '4':
+					italics=false;
+					bold=false;
+					setColor(Color.TEXT_4, opacity);
+					break;
+				case '5':
+					italics=false;
+					bold=false;
+					setColor(Color.TEXT_5, opacity);
+					break;
+				case '6':
+					italics=false;
+					bold=false;
+					setColor(Color.TEXT_6, opacity);
+					break;
+				case '7':
+					italics=false;
+					bold=false;
+					setColor(Color.TEXT_7, opacity);
+					break;
+				case '8':
+					italics=false;
+					bold=false;
+					setColor(Color.TEXT_8, opacity);
+					break;
+				case '9':
+					italics=false;
+					bold=false;
+					setColor(Color.TEXT_9, opacity);
+					break;
+				case 'a':
+					italics=false;
+					bold=false;
+					setColor(Color.TEXT_a, opacity);
+					break;
+				case 'b':
+					italics=false;
+					bold=false;
+					setColor(Color.TEXT_b, opacity);
+					break;
+				case 'c':
+					italics=false;
+					bold=false;
+					setColor(Color.TEXT_c, opacity);
+					break;
+				case 'd':
+					italics=false;
+					bold=false;
+					setColor(Color.TEXT_d, opacity);
+					break;
+				case 'e':
+					italics=false;
+					bold=false;
+					setColor(Color.TEXT_e, opacity);
+					break;
+				case 'f':
+					italics=false;
+					bold=false;
+					setColor(Color.TEXT_f, opacity);
+					break;
+				case 'B':
+					if(italics)
+						mc.getTextureManager().bindTexture(consolas_bold_italics.getResourceLocation());
+					else
+						mc.getTextureManager().bindTexture(consolas_bold.getResourceLocation());
+					bold=true;
+					break;
+				case 'I':
+					if(bold)
+						mc.getTextureManager().bindTexture(consolas_bold_italics.getResourceLocation());
+					else
+						mc.getTextureManager().bindTexture(consolas_italics.getResourceLocation());
+					italics=true;
+					break;
+				}
+				i++;
+			}else {
+				drawChar2D(dx, dy, c, textSize2d*ratio, textSize2d);
+				dx-=rightVect.vectorX();
+				dy-=rightVect.vectorY();
 			}
 		}
 	}
-	private void drawChar2D(double x, double y, char c) {
+	private void drawChar2D(double x, double y, char c, float wide, float tall) {
 		loadUV(c, uvPair);
-		double ux = 0,
-				uy = 1,
-				uz = 0,
-				rx = 1,
-				ry = 0,
-				rz = 0;
+		
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
-		buffer.pos(x    	, y     	, 0     	).tex(uvPair.umax, uvPair.vmax).endVertex(); //bottom left
-		buffer.pos(x+ux     , y+uy		, 0 		).tex(uvPair.umax, uvPair.vmin).endVertex(); //top left
-		buffer.pos(x+ux+rx	, y+uy+ry	, 0			).tex(uvPair.umin, uvPair.vmin).endVertex(); //top right
-		buffer.pos(x+rx		, y+ry     	, 0			).tex(uvPair.umin, uvPair.vmax).endVertex(); //bottom right
+		buffer.pos(x    	, y     	, 0     	).tex(uvPair.umin, uvPair.vmin).endVertex(); //bottom left
+		buffer.pos(x	    , y+tall	, 0 		).tex(uvPair.umin, uvPair.vmax).endVertex(); //top left
+		buffer.pos(x+wide	, y+tall	, 0			).tex(uvPair.umax, uvPair.vmax).endVertex(); //top right
+		buffer.pos(x+wide	, y     	, 0			).tex(uvPair.umax, uvPair.vmin).endVertex(); //bottom right
 		Tessellator.getInstance().draw();
 	}
 

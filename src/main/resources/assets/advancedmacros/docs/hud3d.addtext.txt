@@ -1,4 +1,4 @@
-addHoloText()
+addText()
 Draws some floating text in your world!
 See the full help doc for examples.
 

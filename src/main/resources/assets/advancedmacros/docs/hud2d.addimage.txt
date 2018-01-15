@@ -1,0 +1,3 @@
+addImage()
+Create a 2D image for your HUD.
+Returns a table with controls.

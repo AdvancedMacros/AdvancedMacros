@@ -1,12 +1,8 @@
 package com.theincgi.advancedMacros.misc;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Scanner;
-import java.util.Set;
-import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
@@ -21,7 +17,6 @@ import com.theincgi.advancedMacros.lua.LuaValTexture;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -40,12 +35,10 @@ import net.minecraft.nbt.NBTTagShort;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.ITextComponent.Serializer;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class Utils {
@@ -94,7 +87,7 @@ public class Utils {
 
 		case 1:
 			LuaValue val = v.arg1();
-			if(val.isint()){
+			if(val.isnumber()){
 				return new Color(val.checkint());
 			}else if(val.istable()){
 				if(val.get("r").isint()&&val.get("g").isint()&&val.get("b").isint()){

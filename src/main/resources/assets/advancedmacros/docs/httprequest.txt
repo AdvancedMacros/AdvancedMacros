@@ -1,0 +1,3 @@
+httpRequest(Table:args) - returns table with functions, must include URL, optional:
+'requestMethod' ie. GET, requestProperties (Table: string key,values)
+timeout (in seconds), doOutput (boolean), followRedirects (boolean)

@@ -17,19 +17,15 @@ import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.InputGUI;
 import com.theincgi.advancedMacros.gui.MacroMenuGui;
 import com.theincgi.advancedMacros.gui.RunningScriptsGui;
-import com.theincgi.advancedMacros.gui.ScriptBrowser;
 import com.theincgi.advancedMacros.gui2.ScriptBrowser2;
-import com.theincgi.advancedMacros.hud.hud3D.HoloBlock.DrawType;
-import com.theincgi.advancedMacros.hud.hud3D.HudText;
+import com.theincgi.advancedMacros.hud.hud2D.Hud2D;
+import com.theincgi.advancedMacros.hud.hud3D.Hud3D;
 import com.theincgi.advancedMacros.lua.DocumentationManager;
 import com.theincgi.advancedMacros.lua.LuaDebug;
 import com.theincgi.advancedMacros.lua.LuaFunctions;
 import com.theincgi.advancedMacros.lua.functions.Action;
-import com.theincgi.advancedMacros.lua.functions.AddHoloBlock;
-import com.theincgi.advancedMacros.lua.functions.AddHoloText;
 import com.theincgi.advancedMacros.lua.functions.AdvLog;
 import com.theincgi.advancedMacros.lua.functions.Call;
-import com.theincgi.advancedMacros.lua.functions.ClearWorldHud;
 import com.theincgi.advancedMacros.lua.functions.FileSystem;
 import com.theincgi.advancedMacros.lua.functions.GetBiome;
 import com.theincgi.advancedMacros.lua.functions.GetBlock;
@@ -45,6 +41,7 @@ import com.theincgi.advancedMacros.lua.functions.GetPlayerPos;
 import com.theincgi.advancedMacros.lua.functions.GetProfile;
 import com.theincgi.advancedMacros.lua.functions.GetTextureList;
 import com.theincgi.advancedMacros.lua.functions.GetWorld;
+import com.theincgi.advancedMacros.lua.functions.HTTP;
 import com.theincgi.advancedMacros.lua.functions.IsKeyHeld;
 import com.theincgi.advancedMacros.lua.functions.LightAt;
 import com.theincgi.advancedMacros.lua.functions.MathPlus;
@@ -75,7 +72,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "3.9.3"; //${version} ??
+	public static final String VERSION = "3.10.0"; //${version} ??
 	public static final File macrosRootFolder = new File(Minecraft.getMinecraft().mcDataDir,"mods/advancedMacros");
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -183,7 +180,7 @@ public class AdvancedMacros {
 		math.set("log", new MathPlus.Log());
 		math.set("e", MathPlus.const_e);
 		
-		
+		globals.set("httpRequest", new HTTP());
 		globals.set("getWorld", new GetWorld());
 		globals.set("getBlock", new GetBlock());
 		globals.set("getPlayer", new GetPlayer());
@@ -195,9 +192,12 @@ public class AdvancedMacros {
 		globals.set("getEntityList", new GetEntityList());
 		globals.set("getEntity", new GetEntityData());
 		
-		globals.set("addHoloBlock", new AddHoloBlock());
-		globals.set("addHoloText", new AddHoloText());
-		globals.set("clearWorldHud", new ClearWorldHud());
+//		globals.set("addHoloBlock", new AddHoloBlock());
+//		globals.set("addHoloText", new AddHoloText());
+//		globals.set("clearWorldHud", new ClearWorldHud());
+		
+		globals.set("hud2D", new Hud2D());
+		globals.set("hud3D", new Hud3D());
 		
 		new Action().getKeybindFuncts(globals);
 		globals.set("getInventory", new GetInventory());

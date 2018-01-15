@@ -1,0 +1,3 @@
+addBox()
+Create a 2D outline of a rectangle for your HUD.
+Returns a table with controls.

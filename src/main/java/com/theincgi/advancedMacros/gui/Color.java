@@ -45,6 +45,10 @@ public class Color {
 	
 	
 	public Color(int a, int r, int g, int b) {
+		if(a < 0   || r < 0   || g < 0   || b < 0 || 
+		   a > 255 || r > 255 || g > 255 || b > 255) {
+			throw new IllegalArgumentException("Value out of range 0-255");
+		}
 		this.a = a;
 		this.r = r;
 		this.g = g;
@@ -52,10 +56,7 @@ public class Color {
 	}
 
 	public Color(int r, int g, int b) {
-		a = 0xff;
-		this.r = r;
-		this.g = g;
-		this.b = b;
+		this(0xFF,r,g,b);
 	}
 	
 	public Color(int hexCode){

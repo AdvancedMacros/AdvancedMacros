@@ -4,20 +4,11 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
-import com.theincgi.advancedMacros.misc.Utils;
 
-import net.minecraft.advancements.Advancement;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.toasts.AdvancementToast;
-import net.minecraft.client.gui.toasts.GuiToast;
-import net.minecraft.client.gui.toasts.IToast;
-import net.minecraft.client.gui.toasts.IToast.Visibility;
-import net.minecraft.client.gui.toasts.RecipeToast;
 import net.minecraft.client.gui.toasts.SystemToast;
 import net.minecraft.client.gui.toasts.SystemToast.Type;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.event.entity.minecart.MinecartCollisionEvent;
 
 public class Toast extends TwoArgFunction{
 	

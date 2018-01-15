@@ -6,7 +6,6 @@ import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.ITextComponent.Serializer;
 
 public class AdvLog extends OneArgFunction{
 	@Override

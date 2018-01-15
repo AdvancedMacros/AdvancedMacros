@@ -1,7 +1,5 @@
 package com.theincgi.advancedMacros.gui.elements;
 
-import com.theincgi.advancedMacros.AdvancedMacros;
-
 /**
  *    0 -   99 = MacroMenu
  *  100 -  199 = 

@@ -1,2 +1,0 @@
-clearWorldHud()
-Remove all hud items from the render list.

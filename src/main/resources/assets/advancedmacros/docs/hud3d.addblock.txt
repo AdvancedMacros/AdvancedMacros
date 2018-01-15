@@ -1,4 +1,4 @@
-addHoloBlock([String:Texture/Texture:texture])
+addBlock([String:Texture/Texture:texture])
 Draws a ghost block in your world!
 See the full help doc for examples.
 

@@ -6,13 +6,13 @@ import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.util.Stack;
 
+import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.ForgeEventHandler;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
-import com.theincgi.advancedMacros.gui.ScriptBrowser;
 import com.theincgi.advancedMacros.gui.elements.ColorTextArea;
 import com.theincgi.advancedMacros.gui.elements.Drawable;
 import com.theincgi.advancedMacros.gui.elements.GuiButton;
@@ -20,8 +20,6 @@ import com.theincgi.advancedMacros.gui.elements.GuiRect;
 import com.theincgi.advancedMacros.gui.elements.ListManager;
 import com.theincgi.advancedMacros.gui.elements.Moveable;
 import com.theincgi.advancedMacros.gui.elements.OnClickHandler;
-import com.theincgi.advancedMacros.gui.elements.PopupPrompt;
-import com.theincgi.advancedMacros.gui.elements.PopupPrompt.Answer;
 import com.theincgi.advancedMacros.gui.elements.WidgetID;
 import com.theincgi.advancedMacros.gui2.PopupPrompt2.Result;
 import com.theincgi.advancedMacros.gui2.PopupPrompt2.ResultHandler;
@@ -30,7 +28,6 @@ import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
-import scala.tools.util.PathResolver.MkLines;
 
 public class ScriptBrowser2 extends Gui{
 
@@ -334,10 +331,11 @@ public class ScriptBrowser2 extends Gui{
 				pathText = pathText.substring(1);
 			}
 			File[] files = folder.listFiles();
-			int needed = (files.length+2)/ROW_SIZE;
+			int needed = (files.length+ROW_SIZE)/ROW_SIZE;
 			
-			if(ROW_SIZE!=columnCount.getPropValue().checkint()) {
-				ROW_SIZE=columnCount.getPropValue().checkint();
+			if(ROW_SIZE!=getColumnCount()) {
+				System.out.println("ROW SIZE UPDATED");
+				ROW_SIZE=getColumnCount();
 				listManager.clear();
 			}
 			
@@ -350,7 +348,7 @@ public class ScriptBrowser2 extends Gui{
 				listManager.add(new FileRow());
 			}
 
-			for (int i = 0; i < files.length; i+=ROW_SIZE) {
+			for (int i = 0; i < files.length && i/ROW_SIZE<listManager.getItems().size(); i+=ROW_SIZE) { //FIXME IndexOutOfBounds
 				((FileRow)listManager.getItem(i/ROW_SIZE)).populate(files, i);
 			}
 			listManager.scrollTop();
@@ -358,8 +356,10 @@ public class ScriptBrowser2 extends Gui{
 		}
 	}
 	
-	Property columnCount = new Property("scriptBrowser.columns", LuaValue.valueOf(3), "columnCount", new WidgetID(650));
-	int ROW_SIZE = columnCount.getPropValue().checkint();
+	//Property columnCount = new Property("scriptBrowser.columns", LuaValue.valueOf(3), "columnCount", new WidgetID(650));
+	
+	int ROW_SIZE = getColumnCount();
+	
 	
 	public class FileRow implements Moveable, Drawable, InputSubscriber{
 		//final static int SIZE = 3;
@@ -409,7 +409,7 @@ public class ScriptBrowser2 extends Gui{
 		@Override
 		public void setWidth(int i) {
 			int spacing = bufferSize*(fileElements.length-1);
-			float indiv = i/((float)fileElements.length);
+			float indiv = (i-spacing)/((float)fileElements.length);
 			elementWidth = indiv;
 			for (int j = 0; j < fileElements.length; j++) {
 				fileElements[j].button.setWidth((int) (j==0?Math.ceil(indiv):Math.floor(indiv)));
@@ -606,6 +606,20 @@ public class ScriptBrowser2 extends Gui{
 		this.requester = requester;
 		this.selectionMode = selectionMode;
 	}
+	private int getColumnCount() {
+		LuaTable sets = Settings.settings;
+		LuaValue v = sets.get("scriptBrowser");
+		if(v==LuaValue.NIL) {
+			sets.set("scriptBrowser", new LuaTable());
+			v = sets.get("scriptBrowser");
+		}
+		LuaValue v2 = v.checktable().get("columns");
+		if(v2==LuaValue.NIL) {
+			v.checktable().set("columns", 3);
+		}
+		return v.checktable().get("columns").checkint();
+	}
+
 	public boolean isSelectionMode() {
 		return selectionMode;
 	}

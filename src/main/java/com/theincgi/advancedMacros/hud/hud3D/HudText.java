@@ -1,6 +1,5 @@
 package com.theincgi.advancedMacros.hud.hud3D;
 
-import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
@@ -12,10 +11,10 @@ import net.minecraft.client.Minecraft;
 public class HudText extends WorldHudItem{
 	Minecraft mc = Minecraft.getMinecraft();
 	String text="";
-	private boolean is3D;
+	//private boolean is3D;
 	//Color color;
-	public HudText(boolean is3D) {
-		this.is3D = is3D;
+	public HudText() {
+		//this.is3D = is3D;
 	}
 	@Override
 	public float getOpacity() {
@@ -23,10 +22,10 @@ public class HudText extends WorldHudItem{
 	}
 	@Override
 	public void render(double playerX, double playerY, double playerZ) {
-		if(is3D)
+		//if(is3D)
 			AdvancedMacros.customFontRenderer.renderText(playerX, playerY, playerZ, x, y, z, yaw, pitch, roll, text, opacity);
-		else
-			AdvancedMacros.customFontRenderer.renderText(x, y, text);
+		//else
+		//	AdvancedMacros.customFontRenderer.renderText(x, y, text);
 	}
 	@Override
 	public void destroy() {

@@ -9,7 +9,7 @@ public class AddHoloText extends ZeroArgFunction {
 	
 	@Override
 	public LuaValue call() {
-		HudText hudText = new HudText(true);
+		HudText hudText = new HudText();
 		return hudText.getControls(); 
 	}
 	
