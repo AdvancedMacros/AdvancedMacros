@@ -23,6 +23,8 @@ package org.luaj.vm2_v3_0_1.ast;
 
 import java.util.List;
 
+import org.luaj.vm2_v3_0_1.ast.Exp.VarExp;
+
 abstract public class Visitor {
 	public void visit(Chunk chunk) { 
 		chunk.block.accept(this); 

@@ -92,31 +92,31 @@ public class Settings {
 	 * use "resource:" at the beginning to specify something in the mod<br>
 	 * use "web:" prefix to load from a URL [not implemented] */
 	public static LuaValue getTextureID(String file){
-		
-		if(Thread.currentThread()!=minecraftThread) {
-			final String file2 = file;
-			ListenableFuture<LuaValue> future = Minecraft.getMinecraft().addScheduledTask(new Callable<LuaValue>() {
-				
-				@Override
-				public LuaValue call() throws Exception {
-					return getTextureID(file2);
-				}
-			});
-			while(!future.isDone()) {
-				try {
-					Thread.sleep(10);
-				} catch (InterruptedException e) {break;}
-				
-			}
-			if(!future.isCancelled())
-				try {
-					return future.get();
-				} catch (InterruptedException e) {
-				} catch (ExecutionException e) {
-				}
-			return null;
-		}
-		
+
+		//		if(Thread.currentThread()!=minecraftThread) {
+		//			final String file2 = file;
+		//			ListenableFuture<LuaValue> future = Minecraft.getMinecraft().addScheduledTask(new Callable<LuaValue>() {
+		//				
+		//				@Override
+		//				public LuaValue call() throws Exception {
+		//					return getTextureID(file2);
+		//				}
+		//			});
+		//			while(!future.isDone()) {
+		//				try {
+		//					Thread.sleep(10);
+		//				} catch (InterruptedException e) {break;}
+		//				
+		//			}
+		//			if(!future.isCancelled())
+		//				try {
+		//					return future.get();
+		//				} catch (InterruptedException e) {
+		//				} catch (ExecutionException e) {
+		//				}
+		//			return null;
+		//		}
+
 		if(settings.get("textures").isnil()){
 			settings.set("textures", textures); //keep it available, no excuses
 		}
@@ -169,6 +169,29 @@ public class Settings {
 	//	}
 	private static LuaValue loadTex(String file){
 		try {
+			if(Thread.currentThread() != minecraftThread) {
+				final String sFile = file;
+				ListenableFuture<LuaValue> future = Minecraft.getMinecraft().addScheduledTask(new Callable<LuaValue>() {
+					@Override
+					public LuaValue call() throws Exception {
+						return loadTex(sFile);
+					}
+				});
+				try {
+					while(!future.isDone()) {
+						Thread.sleep(1);
+					}
+					if(future.isCancelled())
+						return null;
+					return future.get();
+				} catch (InterruptedException e) {
+					System.err.println("Interrupted durring texture grab");
+					return null;
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
 			DynamicTexture dTex = new DynamicTexture(ImageIO.read(new File(file)));
 			return new LuaValTexture(file, dTex);
 		} catch (IOException e) {

@@ -23,6 +23,8 @@ package org.luaj.vm2_v3_0_1.ast;
 
 import java.util.List;
 
+import org.luaj.vm2_v3_0_1.ast.Exp.VarExp;
+
 abstract
 public class Stat extends SyntaxElement {
 	public abstract void accept(Visitor visitor);
