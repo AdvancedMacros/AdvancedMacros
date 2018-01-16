@@ -74,14 +74,14 @@ public class Hud2D_Rectangle extends Hud2DItem {
 			dw = interpolate(dw, lastWid, partialTicks);
 			dh = interpolate(dh, lastHei, partialTicks);
 		}
-		drawRectangle(dx, dy, dw, dh, color);
+		drawRectangle(dx, dy, dw, dh, color, z);
 	}
 
 	/**@param dx - draw X
 	 * @param dy - draw Y
 	 * @param dw - draw Width
 	 * @param dh - draw Height*/
-	public static void drawRectangle(float dx, float dy, float dw, float dh, Color color) {
+	public static void drawRectangle(float dx, float dy, float dw, float dh, Color color, float z) {
 		
 		
 		
@@ -94,10 +94,10 @@ public class Hud2D_Rectangle extends Hud2DItem {
 		GlStateManager.color(color.getR()/255f, color.getG()/255f, color.getB()/255f, color.getA()/255f);
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		buffer.begin(7, DefaultVertexFormats.POSITION); //7 is GL_QUADS btw
-		buffer.pos(dx	  	, dy     	, 0).endVertex(); //bottom left -> bottom right -> top right -> top left
-		buffer.pos(dx       , dy+dh 	, 0).endVertex(); //top left 
-		buffer.pos(dx+dw   	, dy+dh   	, 0).endVertex(); //top right
-		buffer.pos(dx+dw 	, dy       	, 0).endVertex(); //bottom right
+		buffer.pos(dx	  	, dy     	, z).endVertex(); //bottom left -> bottom right -> top right -> top left
+		buffer.pos(dx       , dy+dh 	, z).endVertex(); //top left 
+		buffer.pos(dx+dw   	, dy+dh   	, z).endVertex(); //top right
+		buffer.pos(dx+dw 	, dy       	, z).endVertex(); //bottom right
 		
 		Tessellator.getInstance().draw();
 		GlStateManager.enableTexture2D();

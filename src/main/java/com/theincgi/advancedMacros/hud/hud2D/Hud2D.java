@@ -40,6 +40,12 @@ public class Hud2D extends LuaTable{
 				return new Hud2D_Text().getControls();
 			}
 		});
+//		this.set("addLine", new ZeroArgFunction() {
+//			@Override
+//			public LuaValue call() {
+//				return new Hud2D_Line().getControls();
+//			}
+//		});
 		this.set("clearAll", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {

@@ -3,6 +3,7 @@ package com.theincgi.advancedMacros.hud.hud2D;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
+import org.luaj.vm2_v3_0_1.ast.Stat.Return;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
@@ -12,7 +13,7 @@ import com.theincgi.advancedMacros.AdvancedMacros;
 
 public abstract class Hud2DItem {
 	
-	float x, y;
+	float x, y, z;
 	float lastX, lastY;
 	protected float opacity;
 	protected boolean allowFrameInterpolation = false;
@@ -112,6 +113,19 @@ public abstract class Hud2DItem {
 			@Override
 			public LuaValue call() {
 				return LuaValue.valueOf(allowFrameInterpolation);
+			}
+		});
+		controls.set("setZ", new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg) {
+				z = (float) arg.checkdouble();
+				return LuaValue.NONE;
+			}
+		});
+		controls.set("getZ", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return LuaValue.valueOf(z);
 			}
 		});
 	}

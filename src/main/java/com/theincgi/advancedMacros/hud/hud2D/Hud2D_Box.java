@@ -37,10 +37,10 @@ public class Hud2D_Box extends Hud2D_Rectangle {
 			dh = interpolate(dh, lastHei, partialTicks);
 		}
 		
-		drawRectangle(dx,		dy, 	dw, 		thickness, 	color);
-		drawRectangle(dx, 		dy, 	thickness, 	dh, 		color);
-		drawRectangle(dx+dw-1, 	dy, 	thickness, 	dh, 		color);
-		drawRectangle(dx, 		dy+dh-1, 	dw, 		thickness, 	color);
+		drawRectangle(dx,		dy, 	dw, 		thickness, 	color, z);
+		drawRectangle(dx, 		dy, 	thickness, 	dh, 		color, z);
+		drawRectangle(dx+dw-1, 	dy, 	thickness, 	dh, 		color, z);
+		drawRectangle(dx, 		dy+dh-1, 	dw, 	thickness, 	color, z);
 		
 		GlStateManager.popAttrib();
 	}

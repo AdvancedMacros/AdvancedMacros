@@ -86,10 +86,10 @@ public class Hud2D_Image extends Hud2D_Rectangle {
 		
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
-		buffer.pos(dx     	, y     , 0).tex(uMin, vMin).endVertex();
-		buffer.pos(dx     	, y+dh	, 0).tex(uMin, vMax).endVertex();
-		buffer.pos(dx+dw	, y+dh	, 0).tex(uMax, vMax).endVertex();
-		buffer.pos(dx+dw	, y     , 0).tex(uMax, vMin).endVertex();
+		buffer.pos(dx     	, y     , z).tex(uMin, vMin).endVertex();
+		buffer.pos(dx     	, y+dh	, z).tex(uMin, vMax).endVertex();
+		buffer.pos(dx+dw	, y+dh	, z).tex(uMax, vMax).endVertex();
+		buffer.pos(dx+dw	, y     , z).tex(uMax, vMin).endVertex();
 		Tessellator.getInstance().draw();
 		//GlStateManager.disableBlend();
 		GL11.glPopAttrib();

@@ -3,6 +3,7 @@ package com.theincgi.advancedMacros.hud.hud2D;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
+import org.lwjgl.opengl.GL11;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 
@@ -38,7 +39,13 @@ public class Hud2D_Text extends Hud2DItem {
 				return LuaValue.valueOf(size);
 			}
 		});
-		this.opacity = 0;
+		getControls().set("getRatio", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return LuaValue.valueOf(AdvancedMacros.customFontRenderer.getTextRatio());
+			}
+		});
+		this.opacity = 1;
 	}
 	
 	
@@ -50,7 +57,8 @@ public class Hud2D_Text extends Hud2DItem {
 			dx = interpolate(dx, lastX, partialTicks);
 			dy = interpolate(dy, lastY, partialTicks);
 		}
-		AdvancedMacros.customFontRenderer.renderText(dx, dy, text, getOpacity());
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		AdvancedMacros.customFontRenderer.renderText(dx, dy, z, text, getOpacity());
 	}
 
 }

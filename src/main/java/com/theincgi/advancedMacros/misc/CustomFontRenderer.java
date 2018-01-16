@@ -189,7 +189,7 @@ public class CustomFontRenderer {
 	private void setColor(Color color, float opaicty) {
 		GlStateManager.color(color.getR()/255f, color.getG()/255f, color.getB()/255f, opaicty);
 	}
-	public void renderText(double x, double y, String text, float opacity) {
+	public void renderText(double x, double y, float z, String text, float opacity) {
 		boolean bold = false, italics = false;
 		double tx = x;
 		double ty = y;
@@ -316,21 +316,21 @@ public class CustomFontRenderer {
 				}
 				i++;
 			}else {
-				drawChar2D(dx, dy, c, textSize2d*ratio, textSize2d);
+				drawChar2D(dx, dy, z, c, textSize2d*ratio, textSize2d);
 				dx-=rightVect.vectorX();
 				dy-=rightVect.vectorY();
 			}
 		}
 	}
-	private void drawChar2D(double x, double y, char c, float wide, float tall) {
+	private void drawChar2D(double x, double y, float z, char c, float wide, float tall) {
 		loadUV(c, uvPair);
 		
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
-		buffer.pos(x    	, y     	, 0     	).tex(uvPair.umin, uvPair.vmin).endVertex(); //bottom left
-		buffer.pos(x	    , y+tall	, 0 		).tex(uvPair.umin, uvPair.vmax).endVertex(); //top left
-		buffer.pos(x+wide	, y+tall	, 0			).tex(uvPair.umax, uvPair.vmax).endVertex(); //top right
-		buffer.pos(x+wide	, y     	, 0			).tex(uvPair.umax, uvPair.vmin).endVertex(); //bottom right
+		buffer.pos(x    	, y     	, z     	).tex(uvPair.umin, uvPair.vmin).endVertex(); //bottom left
+		buffer.pos(x	    , y+tall	, z 		).tex(uvPair.umin, uvPair.vmax).endVertex(); //top left
+		buffer.pos(x+wide	, y+tall	, z			).tex(uvPair.umax, uvPair.vmax).endVertex(); //top right
+		buffer.pos(x+wide	, y     	, z			).tex(uvPair.umax, uvPair.vmin).endVertex(); //bottom right
 		Tessellator.getInstance().draw();
 	}
 
@@ -458,5 +458,10 @@ public class CustomFontRenderer {
 
 	class UVPair{
 		float umin,umax,vmin,vmax;
+	}
+
+	float ratio = charWid/(float)charHei;
+	public float getTextRatio() {
+		return ratio;
 	}
 }
