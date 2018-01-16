@@ -24,6 +24,7 @@ public class Hud2D_Box extends Hud2D_Rectangle {
 				return LuaValue.valueOf(thickness);
 			}
 		});
+		super.enableColorControl();
 	}
 	
 	@Override

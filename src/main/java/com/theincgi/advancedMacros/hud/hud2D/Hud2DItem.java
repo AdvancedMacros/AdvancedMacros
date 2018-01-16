@@ -10,14 +10,17 @@ import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.gui.Color;
+import com.theincgi.advancedMacros.misc.Utils;
 
 public abstract class Hud2DItem {
 	
 	float x, y, z;
 	float lastX, lastY;
-	protected float opacity;
+	//protected float opacity;
 	protected boolean allowFrameInterpolation = false;
 	LuaValue controls;
+	Color color = Color.BLACK;
 	
 	public Hud2DItem() {
 		this.controls = new LuaTable();
@@ -68,14 +71,14 @@ public abstract class Hud2DItem {
 		controls.set("setOpacity", new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg) {
-				opacity = (float) arg.checkdouble();
+				color.setA((int) (arg.checkdouble()*255));
 				return LuaValue.NONE;
 			}
 		});
 		controls.set("getOpacity", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return LuaValue.valueOf(opacity);
+				return LuaValue.valueOf(color.getA()/255f);
 			}
 		});
 		controls.set("enableDraw", new OneArgFunction() {
@@ -130,6 +133,23 @@ public abstract class Hud2DItem {
 		});
 	}
 	
+	public void enableColorControl() {
+		getControls().set("setColor", new VarArgFunction() {
+			@Override
+			public Varargs invoke(Varargs args) {
+				color = Utils.parseColor(args);
+				//colorInt = color.toInt();
+				return LuaValue.NONE;
+			}
+		});
+		getControls().set("getColor", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return color.toLuaValue();
+			}
+		});
+	}
+	
 	public LuaTable getControls() {
 		return controls.checktable();
 	}
@@ -170,6 +190,6 @@ public abstract class Hud2DItem {
 	}
 	
 	public float getOpacity() {
-		return opacity;
+		return color.getA();
 	}
 }

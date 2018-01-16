@@ -58,6 +58,7 @@ public class Hud2D_Image extends Hud2D_Rectangle {
 				return LuaValue.NONE;
 			}
 		});
+		super.enableColorControl();
 	}
 	
 	public void setUV(float uMin, float vMin, float uMax, float vMax) {

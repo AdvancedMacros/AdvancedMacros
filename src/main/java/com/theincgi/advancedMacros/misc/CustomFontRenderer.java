@@ -189,7 +189,7 @@ public class CustomFontRenderer {
 	private void setColor(Color color, float opaicty) {
 		GlStateManager.color(color.getR()/255f, color.getG()/255f, color.getB()/255f, opaicty);
 	}
-	public void renderText(double x, double y, float z, String text, float opacity) {
+	public void renderText(double x, double y, float z, String text, float opacity, float textSize2d) {
 		boolean bold = false, italics = false;
 		double tx = x;
 		double ty = y;
@@ -460,8 +460,30 @@ public class CustomFontRenderer {
 		float umin,umax,vmin,vmax;
 	}
 
-	float ratio = charWid/(float)charHei;
-	public float getTextRatio() {
-		return ratio;
+	private static final float ratio = charWid/(float)charHei;
+//	public float getTextRatio() { //size*ratio = scaledWidth
+//		return ratio;
+//	}
+	public static float measureWidth(String s, float currentSize) {
+		int max = 0;
+		int sLine = 0;
+		for(int i=0; i<s.length(); i++) {
+			if(s.charAt(i)=='\n') {
+				max = Math.max(sLine, max);
+				sLine = 0;
+			}else {
+				sLine++;
+			}
+		}
+		max = Math.max(sLine, max);
+		return max*(currentSize * ratio);
+	}
+	public static float measureHeight(String s, float size) {
+		int lines = 1;
+		for(int i=0; i<s.length(); i++) {
+			if(s.charAt(i)=='\n')
+				lines++;
+		}
+		return lines*size;
 	}
 }

@@ -17,25 +17,11 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 public class Hud2D_Rectangle extends Hud2DItem {
-	Color color = Color.BLACK; 
+	//Color color = Color.BLACK; 
 	int   colorInt;
 	float wid, hei;
 	float lastWid, lastHei;
 	public Hud2D_Rectangle() {
-		getControls().set("setColor", new VarArgFunction() {
-			@Override
-			public Varargs invoke(Varargs args) {
-				color = Utils.parseColor(args);
-				colorInt = color.toInt();
-				return LuaValue.NONE;
-			}
-		});
-		getControls().set("getColor", new ZeroArgFunction() {
-			@Override
-			public LuaValue call() {
-				return color.toLuaValue();
-			}
-		});
 		getControls().set("setWidth", new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg) {
@@ -62,7 +48,10 @@ public class Hud2D_Rectangle extends Hud2DItem {
 				return LuaValue.valueOf(hei);
 			}
 		});
+		super.enableColorControl();
 	}
+	
+	
 
 	@Override
 	public void render(float partialTicks) {
@@ -90,7 +79,8 @@ public class Hud2D_Rectangle extends Hud2DItem {
 		
 		//GlStateManager.enableBlend();
         GlStateManager.disableTexture2D();
-		
+		//GlStateManager.enableAlpha();
+//		GlStateManager.enableBlend();
 		GlStateManager.color(color.getR()/255f, color.getG()/255f, color.getB()/255f, color.getA()/255f);
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		buffer.begin(7, DefaultVertexFormats.POSITION); //7 is GL_QUADS btw
