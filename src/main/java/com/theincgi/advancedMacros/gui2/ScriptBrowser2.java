@@ -334,17 +334,13 @@ public class ScriptBrowser2 extends Gui{
 			int needed = (files.length+ROW_SIZE)/ROW_SIZE;
 			
 			if(ROW_SIZE!=getColumnCount()) {
-				System.out.println("ROW SIZE UPDATED");
+			//	System.out.println("ROW SIZE UPDATED");
 				ROW_SIZE=getColumnCount();
-				listManager.clear();
+//				listManager.clear();
 			}
 			
-			int has = listManager.getItems().size();
-
-			for(int i = 0; i < has-needed; i++) {//has more than needs
-				listManager.remove(listManager.getItems().size()-1);
-			}
-			for(int i = 0; i< needed-has; i++) {//doesnt have enough
+			listManager.clear();
+			for(int i = 0; i< needed; i++) {//doesnt have enough
 				listManager.add(new FileRow());
 			}
 

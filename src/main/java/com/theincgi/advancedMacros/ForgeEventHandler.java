@@ -518,9 +518,7 @@ public class ForgeEventHandler {
 		GlStateManager.enableCull();
 		GlStateManager.cullFace(CullFace.BACK);
 		GlStateManager.enableBlend();
-		//GlStateManager.enableAlpha();
-		//GlStateManager.disableAlpha();
-		//GlStateManager.disableBlend();
+
 
 		//src color -> src color?
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
@@ -551,23 +549,7 @@ public class ForgeEventHandler {
 		//Entity player = Minecraft.getMinecraft().player;
 
 		GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
-//		GlStateManager.enableCull();
-////		GlStateManager.cullFace(CullFace.BACK);
-		//GlStateManager.enableBlend();
-		//GlStateManager.enableAlpha();
-//		//GlStateManager.disableAlpha();
-//		//GlStateManager.disableBlend();
-//		//GlStateManager.enableLighting();
-//		//GlStateManager.enableColorLogic();
-//		//GlStateManager.disableColorLogic();
-//		//src color -> src color?
-//		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 
-		 //GL11.glDisable(GL11.GL_DEPTH_TEST);
-        // GL11.glDepthMask(false);
-        // GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        // GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-         //GL11.glEnable(GL11.GL_ALPHA_TEST);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         //GlStateManager.enableBlend();

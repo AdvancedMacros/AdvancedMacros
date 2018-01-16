@@ -46,7 +46,7 @@ public abstract class Hud2DItem {
 				return LuaValue.valueOf(y);
 			}
 		});
-		controls.set("setPostition", new TwoArgFunction() {
+		controls.set("setPos", new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg1, LuaValue arg2) {
 				arg2.checkdouble();
@@ -55,7 +55,7 @@ public abstract class Hud2DItem {
 				return LuaValue.NONE;
 			}
 		});
-		controls.set("getPosition", new VarArgFunction() {
+		controls.set("getPos", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs arg) {
 				LuaTable t = new LuaTable();

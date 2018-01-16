@@ -99,6 +99,7 @@ public class MacroMenuGui extends Gui{
 					profileSelect.close();
 				}else{
 					updateProfileList();
+					updateProfileChanges();
 					profileSelect.open();
 				}
 			}
@@ -148,6 +149,7 @@ public class MacroMenuGui extends Gui{
 						//}else if(prompting.equals(Prompting.CONFIRM_DELETE_FILE)){
 					}else if(prompting.equals(Prompting.CONFIRM_DELETE_PROFILE)){
 						Settings.getProfileTable().set(profileSelect.getSelection(), LuaValue.NIL);
+						Settings.save();
 						updateProfileList();
 						loadProfile("DEFAULT");
 					}
@@ -195,6 +197,7 @@ public class MacroMenuGui extends Gui{
 		drawables.remove(guib);
 		inputSubscribers.remove(guib);
 		bindingsList.remove(guib);
+		//TODO save remove
 	}
 
 	/**Ignore isKeydown for non key events, doesn't matter, 
@@ -325,6 +328,11 @@ public class MacroMenuGui extends Gui{
 
 	@Override
 	public void onGuiClosed() {
+		updateProfileChanges();
+		super.onGuiClosed();
+	}
+	
+	public void updateProfileChanges() {
 		LuaTable profiles = Settings.getProfileTable();
 		LuaTable profile = new LuaTable();
 		profiles.set(profileSelect.getSelection(), profile);
@@ -335,7 +343,6 @@ public class MacroMenuGui extends Gui{
 			}
 		}
 		Settings.save();
-		super.onGuiClosed();
 	}
 	//private static final ResourceLocation HOPPER_GUI_TEXTURE = new ResourceLocation("textures/gui/container/hopper.png");
 	//GuiButton button = new GuiButton(this,new WidgetID(1), 5, 5, 30, 30, Settings.getTextureID("D:\\backup\\Ian\\Pictures\\dan.png"), LuaValue.valueOf("Hello"));

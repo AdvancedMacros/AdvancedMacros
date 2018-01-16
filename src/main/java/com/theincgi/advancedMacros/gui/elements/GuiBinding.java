@@ -96,8 +96,10 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 				if(sButton.equals(removeButton)){
 					//TODO gui->addPopup->new Confirmation msg
 					//if yes do action
-					if(gui instanceof MacroMenuGui)
+					if(gui instanceof MacroMenuGui) {
 						((MacroMenuGui)gui).removeBinding(GuiBinding.this);
+						
+					}
 				}else if(sButton.equals(enableButton)){
 					enable = !enable;
 					updateEnableButton();

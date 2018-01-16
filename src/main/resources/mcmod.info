@@ -2,7 +2,7 @@
 {
   "modid": "advancedmacros",
   "name": "Advanced Macros",
-  "description": "Macros powered by Lua!\nSpecial thanks to:\n    Meteor6666, Emex",
+  "description": "Macros powered by Lua!\nSpecial thanks to:\n    Meteor6666, Emex ",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
