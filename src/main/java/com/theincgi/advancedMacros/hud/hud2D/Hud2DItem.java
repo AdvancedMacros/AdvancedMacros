@@ -20,6 +20,7 @@ public abstract class Hud2DItem {
 	//protected float opacity;
 	protected boolean allowFrameInterpolation = false;
 	LuaValue controls;
+	private boolean isDrawing = false;
 	Color color = Color.BLACK;
 	
 	public Hud2DItem() {
@@ -131,6 +132,12 @@ public abstract class Hud2DItem {
 				return LuaValue.valueOf(z);
 			}
 		});
+		controls.set("isDrawing", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return LuaValue.valueOf(isDrawing);
+			}
+		});
 	}
 	
 	public void enableColorControl() {
@@ -169,10 +176,14 @@ public abstract class Hud2DItem {
 		controls = LuaValue.FALSE;
 	}
 	
-	public void disableDraw() {
+	public synchronized void disableDraw() {
+		if(!isDrawing) return;
 		AdvancedMacros.forgeEventHandler.removeHud2DItem(this);
+		isDrawing = false;
 	}
-	public void enableDraw() {
+	public synchronized void enableDraw() {
+		if(isDrawing) return;
+		isDrawing = true;
 		AdvancedMacros.forgeEventHandler.addHud2DItem(this);
 	}
 
