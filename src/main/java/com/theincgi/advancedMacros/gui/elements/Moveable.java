@@ -1,7 +1,6 @@
 package com.theincgi.advancedMacros.gui.elements;
 
 public interface Moveable {
-
 	void setPos(int x, int y);
 
 	/**should not interact with input events when hidden*/
@@ -18,6 +17,5 @@ public interface Moveable {
 	
 	int getX();
 	int getY();
-	
 	
 }

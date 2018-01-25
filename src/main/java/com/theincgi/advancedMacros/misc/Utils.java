@@ -7,6 +7,7 @@ import java.util.Scanner;
 import javax.annotation.Nullable;
 
 import org.luaj.vm2_v3_0_1.LuaError;
+import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
@@ -155,7 +156,7 @@ public class Utils {
 		return null;
 	}
 	public static void logError(LuaError le){
-		AdvancedMacros.logFunc.call("&4"+le.toString());
+		AdvancedMacros.logFunc.call("&c"+le.toString());
 	}
 	public static String normalizeText(String keyName) {
 		return keyName.charAt(0)+(keyName.substring(1).toLowerCase());
@@ -650,7 +651,43 @@ public class Utils {
 		
 	}
 	
+	public static LuaError toLuaError(Throwable t) {
+		return new LuaError(t.getMessage());
+	}
 	
-	
+	public static Varargs pinvoke(LuaFunction func, LuaValue...luaValues) {
+		try {
+			return func.invoke(luaValues);
+		}catch (Throwable e) {
+			logError(toLuaError(e));
+			return null;
+		}
+	}
+	/**nah, its invoke, but it has one return*/
+	public static LuaValue pcall(LuaFunction func, LuaValue...luaValues) {
+		try {
+			return func.invoke(luaValues).arg1();
+		}catch (Throwable e) {
+			logError(toLuaError(e));
+			return LuaValue.NIL;
+		}
+	}
+	public static Varargs pinvoke(LuaFunction func, Varargs luaValues) {
+		try {
+			return func.invoke(luaValues);
+		}catch (Throwable e) {
+			logError(toLuaError(e));
+			return null;
+		}
+	}
+	/**nah, its invoke, but it has one return*/
+	public static LuaValue pcall(LuaFunction func, Varargs luaValues) {
+		try {
+			return func.invoke(luaValues).arg1();
+		}catch (Throwable e) {
+			logError(toLuaError(e));
+			return LuaValue.NIL;
+		}
+	}
 	
 }

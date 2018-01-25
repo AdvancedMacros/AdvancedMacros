@@ -29,6 +29,7 @@ import com.theincgi.advancedMacros.gui.elements.WidgetID;
 import com.theincgi.advancedMacros.lua.LuaDebug;
 import com.theincgi.advancedMacros.lua.LuaDebug.OnScriptFinish;
 import com.theincgi.advancedMacros.misc.Settings;
+import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
 
@@ -253,7 +254,8 @@ public class MacroMenuGui extends Gui{
 							}catch (LuaError le){
 								//TODO allow for option to not log error to chat
 								le.printStackTrace();
-								AdvancedMacros.logFunc.call(LuaValue.valueOf("&c"+le.toString()));
+								//AdvancedMacros.logFunc.call(LuaValue.valueOf("&c"+le.toString()));
+								Utils.logError(le);
 							}
 						}
 					}

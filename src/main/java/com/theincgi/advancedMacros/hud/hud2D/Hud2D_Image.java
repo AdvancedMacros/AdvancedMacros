@@ -24,7 +24,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 public class Hud2D_Image extends Hud2D_Rectangle {
-	LuaValTexture lvt;
+	LuaValTexture lvt = Utils.checkTexture(Settings.getTextureID("resource:holoblock.png"));
 	float uMin, vMin, uMax=1, vMax=1;
 	public Hud2D_Image() {
 		super();
@@ -34,13 +34,7 @@ public class Hud2D_Image extends Hud2D_Rectangle {
 		getControls().set("setImage", new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue v) {
-				if(v instanceof LuaValTexture){
-					lvt = (LuaValTexture) v;
-				}else if(v.isstring()){
-					lvt = Utils.checkTexture(Settings.getTextureID(v.checkjstring()));
-				}else{
-					lvt = Utils.checkTexture(Settings.getTextureID("resource:holoblock.png"));
-				}
+				setTexture(v);
 				return LuaValue.NONE;
 			}
 		});
@@ -61,6 +55,16 @@ public class Hud2D_Image extends Hud2D_Rectangle {
 		super.enableColorControl();
 	}
 	
+	public void setTexture(LuaValue v) {
+		if(v instanceof LuaValTexture){
+			lvt = (LuaValTexture) v;
+		}else if(v.isstring()){
+			lvt = Utils.checkTexture(Settings.getTextureID(v.checkjstring()));
+		}else{
+			lvt = Utils.checkTexture(Settings.getTextureID("resource:holoblock.png"));
+		}
+	}
+
 	public void setUV(float uMin, float vMin, float uMax, float vMax) {
 		this.uMin = uMin;
 		this.vMin = vMin;

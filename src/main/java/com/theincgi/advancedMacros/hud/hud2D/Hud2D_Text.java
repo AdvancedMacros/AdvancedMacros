@@ -30,32 +30,32 @@ public class Hud2D_Text extends Hud2DItem {
 				return LuaValue.valueOf(text);
 			}
 		});
-		getControls().set("setSize", new OneArgFunction() {
+		getControls().set("setTextSize", new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg) {
 				size = (float) arg.checkdouble();
 				return LuaValue.NONE;
 			}
 		});
-		getControls().set("getSize", new ZeroArgFunction() {
+		getControls().set("getTextSize", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
 				return LuaValue.valueOf(size);
 			}
 		});
-		getControls().set("measureWidth", new ZeroArgFunction() {
+		getControls().set("getWidth", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
 				return LuaValue.valueOf(CustomFontRenderer.measureWidth(text, size));
 			}
 		});
-		getControls().set("measureHeight", new ZeroArgFunction() {
+		getControls().set("getHeight", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
 				return LuaValue.valueOf(CustomFontRenderer.measureHeight(text, size));
 			}
 		});
-		getControls().set("measure", new VarArgFunction() {
+		getControls().set("getSize", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs args) {
 				LuaTable temp = new LuaTable();

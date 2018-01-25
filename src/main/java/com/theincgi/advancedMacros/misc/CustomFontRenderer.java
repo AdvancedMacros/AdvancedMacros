@@ -195,7 +195,7 @@ public class CustomFontRenderer {
 		double ty = y;
 
 		float ratio = charWid/(float)charHei;
-		Matrix upVect = Matrix.vector(0, textSize2d, 0);
+		Matrix upVect = Matrix.vector(0, -textSize2d, 0);
 		Matrix rightVect = Matrix.vector(-textSize2d*ratio, 0 , 0);
 		Matrix offset = Matrix.vector(0, 0, 0);
 		
@@ -468,12 +468,26 @@ public class CustomFontRenderer {
 		int max = 0;
 		int sLine = 0;
 		for(int i=0; i<s.length(); i++) {
-			if(s.charAt(i)=='\n') {
+			char c = s.charAt(i);
+			if(c=='\n') {
 				max = Math.max(sLine, max);
 				sLine = 0;
-			}else {
-				sLine++;
+				continue;
 			}
+			if(c=='&' && i<s.length()-1) {
+				char nc = s.charAt(i+1);
+				if(Utils.isTextStyleCode(nc) || Utils.isTextColorCode(nc)) {
+					i++;
+					continue;
+				}else if(nc=='&') {
+					i++;//skip next
+					sLine++;
+					continue;
+				}
+			}
+			
+			sLine++;
+			
 		}
 		max = Math.max(sLine, max);
 		return max*(currentSize * ratio);

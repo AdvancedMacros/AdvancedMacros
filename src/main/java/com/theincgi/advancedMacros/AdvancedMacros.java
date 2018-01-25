@@ -49,6 +49,7 @@ import com.theincgi.advancedMacros.lua.functions.OpenInventory;
 import com.theincgi.advancedMacros.lua.functions.PCall;
 import com.theincgi.advancedMacros.lua.functions.PlaySound;
 import com.theincgi.advancedMacros.lua.functions.RunThread;
+import com.theincgi.advancedMacros.lua.functions.ScriptGui;
 import com.theincgi.advancedMacros.lua.functions.SetProfile;
 import com.theincgi.advancedMacros.lua.functions.SkinCustomizer;
 import com.theincgi.advancedMacros.lua.functions.StopAllScripts;
@@ -214,6 +215,10 @@ public class AdvancedMacros {
 		globals.set("isKeyDown", new IsKeyHeld());
 		globals.set("filesystem", new FileSystem());
 		globals.set("prompt", inputGUI.getPrompt());
+		
+		LuaTable guiStuff = new LuaTable();
+		guiStuff.set("newGui", new ScriptGui.CreateScriptGui());
+		globals.set("gui", guiStuff);
 		//System.out.println("FUNCTIONS:\n"+ColorTextArea.getVariableList(globals.checktable(), LuaValue.TFUNCTION, true, "", new HashMap<LuaTable, Boolean>()));
 	}
 	

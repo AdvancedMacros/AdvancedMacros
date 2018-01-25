@@ -83,6 +83,11 @@ public class Hud2D_Rectangle extends Hud2DItem {
 //		GlStateManager.enableBlend();
 		GlStateManager.color(color.getR()/255f, color.getG()/255f, color.getB()/255f, color.getA()/255f);
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+		GlStateManager.disableBlend();
+		GlStateManager.enableBlend();
+	    //GlStateManager.disableTexture2D();
+	    GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.enableAlpha();
 		buffer.begin(7, DefaultVertexFormats.POSITION); //7 is GL_QUADS btw
 		buffer.pos(dx	  	, dy     	, z).endVertex(); //bottom left -> bottom right -> top right -> top left
 		buffer.pos(dx       , dy+dh 	, z).endVertex(); //top left 
