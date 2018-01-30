@@ -79,15 +79,20 @@ public class Hud2D_Rectangle extends Hud2DItem {
 		
 		//GlStateManager.enableBlend();
         GlStateManager.disableTexture2D();
-		//GlStateManager.enableAlpha();
+//		GlStateManager.enableAlpha();
 //		GlStateManager.enableBlend();
 		GlStateManager.color(color.getR()/255f, color.getG()/255f, color.getB()/255f, color.getA()/255f);
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+		
 		GlStateManager.disableBlend();
 		GlStateManager.enableBlend();
-	    //GlStateManager.disableTexture2D();
+	    
+		//GlStateManager.disableTexture2D();
 	    GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+	    
 		GlStateManager.enableAlpha();
+		GlStateManager.disableAlpha();
+		
 		buffer.begin(7, DefaultVertexFormats.POSITION); //7 is GL_QUADS btw
 		buffer.pos(dx	  	, dy     	, z).endVertex(); //bottom left -> bottom right -> top right -> top left
 		buffer.pos(dx       , dy+dh 	, z).endVertex(); //top left 
@@ -96,6 +101,7 @@ public class Hud2D_Rectangle extends Hud2DItem {
 		
 		Tessellator.getInstance().draw();
 		GlStateManager.enableTexture2D();
+		//GlStateManager.disableBlend();
        // GlStateManager.disableBlend();
        // Gui.drawRect((int)dx, (int)dy, (int)dx+dw, (int)dy+dh, color.toInt());
 		//GL11.glPopAttrib();

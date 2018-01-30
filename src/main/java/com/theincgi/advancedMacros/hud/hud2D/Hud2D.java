@@ -34,7 +34,7 @@ public class Hud2D extends LuaTable{
 				box.y = (float) var.optdouble(2, 0);
 				box.wid = (float) var.optdouble(3, 0);
 				box.hei = (float) var.optdouble(4, 0);
-				box.thickness = (float) var.optdouble(5, 0);
+				box.thickness = (float) var.optdouble(5, 1);
 				return box.controls;
 			}
 		});

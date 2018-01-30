@@ -36,7 +36,7 @@ import net.minecraft.client.Minecraft;
 public class MacroMenuGui extends Gui{
 	//BufferedImage img = null;
 	//GuiDropDown guiDropDown = new GuiDropDown(new WidgetID(10), 5, 5, 150, 12, 150, null);
-	
+
 	private String propAddress = "colors.bindingsMenu";
 
 	GuiDropDown profileSelect = new GuiDropDown(new WidgetID(1), 5, 5, width-23, 12, 12*7, propAddress);
@@ -72,8 +72,8 @@ public class MacroMenuGui extends Gui{
 		prompt = new PopupPrompt(new WidgetID(303), width/3, height/3, width/3, height/3, this);
 
 
-//		for(EventName s : ForgeEventHandler.EventName.values())
-//			GuiBinding.addEventName(s.name());
+		//		for(EventName s : ForgeEventHandler.EventName.values())
+		//			GuiBinding.addEventName(s.name());
 
 		//update size regularly
 		//		drawables.add(new Drawable() {
@@ -119,7 +119,7 @@ public class MacroMenuGui extends Gui{
 			@Override
 			public void onClick(int button, GuiButton sButton) {
 				//if(Gui.isAltKeyDown())
-					ForgeEventHandler.showMenu(AdvancedMacros.scriptBrowser2);
+				ForgeEventHandler.showMenu(AdvancedMacros.scriptBrowser2);
 				//else
 				//	ForgeEventHandler.showMenu(AdvancedMacros.scriptBrowser);
 				//Minecraft.getMinecraft().displayGuiScreen(AdvancedMacros.scriptBrowser);
@@ -180,7 +180,7 @@ public class MacroMenuGui extends Gui{
 		drawables.add(showScriptManager);
 		//drawables.add(gotoSettings);
 		drawables.add(addBinding);
-		
+
 		updateProfileList();
 		profileSelect.select("DEFAULT");
 		onResize(Minecraft.getMinecraft(), width, height);
@@ -216,11 +216,11 @@ public class MacroMenuGui extends Gui{
 				GuiBinding b = (GuiBinding) m;
 				if(b.isDisabled()) 
 					continue; //disabled, skip
-					//System.out.println("Event type matched");
-						//System.out.println("Not key or keyAllowed");
-						if(b.getTriggerName().equals(eventName) && !b.getEventMode().isKeyType()){ //right event
-							return true;
-						}
+				//System.out.println("Event type matched");
+				//System.out.println("Not key or keyAllowed");
+				if(b.getTriggerName().equals(eventName) && !b.getEventMode().isKeyType()){ //right event
+					return true;
+				}
 			}
 		}
 		return false;
@@ -244,18 +244,20 @@ public class MacroMenuGui extends Gui{
 
 							//TODO pcall of some kind
 							File f = new File(AdvancedMacros.macrosFolder, b.getScriptName());
-							try {
-								FileReader fr = new FileReader(f);
-								LuaValue function = AdvancedMacros.globals.load(fr, b.getScriptName());
-								LuaDebug.LuaThread t = new LuaDebug.LuaThread(function, args, b.getScriptName());
-								t.start(onScriptFinish);
-							} catch (FileNotFoundException e) {
-								e.printStackTrace();
-							}catch (LuaError le){
-								//TODO allow for option to not log error to chat
-								le.printStackTrace();
-								//AdvancedMacros.logFunc.call(LuaValue.valueOf("&c"+le.toString()));
-								Utils.logError(le);
+							if(f.exists()) {
+								try {
+									FileReader fr = new FileReader(f);
+									LuaValue function = AdvancedMacros.globals.load(fr, b.getScriptName());
+									LuaDebug.LuaThread t = new LuaDebug.LuaThread(function, args, b.getScriptName());
+									t.start(onScriptFinish);
+								} catch (FileNotFoundException e) {
+									e.printStackTrace();
+								}catch (LuaError le){
+									//TODO allow for option to not log error to chat
+									le.printStackTrace();
+									//AdvancedMacros.logFunc.call(LuaValue.valueOf("&c"+le.toString()));
+									Utils.logError(le);
+								}
 							}
 						}
 					}
@@ -301,8 +303,9 @@ public class MacroMenuGui extends Gui{
 				//				g.setScript(t.get("script").tojstring());
 				bindingsList.add(g);
 			}
-
-
+			LuaTable args = AdvancedMacros.forgeEventHandler.createEvent(EventName.ProfileLoaded);
+			args.set(3, LuaValue.valueOf(profile));
+			AdvancedMacros.forgeEventHandler.fireEvent(EventName.ProfileLoaded, args);
 
 			return true;
 		}else{
@@ -333,7 +336,7 @@ public class MacroMenuGui extends Gui{
 		updateProfileChanges();
 		super.onGuiClosed();
 	}
-	
+
 	public void updateProfileChanges() {
 		LuaTable profiles = Settings.getProfileTable();
 		LuaTable profile = new LuaTable();

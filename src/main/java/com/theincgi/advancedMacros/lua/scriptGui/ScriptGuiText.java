@@ -10,6 +10,8 @@ import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.elements.GuiRect;
 import com.theincgi.advancedMacros.hud.hud2D.Hud2D_Rectangle;
 
+import net.minecraft.client.renderer.GlStateManager;
+
 public class ScriptGuiText extends ScriptGuiElement{
 	public int textSize = 12;
 	private String text="";
@@ -53,6 +55,7 @@ public class ScriptGuiText extends ScriptGuiElement{
 	public void onDraw(Gui g, int mouseX, int mouseY, float partialTicks) {
 		super.onDraw(g, mouseX, mouseY, partialTicks);
 		if(!visible) return;
+		GlStateManager.bindTexture(0);
 		AdvancedMacros.customFontRenderer.renderText(x, y, z, text, color.getA(), textSize);
 		if(getHoverTint()!=null && GuiRect.isInBounds(mouseX, mouseY, (int)x, (int)y, (int)wid, (int)hei)) {
 			Hud2D_Rectangle.drawRectangle(x, y, wid, hei, getHoverTint(), z);

@@ -157,6 +157,7 @@ public class Utils {
 	}
 	public static void logError(LuaError le){
 		AdvancedMacros.logFunc.call("&c"+le.toString());
+		le.printStackTrace();
 	}
 	public static String normalizeText(String keyName) {
 		return keyName.charAt(0)+(keyName.substring(1).toLowerCase());
@@ -652,7 +653,7 @@ public class Utils {
 	}
 	
 	public static LuaError toLuaError(Throwable t) {
-		return new LuaError(t.getMessage());
+		return new LuaError(t);
 	}
 	
 	public static Varargs pinvoke(LuaFunction func, LuaValue...luaValues) {

@@ -3,6 +3,7 @@ package com.theincgi.advancedMacros;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.ArrayList;
 
 import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LuaError;
@@ -73,7 +74,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "3.10.3"; //${version} ??
+	public static final String VERSION = "3.11.3"; //${version} ??
 	public static final File macrosRootFolder = new File(Minecraft.getMinecraft().mcDataDir,"mods/advancedMacros");
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -92,6 +93,9 @@ public class AdvancedMacros {
 	public static ForgeEventHandler forgeEventHandler;
 	public static final CustomFontRenderer customFontRenderer = new CustomFontRenderer();
 	private static final DocumentationManager documentationManager = new DocumentationManager();
+	
+	//protected static ArrayList customEventNames;
+	
 //	public static FloatBuffer modelView3d = BufferUtils.createFloatBuffer(16);
 //	public static FloatBuffer projView3d = BufferUtils.createFloatBuffer(16);
 //	public static FloatBuffer modelView2d = BufferUtils.createFloatBuffer(16);
@@ -137,7 +141,7 @@ public class AdvancedMacros {
 	@SideOnly(Side.CLIENT)
 	public void postInit(FMLPostInitializationEvent event) {
 		editorGUI.postInit();
-		forgeEventHandler.fireEvent(EventName.Startup,ForgeEventHandler.createEvent(EventName.Startup));
+		
 	}
 
 	

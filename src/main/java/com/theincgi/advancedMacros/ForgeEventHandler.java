@@ -12,16 +12,19 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import com.theincgi.advancedMacros.ForgeEventHandler.EventName;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.MacroMenuGui;
 import com.theincgi.advancedMacros.gui.elements.ColorTextArea;
 import com.theincgi.advancedMacros.hud.hud2D.Hud2DItem;
 import com.theincgi.advancedMacros.hud.hud3D.WorldHudItem;
 import com.theincgi.advancedMacros.lua.LuaDebug.OnScriptFinish;
+import com.theincgi.advancedMacros.lua.functions.ScriptGui;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.GlStateManager;
@@ -34,6 +37,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
@@ -71,17 +76,17 @@ public class ForgeEventHandler {
 	/**These enums contain lowercase letters because they're names get used directly*/
 	public static enum EventName{
 		Chat,					//COMPLETE
-		ChatFilter,
+		ChatFilter,				//COMPLETE
 		//LoggedIn,
 		//LoggedOut,
-		JoinWorld,					//COMPLETE
+		JoinWorld,				//COMPLETE
 		LeaveWorld,
-		Respawn,					//COMPLETE
+		Respawn,				//COMPLETE
 		Death,					//COMPLETE
-		HealthChanged,					//COMPLETE
-		HungerChanged,					//COMPLETE
-		SaturationChanged,					//COMPLETE
-		AirChanged,					//COMPLETE
+		HealthChanged,			//COMPLETE
+		HungerChanged,			//COMPLETE
+		SaturationChanged,		//COMPLETE
+		AirChanged,				//COMPLETE
 		DimensionChanged,
 		//DamageTaken, //healthChanged covers this
 		ItemPickup,
@@ -89,15 +94,16 @@ public class ForgeEventHandler {
 		//ItemSmelted,this is server side
 		HotbarChanged, //slot changed					//COMPLETE
 		PotionStatus, 
-		Weather,					//COMPLETE
+		Weather,				//COMPLETE
 		PlayerIgnited, //ouch
 		//FOVChanged, //does this need to be an event?
 		GUIOpened,
+		GUIClosed,
 		//AnvilUpdate, //server event
 		//PotionBrewed, //server event
 		ItemTossed,
 		WorldSaved,
-		ArrowFired,					//COMPLETE
+		ArrowFired,				//COMPLETE
 		AttackEntity,
 		EntityInteract,
 		BlockInteract,
@@ -110,7 +116,7 @@ public class ForgeEventHandler {
 		ItemDurability,
 		PlayerJoin,
 		PlayerLeave,
-		XP,					//COMPLETE
+		XP,						//COMPLETE
 		//PlayerDropItems, //server event
 		//EntityDropItems, //server event
 		AttackReady,
@@ -417,7 +423,56 @@ public class ForgeEventHandler {
 		lastPlayerList = null;
 	}
 
+	private boolean startupHasFired = false;
+	@SubscribeEvent
+	public void onGuiStartup(GuiScreenEvent.InitGuiEvent.Post sEvent) {
+		if(startupHasFired) return;
+		Minecraft.getMinecraft().addScheduledTask(()->{
+			fireEvent(EventName.Startup,ForgeEventHandler.createEvent(EventName.Startup));
+		});
+		startupHasFired = true;
+	}
 
+	@SubscribeEvent
+	public void onGuiOpened(GuiOpenEvent sEvent) {
+		GuiScreen sGui = sEvent.getGui();
+		if(sGui==null) {
+			AdvancedMacros.forgeEventHandler.fireEvent(EventName.GUIClosed, createEvent(EventName.GUIClosed));
+		}else{
+			String name = sGui.getClass().toString();
+			if(sGui.toString().startsWith("ScriptGui:")) {
+				name = sGui.toString();
+			}else {
+				if(name.startsWith("class ")) {
+					name = name.substring(6);
+				}
+				if(name.startsWith("net.minecraft.client.gui")) {
+					name = "Minecraft:"+name.substring(name.lastIndexOf('.'));
+				}else {
+					switch (name) {
+					case "com.theincgi.advancedMacros.gui.MacroMenuGui":
+						name = "AdvancedMacros:BindingsMenu";
+						break;
+					case "com.theincgi.advancedMacros.gui2.ScriptBrowser2":
+						name = "AdvancedMacros:ScriptBrowser";
+						break;
+					case "com.theincgi.advancedMacros.gui.RunningScriptsGui":
+						name = "AdvancedMacros:RunningScripts";
+						break;
+					case "com.theincgi.advancedMacros.gui.EditorGUI":
+						name = "AdvancedMacros:Editor";
+						break;
+					default:
+						break; //defaults to full class name
+					}
+				}
+			}
+			//System.out.println(sGui.getClass());
+			LuaTable args = createEvent(EventName.GUIOpened);
+			args.set(3, name);
+			fireEvent(EventName.GUIOpened, args);
+		}
+	}
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onChat(ClientChatReceivedEvent sEvent){
@@ -541,21 +596,24 @@ public class ForgeEventHandler {
 		GlStateManager.disableBlend();//F1 is black otherwise
 		GlStateManager.popAttrib();
 	}
-	
+
 	@SubscribeEvent
 	public void afterOverlay(RenderGameOverlayEvent.Post event) {
-		
+
 		float p = Minecraft.getMinecraft().getRenderPartialTicks();
 		//Entity player = Minecraft.getMinecraft().player;
 
 		GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		
-        //GlStateManager.enableBlend();
-        //GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 1);
-       // GlStateManager.disableAlpha();
+		GlStateManager.disableBlend();
+		GlStateManager.enableBlend();
+		//GL11.glEnable(GL11.GL_BLEND);
+		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+		//GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+		//GlStateManager.enableBlend();
+		//GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 1);
+		// GlStateManager.disableAlpha();
 		GlStateManager.bindTexture(0);
 		//GlStateManager.enableLighting();
 
@@ -572,10 +630,15 @@ public class ForgeEventHandler {
 		GlStateManager.color(1, 1, 1, 1);
 		//GlStateManager.disableBlend();
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		
-		
+		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.disableAlpha();
+		GlStateManager.enableAlpha();
+		GlStateManager.disableBlend();
+		GlStateManager.enableBlend();
+		GlStateManager.color(1, 1, 1, 1);
+		//	GlStateManager.disableTexture2D();
 	}
-	
+
 	public static double accuPlayerX(float pTick, Entity e){
 		return e.posX*pTick + e.lastTickPosX*(1-pTick);
 	}
@@ -600,6 +663,9 @@ public class ForgeEventHandler {
 	}
 	public void fireEvent(EventName event, LuaTable args){
 		AdvancedMacros.macroMenuGui.fireEvent(false, event.name(), args.unpack(), false);
+	}
+	public void fireEvent(String eventString, LuaTable args){
+		AdvancedMacros.macroMenuGui.fireEvent(false, eventString, args.unpack(), false);
 	}
 	public void fireEvent(EventName event, LuaTable args, OnScriptFinish onScriptFinish){
 		AdvancedMacros.macroMenuGui.fireEvent(false, event.name(), args.unpack(), false, onScriptFinish);
@@ -651,7 +717,7 @@ public class ForgeEventHandler {
 			worldHudItems.clear();
 		}
 	}
-	
+
 	public void addHud2DItem(Hud2DItem item) {
 		synchronized (hud2DItems) {
 			hud2DItems.add(item);
@@ -670,7 +736,7 @@ public class ForgeEventHandler {
 			hud2DItems.clear();
 		}
 	}
-	
+
 	public int getSTick() {
 		return sTick;
 	}

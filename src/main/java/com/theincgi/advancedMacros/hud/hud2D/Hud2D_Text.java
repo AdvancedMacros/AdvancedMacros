@@ -11,6 +11,8 @@ import org.lwjgl.opengl.GL11;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.CustomFontRenderer;
 
+import net.minecraft.client.renderer.GlStateManager;
+
 public class Hud2D_Text extends Hud2DItem {
 	String text = "";
 	float size = 12; 
@@ -75,8 +77,10 @@ public class Hud2D_Text extends Hud2DItem {
 			dx = interpolate(dx, lastX, partialTicks);
 			dy = interpolate(dy, lastY, partialTicks);
 		}
+		//GlStateManager.enableBlend();
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		AdvancedMacros.customFontRenderer.renderText(dx, dy, z, text, getOpacity(), size);
+	//	GlStateManager.disableBlend();
 	}
 
 }

@@ -26,7 +26,7 @@ import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 public class GuiImage extends ScriptGuiElement{
-	LuaValTexture lvt = null;
+	LuaValTexture lvt = Utils.checkTexture(Settings.getTextureID("resource:holoblock.png"));
 	float uMin=0, uMax=1, vMin=0, vMax=1;
 	public GuiImage(Gui gui, Group parent) {
 		super(gui, parent);
@@ -67,14 +67,15 @@ public class GuiImage extends ScriptGuiElement{
 		
 		
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+		//GlStateManager.tryBlendFuncSeparate(SourceFactor.SRC_COLOR, DestFactor.SRC_COLOR, SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 		
 //		GlStateManager.disableAlpha();
 //		GlStateManager.enableAlpha();
-////		
-//		GlStateManager.disableBlend();
-//		GlStateManager.enableBlend();
-////		
-//		GlStateManager.disableTexture2D();
+////////		
+		GlStateManager.disableBlend();
+		GlStateManager.enableBlend();
+//////		
+////		GlStateManager.disableTexture2D();
 //		GlStateManager.enableTexture2D();
 		GlStateManager.color(color.getR()/255f, color.getG()/255f, color.getB()/255f, color.getA()/255f);
 		//GlStateManager.color(1,0,0);
@@ -83,6 +84,7 @@ public class GuiImage extends ScriptGuiElement{
 		//GlStateManager.enable
 		
 		//GlStateManager.enableColorMaterial();
+		if(lvt!=null)
 		Minecraft.getMinecraft().getTextureManager().bindTexture(lvt.getResourceLocation());
 		
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();

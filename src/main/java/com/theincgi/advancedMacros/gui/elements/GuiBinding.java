@@ -144,6 +144,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 						for (EventName string : ForgeEventHandler.EventName.values()) {
 							eventSelector.addOption(string.name());
 						}
+						
 						eventSelector.open();
 					}
 				}

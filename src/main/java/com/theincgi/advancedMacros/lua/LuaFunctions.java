@@ -101,9 +101,11 @@ public class LuaFunctions {
 		}
 		@Override
 		public Varargs invoke(Varargs arg0) {
-			
-			Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(formatString(arg0));
-			
+			try {
+				Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(formatString(arg0));
+			}catch (Throwable e) {
+				//prob tried to log without chat
+			}
 			return LuaValue.NONE;
 		}
 		public synchronized ITextComponent formatString(Varargs arg0){

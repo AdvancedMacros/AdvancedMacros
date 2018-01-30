@@ -30,6 +30,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 
 public class ScriptGui extends LuaTable implements InputSubscriber{
+	private static int counter = 1;
+	String guiName = "generic_"+counter++;
 	Gui gui = new Gui() {
 		@Override
 		public void onGuiClosed() {
@@ -48,6 +50,10 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 			}
 			super.drawScreen(mouseX, mouseY, partialTicks);
 		};
+		@Override
+		public String toString() {
+			return "ScriptGui:"+guiName;
+		}
 	};
 	//LuaTable controls = new LuaTable();
 	LuaFunction onScroll, onMouseClick, onMouseRelease, onMouseDrag, onKeyPressed, onKeyRepeated, onKeyReleased, onGuiClose,
@@ -57,10 +63,6 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 	public ScriptGui() { 
 		gui.inputSubscribers.add(this); //tell yourself everything!
 		set("addRectangle", new VarArgFunction() {
-			@Override
-			public LuaValue call() {
-				return new GuiRectangle(gui, guiGroup);
-			}
 			@Override
 			public Varargs invoke(Varargs args) {
 				GuiRectangle r = new GuiRectangle(gui, guiGroup);
@@ -157,6 +159,19 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				temp.set(1, LuaValue.valueOf(scaled.getScaledWidth()));
 				temp.set(2, LuaValue.valueOf(scaled.getScaledHeight()));
 				return temp.unpack();
+			}
+		});
+		this.set("setName", new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg) {
+				guiName = arg.checkjstring();
+				return NONE;
+			}
+		});
+		this.set("getName", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return LuaValue.valueOf(guiName);
 			}
 		});
 		addInputControls(this);
@@ -298,4 +313,6 @@ public static class CreateScriptGui extends ZeroArgFunction{
 			return Utils.pcall(onKeyReleased, LuaValue.valueOf(typedChar), LuaValue.valueOf(keyCode)).optboolean(false);
 		return false;
 	}
+	
+	
 }
