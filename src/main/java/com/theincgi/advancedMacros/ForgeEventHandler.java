@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
+import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -23,6 +24,9 @@ import com.theincgi.advancedMacros.lua.functions.ScriptGui;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.ISound;
+import net.minecraft.client.audio.ISoundEventListener;
+import net.minecraft.client.audio.SoundEventAccessor;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.ServerData;
@@ -41,6 +45,7 @@ import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
@@ -121,6 +126,7 @@ public class ForgeEventHandler {
 		//EntityDropItems, //server event
 		AttackReady,
 		ProfileLoaded,
+		Sound,
 		Startup, //right after everything is loaded, custom libraries should go here!
 		Anything //also includes key event or mouse event,
 		;//	TEST;
@@ -472,6 +478,28 @@ public class ForgeEventHandler {
 			args.set(3, name);
 			fireEvent(EventName.GUIOpened, args);
 		}
+	}
+	@SubscribeEvent
+	public void onSound(PlaySoundEvent pse) {
+		LuaTable event = createEvent(EventName.Sound);
+		event.set(3, pse.getName());
+		
+		fireEvent(EventName.Sound, event);
+		LuaTable controls = new LuaTable();
+		controls.set("isPlaying", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return LuaValue.valueOf(pse.getManager().isSoundPlaying(pse.getSound()));
+			}
+		});
+		controls.set("stop", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				pse.getManager().stopSound(pse.getSound());
+				return NONE;
+			}
+		});
+		event.set(4, controls);
 	}
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)
