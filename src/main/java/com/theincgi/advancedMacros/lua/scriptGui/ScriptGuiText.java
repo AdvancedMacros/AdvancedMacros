@@ -49,6 +49,7 @@ public class ScriptGuiText extends ScriptGuiElement{
 				return NONE;
 			}
 		});
+		
 	}
 	
 	@Override

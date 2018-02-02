@@ -3,6 +3,7 @@ package com.theincgi.advancedMacros.gui;
 import java.io.IOException;
 import java.util.List;
 
+import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
@@ -384,6 +385,13 @@ public class InputGUI extends Gui{
 
 		@Override
 		public LuaValue invoke(Varargs args) {
+			while(Minecraft.getMinecraft().currentScreen==AdvancedMacros.runningScriptsGui) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					throw new LuaError(e);
+				}
+			}
 			LuaValue arg0 = args.arg1();
 			LuaValue type = args.arg(2);
 			//System.out.println("Block Waiting");

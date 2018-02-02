@@ -11,6 +11,7 @@ import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import org.lwjgl.input.Mouse;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
@@ -24,6 +25,7 @@ import com.theincgi.advancedMacros.lua.scriptGui.ScriptGuiText;
 import com.theincgi.advancedMacros.lua.scriptGui.Group;
 import com.theincgi.advancedMacros.lua.scriptGui.GuiBox;
 import com.theincgi.advancedMacros.lua.scriptGui.GuiImage;
+import com.theincgi.advancedMacros.lua.scriptGui.GuiItemIcon;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
@@ -32,35 +34,36 @@ import net.minecraft.client.gui.ScaledResolution;
 public class ScriptGui extends LuaTable implements InputSubscriber{
 	private static int counter = 1;
 	String guiName = "generic_"+counter++;
-	Gui gui = new Gui() {
-		@Override
-		public void onGuiClosed() {
-			super.onGuiClosed();
-			if(onGuiClose!=null) {
-				onGuiClose.call();
-			}
-		}
-		@Override
-		public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-			if(parentGui!=null) {
-				parentGui.gui.drawScreen(mouseX, mouseY, partialTicks);
-				setDrawDefaultBackground(false);
-			}else {
-				setDrawDefaultBackground(true);
-			}
-			super.drawScreen(mouseX, mouseY, partialTicks);
-		};
-		@Override
-		public String toString() {
-			return "ScriptGui:"+guiName;
-		}
-	};
+	Gui gui;
 	//LuaTable controls = new LuaTable();
 	LuaFunction onScroll, onMouseClick, onMouseRelease, onMouseDrag, onKeyPressed, onKeyRepeated, onKeyReleased, onGuiClose,
 	onGuiOpen;
 	Group guiGroup = new Group();
 	ScriptGui parentGui = null;
 	public ScriptGui() { 
+		gui = new Gui() {
+			@Override
+			public void onGuiClosed() {
+				super.onGuiClosed();
+				if(onGuiClose!=null) {
+					onGuiClose.call();
+				}
+			}
+			@Override
+			public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+				if(parentGui!=null) {
+					parentGui.gui.drawScreen(mouseX, mouseY, partialTicks);
+					setDrawDefaultBackground(false);
+				}else {
+					setDrawDefaultBackground(true);
+				}
+				super.drawScreen(mouseX, mouseY, partialTicks);
+			};
+			@Override
+			public String toString() {
+				return "ScriptGui:"+guiName;
+			}
+		};
 		gui.inputSubscribers.add(this); //tell yourself everything!
 		set("addRectangle", new VarArgFunction() {
 			@Override
@@ -112,6 +115,17 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				t.wid = (float)args.optdouble(4, 0);
 				t.hei = (float)args.optdouble(5, 0);
 				return t;
+			}
+		});
+		set("addItem", new VarArgFunction() {
+			@Override
+			public Varargs invoke(Varargs args) {
+				GuiItemIcon gii = new GuiItemIcon(gui, guiGroup);
+				if(!args.arg1().isnil())
+					gii.setStack(args.checkjstring(1));
+				gii.setPos(args.optint(2, 0), args.optint(3, 0));
+				gii.setCount(args.optint(4, 1));
+				return gii;
 			}
 		});
 		set("open", new ZeroArgFunction() {

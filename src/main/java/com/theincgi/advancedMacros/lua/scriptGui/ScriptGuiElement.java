@@ -28,7 +28,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 	//optional setColor
 	protected Color color = Color.BLACK;
 	private int colorInt;
-	private Color hoverTint = null;
+	private Color hoverTint = Color.CLEAR;
 	private int colorTintInt;
 	LuaFunction onScroll, onMouseClick,
 	onMouseRelease, onMouseDrag, onKeyPressed, onKeyReleased, onKeyRepeated,

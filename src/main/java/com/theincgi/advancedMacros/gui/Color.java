@@ -42,6 +42,7 @@ public class Color {
 		TEXT_d = new Color(255,85,255),
 		TEXT_e = new Color(255,255,85),
 		TEXT_f = new Color(255,255,255);
+	public static final Color CLEAR = new Color(0x00_00_00_00);
 	
 	
 	public Color(int a, int r, int g, int b) {

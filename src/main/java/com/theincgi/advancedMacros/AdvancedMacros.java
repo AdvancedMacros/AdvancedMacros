@@ -34,7 +34,6 @@ import com.theincgi.advancedMacros.lua.functions.GetEntityData;
 import com.theincgi.advancedMacros.lua.functions.GetEntityList;
 import com.theincgi.advancedMacros.lua.functions.GetInventory;
 import com.theincgi.advancedMacros.lua.functions.GetLoadedPlayers;
-import com.theincgi.advancedMacros.lua.functions.GetMIDIKeyboard;
 import com.theincgi.advancedMacros.lua.functions.GetOSMilliseconds;
 import com.theincgi.advancedMacros.lua.functions.GetPlayer;
 import com.theincgi.advancedMacros.lua.functions.GetPlayerBlockPos;
@@ -47,6 +46,7 @@ import com.theincgi.advancedMacros.lua.functions.HTTP;
 import com.theincgi.advancedMacros.lua.functions.IsKeyHeld;
 import com.theincgi.advancedMacros.lua.functions.LightAt;
 import com.theincgi.advancedMacros.lua.functions.MathPlus;
+import com.theincgi.advancedMacros.lua.functions.MidiLib;
 import com.theincgi.advancedMacros.lua.functions.OpenInventory;
 import com.theincgi.advancedMacros.lua.functions.PCall;
 import com.theincgi.advancedMacros.lua.functions.PlaySound;
@@ -75,7 +75,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "3.11.6"; //${version} ??
+	public static final String VERSION = "3.11.7_unoffical"; //${version} ??
 	public static final File macrosRootFolder = new File(Minecraft.getMinecraft().mcDataDir,"mods/advancedMacros");
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -173,8 +173,7 @@ public class AdvancedMacros {
 		globals.set("say", sayFunc = new LuaFunctions.Say());
 		globals.set("toast", new Toast());
 		globals.set("sleep", sleepFunc = new LuaFunctions.Sleep());
-		//globals.set("debug", debugFunc = new LuaFunctions.Debug());
-		globals.set("print", LuaValue.NIL);
+		globals.set("print", new LuaFunctions.Debug());
 		globals.set("getSettings", new Settings.GetSettings());
 		
 		globals.get("os").set("millis", new GetOSMilliseconds());
@@ -215,7 +214,7 @@ public class AdvancedMacros {
 		globals.set("getBiome", new GetBiome());
 		
 		globals.set("playSound", new PlaySound.FromFile());
-		globals.set("getMidiKeyboard", new GetMIDIKeyboard());
+		globals.set("midi", new MidiLib());
 		globals.set("customizeSkin", new SkinCustomizer());
 		//globals.set("getVillages", new GetVillages());
 		globals.set("isKeyDown", new IsKeyHeld());

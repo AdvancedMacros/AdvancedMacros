@@ -7,6 +7,7 @@ import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.lua.scriptGui.GuiItemIcon;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
@@ -64,6 +65,18 @@ public class Hud2D extends LuaTable{
 				text.y = (float) var.optdouble(3, 0);
 				text.size = (float) var.optdouble(4, 12);
 				return text.controls;
+			}
+		});
+		set("addItem", new VarArgFunction() {
+			@Override
+			public Varargs invoke(Varargs args) {
+				Hud2d_itemIcon gii = new Hud2d_itemIcon();
+				if(!args.arg1().isnil())
+					gii.setStack(args.checkjstring(1));
+				gii.x = args.optint(2, 0);
+				gii.y = args.optint(3, 0);
+				gii.setCount(args.optint(4, 1));
+				return gii.controls;
 			}
 		});
 //		this.set("addLine", new ZeroArgFunction() {
