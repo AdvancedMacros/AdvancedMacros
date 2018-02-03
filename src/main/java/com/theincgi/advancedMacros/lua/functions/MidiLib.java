@@ -23,19 +23,38 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import com.theincgi.advancedMacros.lua.functions.MidiLib.GetMIDIKeyboard.KeyboardInstance;
 import com.theincgi.advancedMacros.misc.Utils;
 
-public class MidiLib extends LuaTable {
+import scala.reflect.internal.Trees.Throw;
 
+public class MidiLib extends LuaTable {
+	private final static Object instancesSyncLock = new Object();
 	public MidiLib() {
 		this.set("getDevice", new GetMIDIKeyboard());
 		this.set("stopAll", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				synchronized (GetMIDIKeyboard.instancesSyncLock) {
+				synchronized (instancesSyncLock) {
+					System.out.println("Entered sync block");
+					System.out.println(GetMIDIKeyboard.instances);
 					for (KeyboardInstance ki : GetMIDIKeyboard.instances) {
-						ki.close();
+						System.out.println("LOOPING");
+						try {
+							if(ki.keyboard.isOpen()) {
+								System.out.println("CLosing part 1");
+								ki.receiver.close();
+								System.out.println("Attempting to close");
+								ki.keyboard.close();
+								
+								System.out.println("Closed!");
+							}
+						}catch (Throwable e) {
+							e.printStackTrace();
+							throw new LuaError(e);
+						}
 					}
 					GetMIDIKeyboard.instances.clear();
+					System.out.println("Done");
 				}
+				System.out.println("Returning...");
 				return NONE;
 			}
 		});
@@ -68,7 +87,7 @@ public class MidiLib extends LuaTable {
 	}
 	
 	public static class GetMIDIKeyboard extends TwoArgFunction{
-		private final static Object instancesSyncLock = new Object();
+		
 		static ArrayList<KeyboardInstance> instances = new ArrayList<>();
 
 		@Override
@@ -105,7 +124,7 @@ public class MidiLib extends LuaTable {
 					MidiDevice dev = MidiSystem.getMidiDevice(info);
 					if(!(dev instanceof Synthesizer) && !(dev instanceof Sequencer)) {
 						if(dev.getMaxTransmitters()!=0) {//has outputs
-							if(filter == null || info.getDescription().toLowerCase().contains(filter.toLowerCase())) {
+							if(filter == null || info.getName().toLowerCase().contains(filter.toLowerCase())) {
 								System.out.println("Got MIDI: " + info.getDescription());
 								return dev;
 							}
@@ -276,7 +295,11 @@ public class MidiLib extends LuaTable {
 								t.set("velocity", vel);
 								synchronized (actionSyncronizeLock) {
 									if(action!=null && !action.isnil())
-										action.invoke(t);
+										try {
+											action.invoke(t);
+										}catch (Throwable e) {
+											throw new LuaError(e);
+										}
 								}
 								//System.out.printf("NOTE OFF - Channel: %3d, Key: %3d, Vel: %3d\n", channel, key, vel);
 							}
@@ -291,7 +314,11 @@ public class MidiLib extends LuaTable {
 								t.set("velocity", vel);
 								synchronized (actionSyncronizeLock) {
 									if(action!=null && !action.isnil())
-										action.invoke(t);
+										try {
+											action.invoke(t);
+										}catch (Throwable e) {
+											throw new LuaError(e);
+										}
 								}
 								//System.out.printf("NOTE ON - Channel: %3d, Key: %3d, Vel: %3d\\n", channel, key, vel);
 							}
@@ -306,7 +333,11 @@ public class MidiLib extends LuaTable {
 								t.set("pressure", pressure);
 								synchronized (actionSyncronizeLock) {
 									if(action!=null && !action.isnil())
-										action.invoke(t);
+										try {
+											action.invoke(t);
+										}catch (Throwable e) {
+											throw new LuaError(e);
+										}
 								}
 								//System.out.printf("Poly Key Pressure - Channel: %3d, Key: %3d, Pressure: %3d\n", channel, key, pressure);
 							}
@@ -323,7 +354,11 @@ public class MidiLib extends LuaTable {
 								t.set("value", value);
 								synchronized (actionSyncronizeLock) {
 									if(action!=null && !action.isnil())
-										action.invoke(t);
+										try {
+											action.invoke(t);
+										}catch (Throwable e) {
+											throw new LuaError(e);
+										}
 								}
 								//System.out.printf("Controller Change - Channel: %3d, %s (%3d), %3d\n", channel, controlName, cntrlNum, value);
 							}
@@ -335,7 +370,11 @@ public class MidiLib extends LuaTable {
 								t.set("preset", presetNumber);
 								synchronized (actionSyncronizeLock) {
 									if(action!=null && !action.isnil())
-										action.invoke(t);
+										try {
+											action.invoke(t);
+										}catch (Throwable e) {
+											throw new LuaError(e);
+										}
 								}
 								//System.out.printf("Program Change - Channel: %3d, Preset: %3d\n", channel, presetNumber);
 							}
@@ -348,7 +387,11 @@ public class MidiLib extends LuaTable {
 								t.set("pressure", pressure);
 								synchronized (actionSyncronizeLock) {
 									if(action!=null && !action.isnil())
-										action.invoke(t);
+										try {
+											action.invoke(t);
+										}catch (Throwable e) {
+											throw new LuaError(e);
+										}
 								}
 								//System.out.printf("Channel Pressure - Channel: %3d, Pressure: %3d\n", channel, pressure);
 							}
@@ -363,7 +406,11 @@ public class MidiLib extends LuaTable {
 								t.set("coarse", coarse);
 								synchronized (actionSyncronizeLock) {
 									if(action!=null && !action.isnil())
-										action.invoke(t);
+										try {
+											action.invoke(t);
+										}catch (Throwable e) {
+											throw new LuaError(e);
+										}
 								}
 								//System.out.printf("Pitch Bend - Channel: %3d, Fine: %3d, Coarse: %3d\n", channel, fine, coarse);
 							}
@@ -383,8 +430,17 @@ public class MidiLib extends LuaTable {
 			}
 
 			public void close() {
+				try {
 				receiver.close();
-				keyboard.close();
+				}catch (Throwable e) {
+					e.printStackTrace();
+				}
+				try {
+					if(keyboard.isOpen())
+						keyboard.close();
+				}catch (Throwable e) {
+					e.printStackTrace();
+				}
 			}
 
 

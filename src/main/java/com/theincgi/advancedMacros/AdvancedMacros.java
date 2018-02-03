@@ -75,7 +75,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "3.11.7_unoffical"; //${version} ??
+	public static final String VERSION = "3.11.7"; //${version} ??
 	public static final File macrosRootFolder = new File(Minecraft.getMinecraft().mcDataDir,"mods/advancedMacros");
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");

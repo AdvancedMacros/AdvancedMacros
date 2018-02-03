@@ -104,9 +104,11 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 					enable = !enable;
 					updateEnableButton();
 				}else if(sButton.equals(editButton)){
-					AdvancedMacros.editorGUI.updateKeywords();
-					AdvancedMacros.editorGUI.openScript(script);
-					ForgeEventHandler.showMenu(AdvancedMacros.editorGUI, AdvancedMacros.macroMenuGui);
+					if(script!=null && !script.isEmpty()) {
+						AdvancedMacros.editorGUI.updateKeywords();
+						AdvancedMacros.editorGUI.openScript(script);
+						ForgeEventHandler.showMenu(AdvancedMacros.editorGUI, AdvancedMacros.macroMenuGui);
+					}
 				}else if(sButton.equals(moveButton)){
 					container.grab(GuiBinding.this);
 				}else if(sButton.equals(modeButton)){

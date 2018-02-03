@@ -60,6 +60,7 @@ public class InputGUI extends Gui{
 		listItemPicker.setScrollSpeed(10);
 		choices.setScrollSpeed(10);
 		choices.setSpacing(3);
+		textInput.setMaxStringLength(Integer.MAX_VALUE);
 	}
 
 	public void setInputType(InputType inputType, String prompt) {
