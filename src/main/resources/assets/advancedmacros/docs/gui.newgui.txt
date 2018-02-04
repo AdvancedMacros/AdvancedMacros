@@ -1,0 +1,3 @@
+gui.newGui()
+Creates a new customizable gui.
+Works similarly to hud2D but with more controls.

@@ -1,0 +1,3 @@
+midi.list()
+Get a table listing all of the
+currently available midi devices.

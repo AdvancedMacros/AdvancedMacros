@@ -46,7 +46,6 @@ import com.theincgi.advancedMacros.lua.functions.HTTP;
 import com.theincgi.advancedMacros.lua.functions.IsKeyHeld;
 import com.theincgi.advancedMacros.lua.functions.LightAt;
 import com.theincgi.advancedMacros.lua.functions.MathPlus;
-import com.theincgi.advancedMacros.lua.functions.MidiLib;
 import com.theincgi.advancedMacros.lua.functions.OpenInventory;
 import com.theincgi.advancedMacros.lua.functions.PCall;
 import com.theincgi.advancedMacros.lua.functions.PlaySound;
@@ -56,6 +55,7 @@ import com.theincgi.advancedMacros.lua.functions.SetProfile;
 import com.theincgi.advancedMacros.lua.functions.SkinCustomizer;
 import com.theincgi.advancedMacros.lua.functions.StopAllScripts;
 import com.theincgi.advancedMacros.lua.functions.Toast;
+import com.theincgi.advancedMacros.lua.functions.midi.MidiLib2;
 import com.theincgi.advancedMacros.misc.CustomFontRenderer;
 import com.theincgi.advancedMacros.misc.Settings;
 
@@ -75,7 +75,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "3.11.7"; //${version} ??
+	public static final String VERSION = "3.11.8"; //${version} ??
 	public static final File macrosRootFolder = new File(Minecraft.getMinecraft().mcDataDir,"mods/advancedMacros");
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -214,7 +214,7 @@ public class AdvancedMacros {
 		globals.set("getBiome", new GetBiome());
 		
 		globals.set("playSound", new PlaySound.FromFile());
-		globals.set("midi", new MidiLib());
+		globals.set("midi", new MidiLib2());
 		globals.set("customizeSkin", new SkinCustomizer());
 		//globals.set("getVillages", new GetVillages());
 		globals.set("isKeyDown", new IsKeyHeld());

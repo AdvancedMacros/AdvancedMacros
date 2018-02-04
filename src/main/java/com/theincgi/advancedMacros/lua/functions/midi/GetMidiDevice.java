@@ -37,8 +37,15 @@ public class GetMidiDevice extends TwoArgFunction {
 			return FALSE;
 		
 		LuaReceiver receiver = new LuaReceiver();
+		try {
+			device.getTransmitter().setReceiver(receiver);
+		} catch (MidiUnavailableException e) {
+			e.printStackTrace();
+			receiver.close();
+			throw new LuaError(e);
+		}
 		
-		return new MidiDeviceControl(device, luaReceiver);
+		return new MidiDeviceControl(device, receiver);
 	}
 
 	private MidiDevice findDevice(String filter) throws MidiUnavailableException {

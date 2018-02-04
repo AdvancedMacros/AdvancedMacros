@@ -4,10 +4,35 @@ import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Receiver;
 
 import org.luaj.vm2_v3_0_1.LuaError;
+import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaTable;
 
-public class LuaReceiver implements Receiver{
+import com.theincgi.advancedMacros.misc.Utils;
 
+public class LuaReceiver implements Receiver{
+	LuaFunction onEvent;
+	
+	public LuaReceiver() {
+	}
+	public LuaReceiver(LuaFunction onEvent) {
+		this.onEvent = onEvent;
+	}
+	
+	public void setOnEvent(LuaFunction onEvent) {
+		this.onEvent = onEvent;
+	}
+	
+	public void tryEvent(LuaTable table) {
+		if(onEvent!=null)
+			try {
+				onEvent.call(table);
+			}catch (Throwable e) {
+				e.printStackTrace();
+				Utils.logError(Utils.toLuaError(e));
+				//throw new LuaError(e);
+			}
+	}
+	
 	@Override
 	public void send(MidiMessage message, long timeStamp) {
 		try {
@@ -16,7 +41,8 @@ public class LuaReceiver implements Receiver{
 			parse(bytes, len);
 		}catch (Throwable e) {
 			e.printStackTrace();
-			throw new LuaError(e);
+			Utils.logError(Utils.toLuaError(e));
+			//throw new LuaError(e);
 		}
 	}
 
@@ -33,10 +59,12 @@ public class LuaReceiver implements Receiver{
 				LuaTable event = new LuaTable();
 				event.set("channel", channel);
 				event.set("status", "noteOff");
-				event.set("note", getNoteName(key));
-				event.set("", value); //BOOKMARK
+				event.set("key", key);
+				event.set("velocity", vel);
 				
-				System.out.printf("NOTE OFF - Channel: %3d, Key: %3d, Vel: %3d\n", channel, key, vel);
+				//System.out.printf("NOTE OFF - Channel: %3d, Key: %3d, Vel: %3d\n", channel, key, vel);
+				
+				tryEvent(event);
 			}
 			break;
 		}
@@ -49,8 +77,12 @@ public class LuaReceiver implements Receiver{
 				LuaTable event = new LuaTable();
 				event.set("channel", channel);
 				event.set("status", "noteOn");
+				event.set("key", key); 
+				event.set("velocity", vel);
 				
-				System.out.printf("NOTE ON - Channel: %3d, Key: %3d, Vel: %3d\n", channel, key, vel);
+				//System.out.printf("NOTE ON - Channel: %3d, Key: %3d, Vel: %3d\n", channel, key, vel);
+
+				tryEvent(event);
 			}
 			break;
 		}
@@ -63,8 +95,12 @@ public class LuaReceiver implements Receiver{
 				LuaTable event = new LuaTable();
 				event.set("channel", channel);
 				event.set("status", "polyKeyPressure");
+				event.set("key", key);
+				event.set("pressure", pressure);
 				
-				System.out.printf("Poly Key Pressure - Channel: %3d, Key: %3d, Pressure: %3d\n", channel, key, pressure);
+				//System.out.printf("Poly Key Pressure - Channel: %3d, Key: %3d, Pressure: %3d\n", channel, key, pressure);
+
+				tryEvent(event);
 			}
 			break;
 		}
@@ -78,8 +114,12 @@ public class LuaReceiver implements Receiver{
 				LuaTable event = new LuaTable();
 				event.set("channel", channel);
 				event.set("status", "controllerChange");
+				event.set("control", controlName);
+				event.set("velocity", value);
 				
-				System.out.printf("Controller Change - Channel: %3d, %s (%3d), %3d\n", channel, controlName, cntrlNum, value);
+				//System.out.printf("Controller Change - Channel: %3d, %s (%3d), %3d\n", channel, controlName, cntrlNum, value);
+
+				tryEvent(event);
 			}
 		}
 		case 0xC0:{ //1100nnnn - program change
@@ -90,8 +130,11 @@ public class LuaReceiver implements Receiver{
 				LuaTable event = new LuaTable();
 				event.set("channel", channel);
 				event.set("status", "programChange");
+				event.set("preset", presetNumber);
 				
-				System.out.printf("Program Change - Channel: %3d, Preset: %3d\n", channel, presetNumber);
+				//System.out.printf("Program Change - Channel: %3d, Preset: %3d\n", channel, presetNumber);
+
+				tryEvent(event);
 			}
 			break;
 		}
@@ -103,8 +146,11 @@ public class LuaReceiver implements Receiver{
 				LuaTable event = new LuaTable();
 				event.set("channel", channel);
 				event.set("status", "channelPressure");
+				event.set("pressure", pressure); //BOOKMARK
 				
-				System.out.printf("Channel Pressure - Channel: %3d, Pressure: %3d\n", channel, pressure);
+				//System.out.printf("Channel Pressure - Channel: %3d, Pressure: %3d\n", channel, pressure);
+
+				tryEvent(event);
 			}
 			break;
 		}
@@ -117,8 +163,12 @@ public class LuaReceiver implements Receiver{
 				LuaTable event = new LuaTable();
 				event.set("channel", channel);
 				event.set("status", "pitchBend");
+				event.set("fine", fine);
+				event.set("coarse", coarse);
 				
-				System.out.printf("Pitch Bend - Channel: %3d, Fine: %3d, Coarse: %3d\n", channel, fine, coarse);
+				//System.out.printf("Pitch Bend - Channel: %3d, Fine: %3d, Coarse: %3d\n", channel, fine, coarse);
+
+				tryEvent(event);
 			}
 			break;
 		}
@@ -129,11 +179,11 @@ public class LuaReceiver implements Receiver{
 	
 	
 	
-	private String[] noteTypes = {"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};
-	private String getNoteName(int key) {
+	private static final String[] noteTypes = {"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};
+	public static String getNoteName(int key) {
 		return noteTypes[key % 12];
 	}
-	private int getOctaveNumber(int key) {
+	public static int getOctaveNumber(int key) {
 		return (key/12)-1;
 	}
 

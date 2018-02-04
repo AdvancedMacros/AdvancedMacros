@@ -1,0 +1,3 @@
+midi.getDevice([String:nameFilter], [Function:onEvent])
+Gets an MIDI device for input. Calls 'onEvent' when
+MIDI events are received from the device (if open).

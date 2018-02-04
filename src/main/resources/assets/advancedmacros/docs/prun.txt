@@ -1,3 +1,3 @@
-pcall(String:macroName)
+pRun(String:macroName)
 Same as run except true or false is first return value
 TRUE - no errors, FALSE - caused error (second value is the error detail)

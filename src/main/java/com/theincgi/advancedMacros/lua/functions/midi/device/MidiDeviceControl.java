@@ -9,6 +9,9 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
+import com.theincgi.advancedMacros.lua.functions.midi.LuaReceiver;
+import com.theincgi.advancedMacros.lua.functions.midi.MidiLib2;
+
 public class MidiDeviceControl extends LuaTable {
 	
 	public MidiDeviceControl(MidiDevice device, LuaReceiver luaReceiver) {
@@ -44,6 +47,7 @@ public class MidiDeviceControl extends LuaTable {
 			@Override public LuaValue call() {
 				try {
 					device.open();
+					MidiLib2.devices.add(device);
 				} catch (MidiUnavailableException e) {
 					e.printStackTrace();
 					throw new LuaError(e);
@@ -55,6 +59,7 @@ public class MidiDeviceControl extends LuaTable {
 			@Override
 			public LuaValue call() {
 				device.close();
+				MidiLib2.devices.remove(device);
 				return NONE;
 			}
 		});
@@ -62,8 +67,11 @@ public class MidiDeviceControl extends LuaTable {
 			
 			@Override
 			public LuaValue call(LuaValue arg) {
-				// TODO Auto-generated method stub
-				return null;
+				if(arg.isnil())
+					luaReceiver.setOnEvent(null);
+				else
+					luaReceiver.setOnEvent(arg.checkfunction());
+				return NONE;
 			}
 		});
 	}

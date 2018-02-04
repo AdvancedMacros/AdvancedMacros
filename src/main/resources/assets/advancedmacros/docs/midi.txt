@@ -1,0 +1,3 @@
+This table includes functions for the 
+MIDI library. Allows for use of MIDI
+input devices.
