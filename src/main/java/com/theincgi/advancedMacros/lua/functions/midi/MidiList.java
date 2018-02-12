@@ -5,6 +5,7 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiDevice.Info;
 
 import org.luaj.vm2_v3_0_1.LuaTable;
+import org.luaj.vm2_v3_0_1.LuaUserdata;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
@@ -31,6 +32,11 @@ public class MidiList extends ZeroArgFunction {
 		t.set("description", info.getDescription());
 		t.set("vendor", info.getVendor());
 		t.set("version", info.getVersion());
+		t.set("userdata", new LuaUserdata(info) {@Override
+			public String toString() {
+				return "userdata:midiDevice";
+			}});
+		t.set("type", info.getClass().getSimpleName());
 		return t;
 	}
 

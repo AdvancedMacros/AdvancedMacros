@@ -235,7 +235,7 @@ public class LuaFunctions {
 					s+="\""+v.tojstring().replaceAll("&", "&&")+"&b\""; //added &b to fix color formating in these
 					//added .replaceAll so that way color formating doesnt trigger inside the table print
 				}else{
-					s+=v.tojstring();
+					s+=v.isuserdata()?"&d"+v.tojstring():v.tojstring();
 				}
 				s+="\n";
 			}

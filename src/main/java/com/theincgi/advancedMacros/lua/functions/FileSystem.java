@@ -371,11 +371,11 @@ public class FileSystem extends LuaTable{
 	}
 	private static void assertAddress(LuaValue arg) {
 		if(!isValidAddress(arg.checkjstring())){
-			throw new LuaError("File may not be accessed, move/copy into the macros folder to use this file.");
+			throw new LuaError("File may not be accessed, move/copy into the advanced macros folder to use this file.");
 		}
 		return;
 	}
-	private static boolean isValidAddress(String path) {
+	public static boolean isValidAddress(String path) {
 		try {
 			File f = new File(AdvancedMacros.macrosRootFolder,path);
 			return f.getCanonicalPath().startsWith(AdvancedMacros.macrosRootFolder.getCanonicalPath());

@@ -13,7 +13,7 @@ import com.theincgi.advancedMacros.lua.functions.midi.LuaReceiver;
 import com.theincgi.advancedMacros.lua.functions.midi.MidiLib2;
 
 public class MidiDeviceControl extends LuaTable {
-	
+
 	public MidiDeviceControl(MidiDevice device, LuaReceiver luaReceiver) {
 		//Info section
 		this.set("getName", new ZeroArgFunction() {
@@ -41,7 +41,7 @@ public class MidiDeviceControl extends LuaTable {
 				return LuaValue.valueOf(device.isOpen());
 			}
 		});
-		
+
 		//Control section
 		this.set("open", new ZeroArgFunction() {
 			@Override public LuaValue call() {
@@ -63,16 +63,25 @@ public class MidiDeviceControl extends LuaTable {
 				return NONE;
 			}
 		});
-		this.set("setOnEvent", new OneArgFunction() {
-			
-			@Override
-			public LuaValue call(LuaValue arg) {
-				if(arg.isnil())
-					luaReceiver.setOnEvent(null);
-				else
-					luaReceiver.setOnEvent(arg.checkfunction());
-				return NONE;
+		if(luaReceiver!=null)
+			this.set("setOnEvent", new OneArgFunction() {
+
+				@Override
+				public LuaValue call(LuaValue arg) {
+					if(arg.isnil())
+						luaReceiver.setOnEvent(null);
+					else
+						luaReceiver.setOnEvent(arg.checkfunction());
+					return NONE;
+				}
+			});
+
+		try {
+			if(device.getReceiver()!=null) {
+				this.set("send", new MidiSend(device));
 			}
-		});
+		} catch (MidiUnavailableException e) {
+
+		}
 	}
 }

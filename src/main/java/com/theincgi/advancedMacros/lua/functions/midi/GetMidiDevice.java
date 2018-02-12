@@ -19,32 +19,43 @@ public class GetMidiDevice extends TwoArgFunction {
 
 	@Override
 	public LuaValue call(LuaValue arg1, LuaValue arg2) {
-		String filter = null;
-		if(!arg1.isnil())
-			filter = arg1.checkjstring();
-		LuaFunction onEvent = null;
-		if(!arg2.isnil())
-			onEvent = arg2.checkfunction();
-		
 		MidiDevice device;
-		try {
-			device = findDevice(filter);
-		} catch (MidiUnavailableException e) {
-			e.printStackTrace();
-			throw new LuaError(e);
+		if(arg1.isuserdata()) {
+			try {
+				device = MidiSystem.getMidiDevice((Info) arg1.checkuserdata());
+			} catch (MidiUnavailableException e) {
+				e.printStackTrace();
+				throw new LuaError(e);
+			}
+		}else {
+			String filter = null;
+			if(!arg1.isnil())
+				filter = arg1.checkjstring();
+			
+
+			try {
+				device = findDevice(filter);
+			} catch (MidiUnavailableException e) {
+				e.printStackTrace();
+				throw new LuaError(e);
+			}
 		}
 		if(device == null)
 			return FALSE;
 		
+		LuaFunction onEvent = null;
+		if(!arg2.isnil())
+			onEvent = arg2.checkfunction();
+
 		LuaReceiver receiver = new LuaReceiver();
 		try {
 			device.getTransmitter().setReceiver(receiver);
 		} catch (MidiUnavailableException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			receiver.close();
-			throw new LuaError(e);
+			receiver = null;
 		}
-		
+
 		return new MidiDeviceControl(device, receiver);
 	}
 
@@ -52,13 +63,14 @@ public class GetMidiDevice extends TwoArgFunction {
 		Info[] infos = MidiSystem.getMidiDeviceInfo();
 		for (Info info : infos) {
 			MidiDevice dev = MidiSystem.getMidiDevice(info);
-			if(!(dev instanceof Synthesizer) && !(dev instanceof Sequencer)) {
-				if(info.getName().toLowerCase().contains(filter.toLowerCase())){
-					return dev;
-				}
+
+			//if() {
+			if(info.getName().toLowerCase().contains(filter.toLowerCase())){
+				return dev;
 			}
+			//			}
 		}
 		return null;
 	}
-	
+
 }

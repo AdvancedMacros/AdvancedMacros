@@ -11,7 +11,7 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 public class RAFFuncs {
 	private RandomAccessFile raf;
-	private LuaTable controls;
+	private LuaTable controls = new LuaTable();
 	public RAFFuncs(RandomAccessFile raf) {
 		this.raf = raf;
 		controls.set("seek", 		new Seek());

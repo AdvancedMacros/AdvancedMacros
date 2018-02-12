@@ -62,7 +62,7 @@ public class LuaReceiver implements Receiver{
 				event.set("key", key);
 				event.set("velocity", vel);
 				
-				//System.out.printf("NOTE OFF - Channel: %3d, Key: %3d, Vel: %3d\n", channel, key, vel);
+				System.out.printf("NOTE OFF - Channel: %3d, Key: %3d, Vel: %3d\n", channel, key, vel);
 				
 				tryEvent(event);
 			}
@@ -80,7 +80,7 @@ public class LuaReceiver implements Receiver{
 				event.set("key", key); 
 				event.set("velocity", vel);
 				
-				//System.out.printf("NOTE ON - Channel: %3d, Key: %3d, Vel: %3d\n", channel, key, vel);
+				System.out.printf("NOTE ON - Channel: %3d, Key: %3d, Vel: %3d\n", channel, key, vel);
 
 				tryEvent(event);
 			}
@@ -115,7 +115,7 @@ public class LuaReceiver implements Receiver{
 				event.set("channel", channel);
 				event.set("status", "controllerChange");
 				event.set("control", controlName);
-				event.set("velocity", value);
+				event.set("value", value);
 				
 				//System.out.printf("Controller Change - Channel: %3d, %s (%3d), %3d\n", channel, controlName, cntrlNum, value);
 

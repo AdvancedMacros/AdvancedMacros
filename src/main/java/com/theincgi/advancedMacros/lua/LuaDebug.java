@@ -139,6 +139,7 @@ public class LuaDebug extends DebugLib{
 						}
 					}
 				});
+				thread.setName(sFunc.tojstring());
 				thread.start();
 
 				class Stop extends ZeroArgFunction{

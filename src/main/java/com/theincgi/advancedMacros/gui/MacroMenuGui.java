@@ -243,8 +243,9 @@ public class MacroMenuGui extends Gui{
 							//System.out.println("Trigger matched!");
 
 							//TODO pcall of some kind
+							if(b.getScriptName()==null) return;
 							File f = new File(AdvancedMacros.macrosFolder, b.getScriptName());
-							if(f.exists()) {
+							if(f.exists() && f.isFile()) {
 								try {
 									FileReader fr = new FileReader(f);
 									LuaValue function = AdvancedMacros.globals.load(fr, b.getScriptName());

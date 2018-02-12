@@ -13,6 +13,11 @@ public class MidiLib2 extends LuaTable{
 	public MidiLib2() {
 		this.set("list", new MidiList());
 		this.set("getDevice", new GetMidiDevice());
+		this.set("openMidiFile", new OneArgFunction() {
+			@Override public LuaValue call(LuaValue arg) {
+				return new MidiFileInput(arg.checkjstring());
+			}
+		});
 		this.set("stopAll", new StopAll());
 		this.set("getNoteName", new OneArgFunction() {
 			@Override public LuaValue call(LuaValue arg) {
