@@ -55,6 +55,7 @@ import com.theincgi.advancedMacros.lua.functions.SetProfile;
 import com.theincgi.advancedMacros.lua.functions.SkinCustomizer;
 import com.theincgi.advancedMacros.lua.functions.StopAllScripts;
 import com.theincgi.advancedMacros.lua.functions.Toast;
+import com.theincgi.advancedMacros.lua.functions.lua5_3.StringSerialization;
 import com.theincgi.advancedMacros.lua.functions.midi.MidiLib2;
 import com.theincgi.advancedMacros.misc.CustomFontRenderer;
 import com.theincgi.advancedMacros.misc.Settings;
@@ -75,7 +76,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "3.11.9_unoffical"; //${version} ??
+	public static final String VERSION = "3.11.9"; //${version} ??
 	public static final File macrosRootFolder = new File(Minecraft.getMinecraft().mcDataDir,"mods/advancedMacros");
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -184,6 +185,13 @@ public class AdvancedMacros {
 		math.set("ln", math.get("log")); //because log is some how base e instead of 10
 		math.set("log", new MathPlus.Log());
 		math.set("e", MathPlus.const_e);
+		
+//		//5.3 string tweaks //migrated to org.luaj.vm2_v3_0_1.lib.StringLib
+//		{
+//			LuaTable string = globals.get("string").checktable();
+//			string.set("pack", new StringSerialization.StringPack());
+//			string.set("unpack", new StringSerialization.StringUnpack());
+//		}
 		
 		globals.set("httpRequest", new HTTP());
 		globals.set("getWorld", new GetWorld());

@@ -28,6 +28,7 @@ import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.ISoundEventListener;
 import net.minecraft.client.audio.SoundEventAccessor;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.network.NetworkPlayerInfo;
@@ -432,11 +433,13 @@ public class ForgeEventHandler {
 	private boolean startupHasFired = false;
 	@SubscribeEvent
 	public void onGuiStartup(GuiScreenEvent.InitGuiEvent.Post sEvent) {
-		if(startupHasFired) return;
-		Minecraft.getMinecraft().addScheduledTask(()->{
-			fireEvent(EventName.Startup,ForgeEventHandler.createEvent(EventName.Startup));
-		});
-		startupHasFired = true;
+		if(sEvent.getGui().getClass().equals(GuiMainMenu.class)) {
+			if(startupHasFired) return;
+			Minecraft.getMinecraft().addScheduledTask(()->{
+				fireEvent(EventName.Startup,ForgeEventHandler.createEvent(EventName.Startup));
+			});
+			startupHasFired = true;
+		}
 	}
 
 	@SubscribeEvent
@@ -483,7 +486,7 @@ public class ForgeEventHandler {
 	public void onSound(PlaySoundEvent pse) {
 		LuaTable event = createEvent(EventName.Sound);
 		event.set(3, pse.getName());
-		
+
 		fireEvent(EventName.Sound, event);
 		LuaTable controls = new LuaTable();
 		controls.set("isPlaying", new ZeroArgFunction() {

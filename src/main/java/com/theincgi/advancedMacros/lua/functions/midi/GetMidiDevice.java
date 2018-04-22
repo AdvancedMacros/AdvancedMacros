@@ -51,7 +51,6 @@ public class GetMidiDevice extends TwoArgFunction {
 		try {
 			device.getTransmitter().setReceiver(receiver);
 		} catch (MidiUnavailableException e) {
-			//e.printStackTrace();
 			receiver.close();
 			receiver = null;
 		}

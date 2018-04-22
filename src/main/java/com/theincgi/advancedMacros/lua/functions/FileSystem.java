@@ -40,7 +40,10 @@ public class FileSystem extends LuaTable{
 			assertAddress(arg0);
 			if(arg0.tojstring().isEmpty()) {throw new LuaError("No File name given");}
 			File file = new File(AdvancedMacros.macrosRootFolder, arg0.checkjstring());
-
+			if(!mode.equals("r")) {
+				file.getParentFile().mkdirs();
+			}
+				
 			if(mode.equals("r")) {
 				try {
 					FileInputStream fis = new FileInputStream(file);

@@ -1,8 +1,11 @@
 package com.theincgi.advancedMacros.lua.functions;
 
+import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
+import org.luaj.vm2_v3_0_1.lib.ThreeArgFunction;
+import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -120,8 +123,28 @@ public class GetPlayer extends OneArgFunction {
 				}
 			}
 		}
-		
 		t.set("gamemode", player.isSpectator()?"spectator":player.isCreative()?"creative":"survival");
+		
+		LuaTable meta = new LuaTable();
+		LuaFunction func = new ThreeArgFunction() {
+			@Override public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
+				player.setVelocity(arg1.checkdouble(), arg2.checkdouble(), arg3.checkdouble());
+				return NONE;
+			}
+		};
+		meta.set("__index", new TwoArgFunction() {
+			@Override public LuaValue call(LuaValue arg1, LuaValue arg2) {
+				System.out.println("Check: "+arg1.tojstring()+" : "+arg2.checkjstring());
+				if(arg2.checkjstring().equals("setVelocity") && player instanceof EntityPlayerSP){
+			         return func;
+				}
+				return arg1.rawget(arg2);
+			}
+		});
+		LuaTable blank = new LuaTable();
+		meta.set("__metatable", blank);
+		t.setmetatable(meta);
+		
 		return t;
 	}
 	

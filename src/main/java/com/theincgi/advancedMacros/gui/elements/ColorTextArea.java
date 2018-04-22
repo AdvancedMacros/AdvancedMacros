@@ -715,7 +715,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 					lastSelectionPoint=nP;
 
 				}
-				System.out.println(selectionStart + " " + selectionEnd);
+				//System.out.println(selectionStart + " " + selectionEnd);
 			}else{
 				selectionStart=null;
 				selectionEnd=null;
@@ -940,7 +940,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 							int start,end;
 							start = ((sl==selectionStart.getY())?selectionStart.getX():0);
 							end = ((sl==selectionEnd.getY())?selectionEnd.getX():lines.get(sl).length());
-							System.out.printf("START %d, END %d\n",start, end);
+							//System.out.printf("START %d, END %d\n",start, end);
 							toClipboard+=lines.get(sl).substring(start, Math.min(end,lines.get(sl).length()));
 							toClipboard+=(sl!=selectionEnd.getY()?"\n":"");
 
@@ -968,7 +968,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 					setNeedsSaveFlag(true);
 				}else if(keyCode==Keyboard.KEY_V){
 					if(!isEditable){return false;}
-					System.out.println("paste");
+					//System.out.println("paste");
 					try {
 						String data = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
 						Scanner s = new Scanner(data);
@@ -990,11 +990,15 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 					}
 					setNeedsSaveFlag(true);
 				}else if(typedChar=='w'){
+					//TODO exit editor with CTRL+W
 					System.out.println("Exit");
 				}else if(typedChar=='g'){
+					//TODO goto line popup
+					//TODO clickable errors that jump to line number
 					System.out.println("Goto line");
 				}else if(keyCode==Keyboard.KEY_SPACE){
 					if(!isEditable){return false;}
+					//TODO autocomplete!
 					System.out.println("Autocomplete");
 				}
 			}

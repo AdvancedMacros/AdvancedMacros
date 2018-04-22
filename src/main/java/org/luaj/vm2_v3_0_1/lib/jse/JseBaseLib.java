@@ -104,7 +104,7 @@ public class JseBaseLib extends org.luaj.vm2_v3_0_1.lib.BaseLib {
 	public InputStream findResource(String filename) {
 		File f = new File(filename);
 		if ( ! f.exists() )
-			return super.findResource(filename);
+			try {return super.findResource(filename);}catch (IllegalArgumentException e) {return null;} //Edit by: Theincgi
 		try {
 			return new FileInputStream(f);
 		} catch ( IOException ioe ) {

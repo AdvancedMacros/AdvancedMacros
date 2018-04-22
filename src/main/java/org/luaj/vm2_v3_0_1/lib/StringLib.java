@@ -32,6 +32,8 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.compiler.DumpState;
 
+import com.theincgi.advancedMacros.lua.functions.lua5_3.StringSerialization;
+
 /** 
  * Subclass of {@link LibFunction} which implements the lua standard {@code string} 
  * library. 
@@ -97,6 +99,12 @@ public class StringLib extends TwoArgFunction {
 		string.set("reverse", new reverse());
 		string.set("sub", new sub());
 		string.set("upper", new upper());
+		
+		//5.3 additions - TheIncgi
+		string.set("pack", new StringSerialization.StringPack());
+		string.set("unpack", new StringSerialization.StringUnpack());
+		string.set("packsize", new StringSerialization.PackSize());
+		
 		LuaTable mt = LuaValue.tableOf(
 				new LuaValue[] { INDEX, string });
 		env.set("string", string);

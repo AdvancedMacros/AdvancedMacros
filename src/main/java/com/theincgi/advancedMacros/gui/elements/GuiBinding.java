@@ -338,6 +338,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 	}
 	@Override
 	public void onDraw(Gui gui, int mouseX, int mouseY, float partialTicks) {
+		if(!isVisible) return;
 		gui.drawRect(x, y, x+fullWid, y+12, Color.BLACK.toInt());
 		removeButton.onDraw(gui, mouseX, mouseY, partialTicks);
 		enableButton.onDraw(gui, mouseX, mouseY, partialTicks);

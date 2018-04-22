@@ -693,8 +693,8 @@ public class LuaString extends LuaValue {
 			if ( (c = chars[i]) < 0x80 ) {
 				bytes[j++] = (byte) c;
 			} else if ( c < 0x800 ) {
-				bytes[j++] = (byte) (0xC0 | ((c>>6)  & 0x1f));
-				bytes[j++] = (byte) (0x80 | ( c      & 0x3f));				
+				bytes[j++] = (byte) (0xC0 | ((c>>6)  & 0x1f)); 
+				bytes[j++] = (byte) (0x80 | ( c      & 0x3f)); 	
 			} else {
 				bytes[j++] = (byte) (0xE0 | ((c>>12) & 0x0f));
 				bytes[j++] = (byte) (0x80 | ((c>>6)  & 0x3f));
