@@ -1,16 +1,25 @@
 package com.theincgi.advancedMacros.lua;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Scanner;
+
+import org.luaj.vm2_v3_0_1.LuaClosure;
+import org.luaj.vm2_v3_0_1.LuaFunction;
+import org.luaj.vm2_v3_0_1.LuaTable;
+import org.luaj.vm2_v3_0_1.LuaValue;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
+import com.theincgi.advancedMacros.gui.elements.ColorTextArea;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
@@ -35,10 +44,11 @@ public class DocumentationManager {
 		for(int l = 0; l<text.size(); l++)
 			g.getFontRend().drawString(text.get(l), prefX+2, prefY+4+(l*12), textColor);
 	}
-	
+
 	private String lastRequestL1 = null; //repeated method call indexing
 	private LinkedList<String> lastResponseL1 = null;
 	private LinkedList<String> getLine1(String fName) {
+		String withCase = fName;
 		if(fName==null)
 			return null;
 		fName = fName.toLowerCase();
@@ -46,15 +56,18 @@ public class DocumentationManager {
 			//System.out.println("Dup");
 			return lastResponseL1;
 		}
-		
+
 		//System.out.println("New Q "+fName);
 		lastRequestL1=fName;
 		InputStream in = null;
-		try {
-			in = new FileInputStream(new File(AdvancedMacros.customDocsFolder, fName+".txt"));
-		} catch (FileNotFoundException e) {//this is fine, no custom doc made
-			//System.out.println("No custom doc");
-		}
+
+		LinkedList<String> commentDoc = checkForCommentDocumentation(withCase);
+		if(commentDoc!=null) return lastResponseL1 = commentDoc;
+			try {
+				in = new FileInputStream(new File(AdvancedMacros.customDocsFolder, fName+".txt"));
+			} catch (FileNotFoundException e) {//this is fine, no custom doc made
+				//System.out.println("No custom doc");
+			}
 		if(in==null) {
 			try {
 				in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "docs/"+fName+".txt")).getInputStream();
@@ -75,4 +88,41 @@ public class DocumentationManager {
 		scany.close();
 		return lastResponseL1=lines;
 	}
+	private LinkedList<String> checkForCommentDocumentation(String fName) {
+		LuaFunction f = (LuaFunction) AdvancedMacros.editorGUI.getCta().getFunctionsMap().get(fName);
+		if(f!=null && f.isclosure()) {
+			LuaClosure c = f.checkclosure();
+			String sLine;
+			try(
+					FileInputStream fis = new FileInputStream(new File(AdvancedMacros.macrosFolder, c.p.source.tojstring()));
+					Scanner scan = new Scanner(fis)
+					) {
+				int lineNum = 1;
+				for(int i=0; i<c.p.linedefined-6; i++, lineNum++)
+					scan.nextLine();
+				LinkedList<String> lines = new LinkedList<>();
+				while(lineNum!=c.p.linedefined) {
+					if((sLine=scan.nextLine()).trim().startsWith("--")) {
+						lines.add(sLine.substring(2));
+					}else{
+						lines.clear();
+					}
+					lineNum++;
+				}
+				if(lines.size()>0)
+					return lines;
+				
+			}catch (IOException e) {
+				e.printStackTrace();
+			}
+			System.out.println(c.p.toString());
+		}
+
+		return null;
+	}
+
+
+
+
+
 }

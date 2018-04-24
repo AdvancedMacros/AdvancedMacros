@@ -167,6 +167,7 @@ public class ScriptBrowser2 extends Gui{
 				File f = new File(activePath, result.result);
 				try {
 					f.createNewFile();
+					selectedFile=f;
 				} catch (IOException e) {
 					//TODO log to world
 					e.printStackTrace();
@@ -177,11 +178,13 @@ public class ScriptBrowser2 extends Gui{
 			case FOLDER_NAME:{
 				File f = new File(activePath, result.result);
 				f.mkdir();
+				selectedFile=f;
 				populateList(activePath);
 				return true;
 			}
 			case RENAME:{
-				selectedFile.renameTo(new File(activePath, result.result));
+				selectedFile.renameTo(selectedFile = new File(activePath, result.result));
+				
 				populateList(activePath);
 				return true;
 			}

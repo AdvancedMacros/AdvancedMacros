@@ -18,13 +18,16 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.lwjgl.input.Keyboard;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.ForgeEventHandler;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
 import com.theincgi.advancedMacros.gui.elements.GuiScrollBar.Orientation;
+import com.theincgi.advancedMacros.gui2.ScriptBrowser2;
 import com.theincgi.advancedMacros.misc.Property;
 import com.theincgi.advancedMacros.misc.Utils;
 
+import javafx.scene.input.KeyCode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 
@@ -449,7 +452,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 		//		}
 	}
 
-	private static HashMap<String,Boolean> tables, functions, variables;
+	private static HashMap<String,Object> tables, functions, variables;
 	/**This will get a new list of keywords based on the AdvancedMacros.globals*/
 	public static void updateKeywords(){
 		tables = getVariableList(LuaValue.TTABLE);
@@ -458,6 +461,9 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 		variables = getVariableList(LuaValue.TNUMBER);
 		variables.putAll(getVariableList(LuaValue.TSTRING));
 		variables.putAll(getVariableList(LuaValue.TBOOLEAN));
+	}
+	public static HashMap<String, Object> getFunctionsMap() {
+		return functions;
 	}
 
 	private static final String quoteRegEx = "(\"[^\"]*\")|('[^\']*')|(\\[\\[.*?\\]\\])";
@@ -966,7 +972,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 						e.printStackTrace();
 					}
 					setNeedsSaveFlag(true);
-				}else if(keyCode==Keyboard.KEY_V){
+				}else if(keyCode==Keyboard.KEY_V && isEditable){
 					if(!isEditable){return false;}
 					//System.out.println("paste");
 					try {
@@ -989,14 +995,18 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 					} catch (Exception e) {
 					}
 					setNeedsSaveFlag(true);
-				}else if(typedChar=='w'){
+				}else if(keyCode==Keyboard.KEY_W && isEditable){
 					//TODO exit editor with CTRL+W
 					System.out.println("Exit");
-				}else if(typedChar=='g'){
+				}else if(keyCode==Keyboard.KEY_G && isEditable){
 					//TODO goto line popup
 					//TODO clickable errors that jump to line number
 					System.out.println("Goto line");
-				}else if(keyCode==Keyboard.KEY_SPACE){
+				}else if(keyCode==Keyboard.KEY_R && isEditable) {
+					save();
+					ForgeEventHandler.closeMenu();
+					AdvancedMacros.runScript(ScriptBrowser2.getScriptPath(getScriptFile()));
+				}else if(keyCode==Keyboard.KEY_SPACE && isEditable){
 					if(!isEditable){return false;}
 					//TODO autocomplete!
 					System.out.println("Autocomplete");
@@ -1036,7 +1046,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 	public void save() {
 		System.out.println("Saving...");
 		try {
-			PrintWriter pw = new PrintWriter(new File(AdvancedMacros.macrosFolder,scriptName));
+			PrintWriter pw = new PrintWriter(getScriptFile());
 			for (String string : lines) {
 				pw.println(string);
 			}
@@ -1047,7 +1057,11 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 		}
 		setNeedsSaveFlag(false);
 	}
-
+	
+	public File getScriptFile() {
+		return new File(AdvancedMacros.macrosFolder,scriptName);
+	}
+	
 	public static boolean isCTRLDown(){
 		return Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
 	}
@@ -1181,37 +1195,38 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 	}
 
 
-	public static HashMap<String, Boolean> getVariableList(int luaValType){
+	public static HashMap<String, Object> getVariableList(int luaValType){
 		return getVariableList(AdvancedMacros.globals.checktable(), luaValType, true, "", new HashMap<LuaTable, Boolean>());
 	}
 	/**use AdvancedMacros.globals.getraw("_G");<br>
 	 * for tmp, start with "" <br>
 	 * */
-	public static HashMap<String, Boolean> getVariableList(LuaTable t, int luaValType, boolean checkTables, String tmp, HashMap<LuaTable, Boolean> added){
+	public static HashMap<String, Object> getVariableList(LuaTable t, int luaValType, boolean checkTables, String tmp, HashMap<LuaTable, Boolean> added){
 		//if(luaValType==LuaValue.TINT){return new LinkedList<>();}
 		added.put(t, true);
-		HashMap<String,Boolean> vars = new HashMap<>();
+		HashMap<String,Object> vars = new HashMap<>();
 		if(tmp.equals("package.loaded")){tmp = "";}
 		/**the key name in this table*/
 		LuaValue sKey = t.next(LuaValue.NIL).arg1();
 		LuaValue sVal = t.get(sKey);
 		while(!sKey.isnil()){ //while there is a key in next()
 			if(sVal.type()==luaValType){ //if the value matches the type we want
-				vars.put(tmp+(tmp.length()>0?".":"") + sKey.tojstring(), true); //add it to output
+				vars.put(tmp+(tmp.length()>0?".":"") + sKey.tojstring(), sVal); //add it to output
 				//System.out.println(tmp+(tmp.length()>0?".":"") + sKey.tojstring());
 			}
 			if(checkTables && sVal.istable() && !added.getOrDefault(sVal, false)){
 				String tmp2 = "";
 				if(sKey.isint()){
-					if(tmp.length()==0){
-						tmp2 = "_G["+sVal.tojstring()+"].";
-					}else{
-						tmp2 = tmp+"["+sVal.tojstring()+"].";
-					}
+//					if(tmp.length()==0){
+//						tmp2 = "_G["+sVal.tojstring()+"].";
+//					}else{
+//						tmp2 = tmp+"["+sVal.tojstring()+"].";
+//					}
 				}else{
 					tmp2 = tmp+(tmp.length()>0?".":"") + sKey.tojstring();
 				}
-				vars.putAll(getVariableList(sVal.checktable(), luaValType, checkTables, tmp2, added));
+				if(!sKey.isint())
+					vars.putAll(getVariableList(sVal.checktable(), luaValType, checkTables, tmp2, added));
 			}
 			sKey = t.next(sKey).arg1();
 			sVal = t.get(sKey);

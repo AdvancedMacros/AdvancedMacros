@@ -704,9 +704,14 @@ public class ForgeEventHandler {
 	public boolean eventExists(EventName eName){
 		return AdvancedMacros.macroMenuGui.doesEventExist(eName.name());
 	}
-	/*the main menu*/
+	
+	
+	/*the main menu for this mod*/
 	public static void showMenu(){
 		showMenu(AdvancedMacros.macroMenuGui);
+	}
+	public static void closeMenu() {
+		Minecraft.getMinecraft().displayGuiScreen(null);
 	}
 	public static void showMenu(Gui gui){
 		if(gui==null){

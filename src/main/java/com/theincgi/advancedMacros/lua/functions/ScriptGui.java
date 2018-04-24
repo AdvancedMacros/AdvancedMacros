@@ -310,21 +310,21 @@ public static class CreateScriptGui extends ZeroArgFunction{
 	@Override
 	public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
 		if(onKeyPressed!=null)
-			return Utils.pcall(onKeyPressed, LuaValue.valueOf(typedChar), LuaValue.valueOf(keyCode)).optboolean(false);
+			return Utils.pcall(onKeyPressed, LuaValue.valueOf(typedChar+""), LuaValue.valueOf(keyCode)).optboolean(false);
 		return false;
 	}
 
 	@Override
 	public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
 		if(onKeyRepeated!=null)
-			return Utils.pcall(onKeyRepeated, LuaValue.valueOf(typedChar), LuaValue.valueOf(keyCode), LuaValue.valueOf(repeatMod)).optboolean(false);
+			return Utils.pcall(onKeyRepeated, LuaValue.valueOf(typedChar+""), LuaValue.valueOf(keyCode), LuaValue.valueOf(repeatMod)).optboolean(false);
 		return false;
 	}
 
 	@Override
 	public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
 		if(onKeyReleased!=null)
-			return Utils.pcall(onKeyReleased, LuaValue.valueOf(typedChar), LuaValue.valueOf(keyCode)).optboolean(false);
+			return Utils.pcall(onKeyReleased, LuaValue.valueOf(typedChar+""), LuaValue.valueOf(keyCode)).optboolean(false);
 		return false;
 	}
 	
