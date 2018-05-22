@@ -13,20 +13,15 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-import com.theincgi.advancedMacros.ForgeEventHandler.EventName;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.MacroMenuGui;
 import com.theincgi.advancedMacros.gui.elements.ColorTextArea;
 import com.theincgi.advancedMacros.hud.hud2D.Hud2DItem;
 import com.theincgi.advancedMacros.hud.hud3D.WorldHudItem;
 import com.theincgi.advancedMacros.lua.LuaDebug.OnScriptFinish;
-import com.theincgi.advancedMacros.lua.functions.ScriptGui;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.ISound;
-import net.minecraft.client.audio.ISoundEventListener;
-import net.minecraft.client.audio.SoundEventAccessor;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
@@ -407,6 +402,11 @@ public class ForgeEventHandler {
 	//		e.set(6, event.player.getName());
 	//		fireEvent(EventName.LoggedIn, e);
 	//	}
+	
+	
+	
+	
+	
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onJoinedWorld(FMLNetworkEvent.ClientConnectedToServerEvent event){
 		LuaTable e = createEvent(EventName.JoinWorld);
@@ -414,9 +414,11 @@ public class ForgeEventHandler {
 		e.set(4, LuaValue.valueOf(event.isLocal()?"SP":"MP")); //yeilded false on localhost multiplayer true on single player
 		if(Minecraft.getMinecraft().getCurrentServerData()!=null){
 			ServerData sd = Minecraft.getMinecraft().getCurrentServerData();
-			e.set(5, LuaValue.valueOf(sd.serverName));
-			e.set(6, sd.serverMOTD==null?LuaValue.FALSE:LuaValue.valueOf(sd.serverMOTD));
-			e.set(7, sd.serverIP==null?LuaValue.FALSE:LuaValue.valueOf(sd.serverIP));
+			if(sd!=null) {
+				e.set(5, sd.serverName==null? LuaValue.FALSE    : LuaValue.valueOf(sd.serverName));
+				e.set(6, sd.serverMOTD==null? LuaValue.FALSE    : LuaValue.valueOf(sd.serverMOTD));
+				e.set(7, sd.serverIP==null?   LuaValue.FALSE    : LuaValue.valueOf(sd.serverIP));
+			}
 			//e.set(8, GetWorld.worldToTable(event.));
 		}
 		fireEvent(EventName.JoinWorld, e);

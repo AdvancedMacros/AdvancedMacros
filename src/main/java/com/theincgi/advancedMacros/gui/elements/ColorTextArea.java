@@ -27,7 +27,6 @@ import com.theincgi.advancedMacros.gui2.ScriptBrowser2;
 import com.theincgi.advancedMacros.misc.Property;
 import com.theincgi.advancedMacros.misc.Utils;
 
-import javafx.scene.input.KeyCode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 

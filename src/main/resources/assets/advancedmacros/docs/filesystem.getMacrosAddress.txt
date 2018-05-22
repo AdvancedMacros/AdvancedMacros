@@ -1,0 +1,3 @@
+getMacrosAddress()
+Returns the path to your macros folder as a string.
+Note: filesystem is already local to macros folder.

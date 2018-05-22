@@ -1,8 +1,8 @@
 package com.theincgi.advancedMacros.lua.functions.midi;
 
 import javax.sound.midi.MidiDevice;
-import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiDevice.Info;
+import javax.sound.midi.MidiSystem;
 
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaUserdata;

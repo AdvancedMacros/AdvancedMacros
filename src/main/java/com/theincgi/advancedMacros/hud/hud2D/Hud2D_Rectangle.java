@@ -1,16 +1,11 @@
 package com.theincgi.advancedMacros.hud.hud2D;
 
 import org.luaj.vm2_v3_0_1.LuaValue;
-import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
-import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
-import org.lwjgl.opengl.GL11;
 
 import com.theincgi.advancedMacros.gui.Color;
-import com.theincgi.advancedMacros.misc.Utils;
 
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;

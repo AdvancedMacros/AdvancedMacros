@@ -23,7 +23,6 @@ package org.luaj.vm2_v3_0_1.lib.jse;
 
 import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LoadState;
-import org.luaj.vm2_v3_0_1.LuaThread;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.compiler.LuaC;
 import org.luaj.vm2_v3_0_1.lib.Bit32Lib;

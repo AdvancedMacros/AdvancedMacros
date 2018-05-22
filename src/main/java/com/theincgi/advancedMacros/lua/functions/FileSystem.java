@@ -30,6 +30,11 @@ public class FileSystem extends LuaTable{
 		set("mkDirs", new MkDirs());
 		set("isDir", new IsDir());
 		set("list", new List());
+		set("getMacrosAddress", new ZeroArgFunction() {
+			@Override public LuaValue call() {
+				return LuaValue.valueOf(AdvancedMacros.macrosFolder.toString());
+			}
+		});
 	}
 
 	private static class Open extends TwoArgFunction{

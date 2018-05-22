@@ -11,8 +11,6 @@ import org.lwjgl.opengl.GL11;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.CustomFontRenderer;
 
-import net.minecraft.client.renderer.GlStateManager;
-
 public class Hud2D_Text extends Hud2DItem {
 	String text = "";
 	float size = 12; 

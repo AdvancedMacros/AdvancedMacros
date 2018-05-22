@@ -3,7 +3,8 @@ package com.theincgi.advancedMacros;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.io.InputStream;
 
 import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LuaError;
@@ -12,7 +13,6 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.jse.JsePlatform;
 import org.lwjgl.input.Keyboard;
 
-import com.theincgi.advancedMacros.ForgeEventHandler.EventName;
 import com.theincgi.advancedMacros.gui.EditorGUI;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.InputGUI;
@@ -55,13 +55,13 @@ import com.theincgi.advancedMacros.lua.functions.SetProfile;
 import com.theincgi.advancedMacros.lua.functions.SkinCustomizer;
 import com.theincgi.advancedMacros.lua.functions.StopAllScripts;
 import com.theincgi.advancedMacros.lua.functions.Toast;
-import com.theincgi.advancedMacros.lua.functions.lua5_3.StringSerialization;
 import com.theincgi.advancedMacros.lua.functions.midi.MidiLib2;
 import com.theincgi.advancedMacros.misc.CustomFontRenderer;
 import com.theincgi.advancedMacros.misc.Settings;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
@@ -76,7 +76,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "3.11.10"; //${version} ??
+	public static final String VERSION = "3.11.11"; //${version} ??
 	public static final File macrosRootFolder = new File(Minecraft.getMinecraft().mcDataDir,"mods/advancedMacros");
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -129,7 +129,8 @@ public class AdvancedMacros {
 		runningScriptsGui = new RunningScriptsGui(debug);
 		Settings.getProfileList();//generate DEFAULT 
 		Settings.save();
-			loadFunctions();
+		loadFunctions();
+		loadScripts();
 		macroMenuGui.loadProfile("DEFAULT");
 		
 //		HudText text = new HudText(true);
@@ -140,6 +141,7 @@ public class AdvancedMacros {
 			t.printStackTrace();
 		}
 	}
+	
 	@SideOnly(Side.CLIENT)
 	public void postInit(FMLPostInitializationEvent event) {
 		editorGUI.postInit();
@@ -235,6 +237,14 @@ public class AdvancedMacros {
 		//System.out.println("FUNCTIONS:\n"+ColorTextArea.getVariableList(globals.checktable(), LuaValue.TFUNCTION, true, "", new HashMap<LuaTable, Boolean>()));
 	}
 	
+	private void loadScripts() {
+		try {
+			InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/searcher.lua")).getInputStream();
+			globals.load(in, "searcher", "t", globals).call();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	public static File[] getScriptList(){
 		File[] l = macrosFolder.listFiles();

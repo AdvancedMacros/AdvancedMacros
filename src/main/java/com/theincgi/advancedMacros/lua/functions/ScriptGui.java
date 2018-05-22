@@ -6,26 +6,18 @@ import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
-import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import org.lwjgl.input.Mouse;
 
-import com.theincgi.advancedMacros.AdvancedMacros;
-import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
-import com.theincgi.advancedMacros.gui.elements.Drawable;
-import com.theincgi.advancedMacros.gui.elements.GuiButton;
-import com.theincgi.advancedMacros.gui.elements.Moveable;
-import com.theincgi.advancedMacros.lua.LuaValTexture;
-import com.theincgi.advancedMacros.lua.scriptGui.GuiRectangle;
-import com.theincgi.advancedMacros.lua.scriptGui.ScriptGuiElement;
-import com.theincgi.advancedMacros.lua.scriptGui.ScriptGuiText;
 import com.theincgi.advancedMacros.lua.scriptGui.Group;
 import com.theincgi.advancedMacros.lua.scriptGui.GuiBox;
 import com.theincgi.advancedMacros.lua.scriptGui.GuiImage;
 import com.theincgi.advancedMacros.lua.scriptGui.GuiItemIcon;
+import com.theincgi.advancedMacros.lua.scriptGui.GuiRectangle;
+import com.theincgi.advancedMacros.lua.scriptGui.ScriptGuiText;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;

@@ -3,7 +3,6 @@ package com.theincgi.advancedMacros.lua.scriptGui;
 import java.util.ArrayList;
 
 import org.luaj.vm2_v3_0_1.LuaError;
-import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;

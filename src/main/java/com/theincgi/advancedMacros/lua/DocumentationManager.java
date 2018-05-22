@@ -1,25 +1,19 @@
 package com.theincgi.advancedMacros.lua;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Scanner;
 
 import org.luaj.vm2_v3_0_1.LuaClosure;
 import org.luaj.vm2_v3_0_1.LuaFunction;
-import org.luaj.vm2_v3_0_1.LuaTable;
-import org.luaj.vm2_v3_0_1.LuaValue;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
-import com.theincgi.advancedMacros.gui.elements.ColorTextArea;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;

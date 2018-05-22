@@ -3,7 +3,6 @@ package com.theincgi.advancedMacros.lua.scriptGui;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.elements.GuiRect;
-import com.theincgi.advancedMacros.hud.hud2D.Hud2D_Rectangle;
 
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;

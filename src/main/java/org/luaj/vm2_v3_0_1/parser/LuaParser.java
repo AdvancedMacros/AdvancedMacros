@@ -3,10 +3,22 @@ package org.luaj.vm2_v3_0_1.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.util.*;
-
-import org.luaj.vm2_v3_0_1.*;
-import org.luaj.vm2_v3_0_1.ast.*;
+import org.luaj.vm2_v3_0_1.Lua;
+import org.luaj.vm2_v3_0_1.LuaString;
+import org.luaj.vm2_v3_0_1.LuaValue;
+import org.luaj.vm2_v3_0_1.ast.Block;
+import org.luaj.vm2_v3_0_1.ast.Chunk;
+import org.luaj.vm2_v3_0_1.ast.Exp;
+import org.luaj.vm2_v3_0_1.ast.FuncArgs;
+import org.luaj.vm2_v3_0_1.ast.FuncBody;
+import org.luaj.vm2_v3_0_1.ast.FuncName;
+import org.luaj.vm2_v3_0_1.ast.Name;
+import org.luaj.vm2_v3_0_1.ast.ParList;
+import org.luaj.vm2_v3_0_1.ast.Stat;
+import org.luaj.vm2_v3_0_1.ast.Str;
+import org.luaj.vm2_v3_0_1.ast.SyntaxElement;
+import org.luaj.vm2_v3_0_1.ast.TableConstructor;
+import org.luaj.vm2_v3_0_1.ast.TableField;
 
 public class LuaParser implements LuaParserConstants {
   static {

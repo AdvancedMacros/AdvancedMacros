@@ -16,7 +16,6 @@ import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
 import com.theincgi.advancedMacros.gui.elements.Drawable;
 import com.theincgi.advancedMacros.gui.elements.GuiButton;
 import com.theincgi.advancedMacros.gui.elements.Moveable;
-import com.theincgi.advancedMacros.lua.functions.ScriptGui;
 import com.theincgi.advancedMacros.misc.Utils;
 
 public abstract class ScriptGuiElement extends LuaTable implements Drawable, InputSubscriber, Moveable{
