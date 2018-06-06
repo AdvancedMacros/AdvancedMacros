@@ -14,6 +14,7 @@ import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
 import com.theincgi.advancedMacros.gui.MacroMenuGui;
+import com.theincgi.advancedMacros.gui.elements.GuiDropDown.OnSelectHandler;
 import com.theincgi.advancedMacros.gui2.PopupPrompt2.Result;
 import com.theincgi.advancedMacros.gui2.PopupPrompt2.ResultHandler;
 import com.theincgi.advancedMacros.misc.Settings;
@@ -103,16 +104,20 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 				}else if(sButton.equals(enableButton)){
 					enable = !enable;
 					updateEnableButton();
+					((MacroMenuGui)gui).markDirty();
 				}else if(sButton.equals(editButton)){
 					if(script!=null && !script.isEmpty()) {
 						AdvancedMacros.editorGUI.updateKeywords();
 						AdvancedMacros.editorGUI.openScript(script);
+						((MacroMenuGui)gui).updateProfileChanges();
 						ForgeEventHandler.showMenu(AdvancedMacros.editorGUI, AdvancedMacros.macroMenuGui);
 					}
 				}else if(sButton.equals(moveButton)){
 					container.grab(GuiBinding.this);
+					((MacroMenuGui)gui).markDirty();
 				}else if(sButton.equals(modeButton)){
 					eventMode = eventMode.cycleNext();
+					((MacroMenuGui)gui).markDirty();
 					updateModeButton();
 					eventSelector.dispText="";
 				}
@@ -125,7 +130,14 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		editButton.setOnClick(och);
 		modeButton.setOnClick(och); //TODO make it so changing the mode closes the eventSelector
 		moveButton.setOnClick(och);
-
+		eventSelector.setOnSelect(
+				new OnSelectHandler() {
+					@Override
+					public void onSelect(int index, String text) {
+						((MacroMenuGui)gui).markDirty();
+					}
+				}
+		);
 		eventSelector.setOnOpen(new OnClickHandler() {
 			@Override
 			public void onClick(int button, GuiButton sButton) {
@@ -137,6 +149,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 					}else{
 						gui.nextKeyListen = null;
 						eventSelector.dispText = eventSelector.getText(eventSelector.index);
+						((MacroMenuGui)gui).markDirty();
 					}
 				}else{
 					if(eventSelector.isOpen()){
@@ -182,6 +195,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 				@Override public boolean onResult(Result r) {
 					if(r.isCanceled()) return true;
 					script = r.getResult();
+					((MacroMenuGui)gui).markDirty();
 					return true;
 			}});
 		});
@@ -261,17 +275,19 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 			switch (buttonNum) {
 			case 0:
 				eventSelector.dispText = "LMB";
-				return true;
+				break;
 			case 1:
 				eventSelector.dispText = "RMB";
-				return true;
+				break;
 			case 2:
 				eventSelector.dispText = "MMB";
-				return true;
+				break;
 			default:
 				eventSelector.dispText = "MOUSE:"+buttonNum;
-				return true;
+				break;
 			}
+			((MacroMenuGui)gui).markDirty();
+			return true;
 		}
 		
 		if(eventSelector.isOpen() && !eventSelector.isInBounds(x, y)){eventSelector.close(); return true;}
@@ -313,6 +329,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 	public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
 		if(gui.nextKeyListen!=null){
 			eventSelector.dispText = Keyboard.getKeyName(keyCode);
+			((MacroMenuGui)gui).markDirty();
 			return true;
 		}
 //		if(ColorTextArea.isCTRLDown()){
@@ -525,6 +542,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 	
 	/**will check that event exists, or key is defined based on current mode*/
 	public void setEvent(String tojstring) {
+		((MacroMenuGui)gui).markDirty();
 		if(!eventMode.isKeyType()){
 			eventSelector.clear(true);
 			for (EventName string : ForgeEventHandler.EventName.values()) {

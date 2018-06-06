@@ -388,6 +388,7 @@ public class Settings {
 		@Override
 		public LuaValue call() {
 			save();
+			AdvancedMacros.macroMenuGui.reloadCurrentProfile();
 			return LuaValue.NIL;
 		}
 	}
@@ -396,6 +397,7 @@ public class Settings {
 		public LuaValue call() {
 			try {
 				Settings.load();
+				AdvancedMacros.macroMenuGui.reloadCurrentProfile();
 			} catch (FileNotFoundException e) {
 				return LuaValue.FALSE;
 			}

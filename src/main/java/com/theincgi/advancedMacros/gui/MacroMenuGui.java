@@ -90,6 +90,7 @@ public class MacroMenuGui extends Gui{
 			public void onClick(int button, GuiButton sButton) {
 				GuiBinding g;
 				bindingsList.add(g=new GuiBinding(bindingID, 5, 5, 300, bindingsList, MacroMenuGui.this));
+				markDirty();
 			}
 		});
 
@@ -119,6 +120,7 @@ public class MacroMenuGui extends Gui{
 			@Override
 			public void onClick(int button, GuiButton sButton) {
 				//if(Gui.isAltKeyDown())
+				updateProfileChanges();
 				ForgeEventHandler.showMenu(AdvancedMacros.scriptBrowser2);
 				//else
 				//	ForgeEventHandler.showMenu(AdvancedMacros.scriptBrowser);
@@ -130,6 +132,7 @@ public class MacroMenuGui extends Gui{
 			public void onClick(int button, GuiButton sButton) {
 				prompting = Prompting.PROFILE_NAME;
 				prompt.prompt("New profile name:");
+				markDirty();
 			}
 		});
 
@@ -186,7 +189,12 @@ public class MacroMenuGui extends Gui{
 		onResize(Minecraft.getMinecraft(), width, height);
 
 	}
-
+	
+	
+	public void reloadCurrentProfile() {
+		loadProfile(profileSelect.getSelection());
+	}
+	
 	private void updateProfileList() {
 		profileSelect.clear(false);
 		for(String profile : Settings.getProfileList()){
@@ -198,6 +206,7 @@ public class MacroMenuGui extends Gui{
 		drawables.remove(guib);
 		inputSubscribers.remove(guib);
 		bindingsList.remove(guib);
+		markDirty();
 		//TODO save remove
 	}
 
@@ -209,6 +218,7 @@ public class MacroMenuGui extends Gui{
 	public void fireEvent(boolean isKey, String eventName, Varargs args, boolean isKeyDown){
 		fireEvent(isKey, eventName, args, isKeyDown, null);
 	}
+	
 	/**Exists, and is enabled*/
 	public boolean doesEventExist(String eventName){
 		for(Moveable m : bindingsList.getItems()){
@@ -314,7 +324,9 @@ public class MacroMenuGui extends Gui{
 			return false;
 		}
 	}
-
+	
+	
+	
 	@Override
 	public void onResize(Minecraft mcIn, int w, int h) {
 		super.onResize(mcIn, w, h);
@@ -331,7 +343,8 @@ public class MacroMenuGui extends Gui{
 		prompt.resize(width/3, height/3);
 		bindingsList.setBonusSpace(h/3);
 	}
-
+	public void markDirty() {dirty = true; System.out.println("Profile marked for saving.");}
+	private boolean dirty = false;
 	@Override
 	public void onGuiClosed() {
 		updateProfileChanges();
@@ -339,6 +352,8 @@ public class MacroMenuGui extends Gui{
 	}
 
 	public void updateProfileChanges() {
+		if(!dirty) return;
+		dirty = false;
 		LuaTable profiles = Settings.getProfileTable();
 		LuaTable profile = new LuaTable();
 		profiles.set(profileSelect.getSelection(), profile);
