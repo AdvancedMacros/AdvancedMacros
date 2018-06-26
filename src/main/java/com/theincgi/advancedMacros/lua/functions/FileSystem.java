@@ -383,6 +383,8 @@ public class FileSystem extends LuaTable{
 		}
 		return;
 	}
+	/**
+	 * @param path the path inside the root folder of {@link AdvancedMacros}*/
 	public static boolean isValidAddress(String path) {
 		try {
 			File f = new File(AdvancedMacros.macrosRootFolder,path);

@@ -64,11 +64,25 @@ public class Color {
 		fromHex(hexCode);
 	}
 
-	private void fromHex(int hexCode) {
+	/**Sets this color from the hex code given*/
+	public void fromHex(int hexCode) {
 		this.r = (hexCode >> 16 & 255);
 		this.b = (hexCode >> 0 & 255);
 		this.g = (hexCode >> 8 & 255);
 		this.a = (hexCode >> 24 & 255);		
+	}
+	
+	public static int getA(int hexCode) {
+		return (hexCode >> 24 & 255);
+	}
+	public static int getR(int hexCode) {
+		return (hexCode >> 16 & 255);
+	}
+	public static int getG(int hexCode) {
+		return (hexCode >> 8 & 255);
+	}
+	public static int getB(int hexCode) {
+		return (hexCode >> 0 & 255);
 	}
 
 	public int getA() {

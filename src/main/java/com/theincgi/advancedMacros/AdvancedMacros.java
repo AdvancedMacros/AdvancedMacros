@@ -50,6 +50,7 @@ import com.theincgi.advancedMacros.lua.functions.GetPlayerBlockPos;
 import com.theincgi.advancedMacros.lua.functions.GetPlayerList;
 import com.theincgi.advancedMacros.lua.functions.GetPlayerPos;
 import com.theincgi.advancedMacros.lua.functions.GetProfile;
+import com.theincgi.advancedMacros.lua.functions.GetScreen;
 import com.theincgi.advancedMacros.lua.functions.GetTextureList;
 import com.theincgi.advancedMacros.lua.functions.GetWorld;
 import com.theincgi.advancedMacros.lua.functions.HTTP;
@@ -201,7 +202,7 @@ public class AdvancedMacros {
 		math.set("ln", math.get("log")); //because log is some how base e instead of 10
 		math.set("log", new MathPlus.Log());
 		math.set("e", MathPlus.const_e);
-
+		
 		//		//5.3 string tweaks //migrated to org.luaj.vm2_v3_0_1.lib.StringLib
 		//		{
 		//			LuaTable string = globals.get("string").checktable();
@@ -220,7 +221,7 @@ public class AdvancedMacros {
 
 		globals.set("getEntityList", new GetEntityList());
 		globals.set("getEntity", new GetEntityData());
-
+		globals.set("getScreen", new GetScreen());
 		//		globals.set("addHoloBlock", new AddHoloBlock());
 		//		globals.set("addHoloText", new AddHoloText());
 		//		globals.set("clearWorldHud", new ClearWorldHud());
