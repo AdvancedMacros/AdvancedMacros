@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,6 +62,8 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 	//	private CustomTexture ctaTexture;
 	//private DynamicTexture texture;
 	//private ResourceLocation rLocation;
+	
+	public boolean doSyntaxHighlighting = true;
 
 	private static final HashMap<String, Boolean> keywords = new HashMap<>();
 
@@ -86,7 +89,10 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 	private boolean textChanged = true;
 	private boolean resized;
 	private static final String propAddress = "colors.cta.";
-	public ColorTextArea(WidgetID wID, Gui g) {							     /*AAA, RRR, GGG, BBB*/
+	private static WidgetID wID;
+	public ColorTextArea(WidgetID wID, Gui g) {	
+		this.wID = wID;
+																					 /*AAA, RRR, GGG, BBB*/
 		bgColor 		 = new Property(propAddress+"textFill", 	       new Color(	  128, 128, 128).toLuaValue(), "textFill", 			wID);
 		frameColor 		 = new Property(propAddress+"frame", 		       new Color(	  255, 255, 255).toLuaValue(), "frame", 			wID);
 		defaultTextColor = new Property(propAddress+"plainText", 	       new Color(  	    0,   0,   0).toLuaValue(), "plainText", 		wID);
@@ -153,7 +159,9 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 	//		char c;
 	//	}
 
-
+	public static WidgetID getWidgetID() {
+		return wID;
+	}
 
 	@Override
 	public void onDraw(Gui g, int mouseX, int mouseY, float partialTicks) {
@@ -183,7 +191,8 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 		if(textChanged){
 			clearGrids();
 			loadText();
-			solveTextColor();	
+			if( doSyntaxHighlighting ) 
+				solveTextColor();	
 			solveSelectionGrid();
 			updateScrollbarContent(false);
 		}
@@ -332,6 +341,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 
 
 	private void drawStringBoxes(Gui g) {
+		if( !doSyntaxHighlighting ) return;
 		int boxFillColor = Utils.parseColor(stringBoxFill.getPropValue()).toInt();
 		for (int dy = 0; dy < quote.length; dy++) {
 			boolean isDrawing = false;
@@ -354,6 +364,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 		}
 	}
 	private void drawStringBoxFrame(Gui g){
+		if( !doSyntaxHighlighting ) return;
 		int boxFrameColor = Utils.parseColor(stringBoxFrame.getPropValue()).toInt();
 		for (int dy = 0; dy < quote.length; dy++) {
 			boolean isDrawing = false;
@@ -1059,6 +1070,22 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 	
 	public File getScriptFile() {
 		return new File(AdvancedMacros.macrosFolder,scriptName);
+	}
+	
+	public void setText(String text) {
+		lines.clear();
+		cursor.set(0, 0);
+		Scanner s = new Scanner(text);
+		while(s.hasNextLine())
+			lines.add(s.nextLine());
+		setNeedsSaveFlag(true);
+	}
+	public String getText() {
+		StringJoiner out = new StringJoiner("\n");
+		lines.iterator().forEachRemaining(s->{
+			out.add(s);
+		});
+		return out.toString();
 	}
 	
 	public static boolean isCTRLDown(){
