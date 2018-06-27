@@ -65,7 +65,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 	
 	public boolean doSyntaxHighlighting = true;
 
-	private static final HashMap<String, Boolean> keywords = new HashMap<>();
+	public final HashMap<String, Boolean> keywords = new HashMap<>();
 
 	Property bgColor, frameColor, defaultTextColor, keywordColor, commentColor, variableColor,tableColor,
 	stringBoxFill, stringBoxFrame, functionColor, selectionFillColor, selectionFrameColor;
@@ -165,6 +165,8 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 
 	@Override
 	public void onDraw(Gui g, int mouseX, int mouseY, float partialTicks) {
+		if(wid==0 || hei==0 || !isVisible){return;}
+		
 		GlStateManager.pushAttrib();
 		GlStateManager.enableAlpha();
 		GlStateManager.enableBlend();
@@ -176,7 +178,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 		//draw stringbox outline
 		//draw cursor /w blink
 		//System.out.println("DRAW?");
-		if(wid==0 || hei==0 || !isVisible){return;}
+		
 		//System.out.println("DRAW");
 		viewX = (int) hBar.getOffset();
 		viewY = (int) vBar.getOffset();
@@ -462,7 +464,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 		//		}
 	}
 
-	private static HashMap<String,Object> tables, functions, variables;
+	public static HashMap<String,Object> tables, functions, variables;
 	/**This will get a new list of keywords based on the AdvancedMacros.globals*/
 	public static void updateKeywords(){
 		tables = getVariableList(LuaValue.TTABLE);
@@ -1474,4 +1476,11 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 //			return null;
 //		}
 //	}
+
+	public boolean isFoucused() {
+		return focused;
+	}
+	public boolean isEditable() {
+		return isEditable;
+	}
 }

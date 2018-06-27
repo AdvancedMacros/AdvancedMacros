@@ -38,7 +38,9 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 	private boolean mouseWasOver = false;
 	boolean visible = true;
 	private Group parent;
-	public ScriptGuiElement(Gui gui, Group parent) {
+	
+	public ScriptGuiElement(Gui gui, Group parent) {this(gui, parent, true);}
+	public ScriptGuiElement(Gui gui, Group parent, boolean addEventControls) {
 		gui.inputSubscribers.add(this);
 		gui.drawables.add(this);
 		
@@ -100,7 +102,6 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 				return t.unpack();
 			}
 		});
-		
 		this.set("getZ", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
@@ -114,6 +115,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 				return LuaValue.NONE;
 			}
 		});
+		
 		
 		this.set("setOpacity", new OneArgFunction() {
 			@Override
@@ -158,7 +160,8 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 		});
 
 		//event section
-		addInputControls(this);
+		if(addEventControls)
+			addInputControls(this);
 		
 		
 		this.set("setParent", new OneArgFunction() {

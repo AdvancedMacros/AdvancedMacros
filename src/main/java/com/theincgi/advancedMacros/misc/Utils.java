@@ -3,6 +3,7 @@ package com.theincgi.advancedMacros.misc;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Scanner;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -689,6 +690,12 @@ public class Utils {
 			logError(toLuaError(e));
 			return LuaValue.NIL;
 		}
+	}
+	public static LuaValue toLuaTable(Set<String> keySet) {
+		LuaTable t = new LuaTable();
+		for(String s : keySet)
+			t.set(t.length()+1, s);
+		return t;
 	}
 	
 }

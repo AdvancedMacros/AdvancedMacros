@@ -32,6 +32,10 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	private int repeatMod = 0;
 	private boolean drawDefaultBackground = true;
 
+	public Gui() {
+		super.mc = Minecraft.getMinecraft();
+	}
+	
 	@Override
 	public void drawHorizontalLine(int startX, int endX, int y, int color) {
 		super.drawHorizontalLine(startX, endX, y, color);

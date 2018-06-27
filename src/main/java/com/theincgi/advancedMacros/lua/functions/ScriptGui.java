@@ -14,6 +14,7 @@ import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
 import com.theincgi.advancedMacros.lua.scriptGui.Group;
 import com.theincgi.advancedMacros.lua.scriptGui.GuiBox;
+import com.theincgi.advancedMacros.lua.scriptGui.GuiCTA;
 import com.theincgi.advancedMacros.lua.scriptGui.GuiImage;
 import com.theincgi.advancedMacros.lua.scriptGui.GuiItemIcon;
 import com.theincgi.advancedMacros.lua.scriptGui.GuiRectangle;
@@ -97,6 +98,16 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				return t;
 			}
 		});
+		set("addTextArea", new VarArgFunction() {
+			@Override public Varargs invoke(Varargs args) {
+				GuiCTA cta = new GuiCTA(gui, guiGroup);
+				cta.setPos((int)args.optdouble(1, 0) , (int)args.optdouble(2, 0) );
+				cta.setWidth(  args.optint(3, 0) );
+				cta.setHeight( args.optint(4, 0) );
+				cta.getCTA().setText( args.optstring(5, valueOf("")).tojstring() );
+				return cta;
+			}
+		});
 		set("addImage", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs args) {
@@ -124,7 +135,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 			@Override
 			public LuaValue call() {
 				Minecraft.getMinecraft().displayGuiScreen(gui);
-				Mouse.setGrabbed(false);
+				Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
 				if(onGuiOpen!=null)
 					onGuiOpen.call();
 				return LuaValue.NONE;
