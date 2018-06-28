@@ -251,6 +251,14 @@ public class GuiButton extends GuiRect implements InputSubscriber, Focusable{
 	public boolean isEnabled() {
 		return isEnabled;
 	}
+	@Override
+	public boolean isFocused() {
+		return true;
+	}
+	@Override
+	public void setFocused(boolean f) {
+		//no focus needed
+	}
 	
 
 	

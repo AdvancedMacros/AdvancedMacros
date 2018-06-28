@@ -160,7 +160,10 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	private boolean isInButton(int mouseX, int mouseY){
 		if(orientation.isUPDOWN()){
 			int buttonY = getButtonY(), buttonLen = getButtonLen();
-			return (mouseX >= x+1 && x-1+wid >= mouseX && mouseY >= buttonY && mouseY+buttonLen >=mouseY);
+			return (mouseX >= x+1 && 
+					x-1+wid >= mouseX && 
+					mouseY >= buttonY && 
+					y + buttonLen >=mouseY);
 		}
 		return mouseX >= getButtonX() && mouseX <= getButtonX()+getButtonLen() && mouseY >= y+1 && mouseY+1 <= y+wid-1;
 	}
@@ -335,5 +338,16 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	
 	public void setScrollSpeed(double speed) {
 		scrollSpeed = speed;
+	}
+	
+	/**Always focused*/
+	@Override
+	public boolean isFocused() {
+		return true;
+	}
+	/**Always focused*/
+	@Override
+	public void setFocused(boolean unused) {
+		
 	}
 }

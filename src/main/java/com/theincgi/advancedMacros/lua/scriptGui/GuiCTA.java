@@ -33,7 +33,7 @@ public class GuiCTA extends ScriptGuiElement{
 			@Override
 			public LuaValue call(LuaValue arg) {
 				cta.setText(arg.checkjstring());
-				return NONE;
+				return GuiCTA.this;
 			}
 		});
 		set("getText", new ZeroArgFunction() {
@@ -44,7 +44,7 @@ public class GuiCTA extends ScriptGuiElement{
 		set("setSyntaxHighlight", new OneArgFunction() {
 			@Override public LuaValue call(LuaValue arg) {
 				cta.doSyntaxHighlighting = arg.checkboolean();
-				return NONE;
+				return GuiCTA.this;
 			}
 		});
 		set("isSyntaxHighlight", new ZeroArgFunction() {
@@ -59,19 +59,20 @@ public class GuiCTA extends ScriptGuiElement{
 		});
 		set("isFocused", new ZeroArgFunction() {
 			@Override public LuaValue call() {
-				return valueOf(cta.isFoucused());
+				return valueOf(cta.isFocused());
 			}
 		});
 		set("setFocused", new OneArgFunction() {
 			@Override public LuaValue call(LuaValue arg) {
 				cta.setFocused(arg.checkboolean());
-				return NONE;
+				gui.setFocusItem(cta);
+				return GuiCTA.this;
 			}
 		});
 		set("setEditable", new OneArgFunction() {
 			@Override public LuaValue call(LuaValue arg) {
 				cta.setEditable(arg.checkboolean());;
-				return NONE;
+				return GuiCTA.this;
 			}
 		});
 		set("isEditable", new ZeroArgFunction() {

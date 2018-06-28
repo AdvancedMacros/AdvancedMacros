@@ -241,7 +241,10 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 		}
 	}
 
-	public static interface Focusable{}
+	public static interface Focusable{
+		public boolean isFocused();
+		public void setFocused(boolean f);
+	}
 	public static interface InputSubscriber{ 
 		/**@param i scroll amount*/
 		public boolean onScroll(Gui gui, int i);

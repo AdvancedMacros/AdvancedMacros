@@ -22,6 +22,7 @@ import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.ForgeEventHandler;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
+import com.theincgi.advancedMacros.gui.Gui.Focusable;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
 import com.theincgi.advancedMacros.gui.elements.GuiScrollBar.Orientation;
 import com.theincgi.advancedMacros.gui2.ScriptBrowser2;
@@ -31,7 +32,7 @@ import com.theincgi.advancedMacros.misc.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 
-public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
+public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focusable{
 	//DoubleLinkedList<DoubleLinkedList<Unit>> text = new DoubleLinkedList<>();
 	/**y, x*/
 	char[][] visChars;
@@ -90,9 +91,10 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 	private boolean resized;
 	private static final String propAddress = "colors.cta.";
 	private static WidgetID wID;
+	private Gui gui;
 	public ColorTextArea(WidgetID wID, Gui g) {	
 		this.wID = wID;
-																					 /*AAA, RRR, GGG, BBB*/
+		gui = g;     																 /*AAA, RRR, GGG, BBB*/
 		bgColor 		 = new Property(propAddress+"textFill", 	       new Color(	  128, 128, 128).toLuaValue(), "textFill", 			wID);
 		frameColor 		 = new Property(propAddress+"frame", 		       new Color(	  255, 255, 255).toLuaValue(), "frame", 			wID);
 		defaultTextColor = new Property(propAddress+"plainText", 	       new Color(  	    0,   0,   0).toLuaValue(), "plainText", 		wID);
@@ -285,7 +287,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 	}
 	private int blinkOffset = 0;
 	private void drawCursor(Gui g) {
-		if(!focused){return;}
+		if(!isFocused()){return;}
 		int col;
 		if((System.currentTimeMillis()-blinkOffset)/500%2==0){
 			col = Utils.parseColor(cursorOnColor.getPropValue()).toInt();
@@ -669,7 +671,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 
 	@Override
 	public boolean onScroll(Gui gui, int i) {
-		if(focused){
+		if(isFocused()){
 			if(!isShiftDown()){
 				vBar.onScroll(gui, i);
 			}else{
@@ -677,7 +679,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 			}
 			textChanged=true;
 		}
-		return focused;
+		return isFocused();
 	}
 
 	private void resetBlinkOffset(){
@@ -687,7 +689,9 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 	@Override
 	public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
 		if(hBar.onMouseClick(gui, x, y, buttonNum)){return textChanged=true;}if(vBar.onMouseClick(gui, x, y, buttonNum)){return textChanged=true;}
-		if(x>this.x && x<this.x+this.wid && y> this.y && y<this.y+this.wid){
+		if(GuiRect.isInBounds(x, y, this.x, this.y, this.wid, this.hei)) {
+		//if(x>this.x && x<this.x+this.wid && y> this.y && y<this.y+this.wid){
+			setFocused(true);
 			textChanged = true;
 			x -=this.x+3;
 			y -=this.y+4;
@@ -821,7 +825,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 			}
 			setNeedsSaveFlag(true);
 		}
-		if(!focused){return false;}
+		if(!isFocused()){return false;}
 		switch (keyCode) {
 		case Keyboard.KEY_RETURN:{
 			if(!isEditable){return false;}
@@ -1034,7 +1038,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 		}
 		textChanged = true;
 		resetBlinkOffset();
-		return isVisible && focused;
+		return isVisible && isFocused();
 	}
 	private boolean isEditKey(char typedChar, int keyCode) {
 		@SuppressWarnings("deprecation")
@@ -1098,7 +1102,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 	}
 	@Override
 	public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
-		if(focused && repeatMod%5==0 && !isCTRLDown()){
+		if(isFocused() && repeatMod%5==0 && !isCTRLDown()){
 			onKeyPressed(gui, typedChar, keyCode);
 			return true;
 		}
@@ -1295,9 +1299,8 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 		this.isEditable = isEditable;
 	}
 
-	boolean focused;
 	public void setFocused(boolean b) {
-		focused = b;
+		gui.setFocusItem( b ? this : null );
 	}
 
 	private void drawBlinkyLine(Gui g, BlinkyLineDirection bld, int x, int y){
@@ -1476,10 +1479,11 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable{
 //			return null;
 //		}
 //	}
-
-	public boolean isFoucused() {
-		return focused;
+	@Override
+	public boolean isFocused() {
+		return gui.getFocusItem().equals(this);
 	}
+	
 	public boolean isEditable() {
 		return isEditable;
 	}
