@@ -1084,6 +1084,8 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		Scanner s = new Scanner(text);
 		while(s.hasNextLine())
 			lines.add(s.nextLine());
+		if(lines.isEmpty())
+			lines.add("");
 		setNeedsSaveFlag(true);
 	}
 	public String getText() {
@@ -1481,7 +1483,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 //	}
 	@Override
 	public boolean isFocused() {
-		return gui.getFocusItem().equals(this);
+		return gui.getFocusItem()!=null && gui.getFocusItem().equals(this);
 	}
 	
 	public boolean isEditable() {

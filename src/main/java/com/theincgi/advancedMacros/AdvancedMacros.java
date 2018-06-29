@@ -5,11 +5,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
+import java.util.Scanner;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -89,8 +91,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "3.13.1"; //${version} ??
-	public static final File macrosRootFolder = new File(Minecraft.getMinecraft().mcDataDir,"mods/advancedMacros");
+	public static final String VERSION = "3.14.2"; //${version} ??
+	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
 	public static final File customDocsFolder = new File(macrosRootFolder, "docs");
@@ -355,5 +357,26 @@ public class AdvancedMacros {
 			AdvancedMacros.logFunc.call(LuaValue.valueOf("&c"+e.toString()));
 		}
 	}
-
+	private static File getRootFolder() {
+		File defaultRoot = new File(Minecraft.getMinecraft().mcDataDir,"mods/advancedMacros");
+		File f = new File(Minecraft.getMinecraft().mcDataDir,"config/advancedMacros.cfg");
+		if(!f.exists()) {
+			try (PrintWriter pw = new PrintWriter(f)){
+				pw.write("advancedMacrosRootFolder=" +defaultRoot.toString()+"\n");
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			return defaultRoot;
+		}
+		try(Scanner s = new Scanner(f)){
+			String line = s.nextLine();
+			if(line.startsWith("advancedMacrosRootFolder=")) {
+				String value = line.substring(line.indexOf('=') + 1);
+				return new File(value);
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} 
+		return defaultRoot;
+	}
 }
