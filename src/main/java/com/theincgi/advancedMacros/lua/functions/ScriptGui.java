@@ -135,7 +135,9 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 			@Override
 			public LuaValue call() {
 				Minecraft.getMinecraft().displayGuiScreen(gui);
-				Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
+				Minecraft.getMinecraft().addScheduledTask(()->{
+					Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
+				});
 				if(onGuiOpen!=null)
 					onGuiOpen.call();
 				return LuaValue.NONE;
