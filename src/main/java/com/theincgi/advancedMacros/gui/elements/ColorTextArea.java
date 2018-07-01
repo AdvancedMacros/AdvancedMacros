@@ -14,6 +14,7 @@ import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.lwjgl.input.Keyboard;
@@ -26,6 +27,7 @@ import com.theincgi.advancedMacros.gui.Gui.Focusable;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
 import com.theincgi.advancedMacros.gui.elements.GuiScrollBar.Orientation;
 import com.theincgi.advancedMacros.gui2.ScriptBrowser2;
+import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Property;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -68,10 +70,12 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 
 	public final HashMap<String, Boolean> keywords = new HashMap<>();
 
-	Property bgColor, frameColor, defaultTextColor, keywordColor, commentColor, variableColor,tableColor,
-	stringBoxFill, stringBoxFrame, functionColor, selectionFillColor, selectionFrameColor;
-	Property tabCount;
-	Property cursorOnColor/*,cursorOffColor*/;
+	//Property bgColor, frameColor, defaultTextColor, keywordColor, commentColor, variableColor,tableColor,
+	//stringBoxFill, stringBoxFrame, functionColor, selectionFillColor, selectionFrameColor;
+	PropertyPalette propPalette;
+	
+	//Property tabCount;
+	//Property cursorOnColor/*,cursorOffColor*/;
 	final int charWid = 7;
 	final int charHei = 12;
 
@@ -89,27 +93,35 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	private boolean isVisible = true;
 	private boolean textChanged = true;
 	private boolean resized;
-	private static final String propAddress = "colors.cta.";
+	//private static final String propAddress = "colors.cta.";
 	private static WidgetID wID;
 	private Gui gui;
-	public ColorTextArea(WidgetID wID, Gui g) {	
-		this.wID = wID;
+	public ColorTextArea(Gui gui, LuaTable settings) {
+		this(gui, settings, new String[] {"editor"});
+	}
+	public ColorTextArea(Gui gui, LuaTable settings, String... settingsPath) {
+		this( new PropertyPalette(settingsPath, settings), gui);
+	}
+	public ColorTextArea(PropertyPalette propPalette, Gui g) {	
 		gui = g;     																 /*AAA, RRR, GGG, BBB*/
-		bgColor 		 = new Property(propAddress+"textFill", 	       new Color(	  128, 128, 128).toLuaValue(), "textFill", 			wID);
-		frameColor 		 = new Property(propAddress+"frame", 		       new Color(	  255, 255, 255).toLuaValue(), "frame", 			wID);
-		defaultTextColor = new Property(propAddress+"plainText", 	       new Color(  	    0,   0,   0).toLuaValue(), "plainText", 		wID);
-		keywordColor 	 = new Property(propAddress+"keyword", 		       new Color(  	    0,  80, 100).toLuaValue(), "keyword", 			wID);
-		commentColor 	 = new Property(propAddress+"comment", 		       new Color(  	    0,  85,   0).toLuaValue(), "comment", 			wID);
-		variableColor 	 = new Property(propAddress+"variable", 	       new Color(       0, 109,   9).toLuaValue(), "variable", 			wID);
-		stringBoxFill 	 = new Property(propAddress+"stringBoxFill",       new Color( 60, 255, 128,  64).toLuaValue(), "stringBoxFill", 	wID);
-		stringBoxFrame 	 = new Property(propAddress+"stringBoxFrame",      new Color(     255, 128,  64).toLuaValue(), "stringBoxFrame", 	wID);
-		functionColor 	 = new Property(propAddress+"function", 	       new Color(     128, 255, 255).toLuaValue(), "function", 			wID);
-		tableColor       = new Property(propAddress+"table",  	           new Color(     120, 250, 100).toLuaValue(), "table", 			wID); 	
-		cursorOnColor    = new Property(propAddress+"cursorOn", 	 	   new Color(      91, 182, 255).toLuaValue(), "cursorOn",			wID);
-		selectionFrameColor=new Property(propAddress+"selectionFrame",     new Color(       0, 132,  79).toLuaValue(), "selectionColor" , 	wID);
-		selectionFillColor=new Property(propAddress+"selectionFill",       new Color(      57, 206, 146).toLuaValue(), "selectionFrame", 	wID);
-		//cursorOffColor   = new Property(propAddress+"cursorOff", 	 new Color(     178, 208, 232).toLuaValue(), "cursorOff", 		wID);
-		tabCount         = new Property(propAddress+"tabCount", LuaValue.valueOf(2), "tabCount", wID);
+		this.propPalette = propPalette;
+		propPalette
+		.addColorIfNil   (new Color(	      128, 128, 128)	, 	"colors", "textFill" 		)
+	    .addColorIfNil   (new Color(	      255, 255, 255)	, 	"colors", "frame"    		)
+	    .addColorIfNil   (new Color(  		    0,   0,   0)	,  	"colors", "plainText"		)
+	    .addColorIfNil   (new Color(  	 	    0,  80, 100)	,  	"colors", "keyword"  		)
+	    .addColorIfNil   (new Color(  	   		0,  85,   0)	,  	"colors", "comment"  		)
+	    .addColorIfNil   (new Color(            0, 109,   9)	,  	"colors", "variable" 		)
+	    .addColorIfNil   (new Color(      60, 255, 128,  64)	,  	"colors", "stringBoxFill" 	)
+	    .addColorIfNil   (new Color(     	  255, 128,  64)	,  	"colors", "stringBoxFrame"	)
+	    .addColorIfNil   (new Color(          128, 255, 255)	,  	"colors", "function" 		)
+	    .addColorIfNil   (new Color(          120, 250, 100)	,  	"colors", "table" 			)
+	    .addColorIfNil   (new Color(           91, 182, 255)	,  	"colors", "cursorOn" 		)
+	    .addColorIfNil   (new Color(            0, 132,  79)	,  	"colors", "selectionFrame"	)
+	    .addColorIfNil   (new Color(           57, 206, 146)	,	"colors", "selectionFill" 	);
+		
+		propPalette.setPropIfNil(LuaValue.valueOf(2), "tabCount");
+		
 		this.g= g;
 
 		hBar = new GuiScrollBar(wID, 0, 0, 0, 0, Orientation.LEFTRIGHT, "colors.cta.scrollbar");
@@ -184,12 +196,12 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		//System.out.println("DRAW");
 		viewX = (int) hBar.getOffset();
 		viewY = (int) vBar.getOffset();
-		g.drawBoxedRectangle(x, y, wid-7, hei-7, Utils.parseColor(frameColor.getPropValue()).toInt(), Utils.parseColor(bgColor.getPropValue()).toInt());
+		g.drawBoxedRectangle(x, y, wid-7, hei-7, propPalette.getColor("colors", "frame").toInt(), propPalette.getColor("colors", "textFill").toInt());
 		hBar.setWid(7);
 		vBar.setWid(7);
 		hBar.setLen(wid-7);
 		vBar.setLen(hei-7);
-		g.drawBoxedRectangle(x+wid-7, y+hei-7, 7, 7, Utils.parseColor(frameColor.getPropValue()).toInt(), Utils.parseColor(bgColor.getPropValue()).toInt());
+		g.drawBoxedRectangle(x+wid-7, y+hei-7, 7, 7, propPalette.getColor("colors", "frame").toInt(), propPalette.getColor("colors", "textFill").toInt());
 		hBar.onDraw(g, mouseX, mouseY, partialTicks);
 		vBar.onDraw(g, mouseX, mouseY, partialTicks);
 		if(textChanged){
@@ -274,7 +286,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	}
 
 	private void drawSelectionBG(Gui g) {
-		int sCol = Utils.parseColor(selectionFillColor.getPropValue()).toInt();
+		int sCol = propPalette.getColor("colors", "selectionFill").toInt(); //Utils.parseColor(selectionFillColor.getPropValue()).toInt();
 		for (int dy = 0; dy < selection.length; dy++) {
 			for (int dx = 0; dx < selection[dy].length; dx++) {
 				if(selection[dy][dx]){
@@ -290,7 +302,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		if(!isFocused()){return;}
 		int col;
 		if((System.currentTimeMillis()-blinkOffset)/500%2==0){
-			col = Utils.parseColor(cursorOnColor.getPropValue()).toInt();
+			col = propPalette.getColor("colors", "cursorOn").toInt();//Utils.parseColor(cursorOnColor.getPropValue()).toInt();
 		}else{
 			//col = Utils.parseColor(cursorOffColor.getPropValue()).toInt();
 			return;
@@ -328,7 +340,8 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	//	}
 
 	private void clearGrids(){
-		Color plain = Utils.parseColor(defaultTextColor.getPropValue());
+		//Color plain = Utils.parseColor(defaultTextColor.getPropValue());
+		Color plain = propPalette.getColor("colors", "plainText");
 		for(int y = 0; y<visChars.length; y++){
 			for(int x = 0; x<visChars[y].length;x++){
 				visChars[y][x] = ' ';
@@ -346,7 +359,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 
 	private void drawStringBoxes(Gui g) {
 		if( !doSyntaxHighlighting ) return;
-		int boxFillColor = Utils.parseColor(stringBoxFill.getPropValue()).toInt();
+		int boxFillColor = propPalette.getColor("colors", "stringBoxFill").toInt();//Utils.parseColor(stringBoxFill.getPropValue()).toInt();
 		for (int dy = 0; dy < quote.length; dy++) {
 			boolean isDrawing = false;
 			for (int dx = 0; dx < quote[dy].length; dx++) {
@@ -369,7 +382,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	}
 	private void drawStringBoxFrame(Gui g){
 		if( !doSyntaxHighlighting ) return;
-		int boxFrameColor = Utils.parseColor(stringBoxFrame.getPropValue()).toInt();
+		int boxFrameColor = propPalette.getColor("colors", "stringBoxFrame").toInt();//Utils.parseColor(stringBoxFrame.getPropValue()).toInt();
 		for (int dy = 0; dy < quote.length; dy++) {
 			boolean isDrawing = false;
 			for (int dx = 0; dx < quote[dy].length; dx++) {
@@ -487,13 +500,13 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 
 	private class Q{int start, end; public Q(int a, int b){start = a;end = b;}}
 	private void solveTextColor(){
-		Color color_table   = Utils.parseColor(tableColor.getPropValue()).copy();
-		Color color_funct   = Utils.parseColor(functionColor.getPropValue()).copy();
-		Color color_var     = Utils.parseColor(variableColor.getPropValue()).copy();
-		Color color_str     = Utils.parseColor(stringBoxFill.getPropValue()).copy();
-		Color color_plain   = Utils.parseColor(defaultTextColor.getPropValue()).copy();
-		Color color_comment = Utils.parseColor(commentColor.getPropValue()).copy();
-		Color color_keyword = Utils.parseColor(keywordColor.getPropValue()).copy();
+		Color color_table   = propPalette.getColor("colors", "table");//Utils.parseColor(tableColor.getPropValue()).copy();
+		Color color_funct   = propPalette.getColor("colors", "function");//Utils.parseColor(functionColor.getPropValue()).copy();
+		Color color_var     = propPalette.getColor("colors", "variable");//Utils.parseColor(variableColor.getPropValue()).copy();
+		Color color_str     = propPalette.getColor("colors", "stringBoxFill");//Utils.parseColor(stringBoxFill.getPropValue()).copy();
+		Color color_plain   = propPalette.getColor("colors", "plainText");//Utils.parseColor(defaultTextColor.getPropValue()).copy();
+		Color color_comment = propPalette.getColor("colors", "comment");//Utils.parseColor(commentColor.getPropValue()).copy();
+		Color color_keyword = propPalette.getColor("colors", "keyword");//Utils.parseColor(keywordColor.getPropValue()).copy();
 		
 		hoverWord = null;
 		
@@ -912,7 +925,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 			break;
 		case Keyboard.KEY_TAB:
 			if(!isEditable){return false;}
-			for(int i = 0; i<tabCount.getPropValue().checkint(); i++)
+			for(int i = 0; i<propPalette.getValue("tabCount").optint(2); i++)
 				onKeyPressed(gui, ' ', Keyboard.KEY_SPACE);
 			setNeedsSaveFlag(true);
 			break;
@@ -1180,7 +1193,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 			quote = new boolean[charY][charX];
 			formating = new String[charY][charX];
 			selection = new boolean[charY][charX];
-			Color plain = Utils.parseColor(defaultTextColor.getPropValue());
+			Color plain = propPalette.getColor("colors", "plainText");//Utils.parseColor(defaultTextColor.getPropValue());
 			for(int y = 0; y<charY;y++){
 				for(int x=0; x<charX;x++){ //TODO make bufferes have +1 on both sides so string can draw offscreen boxes
 					cols[y][x]=plain.copy();
@@ -1306,7 +1319,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	}
 
 	private void drawBlinkyLine(Gui g, BlinkyLineDirection bld, int x, int y){
-		int sCol = Utils.parseColor(selectionFrameColor.getPropValue()).toInt();
+		int sCol = propPalette.getColor("colors", "selectionFrame").toInt();//Utils.parseColor(selectionFrameColor.getPropValue()).toInt();
 		int i = (int) (System.currentTimeMillis()/250%6);
 		if(bld.isUp() || bld.isLeft()){i=6-i;}
 		//		boolean a = ((int)(i/3))==(bld.isLeft()||bld.isRight()?x:y)%3;

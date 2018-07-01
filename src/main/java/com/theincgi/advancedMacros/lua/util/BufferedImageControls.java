@@ -25,7 +25,13 @@ public class BufferedImageControls extends LuaTable{
 	//buffering means multiple objects arn't created and destroyed, but provide a thread safe way to buffer without syncronization
 	ThreadLocal<Color> colorBuffer = new ThreadLocal<Color>() { @Override protected Color initialValue() {return new Color(0);} } ;
 	
-	
+	public static class CreateImg extends TwoArgFunction {
+		@Override
+		public LuaValue call(LuaValue arg1, LuaValue arg2) {
+			BufferedImage img = new BufferedImage(arg1.checkint(), arg2.checkint(), BufferedImage.TYPE_INT_ARGB);
+			return new BufferedImageControls(img);
+		}
+	}
 	public static class LoadImg extends OneArgFunction {
 		@Override
 		public LuaValue call(LuaValue arg) {

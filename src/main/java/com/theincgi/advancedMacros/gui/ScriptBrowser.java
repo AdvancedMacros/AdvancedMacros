@@ -40,7 +40,7 @@ public class ScriptBrowser extends Gui{
 		listManager.setAlwaysShowScroll(true);
 		listManager.setDrawBG(false); 
 		//listManager.setScrollbarGap(5);
-		textPreview = new ColorTextArea(new WidgetID(300), this);//made to match settings from editor
+		textPreview = new ColorTextArea(this, Settings.settings, "browserTextPreview");//made to match settings from editor
 		back = new GuiButton(new WidgetID(402), 5, 5, listManager.getItemWidth()/2, 12, LuaValue.NIL, LuaValue.valueOf("Back"), PROP_TABLE, Color.BLACK, Color.WHITE, Color.WHITE);
 		createFile = new GuiButton(new WidgetID(403), 5+back.getWid(), 5, back.getWid(), 12, LuaValue.NIL, LuaValue.valueOf("Create File"), PROP_TABLE, Color.BLACK, Color.WHITE, Color.WHITE);
 		textPreview.setEditable(false);

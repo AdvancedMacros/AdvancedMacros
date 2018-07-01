@@ -15,6 +15,7 @@ import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.elements.ColorTextArea;
 import com.theincgi.advancedMacros.gui.elements.WidgetID;
+import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Utils;
 
 /**
@@ -24,7 +25,8 @@ public class GuiCTA extends ScriptGuiElement{
 	ColorTextArea cta;
 	public GuiCTA(Gui gui, Group parent) {
 		super(gui, parent, false);
-		cta = new ColorTextArea(AdvancedMacros.editorGUI.getCta().getWidgetID(), gui);
+		PropertyPalette colorPalette = new PropertyPalette();
+		cta = new ColorTextArea(colorPalette, gui);
 		cta.setVisible(true);
 		enableSizeControl();
 		cta.setEditable(true);
@@ -80,6 +82,7 @@ public class GuiCTA extends ScriptGuiElement{
 				return valueOf(cta.isEditable());
 			}
 		});
+		set("settings", colorPalette.getTableFromKey());
 		
 //		this.set("setX", new OneArgFunction() {
 //			@Override

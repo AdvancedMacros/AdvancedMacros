@@ -78,7 +78,7 @@ public class ScriptBrowser2 extends Gui{
 		//		popupPrompt = new PopupPrompt(new WidgetID(404), width/3, 36, width/3, height/3,this);
 		popupPrompt2 = new PopupPrompt2(this);
 
-		filePreview = new ColorTextArea(new WidgetID(300), this);
+		filePreview = new ColorTextArea(this, Settings.settings, "browserTextPreview");
 		filePreview.setEditable(false);
 		filePreview.setFocused(true);
 

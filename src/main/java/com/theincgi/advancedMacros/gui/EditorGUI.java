@@ -11,13 +11,14 @@ import com.theincgi.advancedMacros.gui.elements.GuiButton;
 import com.theincgi.advancedMacros.gui.elements.OnClickHandler;
 import com.theincgi.advancedMacros.gui.elements.WidgetID;
 import com.theincgi.advancedMacros.gui2.ScriptBrowser2;
+import com.theincgi.advancedMacros.misc.Settings;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
 
 public class EditorGUI extends Gui{
 
-	ColorTextArea cta = new ColorTextArea(new WidgetID(300), this);
+	ColorTextArea cta = new ColorTextArea(this, Settings.settings, "editor");
 	GuiTextField gtf;
 	GuiButton save, exit, quickRun;
 	

@@ -1,5 +1,5 @@
 package com.theincgi.advancedMacros.misc;
 
-public class ColorPalette {
-
+public class SimpleLuaProperty {
+	
 }
