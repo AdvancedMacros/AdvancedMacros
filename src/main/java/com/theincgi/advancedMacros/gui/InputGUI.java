@@ -17,6 +17,8 @@ import com.theincgi.advancedMacros.gui.elements.ListManager;
 import com.theincgi.advancedMacros.gui.elements.Moveable;
 import com.theincgi.advancedMacros.gui.elements.WidgetID;
 import com.theincgi.advancedMacros.lua.LuaDebug;
+import com.theincgi.advancedMacros.misc.PropertyPalette;
+import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
@@ -39,8 +41,9 @@ public class InputGUI extends Gui{
 	private String prompt;
 	private boolean answered = true;
 	private LuaValue answer = LuaValue.NIL;
-	private ListManager listItemPicker = new ListManager(5, 19, 30, 30, new WidgetID(800), "colors.promptGUI");
-	private ListManager choices = new ListManager(5, 19, 30, 30, new WidgetID(800), "colors.promptGUI");
+	PropertyPalette propPalette = new PropertyPalette(new String[] {"promptGui"}, Settings.settings);
+	private ListManager listItemPicker = new ListManager(5, 19, 30, 30, /*new WidgetID(800), "colors.promptGUI"*/ propPalette);
+	private ListManager choices = new ListManager(5, 19, 30, 30, /*new WidgetID(800), "colors.promptGUI"*/ propPalette);
 	private static ItemRenderer itemRenderer = Minecraft.getMinecraft().getItemRenderer();
 	public InputGUI(LuaDebug debug) {
 		this.debug = debug;

@@ -69,6 +69,7 @@ import com.theincgi.advancedMacros.lua.functions.SkinCustomizer;
 import com.theincgi.advancedMacros.lua.functions.StopAllScripts;
 import com.theincgi.advancedMacros.lua.functions.Toast;
 import com.theincgi.advancedMacros.lua.functions.midi.MidiLib2;
+import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
 import com.theincgi.advancedMacros.misc.CustomFontRenderer;
 import com.theincgi.advancedMacros.misc.JarLibSearcher;
 import com.theincgi.advancedMacros.misc.Settings;
@@ -91,7 +92,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "3.14.3"; //${version} ??
+	public static final String VERSION = "4.0.0"; //${version} ??
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -198,7 +199,11 @@ public class AdvancedMacros {
 
 		globals.get("os").set("millis", new GetOSMilliseconds());
 		globals.get("os").set("exit", LuaValue.NIL);
-
+		
+		LuaTable imgTools = new LuaTable();
+		imgTools.set("new", new BufferedImageControls.CreateImg());
+		imgTools.set("load", new BufferedImageControls.LoadImg());
+		globals.set("image", imgTools);
 		//math tweaks
 		LuaTable math = globals.get("math").checktable();
 		math.set("ln", math.get("log")); //because log is some how base e instead of 10

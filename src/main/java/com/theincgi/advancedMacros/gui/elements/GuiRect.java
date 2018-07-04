@@ -10,13 +10,17 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.misc.Property;
+import com.theincgi.advancedMacros.misc.PropertyPalette;
+import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
 public class GuiRect implements Drawable, Moveable{
 	WidgetID wID;
-	Property colorFrame;
-	Property colorFill;
-	Property colorShade;
+//	Property colorFrame;
+//	Property colorFill;
+//	Property colorShade;
+	
+	PropertyPalette propertyPalette;
 	
 	public boolean isVisible = true;
 	private int x,y,wid,hei;
@@ -24,57 +28,76 @@ public class GuiRect implements Drawable, Moveable{
 	public Color frame = DEFAULT_FRAME;
 	public Color shade = DEFAULT_SHADE;
 	public static final Color DEFAULT_SHADE = new Color(100, 100, 100, 255);
-	public static final Color DEFAULT_FILL = new Color(30, 30, 30);
-	public static final Color DEFAULT_FRAME = new Color(255, 255, 255);
+	public static final Color DEFAULT_FILL = Color.BLACK;
+	public static final Color DEFAULT_FRAME = Color.WHITE;
 	protected boolean doAnimation = false;
 	private int drawX, drawY, drawWid,drawHei;
 	private double scale;
 	//protected Gui gui;
 	private static final String defaultPropTableName = "colors.standardRect";
-	public GuiRect(WidgetID wID, int x, int y, int wid, int hei, String nullOrPropTableName) {
-		super();
-		this.wID = wID;
-		nullOrPropTableName = nullOrPropTableName==null?defaultPropTableName:nullOrPropTableName;
-		loadProps(nullOrPropTableName);
-		//this.gui = g;
+	
+	public GuiRect(int x, int y, int wid, int hei, String...propPath) {
+		this(x, y, wid, hei, new PropertyPalette(propPath, Settings.settings));
+	}
+	public GuiRect(int x, int y, int wid, int hei, PropertyPalette propPal) {
 		this.x = x;
 		this.y = y;
 		this.wid = wid;
 		this.hei = hei;
-		scale = 1;
-		scale(1);
-		fill = Utils.parseColor(colorFill.getPropValue());
-		frame= Utils.parseColor(colorFrame.getPropValue());
-		shade= Utils.parseColor(colorShade.getPropValue());
+		this.propertyPalette = propPal;
+		propPal.addColorIfNil(DEFAULT_FRAME, "colors", "frame");
+		propPal.addColorIfNil(DEFAULT_SHADE, "colors", "shade");
+		propPal.addColorIfNil(DEFAULT_FILL , "colors", "fill" );
+		
+		fill =  propPal.getColor("colors", "fill" );
+		frame = propPal.getColor("colors", "frame");
+		shade = propPal.getColor("colors", "shade");
 	}
-	public GuiRect(WidgetID wID, int x, int y, int wid, int hei, String nullOrPropTableName, Color fill, Color frame) {
-		super();
-		this.wID = wID;
-		nullOrPropTableName = nullOrPropTableName==null?defaultPropTableName:nullOrPropTableName;
-		loadProps(nullOrPropTableName, fill, frame);
-		//this.gui = g;
-		this.x = x;
-		this.y = y;
-		this.wid = wid;
-		this.hei = hei;
-		scale = 1;
-		scale(1);
-		this.fill = Utils.parseColor(colorFill.getPropValue());
-		this.frame= Utils.parseColor(colorFrame.getPropValue());
-		shade= Utils.parseColor(colorShade.getPropValue());
-	}
-	protected void loadProps(String nullOrPropTableName) {
-		nullOrPropTableName = nullOrPropTableName==null?defaultPropTableName :nullOrPropTableName;
-		colorFill  = new Property(nullOrPropTableName+".fill" , new Color(0, 0, 0).toLuaValue(), "color.fill", wID);
-		colorFrame = new Property(nullOrPropTableName+".frame", new Color(0,0,0,0).toLuaValue(), "color.frame", wID);
-		colorShade = new Property(nullOrPropTableName+".shade", DEFAULT_SHADE.toLuaValue(), "color.shade", wID);
-	}
-	protected void loadProps(String nullOrPropTableName, Color fill, Color frame) {
-		nullOrPropTableName = nullOrPropTableName==null?defaultPropTableName :nullOrPropTableName;
-		colorFill  = new Property(nullOrPropTableName+".fill" , fill.toLuaValue(), "color.fill", wID);
-		colorFrame = new Property(nullOrPropTableName+".frame", frame.toLuaValue(), "color.frame", wID);
-		colorShade = new Property(nullOrPropTableName+".shade", DEFAULT_SHADE.toLuaValue(), "color.shade", wID);
-	}
+	
+//	public GuiRect(WidgetID wID, int x, int y, int wid, int hei, String nullOrPropTableName) {
+//		super();
+//		this.wID = wID;
+//		nullOrPropTableName = nullOrPropTableName==null?defaultPropTableName:nullOrPropTableName;
+//		loadProps(nullOrPropTableName);
+//		//this.gui = g;
+//		this.x = x;
+//		this.y = y;
+//		this.wid = wid;
+//		this.hei = hei;
+//		scale = 1;
+//		scale(1);
+//		fill = propertyPalette.getColor("colors", "fill");//Utils.parseColor(colorFill.getPropValue());
+//		frame= propertyPalette.getColor("colors", "frame");//Utils.parseColor(colorFrame.getPropValue());
+//		shade= propertyPalette.getColor("colors", "shade");//Utils.parseColor(colorShade.getPropValue());
+//	}
+//	public GuiRect(WidgetID wID, int x, int y, int wid, int hei, String nullOrPropTableName, Color fill, Color frame) {
+//		super();
+//		this.wID = wID;
+//		nullOrPropTableName = nullOrPropTableName==null?defaultPropTableName:nullOrPropTableName;
+//		loadProps(nullOrPropTableName, fill, frame);
+//		//this.gui = g;
+//		this.x = x;
+//		this.y = y;
+//		this.wid = wid;
+//		this.hei = hei;
+//		scale = 1;
+//		scale(1);
+//		this.fill = Utils.parseColor(colorFill.getPropValue());
+//		this.frame= Utils.parseColor(colorFrame.getPropValue());
+//		shade= Utils.parseColor(colorShade.getPropValue());
+//	}
+//	protected void loadProps(String nullOrPropTableName) {
+//		nullOrPropTableName = nullOrPropTableName==null?defaultPropTableName :nullOrPropTableName;
+//		colorFill  = new Property(nullOrPropTableName+".fill" , new Color(0, 0, 0).toLuaValue(), "color.fill", wID);
+//		colorFrame = new Property(nullOrPropTableName+".frame", new Color(0,0,0,0).toLuaValue(), "color.frame", wID);
+//		colorShade = new Property(nullOrPropTableName+".shade", DEFAULT_SHADE.toLuaValue(), "color.shade", wID);
+//	}
+//	protected void loadProps(String nullOrPropTableName, Color fill, Color frame) {
+//		nullOrPropTableName = nullOrPropTableName==null?defaultPropTableName :nullOrPropTableName;
+//		colorFill  = new Property(nullOrPropTableName+".fill" , fill.toLuaValue(), "color.fill", wID);
+//		colorFrame = new Property(nullOrPropTableName+".frame", frame.toLuaValue(), "color.frame", wID);
+//		colorShade = new Property(nullOrPropTableName+".shade", DEFAULT_SHADE.toLuaValue(), "color.shade", wID);
+//	}
 	public GuiRect setFill(Color fill){
 		this.fill = fill;
 		return this;

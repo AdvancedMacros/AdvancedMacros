@@ -1,11 +1,13 @@
 package com.theincgi.advancedMacros.gui.elements;
 
+import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
 import com.theincgi.advancedMacros.misc.Property;
+import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -15,7 +17,7 @@ public class GuiDropDown implements Drawable, InputSubscriber, Moveable{
 	GuiButton dropButton;
 	String dispText = "";
 	int index = 0;
-	Property colorText;
+	//Property colorText;
 	
 	
 	
@@ -24,25 +26,54 @@ public class GuiDropDown implements Drawable, InputSubscriber, Moveable{
 	private int x,y,width,height,maxHeight;
 	String nullOrPropTableName;
 	private OnClickHandler och;
-	public GuiDropDown(WidgetID wID, int x, int y, int width, int height, int maxHeight, String nullOrPropTableName) {
-		this.wID = wID;
-		this.x = x; this.y = y;
-		this.width = width; this.height = height;
+	
+	PropertyPalette propertyPalette;
+	PropertyPalette optionPalette;
+	
+	
+	public GuiDropDown(int x, int y, int width, int height, int maxHeight, String...propPath) {
+		this(x, y, width, height, maxHeight, propPath.length==0? new PropertyPalette() : new PropertyPalette(propPath, Settings.settings));
+	}
+	public GuiDropDown(int x, int y, int width, int height, int maxHeight, LuaTable propHome, String...propPath) {
+		this(x, y, width, height, maxHeight, propPath.length==0? new PropertyPalette() : new PropertyPalette(propPath, propHome));
+	}
+	
+	public GuiDropDown(int x, int y, int width, int height, int maxHeight, PropertyPalette propertyPalette) {
+		this.propertyPalette = propertyPalette;
+		this.optionPalette = propertyPalette.propertyPaletteOf("options");
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
 		this.maxHeight = maxHeight;
-		this.nullOrPropTableName = nullOrPropTableName = nullOrPropTableName==null?defaultTableName:nullOrPropTableName;
 		
-		
-		dropButton = new GuiButton(wID, 
-				x+width-height, 	y, 
+		dropButton = new GuiButton(x+width-height, 	y, 
 				height, 		height, 
-				Settings.getTextureID("resource:whiteDownTri.png"), LuaValue.NIL, //"resource:whiteDownTri.png" 
-				nullOrPropTableName, 
-				Color.BLACK, Color.WHITE, Color.WHITE);
-		txtBG = new GuiRect(wID, x, y, width-dropButton.getWid(), height, nullOrPropTableName, Color.BLACK, Color.WHITE);
-		listManager = new ListManager(x, y+height, width, maxHeight-height, wID, nullOrPropTableName);
+				Settings.getTextureID("resource:whiteDownTri.png"), LuaValue.NIL, propertyPalette.propertyPaletteOf("dropButton"));
+		txtBG = new GuiRect(x, y, width-dropButton.getWid(), height, propertyPalette.propertyPaletteOf("textBackground"));
+		propertyPalette.addColorIfNil(Color.WHITE, "colors","text");
+//	}
+//	public GuiDropDown(WidgetID wID, int x, int y, int width, int height, int maxHeight, String nullOrPropTableName) {
+//		this.wID = wID;
+//		this.x = x; this.y = y;
+//		this.width = width; this.height = height;
+//		this.maxHeight = maxHeight;
+//		this.nullOrPropTableName = nullOrPropTableName = nullOrPropTableName==null?defaultTableName:nullOrPropTableName;
+//		
+//		
+//		dropButton = new GuiButton(wID, 
+//				x+width-height, 	y, 
+//				height, 		height, 
+//				Settings.getTextureID("resource:whiteDownTri.png"), LuaValue.NIL, //"resource:whiteDownTri.png" 
+//				nullOrPropTableName, 
+//				Color.BLACK, Color.WHITE, Color.WHITE);
+//		//dropButton = new GuiButton()
+//		txtBG = new GuiRect(wID, x, y, width-dropButton.getWid(), height, nullOrPropTableName, Color.BLACK, Color.WHITE);
+		listManager = new ListManager(x, y+height, width, maxHeight-height, /*wID, nullOrPropTableName*/ propertyPalette);
 		listManager.scrollBar.setWid(height);
 		//listBG = new GuiRect(wID, listManager.getX(), listManager.getY(), listManager.getItemWidth(), listManager.getItemHeight(), null, Color.BLACK, Color.WHITE);
-		colorText = new Property(nullOrPropTableName+".textColor", Color.WHITE.toLuaValue(), "textColor", wID);
+		//colorText = new Property(nullOrPropTableName+".textColor", Color.WHITE.toLuaValue(), "textColor", wID);
+		
 		och = new OnClickHandler() {
 			@Override
 			public void onClick(int button, GuiButton sButton) {
@@ -70,7 +101,8 @@ public class GuiDropDown implements Drawable, InputSubscriber, Moveable{
 	
 	public void addOption(String s){
 		//-listManager.scrollBar.getItemWidth()
-		GuiButton b = new GuiButton(wID, x, y, txtBG.getWid(), height, LuaValue.NIL, LuaValue.NIL, nullOrPropTableName, Color.BLACK, Color.WHITE, Color.WHITE);
+//		GuiButton b = new GuiButton(wID, x, y, txtBG.getWid(), height, LuaValue.NIL, LuaValue.NIL, nullOrPropTableName, Color.BLACK, Color.WHITE, Color.WHITE);
+		GuiButton b = new GuiButton(x, y, txtBG.getWid(), height, LuaValue.NIL, LuaValue.NIL, optionPalette);
 		b.changeTexture(null);
 		b.setScaleTo(1.05);
 		listManager.add(b);
@@ -78,7 +110,8 @@ public class GuiDropDown implements Drawable, InputSubscriber, Moveable{
 		b.setText(s);
 	}
 	public GuiButton makeOption(String s){
-		GuiButton b = new GuiButton(wID, x, y, txtBG.getWid(), height, LuaValue.NIL, LuaValue.NIL, nullOrPropTableName, Color.BLACK, Color.WHITE, Color.WHITE);
+//		GuiButton b = new GuiButton(wID, x, y, txtBG.getWid(), height, LuaValue.NIL, LuaValue.NIL, nullOrPropTableName, Color.BLACK, Color.WHITE, Color.WHITE);
+		GuiButton b = new GuiButton(x, y, txtBG.getWid(), height, LuaValue.NIL, LuaValue.NIL, optionPalette);
 		b.changeTexture(null);
 		b.setScaleTo(1.05);
 		b.setOnClick(och);
@@ -169,7 +202,7 @@ public class GuiDropDown implements Drawable, InputSubscriber, Moveable{
 		dropButton.setPos(x+width-dropButton.getWid(), y);
 		dropButton.onDraw(gui, mouseX, mouseY, partialTicks);
 		if(dispText!=null)
-			gui.drawCenteredString(gui.getFontRend(), dispText, txtBG.getX()+txtBG.getWid()/2, txtBG.getY()+txtBG.getHei()/2, Utils.parseColor(colorText.getPropValue()).toInt());
+			gui.drawCenteredString(gui.getFontRend(), dispText, txtBG.getX()+txtBG.getWid()/2, txtBG.getY()+txtBG.getHei()/2, propertyPalette.getColor("colors","text").toInt());
 		
 	}
 	

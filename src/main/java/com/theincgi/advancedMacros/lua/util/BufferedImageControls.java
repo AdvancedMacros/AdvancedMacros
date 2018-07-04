@@ -51,15 +51,15 @@ public class BufferedImageControls extends LuaTable{
 			@Override
 			public LuaValue call(LuaValue x, LuaValue y) {
 				Color b = colorBuffer.get();
-				b.fromHex(img.getRGB(x.checkint(), y.checkint()));
+				b.fromHex(img.getRGB(x.checkint()-1, y.checkint()-1));
 				return b.toLuaValue();
 			}
 		});
 		set("setPixel", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs args) {
-				int x = args.checkint(1);
-				int y = args.checkint(2);
+				int x = args.checkint(1)-1;
+				int y = args.checkint(2)-1;
 				args = args.subargs(3);
 				img.setRGB(x, y, Utils.parseColor(args).toInt());
 				return NONE;

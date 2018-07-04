@@ -13,6 +13,7 @@ import com.theincgi.advancedMacros.gui.elements.WidgetID;
 import com.theincgi.advancedMacros.lua.LuaDebug;
 import com.theincgi.advancedMacros.lua.LuaDebug.Status;
 import com.theincgi.advancedMacros.lua.LuaDebug.StatusListener;
+import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Utils;
 import com.theincgi.advancedMacros.misc.Utils.TimeFormat;
 
@@ -24,7 +25,7 @@ public class RunningScriptsGui extends Gui{
 	HashMap<Thread, Script> scripts = new HashMap<>(10);
 	public RunningScriptsGui(LuaDebug luaDebug) {
 		this.luaDebug = luaDebug;
-		listManager = new ListManager(5, 17, width-10, height-22, new WidgetID(700), "colors.runningScripts");
+		listManager = new ListManager(5, 17, width-10, height-22, /*new WidgetID(700), "colors.runningScripts"*/ new PropertyPalette());
 		listManager.setDrawBG(false);
 		inputSubscribers.add(listManager);
 		luaDebug.addStatusListener(new StatusListener() {
@@ -91,8 +92,9 @@ public class RunningScriptsGui extends Gui{
 		public Script(final Thread thread) {
 			this.thread = thread;
 			label = luaDebug.getLabel(thread);
-			stop = new GuiButton(new WidgetID(701), 0, 0, 20, 12, LuaValue.NIL, LuaValue.valueOf("[X]"), "colors.runningScript", 
-					Color.BLACK, Color.WHITE, Color.TEXT_c);
+			//stop = new GuiButton(new WidgetID(701), 0, 0, 20, 12, LuaValue.NIL, LuaValue.valueOf("[X]"), "colors.runningScript", 
+			//		Color.BLACK, Color.WHITE, Color.TEXT_c);
+			stop = new GuiButton(0, 0, 20, 12, LuaValue.NIL, LuaValue.valueOf("[X]"), "runningScript","stopButton");
 			stop.setOnClick(new OnClickHandler() {
 				@Override
 				public void onClick(int button, GuiButton sButton) {

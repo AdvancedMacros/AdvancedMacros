@@ -11,6 +11,7 @@ import com.theincgi.advancedMacros.gui.elements.GuiButton;
 import com.theincgi.advancedMacros.gui.elements.OnClickHandler;
 import com.theincgi.advancedMacros.gui.elements.WidgetID;
 import com.theincgi.advancedMacros.gui2.ScriptBrowser2;
+import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Settings;
 
 import net.minecraft.client.Minecraft;
@@ -34,10 +35,19 @@ public class EditorGUI extends Gui{
 		gtf = new GuiTextField(0, getFontRend(), 6, 2, width/3, 20);
 		gtf.setCanLoseFocus(true);
 		
+		{
+			PropertyPalette p = new PropertyPalette(new String[] {"editor"}, Settings.settings);
+			p.addColor(Color.TEXT_8, "saveButton", "colors", "frame");
+			p.addColor(Color.TEXT_8, "exitButton", "colors", "frame");
+			p.addColor(Color.TEXT_8, "runButton", "colors", "frame");
+		}
 		cta.setFocused(true);
-		save 	= new GuiButton(new WidgetID(301), 7+width/3, 				2	, width/4, 10, LuaValue.NIL, LuaValue.valueOf("Save"), "editor.save", Color.BLACK, Color.TEXT_8, Color.WHITE);
-		exit 	= new GuiButton(new WidgetID(302), 7+width/3, 				12	, width/4, 10, LuaValue.NIL, LuaValue.valueOf("Exit"), "editor.exit", Color.BLACK, Color.TEXT_8, Color.WHITE);
-		quickRun= new GuiButton(new WidgetID(303), save.getX()+save.getWid(),12	, width/8, 10, LuaValue.NIL, LuaValue.valueOf("Run"), "editor.run", Color.BLACK, Color.TEXT_8, Color.WHITE);
+		save    = new GuiButton(7+width/3, 				2	, width/4, 10, LuaValue.NIL, LuaValue.valueOf("Save"), "editor","saveButton");
+		//save 	= new GuiButton(new WidgetID(301), 7+width/3, 				2	, width/4, 10, LuaValue.NIL, LuaValue.valueOf("Save"), "editor.save", Color.BLACK, Color.TEXT_8, Color.WHITE);
+		exit    = new GuiButton(7+width/3, 				12	, width/4, 10, LuaValue.NIL, LuaValue.valueOf("Exit"), "editor","exitButton");
+		//exit 	= new GuiButton(new WidgetID(302), 7+width/3, 				12	, width/4, 10, LuaValue.NIL, LuaValue.valueOf("Exit"), "editor.exit", Color.BLACK, Color.TEXT_8, Color.WHITE);
+		quickRun= new GuiButton(save.getX()+save.getWid(),12	, width/8, 10, LuaValue.NIL, LuaValue.valueOf("Run"), "editor","runButton");
+		//quickRun= new GuiButton(new WidgetID(303), save.getX()+save.getWid(),12	, width/8, 10, LuaValue.NIL, LuaValue.valueOf("Run"), "editor.run", Color.BLACK, Color.TEXT_8, Color.WHITE);
 		inputSubscribers.add(save);
 		inputSubscribers.add(exit);
 		inputSubscribers.add(quickRun);

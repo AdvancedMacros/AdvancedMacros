@@ -28,6 +28,7 @@ import com.theincgi.advancedMacros.gui.elements.PopupPrompt.Choice;
 import com.theincgi.advancedMacros.gui.elements.WidgetID;
 import com.theincgi.advancedMacros.lua.LuaDebug;
 import com.theincgi.advancedMacros.lua.LuaDebug.OnScriptFinish;
+import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -39,18 +40,23 @@ public class MacroMenuGui extends Gui{
 
 	private String propAddress = "colors.bindingsMenu";
 
-	GuiDropDown profileSelect = new GuiDropDown(new WidgetID(1), 5, 5, width-23, 12, 12*7, propAddress);
-	GuiButton   addProifle    = new GuiButton(new WidgetID(2),   width-22, 5, 12, 12, Settings.getTextureID("resource:whiteplus.png"), LuaValue.NIL, propAddress, Color.BLACK, com.theincgi.advancedMacros.gui.Color.WHITE, Color.WHITE);
-	GuiButton removeProifle   = new GuiButton(new WidgetID(3),   width-22, 5, 12, 12, Settings.getTextureID("resource:trashcan.png"), LuaValue.NIL, propAddress, Color.BLACK, com.theincgi.advancedMacros.gui.Color.WHITE, Color.WHITE);
-	GuiButton addBinding       = new GuiButton(new WidgetID(4),   5, 17, 36, 12, Settings.getTextureID("resource:whitenewbinding.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
-	GuiButton showScriptManager=new GuiButton(new WidgetID(5), 41, 17, 36, 12, Settings.getTextureID("resource:whitescripts.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE); //file browser thing, no folders tho, all macros are in /macros, this will be sepereate gui housing the script manager
+	//GuiDropDown profileSelect = new GuiDropDown(new WidgetID(1), 5, 5, width-23, 12, 12*7, propAddress);
+	GuiDropDown profileSelect = new GuiDropDown(5, 5, width-23, 12, 12*7, "bindingsMenu", "profileSelect");
+	GuiButton   addProfile    = new GuiButton(width-22, 5, 12, 12, Settings.getTextureID("resource:whiteplus.png"), LuaValue.NIL, "bindingsMenu","addProfileButton");
+	//GuiButton   addProifle    = new GuiButton(new WidgetID(2),   width-22, 5, 12, 12, Settings.getTextureID("resource:whiteplus.png"), LuaValue.NIL, propAddress, Color.BLACK, com.theincgi.advancedMacros.gui.Color.WHITE, Color.WHITE);
+	//GuiButton removeProifle   = new GuiButton(new WidgetID(3),   width-22, 5, 12, 12, Settings.getTextureID("resource:trashcan.png"), LuaValue.NIL, propAddress, Color.BLACK, com.theincgi.advancedMacros.gui.Color.WHITE, Color.WHITE);
+	GuiButton removeProfile   = new GuiButton(width-22, 5, 12, 12, Settings.getTextureID("resource:trashcan.png"), LuaValue.NIL, "bindingsMenu", "removeProfileButton");
+	//GuiButton addBinding       = new GuiButton(new WidgetID(4),   5, 17, 36, 12, Settings.getTextureID("resource:whitenewbinding.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
+	GuiButton addBinding       = new GuiButton(5, 17, 36, 12, Settings.getTextureID("resource:whitenewbinding.png"), LuaValue.NIL, "bindingsMenu", "addBindingButton");
+	GuiButton showScriptManager=new GuiButton(41, 17, 36, 12, Settings.getTextureID("resource:whitescripts.png"), LuaValue.NIL, "bindingsMenu", "scriptManagerButton");
+	//GuiButton showScriptManager=new GuiButton(new WidgetID(5), 41, 17, 36, 12, Settings.getTextureID("resource:whitescripts.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE); //file browser thing, no folders tho, all macros are in /macros, this will be sepereate gui housing the script manager
 	//GuiButton gotoSettings	  = new GuiButton(new WidgetID(6), width-5-36, 17, 36, 12, Settings.getTextureID("resource:whitesettings.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.BLACK);
 	Prompting prompting;
 	PopupPrompt prompt;
 
 
 
-	ListManager bindingsList = new ListManager(5, 33, 100, 12*10, new WidgetID(33), propAddress);
+	ListManager bindingsList = new ListManager(5, 33, 100, 12*10, /*new WidgetID(33), propAddress*/ new PropertyPalette());
 	//	GuiBinding gb = new GuiBinding(new WidgetID(11), 5, 5, 300, bindingsList, this);
 	//	GuiBinding gb2 = new GuiBinding(new WidgetID(11), 5, 5, 300, bindingsList, this);
 	//	GuiBinding gb3 = new GuiBinding(new WidgetID(11), 5, 5, 300, bindingsList, this);
@@ -127,7 +133,7 @@ public class MacroMenuGui extends Gui{
 				//Minecraft.getMinecraft().displayGuiScreen(AdvancedMacros.scriptBrowser);
 			}
 		});
-		addProifle.setOnClick(new OnClickHandler() {
+		addProfile.setOnClick(new OnClickHandler() {
 			@Override
 			public void onClick(int button, GuiButton sButton) {
 				prompting = Prompting.PROFILE_NAME;
@@ -160,7 +166,7 @@ public class MacroMenuGui extends Gui{
 				}
 			}
 		});
-		removeProifle.setOnClick(new OnClickHandler() {
+		removeProfile.setOnClick(new OnClickHandler() {
 			@Override
 			public void onClick(int button, GuiButton sButton) {
 				prompting = Prompting.CONFIRM_DELETE_PROFILE;
@@ -170,19 +176,19 @@ public class MacroMenuGui extends Gui{
 
 		inputSubscribers.add(bindingsList);
 		inputSubscribers.add(profileSelect);
-		inputSubscribers.add(removeProifle);
-		inputSubscribers.add(addProifle);
+		inputSubscribers.add(removeProfile);
+		inputSubscribers.add(addProfile);
 		inputSubscribers.add(showScriptManager);
 		//inputSubscribers.add(gotoSettings);
 		inputSubscribers.add(addBinding);
 
-		drawables.add(bindingsList);
-		drawables.add(profileSelect);
-		drawables.add(removeProifle);
-		drawables.add(addProifle);
-		drawables.add(showScriptManager);
+		addDrawable(bindingsList);
+		addDrawable(profileSelect);
+		addDrawable(removeProfile);
+		addDrawable(addProfile);
+		addDrawable(showScriptManager);
 		//drawables.add(gotoSettings);
-		drawables.add(addBinding);
+		addDrawable(addBinding);
 
 		updateProfileList();
 		profileSelect.select("DEFAULT");
@@ -203,7 +209,7 @@ public class MacroMenuGui extends Gui{
 	}
 
 	public void removeBinding(GuiBinding guib) {
-		drawables.remove(guib);
+		removeDrawables(guib);
 		inputSubscribers.remove(guib);
 		bindingsList.remove(guib);
 		markDirty();
@@ -330,8 +336,8 @@ public class MacroMenuGui extends Gui{
 	@Override
 	public void onResize(Minecraft mcIn, int w, int h) {
 		super.onResize(mcIn, w, h);
-		addProifle.setPos(width-5-24, 5);
-		removeProifle.setPos(width-5-12, 5);
+		addProfile.setPos(width-5-24, 5);
+		removeProfile.setPos(width-5-12, 5);
 		//gotoSettings.setPos(width-5-36, 17);
 		bindingsList.setWidth(w-24);
 		//gotoSettings.setPos(12*6+5, 17);

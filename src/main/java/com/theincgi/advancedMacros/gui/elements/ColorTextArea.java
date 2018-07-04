@@ -65,7 +65,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	//	private CustomTexture ctaTexture;
 	//private DynamicTexture texture;
 	//private ResourceLocation rLocation;
-	
+
 	public boolean doSyntaxHighlighting = true;
 
 	public final HashMap<String, Boolean> keywords = new HashMap<>();
@@ -73,7 +73,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	//Property bgColor, frameColor, defaultTextColor, keywordColor, commentColor, variableColor,tableColor,
 	//stringBoxFill, stringBoxFrame, functionColor, selectionFillColor, selectionFrameColor;
 	PropertyPalette propPalette;
-	
+
 	//Property tabCount;
 	//Property cursorOnColor/*,cursorOffColor*/;
 	final int charWid = 7;
@@ -107,25 +107,27 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		this.propPalette = propPalette;
 		propPalette
 		.addColorIfNil   (new Color(	      128, 128, 128)	, 	"colors", "textFill" 		)
-	    .addColorIfNil   (new Color(	      255, 255, 255)	, 	"colors", "frame"    		)
-	    .addColorIfNil   (new Color(  		    0,   0,   0)	,  	"colors", "plainText"		)
-	    .addColorIfNil   (new Color(  	 	    0,  80, 100)	,  	"colors", "keyword"  		)
-	    .addColorIfNil   (new Color(  	   		0,  85,   0)	,  	"colors", "comment"  		)
-	    .addColorIfNil   (new Color(            0, 109,   9)	,  	"colors", "variable" 		)
-	    .addColorIfNil   (new Color(      60, 255, 128,  64)	,  	"colors", "stringBoxFill" 	)
-	    .addColorIfNil   (new Color(     	  255, 128,  64)	,  	"colors", "stringBoxFrame"	)
-	    .addColorIfNil   (new Color(          128, 255, 255)	,  	"colors", "function" 		)
-	    .addColorIfNil   (new Color(          120, 250, 100)	,  	"colors", "table" 			)
-	    .addColorIfNil   (new Color(           91, 182, 255)	,  	"colors", "cursorOn" 		)
-	    .addColorIfNil   (new Color(            0, 132,  79)	,  	"colors", "selectionFrame"	)
-	    .addColorIfNil   (new Color(           57, 206, 146)	,	"colors", "selectionFill" 	);
-		
+		.addColorIfNil   (new Color(	      255, 255, 255)	, 	"colors", "frame"    		)
+		.addColorIfNil   (new Color(  		    0,   0,   0)	,  	"colors", "plainText"		)
+		.addColorIfNil   (new Color(  	 	    0,  80, 100)	,  	"colors", "keyword"  		)
+		.addColorIfNil   (new Color(  	   		0,  85,   0)	,  	"colors", "comment"  		)
+		.addColorIfNil   (new Color(            0, 109,   9)	,  	"colors", "variable" 		)
+		.addColorIfNil   (new Color(      60, 255, 128,  64)	,  	"colors", "stringBoxFill" 	)
+		.addColorIfNil   (new Color(     	  255, 128,  64)	,  	"colors", "stringBoxFrame"	)
+		.addColorIfNil   (new Color(          128, 255, 255)	,  	"colors", "function" 		)
+		.addColorIfNil   (new Color(          120, 250, 100)	,  	"colors", "table" 			)
+		.addColorIfNil   (new Color(           91, 182, 255)	,  	"colors", "cursorOn" 		)
+		.addColorIfNil   (new Color(            0, 132,  79)	,  	"colors", "selectionFrame"	)
+		.addColorIfNil   (new Color(           57, 206, 146)	,	"colors", "selectionFill" 	);
+
 		propPalette.setPropIfNil(LuaValue.valueOf(2), "tabCount");
-		
+
 		this.g= g;
 
-		hBar = new GuiScrollBar(wID, 0, 0, 0, 0, Orientation.LEFTRIGHT, "colors.cta.scrollbar");
-		vBar = new GuiScrollBar(wID, 0, 0, 0, 0, Orientation.UPDOWN,    "colors.cta.scrollbar");
+//		hBar = new GuiScrollBar(wID, 0, 0, 0, 0, Orientation.LEFTRIGHT, "colors.cta.scrollbar");
+//		vBar = new GuiScrollBar(wID, 0, 0, 0, 0, Orientation.UPDOWN,    "colors.cta.scrollbar");
+		hBar = new GuiScrollBar( 0, 0, 0, 0, Orientation.LEFTRIGHT, propPalette.propertyPaletteOf("horzScrollBar"));
+		vBar = new GuiScrollBar( 0, 0, 0, 0, Orientation.UPDOWN,    propPalette.propertyPaletteOf("vertScrollBar"));
 		lines = new ArrayList<String>(){
 			@Override
 			public String get(int index) {
@@ -180,7 +182,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	@Override
 	public void onDraw(Gui g, int mouseX, int mouseY, float partialTicks) {
 		if(wid==0 || hei==0 || !isVisible){return;}
-		
+
 		GlStateManager.pushAttrib();
 		GlStateManager.enableAlpha();
 		GlStateManager.enableBlend();
@@ -192,7 +194,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		//draw stringbox outline
 		//draw cursor /w blink
 		//System.out.println("DRAW?");
-		
+
 		//System.out.println("DRAW");
 		viewX = (int) hBar.getOffset();
 		viewY = (int) vBar.getOffset();
@@ -507,9 +509,9 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		Color color_plain   = propPalette.getColor("colors", "plainText");//Utils.parseColor(defaultTextColor.getPropValue()).copy();
 		Color color_comment = propPalette.getColor("colors", "comment");//Utils.parseColor(commentColor.getPropValue()).copy();
 		Color color_keyword = propPalette.getColor("colors", "keyword");//Utils.parseColor(keywordColor.getPropValue()).copy();
-		
+
 		hoverWord = null;
-		
+
 		for(int sLine = viewY, dY = 0; dY<visChars.length; sLine++, dY++){
 			//sLine, line # in lines
 			//dY draw Y, where in the visChars and cols this goes
@@ -531,12 +533,12 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 
 				int start = matcher.start();
 				int end   = matcher.end();
-				
+
 				if(sLine==hoverCursor.getY()) {
 					if(start<=hoverCursor.getX() && hoverCursor.getX()<end)
 						hoverWord = line.substring(start, end);
 				}
-				
+
 				//System.out.printf("Found: %s [%4d - %4d]\n", m, start,end);
 				if(keywords.containsKey(m)){
 					//System.out.println("KEYWORD");
@@ -588,7 +590,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 						quote[dY][x-viewX]=true;
 					}
 					if(c=='&' && x<line.length()-1 && line.charAt(x+1)=='&') {//example "blah&&blah"
-						
+
 						x++; 
 						if(x-viewX>=0 && x-viewX<quote[dY].length){ //on screen in width
 							quote[dY][x-viewX]=true;
@@ -703,7 +705,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
 		if(hBar.onMouseClick(gui, x, y, buttonNum)){return textChanged=true;}if(vBar.onMouseClick(gui, x, y, buttonNum)){return textChanged=true;}
 		if(GuiRect.isInBounds(x, y, this.x, this.y, this.wid, this.hei)) {
-		//if(x>this.x && x<this.x+this.wid && y> this.y && y<this.y+this.wid){
+			//if(x>this.x && x<this.x+this.wid && y> this.y && y<this.y+this.wid){
 			setFocused(true);
 			textChanged = true;
 			x -=this.x+3;
@@ -1054,7 +1056,6 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		return isVisible && isFocused();
 	}
 	private boolean isEditKey(char typedChar, int keyCode) {
-		@SuppressWarnings("deprecation")
 		int[] blacklist = new int[]{Keyboard.KEY_APPS, Keyboard.KEY_DOWN, Keyboard.KEY_UP, Keyboard.KEY_LEFT, Keyboard.KEY_RIGHT,
 				Keyboard.KEY_PRIOR, Keyboard.KEY_NEXT, Keyboard.KEY_LSHIFT, Keyboard.KEY_RSHIFT,
 				Keyboard.KEY_LCONTROL, Keyboard.KEY_RCONTROL, Keyboard.KEY_HOME, Keyboard.KEY_END,
@@ -1086,20 +1087,21 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		}
 		setNeedsSaveFlag(false);
 	}
-	
+
 	public File getScriptFile() {
 		return new File(AdvancedMacros.macrosFolder,scriptName);
 	}
-	
+
 	public void setText(String text) {
 		lines.clear();
 		cursor.set(0, 0);
-		Scanner s = new Scanner(text);
-		while(s.hasNextLine())
-			lines.add(s.nextLine());
-		if(lines.isEmpty())
-			lines.add("");
-		setNeedsSaveFlag(true);
+		try (Scanner s = new Scanner(text); ) {
+			while(s.hasNextLine())
+				lines.add(s.nextLine());
+			if(lines.isEmpty())
+				lines.add("");
+			setNeedsSaveFlag(true);
+		}
 	}
 	public String getText() {
 		StringJoiner out = new StringJoiner("\n");
@@ -1108,7 +1110,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		});
 		return out.toString();
 	}
-	
+
 	public static boolean isCTRLDown(){
 		return Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
 	}
@@ -1264,11 +1266,11 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 			if(checkTables && sVal.istable() && !added.getOrDefault(sVal, false)){
 				String tmp2 = "";
 				if(sKey.isint()){
-//					if(tmp.length()==0){
-//						tmp2 = "_G["+sVal.tojstring()+"].";
-//					}else{
-//						tmp2 = tmp+"["+sVal.tojstring()+"].";
-//					}
+					//					if(tmp.length()==0){
+					//						tmp2 = "_G["+sVal.tojstring()+"].";
+					//					}else{
+					//						tmp2 = tmp+"["+sVal.tojstring()+"].";
+					//					}
 				}else{
 					tmp2 = tmp+(tmp.length()>0?".":"") + sKey.tojstring();
 				}
@@ -1443,7 +1445,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		public String toString() {
 			return "Point [x=" + x + ", y=" + y + ", lastX=" + lastX + ", lastY=" + lastY + "]";
 		}
-		
+
 	}
 	public Point getCursor() {
 		return cursor;
@@ -1464,7 +1466,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		//		if(needsSaveChanged!=null)
 		//			needsSaveChanged.run();
 	}
-	
+
 	/**recently added util to tell you where the cursor is over in char coords instead of pixels*/
 	public Point cursorOver(int x, int y) {
 		x -=this.x+3;
@@ -1473,32 +1475,32 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		y /= charHei;
 		return new Point(Math.min(lines.get(cursor.getY()).length(), x+viewX),  Math.min(y+viewY, lines.size()-1));
 	}
-//	public String wordAt(Point p) {
-//		try {
-//			String line = lines.get(p.getY());
-//			if(line.charAt(p.getX())==' ') {return null;}
-//			int start = 0, end = 0;
-//			int di = 1, dj=-1;
-//			for(int i = p.getX(), j=p.getX(); ;i+=di,j-=dj) {
-//				if(i<0) {i=0; di=0;}
-//				if(j>=line.length()) {j=line.length(); dj=0;}
-//				if(di==0 && dj==0) {start = i; end = j; break;}
-//				
-//				char a = line.charAt(i), b = line.charAt(j);
-//				if(a==' ') {di=0;}
-//				if(b==' ') {dj=0;}
-//			}
-//			//System.out.println("Word is "+line.substring(start,end));
-//			return line.substring(start, end);
-//		}catch (Exception e) {
-//			return null;
-//		}
-//	}
+	//	public String wordAt(Point p) {
+	//		try {
+	//			String line = lines.get(p.getY());
+	//			if(line.charAt(p.getX())==' ') {return null;}
+	//			int start = 0, end = 0;
+	//			int di = 1, dj=-1;
+	//			for(int i = p.getX(), j=p.getX(); ;i+=di,j-=dj) {
+	//				if(i<0) {i=0; di=0;}
+	//				if(j>=line.length()) {j=line.length(); dj=0;}
+	//				if(di==0 && dj==0) {start = i; end = j; break;}
+	//				
+	//				char a = line.charAt(i), b = line.charAt(j);
+	//				if(a==' ') {di=0;}
+	//				if(b==' ') {dj=0;}
+	//			}
+	//			//System.out.println("Word is "+line.substring(start,end));
+	//			return line.substring(start, end);
+	//		}catch (Exception e) {
+	//			return null;
+	//		}
+	//	}
 	@Override
 	public boolean isFocused() {
 		return gui.getFocusItem()!=null && gui.getFocusItem().equals(this);
 	}
-	
+
 	public boolean isEditable() {
 		return isEditable;
 	}

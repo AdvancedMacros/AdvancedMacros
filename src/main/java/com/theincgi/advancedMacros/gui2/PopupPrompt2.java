@@ -11,6 +11,7 @@ import com.theincgi.advancedMacros.gui.elements.GuiDropDown;
 import com.theincgi.advancedMacros.gui.elements.GuiRect;
 import com.theincgi.advancedMacros.gui.elements.WidgetID;
 import com.theincgi.advancedMacros.misc.Property;
+import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
@@ -23,21 +24,27 @@ public class PopupPrompt2 extends Gui{
 	GuiButton ok, cancel;
 	//static final long baseWidgetID = 500;
 	
-	Property promptTextColor = new Property("colors.popupPrompt2.text", Color.WHITE.toLuaValue(), "msgColor", new WidgetID(504));
-	
+	//Property promptTextColor = new Property("colors.popupPrompt2.text", Color.WHITE.toLuaValue(), "msgColor", new WidgetID(504));
+	PropertyPalette propertyPalette;
 	private Result result;
 	private Type type;
 	private ResultHandler resultHandler;
 	String msg;
 	private Gui owner;
 
-	public PopupPrompt2(Gui owner) {
+	public PopupPrompt2(Gui owner, PropertyPalette propPal) {
 		this.owner = owner;
-		background = new GuiRect(new WidgetID(500), 5, 5, 12, 12, "colors.popupPrompt2.background", Color.BLACK, Color.WHITE);
+		this.propertyPalette = propPal;
+		propPal.addColorIfNil(Color.WHITE, "popupPrompt", "colors", "text");
+		//background = new GuiRect(new WidgetID(500), 5, 5, 12, 12, "colors.popupPrompt2.background", Color.BLACK, Color.WHITE);
+		background = new GuiRect(5, 5, 12, 12, "popupPrompt", "background");
 		textField = new GuiTextField(1, getFontRend(), 5, 5, 12, 12);
-		choiceBox = new GuiDropDown(new WidgetID(501), 5, 5, 12, 12, 36, "colors.popupPrompt2");
-		ok = new GuiButton(new WidgetID(502), 5, 5, 12, 12, LuaValue.NIL, LuaValue.valueOf("Ok"), "colors.popupPrompt2.ok");
-		cancel = new GuiButton(new WidgetID(503), 5, 5, 12, 12, LuaValue.NIL, LuaValue.valueOf("Cancel"), "colors.popupPrompt2.cancel");
+		//choiceBox = new GuiDropDown(new WidgetID(501), 5, 5, 12, 12, 36, "colors.popupPrompt2");
+		choiceBox = new GuiDropDown(5, 5, 12, 12, 36, "popupPrompt", "choiceBox");
+		//ok = new GuiButton(new WidgetID(502), 5, 5, 12, 12, LuaValue.NIL, LuaValue.valueOf("Ok"), "colors.popupPrompt2.ok");
+		ok = new GuiButton(5, 5, 12, 12, LuaValue.NIL, LuaValue.valueOf("Ok"), "popupPrompt","okButton");
+		//cancel = new GuiButton(new WidgetID(503), 5, 5, 12, 12, LuaValue.NIL, LuaValue.valueOf("Cancel"), "colors.popupPrompt2.cancel");
+		cancel = new GuiButton(5, 5, 12, 12, LuaValue.NIL, LuaValue.valueOf("Cancel"), "popupPrompt", "cancelButton");
 
 		ok.setOnClick((int mouseButton, GuiButton button)->{
 			result = new Result();
@@ -72,10 +79,10 @@ public class PopupPrompt2 extends Gui{
 		});
 		//cancel.setImg(null);
 		
-		drawables.add(background);
-		drawables.add(choiceBox);
-		drawables.add(ok);
-		drawables.add(cancel);
+		addDrawable(background);
+		addDrawable(choiceBox);
+		addDrawable(ok);
+		addDrawable(cancel);
 		
 		inputSubscribers.add(choiceBox);
 		inputSubscribers.add(ok);
@@ -208,7 +215,7 @@ public class PopupPrompt2 extends Gui{
 		super.drawScreen(mouseX, mouseY, partialTicks);
 		textField.drawTextBox();
 		
-		getFontRend().drawString(msg, background.getX()+2, background.getY()+8, Utils.parseColor(promptTextColor.getPropValue()).toInt());
+		getFontRend().drawString(msg, background.getX()+2, background.getY()+8, propertyPalette.getColor("popupPrompt", "colors", "text").toInt());
 	}
 	
 	@Override

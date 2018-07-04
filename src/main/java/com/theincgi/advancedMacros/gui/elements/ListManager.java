@@ -8,6 +8,8 @@ import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
 import com.theincgi.advancedMacros.gui.elements.GuiScrollBar.Orientation;
 import com.theincgi.advancedMacros.misc.Property;
+import com.theincgi.advancedMacros.misc.PropertyPalette;
+import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
 public class ListManager implements InputSubscriber, Drawable, Moveable{
@@ -16,17 +18,25 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 	private int spacing = 6;
 	private int x,y,wid,hei;
 	GuiScrollBar scrollBar;
-	Property colorBGFill;
-	Property colorBGFrame;
+//	Property colorBGFill;
+//	Property colorBGFrame;
 	private static final String DEFAULT_PROP = "colors.list";
-	/**the starting bounds for the list to show<br>
-	 * @param widgetPropTableName example "colors.dropDownBox" */
-	public ListManager(int x, int y, int wid, int hei, WidgetID wID, String widgetPropTableName) {
-		widgetPropTableName = widgetPropTableName==null?DEFAULT_PROP:widgetPropTableName;
-		scrollBar = new GuiScrollBar(wID, x+wid-7, y, 7, hei, Orientation.UPDOWN, widgetPropTableName);
-
-		colorBGFill = new Property(widgetPropTableName+".BGFill", Color.BLACK.toLuaValue(), "listBGFill", wID);
-		colorBGFrame = new Property(widgetPropTableName+".BGFrame", Color.WHITE.toLuaValue(), "listBGFrame", wID);
+	PropertyPalette propertyPalette;
+	public ListManager(int x, int y, int wid, int hei, String...propPath) {
+		this(x, y, wid, hei, propPath.length==0? new PropertyPalette() : new PropertyPalette(propPath, Settings.settings));
+	}
+	
+	public ListManager(int x, int y, int wid, int hei, PropertyPalette propPalette) {
+		this.propertyPalette = propPalette;
+		//widgetPropTableName = widgetPropTableName==null?DEFAULT_PROP:widgetPropTableName;
+//		scrollBar = new GuiScrollBar(wID, x+wid-7, y, 7, hei, Orientation.UPDOWN, widgetPropTableName);
+		scrollBar = new GuiScrollBar( x+wid-7, y, 7, hei, Orientation.UPDOWN, propPalette.propertyPaletteOf("scrollBar"));
+		
+		propPalette.addColorIfNil(Color.BLACK, "colors", "backgroundFill");
+		propPalette.addColorIfNil(Color.WHITE, "colors", "backgroundFrame");
+		
+//		colorBGFill = new Property(widgetPropTableName+".BGFill", Color.BLACK.toLuaValue(), "listBGFill", wID);
+//		colorBGFrame = new Property(widgetPropTableName+".BGFrame", Color.WHITE.toLuaValue(), "listBGFrame", wID);
 
 		updateBounds(x, y, wid, hei);
 		scrollBar.setItemCount(1);
@@ -224,12 +234,15 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 	@Override
 	public void onDraw(Gui gui, int mouseX, int mouseY, float partialTicks) {
 		if(!isVisible){return;}
+
+		int frame = propertyPalette.getColor("colors", "backgroundFrame").toInt(); 
+		int fill = propertyPalette.getColor("colors", "backgroundFill").toInt();
 		synchronized(this){
 			//System.out.println(String.format("Items: %s, Hei is %s for drawing", items.size(), hei));
 			
 			if(drawBG){
 				//System.out.println(("Box: HEI "+ Math.min(hei, getTotalHeight())));
-				gui.drawBoxedRectangle(x, y, wid-scrollBar.getItemWidth(), modeFullBox? hei:Math.min(hei, getTotalHeight()), Utils.parseColor(colorBGFrame.getPropValue()).toInt(), Utils.parseColor(colorBGFill.getPropValue()).toInt());
+				gui.drawBoxedRectangle(x, y, wid-scrollBar.getItemWidth(), modeFullBox? hei:Math.min(hei, getTotalHeight()), frame, fill);
 			}
 			Iterator<Moveable> moveables = items.iterator();
 			int heightUsed = 0;
@@ -272,9 +285,9 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 				}
 			}
 			if(forceFrame) {
-				gui.drawVerticalLine(getX(), getY(), getY()+getItemHeight(), Utils.parseColor(colorBGFrame.getPropValue()).toInt());
-				gui.drawHorizontalLine(getX(), getX()+getItemWidth()-scrollBar.getItemWidth()-1, getY(), Utils.parseColor(colorBGFrame.getPropValue()).toInt());
-				gui.drawHorizontalLine(getX(), getX()+getItemWidth()-scrollBar.getItemWidth()-1, getY()+getItemHeight(), Utils.parseColor(colorBGFrame.getPropValue()).toInt());
+				gui.drawVerticalLine(getX(), getY(), getY()+getItemHeight(), frame);
+				gui.drawHorizontalLine(getX(), getX()+getItemWidth()-scrollBar.getItemWidth()-1, getY(), frame);
+				gui.drawHorizontalLine(getX(), getX()+getItemWidth()-scrollBar.getItemWidth()-1, getY()+getItemHeight(), frame);
 			}
 		}
 	}

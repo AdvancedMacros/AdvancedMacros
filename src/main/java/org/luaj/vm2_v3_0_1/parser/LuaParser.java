@@ -80,8 +80,7 @@ public class LuaParser implements LuaParserConstants {
     }
     b = Block();
     jj_consume_token(0);
-                                                                          c=new Chunk(b); L(c,i); {if (true) return c;}
-    throw new Error("Missing return statement in function");
+                                                                          c=new Chunk(b); L(c,i); { return c;}
   }
 
   final public Block Block() throws ParseException {
@@ -122,8 +121,7 @@ public class LuaParser implements LuaParserConstants {
       jj_la1[2] = jj_gen;
       ;
     }
-                                                                  L(b,i); {if (true) return b;}
-    throw new Error("Missing return statement in function");
+                                                                  L(b,i); { return b;}
   }
 
   final public Stat Stat() throws ParseException {
@@ -139,46 +137,38 @@ public class LuaParser implements LuaParserConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 70:
       jj_consume_token(70);
-              {if (true) return null;}
-      break;
+              { return null;}
     case DBCOLON:
       s = Label();
-                    L(s,i); {if (true) return s;}
-      break;
+                    L(s,i); { return s;}
     case BREAK:
       jj_consume_token(BREAK);
-                  s=Stat.breakstat(); L(s,i); {if (true) return s;}
-      break;
+                  s=Stat.breakstat(); L(s,i); { return s;}
     case GOTO:
       jj_consume_token(GOTO);
       n = jj_consume_token(NAME);
-                          s=Stat.gotostat(n.image); L(s,i); {if (true) return s;}
-      break;
+                          s=Stat.gotostat(n.image); L(s,i); { return s;}
     case DO:
       jj_consume_token(DO);
       b = Block();
       jj_consume_token(END);
-                               s=Stat.block(b); L(s,i); {if (true) return s;}
-      break;
+                               s=Stat.block(b); L(s,i); { return s;}
     case WHILE:
       jj_consume_token(WHILE);
       e = Exp();
       jj_consume_token(DO);
       b = Block();
       jj_consume_token(END);
-                                               s=Stat.whiledo(e,b); L(s,i); {if (true) return s;}
-      break;
+                                               s=Stat.whiledo(e,b); L(s,i); { return s;}
     case REPEAT:
       jj_consume_token(REPEAT);
       b = Block();
       jj_consume_token(UNTIL);
       e = Exp();
-                                             s=Stat.repeatuntil(b,e); L(s,i); {if (true) return s;}
-      break;
+                                             s=Stat.repeatuntil(b,e); L(s,i); { return s;}
     case IF:
       s = IfThenElse();
-                         L(s,i); {if (true) return s;}
-      break;
+                         L(s,i); { return s;}
     default:
       jj_la1[5] = jj_gen;
       if (jj_2_1(3)) {
@@ -200,7 +190,7 @@ public class LuaParser implements LuaParserConstants {
         jj_consume_token(DO);
         b = Block();
         jj_consume_token(END);
-                                                                                                          s=Stat.fornumeric(n.image,e,e2,e3,b); L(s,i); {if (true) return s;}
+                                                                                                          s=Stat.fornumeric(n.image,e,e2,e3,b); L(s,i); { return s;}
       } else {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case FOR:
@@ -211,14 +201,12 @@ public class LuaParser implements LuaParserConstants {
           jj_consume_token(DO);
           b = Block();
           jj_consume_token(END);
-                                                                     s=Stat.forgeneric(nl,el,b); L(s,i); {if (true) return s;}
-          break;
+                                                                     s=Stat.forgeneric(nl,el,b); L(s,i); { return s;}
         case FUNCTION:
           jj_consume_token(FUNCTION);
           fn = FuncName();
           fb = FuncBody();
-                                                 s=Stat.functiondef(fn,fb); L(s,i); {if (true) return s;}
-          break;
+                                                 s=Stat.functiondef(fn,fb); L(s,i); { return s;}
         default:
           jj_la1[6] = jj_gen;
           if (jj_2_2(2)) {
@@ -226,7 +214,7 @@ public class LuaParser implements LuaParserConstants {
             jj_consume_token(FUNCTION);
             n = jj_consume_token(NAME);
             fb = FuncBody();
-                                                                 s=Stat.localfunctiondef(n.image,fb); L(s,i); {if (true) return s;}
+                                                                 s=Stat.localfunctiondef(n.image,fb); L(s,i); { return s;}
           } else {
             switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
             case LOCAL:
@@ -241,13 +229,11 @@ public class LuaParser implements LuaParserConstants {
                 jj_la1[4] = jj_gen;
                 ;
               }
-                                                       s=Stat.localassignment(nl,el); L(s,i); {if (true) return s;}
-              break;
+                                                       s=Stat.localassignment(nl,el); L(s,i); { return s;}
             case NAME:
             case 75:
               s = ExprStat();
-                       L(s,i); {if (true) return s;}
-              break;
+                       L(s,i); { return s;}
             default:
               jj_la1[7] = jj_gen;
               jj_consume_token(-1);
@@ -257,7 +243,6 @@ public class LuaParser implements LuaParserConstants {
         }
       }
     }
-    throw new Error("Missing return statement in function");
   }
 
   final public Stat IfThenElse() throws ParseException {
@@ -298,8 +283,7 @@ public class LuaParser implements LuaParserConstants {
       ;
     }
     jj_consume_token(END);
-                          {if (true) return Stat.ifthenelse(e,b,el,bl,b3);}
-    throw new Error("Missing return statement in function");
+                          { return Stat.ifthenelse(e,b,el,bl,b3);}
   }
 
   final public Stat ReturnStat() throws ParseException {
@@ -341,8 +325,7 @@ public class LuaParser implements LuaParserConstants {
       jj_la1[11] = jj_gen;
       ;
     }
-                                              s=Stat.returnstat(el); L(s,i); {if (true) return s;}
-    throw new Error("Missing return statement in function");
+                                              s=Stat.returnstat(el); L(s,i); { return s;}
   }
 
   final public Stat Label() throws ParseException {
@@ -350,8 +333,7 @@ public class LuaParser implements LuaParserConstants {
     jj_consume_token(DBCOLON);
     n = jj_consume_token(NAME);
     jj_consume_token(DBCOLON);
-                                       {if (true) return Stat.labelstat(n.image);}
-    throw new Error("Missing return statement in function");
+                                       { return Stat.labelstat(n.image);}
   }
 
   final public Stat ExprStat() throws ParseException {
@@ -368,8 +350,7 @@ public class LuaParser implements LuaParserConstants {
       jj_la1[12] = jj_gen;
       ;
     }
-          if (s==null) { s=Stat.functioncall(assertfunccall(p)); } L(s,i); {if (true) return s;}
-    throw new Error("Missing return statement in function");
+          if (s==null) { s=Stat.functioncall(assertfunccall(p)); } L(s,i); { return s;}
   }
 
   final public Stat Assign(Exp.VarExp v0) throws ParseException {
@@ -395,15 +376,13 @@ public class LuaParser implements LuaParserConstants {
     }
     jj_consume_token(71);
     el = ExpList();
-                                                                s=Stat.assignment(vl,el); L(s,i); {if (true) return s;}
-    throw new Error("Missing return statement in function");
+                                                                s=Stat.assignment(vl,el); L(s,i); { return s;}
   }
 
   final public Exp.VarExp VarExp() throws ParseException {
         Exp.PrimaryExp p;
     p = PrimaryExp();
-                         {if (true) return assertvarexp(p);}
-    throw new Error("Missing return statement in function");
+                         { return assertvarexp(p);}
   }
 
   final public FuncName FuncName() throws ParseException {
@@ -435,8 +414,7 @@ public class LuaParser implements LuaParserConstants {
       jj_la1[15] = jj_gen;
       ;
     }
-                         L(f,n); {if (true) return f;}
-    throw new Error("Missing return statement in function");
+                         L(f,n); { return f;}
   }
 
   final public Exp.PrimaryExp PrefixExp() throws ParseException {
@@ -447,20 +425,17 @@ public class LuaParser implements LuaParserConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NAME:
       n = jj_consume_token(NAME);
-                                          p=Exp.nameprefix(n.image); L(p,i); {if (true) return p;}
-      break;
+                                          p=Exp.nameprefix(n.image); L(p,i); { return p;}
     case 75:
       jj_consume_token(75);
       e = Exp();
       jj_consume_token(76);
-                                  p=Exp.parensprefix(e); L(p,i); {if (true) return p;}
-      break;
+                                  p=Exp.parensprefix(e); L(p,i); { return p;}
     default:
       jj_la1[16] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
   }
 
   final public Exp.PrimaryExp PrimaryExp() throws ParseException {
@@ -476,8 +451,7 @@ public class LuaParser implements LuaParserConstants {
       }
       p = PostfixOp(p);
     }
-                                                         L(p,i); {if (true) return p;}
-    throw new Error("Missing return statement in function");
+                                                         L(p,i); { return p;}
   }
 
   final public Exp.PrimaryExp PostfixOp(Exp.PrimaryExp lhs) throws ParseException {
@@ -490,20 +464,17 @@ public class LuaParser implements LuaParserConstants {
     case 73:
       jj_consume_token(73);
       n = jj_consume_token(NAME);
-                                                  p=Exp.fieldop(lhs, n.image); L(p,i); {if (true) return p;}
-      break;
+                                                  p=Exp.fieldop(lhs, n.image); L(p,i); { return p;}
     case 77:
       jj_consume_token(77);
       e = Exp();
       jj_consume_token(78);
-                                                  p=Exp.indexop(lhs, e); L(p,i); {if (true) return p;}
-      break;
+                                                  p=Exp.indexop(lhs, e); L(p,i); { return p;}
     case 74:
       jj_consume_token(74);
       n = jj_consume_token(NAME);
       a = FuncArgs();
-                                          p=Exp.methodop(lhs, n.image,a); L(p,i); {if (true) return p;}
-      break;
+                                          p=Exp.methodop(lhs, n.image,a); L(p,i); { return p;}
     case LONGSTRING0:
     case LONGSTRING1:
     case LONGSTRING2:
@@ -514,14 +485,12 @@ public class LuaParser implements LuaParserConstants {
     case 75:
     case 80:
       a = FuncArgs();
-                                                  p=Exp.functionop(lhs, a); L(p,i); {if (true) return p;}
-      break;
+                                                  p=Exp.functionop(lhs, a); L(p,i); { return p;}
     default:
       jj_la1[17] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
   }
 
   final public FuncArgs FuncArgs() throws ParseException {
@@ -560,12 +529,10 @@ public class LuaParser implements LuaParserConstants {
         ;
       }
       jj_consume_token(76);
-                                          a=FuncArgs.explist(el); L(a,i); {if (true) return a;}
-      break;
+                                          a=FuncArgs.explist(el); L(a,i); { return a;}
     case 80:
       tc = TableConstructor();
-                                          a=FuncArgs.tableconstructor(tc); L(a,i); {if (true) return a;}
-      break;
+                                          a=FuncArgs.tableconstructor(tc); L(a,i); { return a;}
     case LONGSTRING0:
     case LONGSTRING1:
     case LONGSTRING2:
@@ -574,14 +541,12 @@ public class LuaParser implements LuaParserConstants {
     case STRING:
     case CHARSTRING:
       s = Str();
-                                                          a=FuncArgs.string(s); L(a,i); {if (true) return a;}
-      break;
+                                                          a=FuncArgs.string(s); L(a,i); { return a;}
     default:
       jj_la1[19] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
   }
 
   final public List NameList() throws ParseException {
@@ -600,8 +565,7 @@ public class LuaParser implements LuaParserConstants {
       name = jj_consume_token(NAME);
                                                                                    l.add(new Name(name.image));
     }
-                                                                                                                     {if (true) return l;}
-    throw new Error("Missing return statement in function");
+                                                                                                                     { return l;}
   }
 
   final public List ExpList() throws ParseException {
@@ -623,8 +587,7 @@ public class LuaParser implements LuaParserConstants {
       e = Exp();
                                            l.add(e);
     }
-                                                          {if (true) return l;}
-    throw new Error("Missing return statement in function");
+                                                          { return l;}
   }
 
   final public Exp SimpleExp() throws ParseException {
@@ -637,20 +600,16 @@ public class LuaParser implements LuaParserConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NIL:
       jj_consume_token(NIL);
-                                                  e=Exp.constant(LuaValue.NIL); L(e,i); {if (true) return e;}
-      break;
+                                                  e=Exp.constant(LuaValue.NIL); L(e,i); { return e;}
     case TRUE:
       jj_consume_token(TRUE);
-                                                  e=Exp.constant(LuaValue.TRUE); L(e,i); {if (true) return e;}
-      break;
+                                                  e=Exp.constant(LuaValue.TRUE); L(e,i); { return e;}
     case FALSE:
       jj_consume_token(FALSE);
-                                                  e=Exp.constant(LuaValue.FALSE); L(e,i); {if (true) return e;}
-      break;
+                                                  e=Exp.constant(LuaValue.FALSE); L(e,i); { return e;}
     case NUMBER:
       n = jj_consume_token(NUMBER);
-                                                  e=Exp.numberconstant(n.image); L(e,i); {if (true) return e;}
-      break;
+                                                  e=Exp.numberconstant(n.image); L(e,i); { return e;}
     case LONGSTRING0:
     case LONGSTRING1:
     case LONGSTRING2:
@@ -659,69 +618,55 @@ public class LuaParser implements LuaParserConstants {
     case STRING:
     case CHARSTRING:
       s = Str();
-                                                  e=Exp.constant(s); L(e,i); {if (true) return e;}
-      break;
+                                                  e=Exp.constant(s); L(e,i); { return e;}
     case 79:
       jj_consume_token(79);
-                                                  e=Exp.varargs(); L(e,i); {if (true) return e;}
-      break;
+                                                  e=Exp.varargs(); L(e,i); { return e;}
     case 80:
       c = TableConstructor();
-                                  e=Exp.tableconstructor(c); L(e,i); {if (true) return e;}
-      break;
+                                  e=Exp.tableconstructor(c); L(e,i); { return e;}
     case FUNCTION:
       b = FunctionCall();
-                                          e=Exp.anonymousfunction(b); L(e,i); {if (true) return e;}
-      break;
+                                          e=Exp.anonymousfunction(b); L(e,i); { return e;}
     case NAME:
     case 75:
       e = PrimaryExp();
-                                          {if (true) return e;}
-      break;
+                                          { return e;}
     default:
       jj_la1[21] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
   }
 
   final public LuaString Str() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case STRING:
       jj_consume_token(STRING);
-                                  {if (true) return Str.quoteString(token.image);}
-      break;
+                                  { return Str.quoteString(token.image);}
     case CHARSTRING:
       jj_consume_token(CHARSTRING);
-                          {if (true) return Str.charString(token.image);}
-      break;
+                          { return Str.charString(token.image);}
     case LONGSTRING0:
       jj_consume_token(LONGSTRING0);
-                          {if (true) return Str.longString(token.image);}
-      break;
+                          { return Str.longString(token.image);}
     case LONGSTRING1:
       jj_consume_token(LONGSTRING1);
-                          {if (true) return Str.longString(token.image);}
-      break;
+                          { return Str.longString(token.image);}
     case LONGSTRING2:
       jj_consume_token(LONGSTRING2);
-                          {if (true) return Str.longString(token.image);}
-      break;
+                          { return Str.longString(token.image);}
     case LONGSTRING3:
       jj_consume_token(LONGSTRING3);
-                          {if (true) return Str.longString(token.image);}
-      break;
+                          { return Str.longString(token.image);}
     case LONGSTRINGN:
       jj_consume_token(LONGSTRINGN);
-                          {if (true) return Str.longString(token.image);}
-      break;
+                          { return Str.longString(token.image);}
     default:
       jj_la1[22] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
   }
 
   final public Exp Exp() throws ParseException {
@@ -770,8 +715,7 @@ public class LuaParser implements LuaParserConstants {
       s = Exp();
                                                   e=Exp.binaryexp(e,op,s);
     }
-                                                                                 L(e,i); {if (true) return e;}
-    throw new Error("Missing return statement in function");
+                                                                                 L(e,i); { return e;}
   }
 
   final public FuncBody FunctionCall() throws ParseException {
@@ -779,8 +723,7 @@ public class LuaParser implements LuaParserConstants {
         long i = LineInfo();
     jj_consume_token(FUNCTION);
     b = FuncBody();
-                                  L(b,i); {if (true) return b;}
-    throw new Error("Missing return statement in function");
+                                  L(b,i); { return b;}
   }
 
   final public FuncBody FuncBody() throws ParseException {
@@ -801,8 +744,7 @@ public class LuaParser implements LuaParserConstants {
     jj_consume_token(76);
     b = Block();
     jj_consume_token(END);
-                                                    f=new FuncBody(pl,b); L(f,i); {if (true) return f;}
-    throw new Error("Missing return statement in function");
+                                                    f=new FuncBody(pl,b); L(f,i); { return f;}
   }
 
   final public ParList ParList() throws ParseException {
@@ -823,18 +765,15 @@ public class LuaParser implements LuaParserConstants {
         jj_la1[25] = jj_gen;
         ;
       }
-                                                  p=new ParList(l,v); L(p,i); {if (true) return p;}
-      break;
+                                                  p=new ParList(l,v); L(p,i); { return p;}
     case 79:
       jj_consume_token(79);
-                 p=new ParList(null,true); L(p,i); {if (true) return p;}
-      break;
+                 p=new ParList(null,true); L(p,i); { return p;}
     default:
       jj_la1[26] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
   }
 
   final public TableConstructor TableConstructor() throws ParseException {
@@ -871,8 +810,7 @@ public class LuaParser implements LuaParserConstants {
       ;
     }
     jj_consume_token(81);
-                                                   L(c,i); {if (true) return c;}
-    throw new Error("Missing return statement in function");
+                                                   L(c,i); { return c;}
   }
 
   final public List FieldList() throws ParseException {
@@ -900,8 +838,7 @@ public class LuaParser implements LuaParserConstants {
       jj_la1[28] = jj_gen;
       ;
     }
-                                                                                               {if (true) return l;}
-    throw new Error("Missing return statement in function");
+                                                                                               { return l;}
   }
 
   final public TableField Field() throws ParseException {
@@ -916,15 +853,14 @@ public class LuaParser implements LuaParserConstants {
       jj_consume_token(78);
       jj_consume_token(71);
       rhs = Exp();
-                                                  f=TableField.keyedField(exp,rhs); L(f,i); {if (true) return f;}
-      break;
+                                                  f=TableField.keyedField(exp,rhs); L(f,i); { return f;}
     default:
       jj_la1[29] = jj_gen;
       if (jj_2_7(2)) {
         name = jj_consume_token(NAME);
         jj_consume_token(71);
         rhs = Exp();
-                                                  f=TableField.namedField(name.image,rhs); L(f,i); {if (true) return f;}
+                                                  f=TableField.namedField(name.image,rhs); L(f,i); { return f;}
       } else {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case LONGSTRING0:
@@ -947,8 +883,7 @@ public class LuaParser implements LuaParserConstants {
         case 80:
         case 83:
           rhs = Exp();
-                                                  f=TableField.listField(rhs); L(f,i); {if (true) return f;}
-          break;
+                                                  f=TableField.listField(rhs); L(f,i); { return f;}
         default:
           jj_la1[30] = jj_gen;
           jj_consume_token(-1);
@@ -956,7 +891,6 @@ public class LuaParser implements LuaParserConstants {
         }
       }
     }
-    throw new Error("Missing return statement in function");
   }
 
   final public void FieldSep() throws ParseException {
@@ -978,92 +912,72 @@ public class LuaParser implements LuaParserConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 82:
       jj_consume_token(82);
-                {if (true) return Lua.OP_ADD;}
-      break;
+                { return Lua.OP_ADD;}
     case 83:
       jj_consume_token(83);
-                {if (true) return Lua.OP_SUB;}
-      break;
+                { return Lua.OP_SUB;}
     case 84:
       jj_consume_token(84);
-                {if (true) return Lua.OP_MUL;}
-      break;
+                { return Lua.OP_MUL;}
     case 85:
       jj_consume_token(85);
-                {if (true) return Lua.OP_DIV;}
-      break;
+                { return Lua.OP_DIV;}
     case 86:
       jj_consume_token(86);
-                {if (true) return Lua.OP_POW;}
-      break;
+                { return Lua.OP_POW;}
     case 87:
       jj_consume_token(87);
-                {if (true) return Lua.OP_MOD;}
-      break;
+                { return Lua.OP_MOD;}
     case 88:
       jj_consume_token(88);
-                {if (true) return Lua.OP_CONCAT;}
-      break;
-    case 89:
+                { return Lua.OP_CONCAT;}
+      case 89:
       jj_consume_token(89);
-                {if (true) return Lua.OP_LT;}
-      break;
-    case 90:
+                { return Lua.OP_LT;}
+      case 90:
       jj_consume_token(90);
-                {if (true) return Lua.OP_LE;}
-      break;
+                { return Lua.OP_LE;}
     case 91:
       jj_consume_token(91);
-                {if (true) return Lua.OP_GT;}
-      break;
+                { return Lua.OP_GT;}
     case 92:
       jj_consume_token(92);
-                {if (true) return Lua.OP_GE;}
-      break;
+                { return Lua.OP_GE;}
     case 93:
       jj_consume_token(93);
-                {if (true) return Lua.OP_EQ;}
-      break;
+                { return Lua.OP_EQ;}
     case 94:
       jj_consume_token(94);
-                {if (true) return Lua.OP_NEQ;}
-      break;
+                { return Lua.OP_NEQ;}
     case AND:
       jj_consume_token(AND);
-                {if (true) return Lua.OP_AND;}
-      break;
+                { return Lua.OP_AND;}
     case OR:
       jj_consume_token(OR);
-                {if (true) return Lua.OP_OR;}
-      break;
+                { return Lua.OP_OR;}
     default:
       jj_la1[32] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
   }
 
   final public int Unop() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case 83:
       jj_consume_token(83);
-                {if (true) return Lua.OP_UNM;}
-      break;
+                { return Lua.OP_UNM;}
     case NOT:
       jj_consume_token(NOT);
-                {if (true) return Lua.OP_NOT;}
-      break;
+                { return Lua.OP_NOT;}
     case 69:
       jj_consume_token(69);
-                {if (true) return Lua.OP_LEN;}
-      break;
+                { return Lua.OP_LEN;}
     default:
       jj_la1[33] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
   }
 
   private boolean jj_2_1(int xla) {

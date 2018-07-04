@@ -32,10 +32,12 @@ public class PopupPrompt implements InputSubscriber, Drawable{
 		this.y = y;
 		this.width = width;
 		this.height = height;
-		ok = new GuiButton(wID, x, y+height*2/3, width/2, 12, LuaValue.NIL, LuaValue.NIL, "colors.popup.ok", Color.BLACK, Color.WHITE, Color.WHITE);
-		cancel = new GuiButton(wID, x+width/2, y+height*2/3, width/2, 12, LuaValue.NIL, LuaValue.NIL, "colors.popup.cancel", Color.BLACK, Color.WHITE, Color.WHITE);
-		
-		choicePicker = new GuiDropDown(wID, x+1, ok.getY()-12, width-2, 12, gui.height-15-(ok.getY()-12), "colors.popup.dropdown");
+		//ok = new GuiButton(wID, x, y+height*2/3, width/2, 12, LuaValue.NIL, LuaValue.NIL, "colors.popup.ok", Color.BLACK, Color.WHITE, Color.WHITE);
+		ok = new GuiButton(x, y+height*2/3, width/2, 12, LuaValue.NIL, LuaValue.NIL, "popupPrompt","colors","okButton");
+		//cancel = new GuiButton(wID, x+width/2, y+height*2/3, width/2, 12, LuaValue.NIL, LuaValue.NIL, "colors.popup.cancel", Color.BLACK, Color.WHITE, Color.WHITE);
+		cancel = new GuiButton(x+width/2, y+height*2/3, width/2, 12, LuaValue.NIL, LuaValue.NIL, "popupPrompt", "colors", "cancelButton");
+		//choicePicker = new GuiDropDown(wID, x+1, ok.getY()-12, width-2, 12, gui.height-15-(ok.getY()-12), "colors.popup.dropdown");
+		choicePicker = new GuiDropDown(x+1, ok.getY()-12, width-2, 12, gui.height-15-(ok.getY()-12), "popupPrompt", "colors", "choicePicker");
 		
 		ok.setText("Ok");
 		cancel.setText("Cancel");

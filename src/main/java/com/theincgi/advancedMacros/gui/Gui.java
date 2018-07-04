@@ -23,8 +23,8 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	public LinkedList<InputSubscriber> inputSubscribers = new LinkedList<>();
 	/**The next key or mouse event will be sent to this before anything else*/
 	public InputSubscriber nextKeyListen = null;
-	public LinkedList<Drawable> drawables = new LinkedList<>();
-	public Drawable drawLast = null;
+	private LinkedList<Drawable> drawables = new LinkedList<>();
+	public volatile Drawable drawLast = null;
 	private Focusable focusItem = null;
 	/**Strictly key typed and mouse clicked events atm*/
 	public InputSubscriber firstSubsciber;
@@ -35,7 +35,7 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	public Gui() {
 		super.mc = Minecraft.getMinecraft();
 	}
-	
+
 	@Override
 	public void drawHorizontalLine(int startX, int endX, int y, int color) {
 		super.drawHorizontalLine(startX, endX, y, color);
@@ -58,7 +58,7 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 		drawVerticalLine(x, y, y+h, col);
 		drawVerticalLine(x+w, y, y+h, col);
 	}
-	
+
 	/**returns next x to use in this for multiColoring*/
 	public int drawMonospaceString(String str, int x, int y, int color){
 		FontRenderer fr = getFontRend();
@@ -70,7 +70,7 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 		}
 		return cWid*str.length()+x;
 	}
-	
+
 	@Override
 	protected void keyTyped(char typedChar, int keyCode) throws IOException {
 		if(nextKeyListen!=null && nextKeyListen.onKeyPressed(this, typedChar, keyCode)){nextKeyListen = null; return;}
@@ -112,16 +112,17 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 			heldKeys.remove(keyTime);
 		}
 
+		synchronized (drawables) {
+			for (Drawable drawable : drawables) {
+				GlStateManager.pushAttrib();
+				//GlStateManager.enableAlpha();
+				//GlStateManager.disableBlend();
+				//GlStateManager.enableColorMaterial();
 
-		for (Drawable drawable : drawables) {
-			GlStateManager.pushAttrib();
-			//GlStateManager.enableAlpha();
-			//GlStateManager.disableBlend();
-			//GlStateManager.enableColorMaterial();
 
-
-			drawable.onDraw(this, mouseX, mouseY, partialTicks);
-			GlStateManager.popAttrib();
+				drawable.onDraw(this, mouseX, mouseY, partialTicks);
+				GlStateManager.popAttrib();
+			}
 		}
 		if(drawLast!=null){
 			drawLast.onDraw(this, mouseX, mouseY, partialTicks);
@@ -165,8 +166,12 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	//Called by drawScreen, gets overridden by gui
 	public void mouseScroll(int i){
 		if(firstSubsciber!=null && firstSubsciber.onScroll(this, i)) return;
-		for (InputSubscriber inputSubscriber : inputSubscribers) {
-			if(inputSubscriber.onScroll(this, i)) break;
+		synchronized (drawables) {
+
+			for (InputSubscriber inputSubscriber : inputSubscribers) {
+				if(inputSubscriber.onScroll(this, i)) break;
+			}
+
 		}
 	}
 
@@ -268,9 +273,9 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	}
 	//something to call each time you switch back
 	public void onOpen(){
-		
+
 	}
-	
+
 	public Focusable getFocusItem() {
 		//System.out.println("Foooocas "+focusItem);
 		return focusItem;
@@ -285,11 +290,27 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	public int getUnscaledWindowHeight(){
 		return Minecraft.getMinecraft().displayHeight;
 	}
-	
+
 	public void setDrawDefaultBackground(boolean drawDefaultBackground) {
 		this.drawDefaultBackground = drawDefaultBackground;
 	}
 	public boolean getDrawDefaultBackground() {
 		return drawDefaultBackground;
+	}
+
+	public void addDrawable(Drawable d) {
+		synchronized (drawables) {
+			drawables.add(d);
+		}
+	}
+	public void removeDrawables(Drawable d) {
+		synchronized (drawables) {
+			drawables.remove(d);
+		}
+	}
+	public void clearDrawables() {
+		synchronized (drawables) {
+			drawables.clear();
+		}
 	}
 }

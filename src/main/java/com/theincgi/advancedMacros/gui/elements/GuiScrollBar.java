@@ -5,11 +5,13 @@ import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.Focusable;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
 import com.theincgi.advancedMacros.misc.Property;
+import com.theincgi.advancedMacros.misc.PropertyPalette;
+import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
 public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Moveable{
 	//boolean prop keep scroll, for exit and return to menu
-	Property scrollbarFrame, scrollbarBG, scrollBarButtonFrame, scrollBarButtonFill, scrollBarButtonDetail, scrollBarButtonShade;
+	//Property scrollbarFrame, scrollbarBG, scrollBarButtonFrame, scrollBarButtonFill, scrollBarButtonDetail, scrollBarButtonShade;
 
 	private int items=2;
 	private int visible=1;
@@ -20,40 +22,62 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	public boolean needsFocus = false;
 	private boolean isVisible=true;
 	private double scrollSpeed = 1;
-	public GuiScrollBar(WidgetID wID, int x, int y, int wid, int len, Orientation or) {
-		this.wID = wID;
+	
+	PropertyPalette propertyPalette;
+	
+	public GuiScrollBar(int x, int y, int wid, int len, Orientation or, String...propPath) {
+		this(x, y, wid, len, or, propPath.length==0 ? new PropertyPalette() : new PropertyPalette(propPath, Settings.settings));
+	}
+	
+	public GuiScrollBar(int x, int y, int wid, int len, Orientation or, PropertyPalette propPal) {
+		this.propertyPalette = propPal;
 		this.x = x;
 		this.y = y;
 		this.wid = wid;
 		this.len = len;
 		this.orientation = or;
-		scrollbarFrame 			= new Property("colors.standardScrollbar.bgFrame", 		new Color(100, 	100, 	255).toLuaValue(), 	"bgFrame", 		wID);
-		scrollbarBG    			= new Property("colors.standardScrollbar.bgFill",  		new Color(142, 	142, 	142).toLuaValue(), 	"bgFill",		wID);
-		scrollBarButtonFrame 	= new Property("colors.standardScrollbar.buttonFrame", 	new Color(220,	220,	220).toLuaValue(), 	"buttonFrame",	wID);
-		scrollBarButtonFill 	= new Property("colors.standardScrollbar.buttonFill", 	new Color(204, 	223, 	255).toLuaValue(), 	"buttonFill",	wID);
-		scrollBarButtonDetail 	= new Property("colors.standardScrollbar.buttonDetail", new Color(0, 	97, 	255).toLuaValue(), 	"buttonDetail", wID);
-		scrollBarButtonShade    = new Property("colors.standardScrollbar.buttonShade",  GuiRect.DEFAULT_SHADE.toLuaValue(), "buttonShade", wID);
-
+		propPal.addColorIfNil(new Color(100, 	100, 	255), "colors", "bgFrame");
+		propPal.addColorIfNil(new Color(142, 	142, 	142), "colors", "bgFill");
+		propPal.addColorIfNil(new Color(220,	220,	220), "colors", "buttonFrame");
+		propPal.addColorIfNil(new Color(204, 	223, 	255), "colors", "buttonFill");
+		propPal.addColorIfNil(new Color(  0, 	 97, 	255), "colors", "buttonDetail");
+		propPal.addColorIfNil(GuiRect.DEFAULT_SHADE,          "colors", "buttonShade");
 	}
-	/**@param defPropPointerPrefix used to change table for color property defaults<br>
-	 * param = "colors.dropDownBox" will put buttonFill in "colors.dropDownBox.buttonFill,<br>
-	 * use this constructor if it is an element of something else*/
-	public GuiScrollBar(WidgetID wID, int x, int y, int wid, int len, Orientation or, String defPropPointerPrefix) {
-		defPropPointerPrefix = defPropPointerPrefix==null?"colors.standardScrollbar":defPropPointerPrefix;
-		this.wID = wID;
-		this.x = x;
-		this.y = y;
-		this.wid = wid;
-		this.len = len;
-		this.orientation = or;
-		scrollbarFrame 			= new Property(defPropPointerPrefix+".bgFrame", 		new Color(100, 	100, 	255).toLuaValue(), 	"bgFrame", 		wID);
-		scrollbarBG    			= new Property(defPropPointerPrefix+".bgFill",  		new Color(142, 	142, 	142).toLuaValue(), 	"bgFill",		wID);
-		scrollBarButtonFrame 	= new Property(defPropPointerPrefix+".buttonFrame", 	new Color(220,	220,	220).toLuaValue(), 	"buttonFrame",	wID);
-		scrollBarButtonFill 	= new Property(defPropPointerPrefix+".buttonFill", 		new Color(204, 	223, 	255).toLuaValue(), 	"buttonFill",	wID);
-		scrollBarButtonDetail 	= new Property(defPropPointerPrefix+".buttonDetail", 	new Color(0, 	97, 	255).toLuaValue(), 	"buttonDetail", wID);
-		scrollBarButtonShade    = new Property(defPropPointerPrefix+".buttonShade",  	GuiRect.DEFAULT_SHADE.toLuaValue(), 		"buttonShade", 	wID);
-
-	}
+	
+//	public GuiScrollBar(WidgetID wID, int x, int y, int wid, int len, Orientation or) {
+//		this.wID = wID;
+//		this.x = x;
+//		this.y = y;
+//		this.wid = wid;
+//		this.len = len;
+//		this.orientation = or;
+////		scrollbarFrame 			= new Property("colors.standardScrollbar.bgFrame", 		new Color(100, 	100, 	255).toLuaValue(), 	"bgFrame", 		wID);
+////		scrollbarBG    			= new Property("colors.standardScrollbar.bgFill",  		new Color(142, 	142, 	142).toLuaValue(), 	"bgFill",		wID);
+////		scrollBarButtonFrame 	= new Property("colors.standardScrollbar.buttonFrame", 	new Color(220,	220,	220).toLuaValue(), 	"buttonFrame",	wID);
+////		scrollBarButtonFill 	= new Property("colors.standardScrollbar.buttonFill", 	new Color(204, 	223, 	255).toLuaValue(), 	"buttonFill",	wID);
+////		scrollBarButtonDetail 	= new Property("colors.standardScrollbar.buttonDetail", new Color(0, 	97, 	255).toLuaValue(), 	"buttonDetail", wID);
+////		scrollBarButtonShade    = new Property("colors.standardScrollbar.buttonShade",  GuiRect.DEFAULT_SHADE.toLuaValue(), "buttonShade", wID);
+//
+//	}
+//	/**@param defPropPointerPrefix used to change table for color property defaults<br>
+//	 * param = "colors.dropDownBox" will put buttonFill in "colors.dropDownBox.buttonFill,<br>
+//	 * use this constructor if it is an element of something else*/
+//	public GuiScrollBar(WidgetID wID, int x, int y, int wid, int len, Orientation or, String defPropPointerPrefix) {
+//		defPropPointerPrefix = defPropPointerPrefix==null?"colors.standardScrollbar":defPropPointerPrefix;
+//		this.wID = wID;
+//		this.x = x;
+//		this.y = y;
+//		this.wid = wid;
+//		this.len = len;
+//		this.orientation = or;
+//		scrollbarFrame 			= new Property(defPropPointerPrefix+".bgFrame", 		new Color(100, 	100, 	255).toLuaValue(), 	"bgFrame", 		wID);
+//		scrollbarBG    			= new Property(defPropPointerPrefix+".bgFill",  		new Color(142, 	142, 	142).toLuaValue(), 	"bgFill",		wID);
+//		scrollBarButtonFrame 	= new Property(defPropPointerPrefix+".buttonFrame", 	new Color(220,	220,	220).toLuaValue(), 	"buttonFrame",	wID);
+//		scrollBarButtonFill 	= new Property(defPropPointerPrefix+".buttonFill", 		new Color(204, 	223, 	255).toLuaValue(), 	"buttonFill",	wID);
+//		scrollBarButtonDetail 	= new Property(defPropPointerPrefix+".buttonDetail", 	new Color(0, 	97, 	255).toLuaValue(), 	"buttonDetail", wID);
+//		scrollBarButtonShade    = new Property(defPropPointerPrefix+".buttonShade",  	GuiRect.DEFAULT_SHADE.toLuaValue(), 		"buttonShade", 	wID);
+//
+//	}
 	
 
 	public void setItemCount(int items){
@@ -85,31 +109,38 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	@Override
 	public void onDraw(Gui gui, int mouseX, int mouseY, float partialTicks) {
 		if(!isVisible){return;}
+		int barFrame =   propertyPalette.getColor("colors", "bgFrame").toInt(),
+		    barBG    =   propertyPalette.getColor("colors", "bgFill").toInt(),
+		    buttonFrame= propertyPalette.getColor("colors", "buttonFrame").toInt(),
+		    buttonFill = propertyPalette.getColor("colors", "buttonFill").toInt(),
+		    buttonDetail=propertyPalette.getColor("colors", "buttonDetail").toInt(),
+		    buttonShade =propertyPalette.getColor("colors", "buttonShade").toInt();
+		
 		if(orientation.isUPDOWN()){
-			gui.drawBoxedRectangle(x, y, wid, len, Utils.parseColor(scrollbarFrame.getPropValue()).toInt(), Utils.parseColor(scrollbarBG.getPropValue()).toInt());
+			gui.drawBoxedRectangle(x, y, wid, len, barFrame, barBG);
 			int buttonLen = getButtonLen()-1;
 			int buttonY =   getButtonY()+1;
-			gui.drawBoxedRectangle(x+1, buttonY, wid-2, buttonLen, Utils.parseColor(scrollBarButtonFrame.getPropValue()).toInt(), Utils.parseColor(scrollBarButtonFill.getPropValue()).toInt());
-			gui.drawHorizontalLine(x+4, x+wid-4, buttonY+buttonLen/2, Utils.parseColor(scrollBarButtonDetail.getPropValue()).toInt());
-			gui.drawHorizontalLine(x+4, x+wid-4, buttonY+buttonLen/2-2, Utils.parseColor(scrollBarButtonDetail.getPropValue()).toInt());
-			gui.drawHorizontalLine(x+4, x+wid-4, buttonY+buttonLen/2+2, Utils.parseColor(scrollBarButtonDetail.getPropValue()).toInt());
+			gui.drawBoxedRectangle(x+1, buttonY, wid-2, buttonLen, buttonFrame, buttonFill);
+			gui.drawHorizontalLine(x+4, x+wid-4, buttonY+buttonLen/2, buttonDetail);
+			gui.drawHorizontalLine(x+4, x+wid-4, buttonY+buttonLen/2-2, buttonDetail);
+			gui.drawHorizontalLine(x+4, x+wid-4, buttonY+buttonLen/2+2, buttonDetail);
 			//System.out.println(">>> "+x+" "+y+" "+wid+" "+len+" "+buttonLen+" "+buttonY);
 
 			if(anchorSet || isInButton(mouseX, mouseY)){
-				net.minecraft.client.gui.Gui.drawRect(x+1, buttonY, wid+x, buttonLen+buttonY+1, Utils.parseColor(scrollBarButtonShade.getPropValue()).toInt());
+				net.minecraft.client.gui.Gui.drawRect(x+1, buttonY, wid+x, buttonLen+buttonY+1, buttonShade);
 			}
 		}else if(orientation.isLEFTRIGHT()){
-			gui.drawBoxedRectangle(x, y, len, wid, Utils.parseColor(scrollbarFrame.getPropValue()).toInt(), Utils.parseColor(scrollbarBG.getPropValue()).toInt());
+			gui.drawBoxedRectangle(x, y, len, wid, barFrame, barBG);
 			
-			gui.drawBoxedRectangle(getButtonX(), y+1, getButtonLen()-1, wid-2, Utils.parseColor(scrollBarButtonFrame.getPropValue()).toInt(), Utils.parseColor(scrollBarButtonFill.getPropValue()).toInt());
+			gui.drawBoxedRectangle(getButtonX(), y+1, getButtonLen()-1, wid-2, buttonFrame, buttonFill);
 			
-			gui.drawVerticalLine(getButtonX()+getButtonLen()/2, y+2, y+wid-2, Utils.parseColor(scrollBarButtonDetail.getPropValue()).toInt());
-			gui.drawVerticalLine(getButtonX()+getButtonLen()/2-2, y+2, y+wid-2, Utils.parseColor(scrollBarButtonDetail.getPropValue()).toInt());
-			gui.drawVerticalLine(getButtonX()+getButtonLen()/2+2, y+2, y+wid-2, Utils.parseColor(scrollBarButtonDetail.getPropValue()).toInt());
+			gui.drawVerticalLine(getButtonX()+getButtonLen()/2, y+2, y+wid-2, buttonDetail);
+			gui.drawVerticalLine(getButtonX()+getButtonLen()/2-2, y+2, y+wid-2, buttonDetail);
+			gui.drawVerticalLine(getButtonX()+getButtonLen()/2+2, y+2, y+wid-2, buttonDetail);
 			
 			
 			if(anchorSet || isInButton(mouseX, mouseY)){
-				net.minecraft.client.gui.Gui.drawRect(getButtonX(),y+1,getButtonX()+getButtonLen(), y+wid, Utils.parseColor(scrollBarButtonShade.getPropValue()).toInt());
+				net.minecraft.client.gui.Gui.drawRect(getButtonX(),y+1,getButtonX()+getButtonLen(), y+wid, buttonShade);
 			}
 		}
 		//		gui.drawBoxedRectangle(x, y, 

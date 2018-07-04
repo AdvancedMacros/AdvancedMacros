@@ -28,8 +28,10 @@ public class PropertyPalette{
 	}
 	public PropertyPalette setProp ( LuaValue c, String...keyPath) {
 		LuaTable t = getTableFromKey();
-		for(int i = 0; i<keyPath.length-1; i++)
+		for(int i = 0; i<keyPath.length-1; i++) {
+			if(t.get(keyPath[i]).isnil()) t.set(keyPath[i], new LuaTable());
 			t = t.get(keyPath[i]).checktable();
+		}
 		t.set( keyPath[ keyPath.length -1 ], c );
 		return this;
 	}
@@ -45,8 +47,10 @@ public class PropertyPalette{
 	}
 	public LuaValue getValue( String...keyPath) {
 		LuaTable t = getTableFromKey();
-		for(int i = 0; i<keyPath.length-1; i++)
+		for(int i = 0; i<keyPath.length-1; i++) {
+			if(t.get(keyPath[i]).isnil()) t.set(keyPath[i], new LuaTable());
 			t = t.get(keyPath[i]).checktable();
+		}
 		return t.get(keyPath[ keyPath.length -1 ]);
 	}
 	
@@ -54,6 +58,7 @@ public class PropertyPalette{
 		LuaTable t = settings;
 		if(key != null)
 			for( String k : this.key) {
+				if(t.get(k).isnil()) t.set(k, new LuaTable());
 				t = t.get(k).checktable();
 			}
 		return t;
@@ -69,10 +74,18 @@ public class PropertyPalette{
 	}
 	public PropertyPalette setPropIfNil(LuaValue prop, String... keyPath) {
 		LuaTable t = getTableFromKey();
-		for(int i = 0; i<keyPath.length-1; i++)
+		for(int i = 0; i<keyPath.length-1; i++) {
+			if(t.get(keyPath[i]).isnil()) t.set(keyPath[i], new LuaTable());
 			t = t.get(keyPath[i]).checktable();
+		}
 		if(t.get(keyPath[ keyPath.length -1 ]).isnil())
 			t.set( keyPath[ keyPath.length -1 ], prop );
 		return this;
+	}
+	public PropertyPalette propertyPaletteOf(String...keyPath) {
+		LuaValue v = getValue(keyPath);
+		if(v.isnil())
+			setProp(v = new LuaTable(), keyPath);
+		return new PropertyPalette(null, v.checktable());
 	}
 }

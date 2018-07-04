@@ -5,6 +5,7 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 
 import com.theincgi.advancedMacros.gui.elements.WidgetID;
 
+@Deprecated
 public class Property {
 	//in settings widgetSettings.w###.colors_standardButton_*** where *** is either value or name will save the custom value for a widget if changed from default 
 	private static final String propLocation = "widgetSettings";
@@ -20,7 +21,7 @@ public class Property {
 	 * @param propName ex: fillColor will create widgetSettings.w15.PROPNAME = defValue, grouping recommended (color.fill)<br>
 	 * @param wID the widget ID object<br>
 	 * */
-	public Property(String defaultPropPointer, LuaValue defaultPropValue, String propName, WidgetID wID) {
+	private Property(String defaultPropPointer, LuaValue defaultPropValue, String propName, WidgetID wID) {
 		this.defaultPropPointer = defaultPropPointer;
 		this.defaultPropValue = defaultPropValue;
 		this.propName = propName;

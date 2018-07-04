@@ -24,6 +24,7 @@ import com.theincgi.advancedMacros.gui.elements.WidgetID;
 import com.theincgi.advancedMacros.gui2.PopupPrompt2.Result;
 import com.theincgi.advancedMacros.gui2.PopupPrompt2.ResultHandler;
 import com.theincgi.advancedMacros.misc.Property;
+import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -59,43 +60,50 @@ public class ScriptBrowser2 extends Gui{
 
 	Stack<String> history = new Stack<>();
 	private String pathText;
-
+	public PropertyPalette propertyPalette = new PropertyPalette(new String[] {"scriptBrowser"}, Settings.settings);
 	public ScriptBrowser2() {
 		super();
 		int defWid = 12;
 		int defHei = 12;
-		returnButton = new GuiButton(new WidgetID(600), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitereturn.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
-		backButton = new GuiButton(new WidgetID(601), 5, 5, defWid, defHei, Settings.getTextureID("resource:whiteback.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
-		forwardButton = new GuiButton(new WidgetID(602), 5, 5, defWid, defHei, Settings.getTextureID("resource:whiteforward.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
-		createFolderButton = new GuiButton(new WidgetID(603), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitecreatefolder.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
-		createFileButton = new GuiButton(new WidgetID(604), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitecreatefile.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
-		searchButton = new GuiButton(new WidgetID(605), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitesearch.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
-		pasteButton = new GuiButton(new WidgetID(635), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitepaste.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
+		returnButton = new GuiButton(5, 5, defWid, defHei, Settings.getTextureID("resource:whitereturn.png"), LuaValue.NIL, "scriptBrowser", "returnButton");
+		//returnButton = new GuiButton(new WidgetID(600), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitereturn.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
+		backButton = new GuiButton(5, 5, defWid, defHei, Settings.getTextureID("resource:whiteback.png"), LuaValue.NIL, "scriptBrowser", "backButton");
+		//backButton = new GuiButton(new WidgetID(601), 5, 5, defWid, defHei, Settings.getTextureID("resource:whiteback.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
+		//forwardButton = new GuiButton(new WidgetID(602), 5, 5, defWid, defHei, Settings.getTextureID("resource:whiteforward.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
+		forwardButton = new GuiButton(5, 5, defWid, defHei, Settings.getTextureID("resource:whiteforward.png"), LuaValue.NIL, "scriptBrowser", "forwardButton");
+		//createFolderButton = new GuiButton(new WidgetID(603), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitecreatefolder.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
+		createFolderButton = new GuiButton(5, 5, defWid, defHei, Settings.getTextureID("resource:whitecreatefolder.png"), LuaValue.NIL, "scriptBrowser", "createFolderButton");
+//		createFileButton = new GuiButton(new WidgetID(604), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitecreatefile.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
+		createFileButton = new GuiButton(5, 5, defWid, defHei, Settings.getTextureID("resource:whitecreatefile.png"), LuaValue.NIL, "scriptBrowser", "createFileButton");
+//		searchButton = new GuiButton(new WidgetID(605), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitesearch.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
+		searchButton = new GuiButton(5, 5, defWid, defHei, Settings.getTextureID("resource:whitesearch.png"), LuaValue.NIL, "scriptBrowser", "searchButton");
+		//pasteButton = new GuiButton(new WidgetID(635), 5, 5, defWid, defHei, Settings.getTextureID("resource:whitepaste.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
+		pasteButton = new GuiButton(5, 5, defWid, defHei, Settings.getTextureID("resource:whitepaste.png"), LuaValue.NIL, "scriptBrowser", "pasteButton");
 		
-		
-		addressBackdrop = new GuiRect(new WidgetID(606), 5, 5, defWid, defHei, propAddress+".addressBackground", Color.BLACK, Color.WHITE);
+		//addressBackdrop = new GuiRect(new WidgetID(606), 5, 5, defWid, defHei, propAddress+".addressBackground", Color.BLACK, Color.WHITE);
+		addressBackdrop = new GuiRect(5, 5, defWid, defHei, "scriptBrowser","addressBackground");
 
 		//		popupPrompt = new PopupPrompt(new WidgetID(404), width/3, 36, width/3, height/3,this);
-		popupPrompt2 = new PopupPrompt2(this);
+		popupPrompt2 = new PopupPrompt2(this, propertyPalette);
 
 		filePreview = new ColorTextArea(this, Settings.settings, "browserTextPreview");
 		filePreview.setEditable(false);
 		filePreview.setFocused(true);
 
-		listManager = new ListManager(5, 5, 5, 5, new WidgetID(607), propAddress+".list");
+		listManager = new ListManager(5, 5, 5, 5 /*new WidgetID(607), propAddress+".list"*/, propertyPalette);
 
-		drawables.add(returnButton);
-		drawables.add(backButton);
-		drawables.add(forwardButton);
-		drawables.add(createFolderButton);
-		drawables.add(createFileButton);
+		addDrawable(returnButton);
+		addDrawable(backButton);
+		addDrawable(forwardButton);
+		addDrawable(createFolderButton);
+		addDrawable(createFileButton);
 		//drawables.add(searchButton);
 		
-		drawables.add(listManager);
-		drawables.add(filePreview);
+		addDrawable(listManager);
+		addDrawable(filePreview);
 		//drawables.add(popupPrompt);
-		drawables.add(addressBackdrop);
-		drawables.add(pasteButton);
+		addDrawable(addressBackdrop);
+		addDrawable(pasteButton);
 
 		inputSubscribers.add(returnButton);
 		inputSubscribers.add(backButton);
@@ -227,8 +235,16 @@ public class ScriptBrowser2 extends Gui{
 		listManager.setAlwaysShowScroll(true);
 		listManager.setDrawBG(true);
 		populateList(AdvancedMacros.macrosFolder);
+		propertyPalette.addColorIfNil(Color.TEXT_f, "scriptBrowser", "colors", "file"          );
+		propertyPalette.addColorIfNil(Color.TEXT_e, "scriptBrowser", "colors", "folder"        );
+		propertyPalette.addColorIfNil(Color.TEXT_b, "scriptBrowser", "colors", "selectedFile"  );
+		propertyPalette.addColorIfNil(Color.TEXT_d, "scriptBrowser", "colors", "selectedFolder");
+		
 	}
-	
+//	private Property fileColorProp = new Property("colors.scriptBrowser2.file", Color.TEXT_f.toLuaValue(), "color.file", widgetID);
+//	private Property folderColorProp = new Property("colors.scriptBrowser2.folder", Color.TEXT_e.toLuaValue(), "color.folder", widgetID);
+//	private Property selFileColorProp = new Property("colors.scriptBrowser2.selectedFile", Color.TEXT_b.toLuaValue(), "color.selectedFile", widgetID);
+//	private Property selFolderColorProp = new Property("colors.scriptBrowser2.selectedFolder", Color.TEXT_d.toLuaValue(), "color.selectedFolder", widgetID);
 	public static String getScriptPath(File filePath) {
 		//System.out.println("This: ");
 		try {
@@ -479,35 +495,35 @@ public class ScriptBrowser2 extends Gui{
 	}
 
 	public class FileElement {
-		private final WidgetID widgetID = new WidgetID(610);
-
-		private Property fileColorProp = new Property("colors.scriptBrowser2.file", Color.TEXT_f.toLuaValue(), "color.file", widgetID);
-		private Property folderColorProp = new Property("colors.scriptBrowser2.folder", Color.TEXT_e.toLuaValue(), "color.folder", widgetID);
-		private Property selFileColorProp = new Property("colors.scriptBrowser2.selectedFile", Color.TEXT_b.toLuaValue(), "color.selectedFile", widgetID);
-		private Property selFolderColorProp = new Property("colors.scriptBrowser2.selectedFolder", Color.TEXT_d.toLuaValue(), "color.selectedFolder", widgetID);
+		//private final WidgetID widgetID = new WidgetID(610);
+//
+//		private Property fileColorProp = new Property("colors.scriptBrowser2.file", Color.TEXT_f.toLuaValue(), "color.file", widgetID);
+//		private Property folderColorProp = new Property("colors.scriptBrowser2.folder", Color.TEXT_e.toLuaValue(), "color.folder", widgetID);
+//		private Property selFileColorProp = new Property("colors.scriptBrowser2.selectedFile", Color.TEXT_b.toLuaValue(), "color.selectedFile", widgetID);
+//		private Property selFolderColorProp = new Property("colors.scriptBrowser2.selectedFolder", Color.TEXT_d.toLuaValue(), "color.selectedFolder", widgetID);
 		private String selectedName;
 		private String unselectedName;
 		File filePath;
 		GuiButton button;
 		public FileElement() {
-			button = new GuiButton(widgetID, 5, 5, 12, 12, LuaValue.NIL, LuaValue.NIL,null, Color.BLACK, Color.BLACK, Color.WHITE) {
-
+			//button = new GuiButton(widgetID, 5, 5, 12, 12, LuaValue.NIL, LuaValue.NIL,null, Color.BLACK, Color.BLACK, Color.WHITE) {
+			button = new GuiButton(5, 5, 12, 12, LuaValue.NIL, LuaValue.NIL) {
 
 				@Override
 				public void onDraw(Gui gui, int mouseX, int mouseY, float partialTicks) {
 					if(selectedFile!=null && selectedFile.equals(filePath)) {
 						if(filePath.isDirectory()) {
-							setTextColor(Utils.parseColor(selFolderColorProp.getPropValue()));
+							setTextColor( propertyPalette.getColor("scriptBrowser", "colors", "selectedFolder") );//Utils.parseColor(selFolderColorProp.getPropValue()));
 						}else {
-							setTextColor(Utils.parseColor(selFileColorProp.getPropValue()));
+							setTextColor( propertyPalette.getColor("scriptBrowser", "colors", "selectedFile"));//Utils.parseColor(selFileColorProp.getPropValue()));
 						}
 						setText(selectedName);
 					}else{
 						if(filePath!=null)
 							if(filePath.isDirectory()) {
-								setTextColor(Utils.parseColor(folderColorProp.getPropValue()));
+								setTextColor( propertyPalette.getColor("scriptBrowser", "colors", "folder") );//Utils.parseColor(folderColorProp.getPropValue()));
 							}else {
-								setTextColor(Utils.parseColor(fileColorProp.getPropValue()));
+								setTextColor( propertyPalette.getColor("scriptBrowser", "colors", "file"));//Utils.parseColor(fileColorProp.getPropValue()));
 							}
 						setText(unselectedName);
 					}

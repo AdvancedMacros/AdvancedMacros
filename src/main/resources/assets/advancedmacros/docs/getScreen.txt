@@ -1,0 +1,3 @@
+getScreen()
+returns a screenshot with a
+table of controls

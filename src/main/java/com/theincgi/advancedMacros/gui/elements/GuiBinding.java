@@ -62,12 +62,17 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		
 		//enableTexProp = new Property("texture.binding.enabled", LuaValue.valueOf("resource:greencheck.png"), "enabled", wID);
 		
-		removeButton = new GuiButton(wID, x, y, 12, 12, LuaValue.NIL, LuaValue.NIL, "colors.binding", Color.BLACK, Color.WHITE, Color.WHITE);
-		enableButton = new GuiButton(wID, x, y, 12, 12, LuaValue.NIL, LuaValue.NIL, "colors.binding", Color.BLACK, Color.WHITE, Color.WHITE);
-		editButton   = new GuiButton(wID, x, y, 12*3, 12, LuaValue.NIL, LuaValue.NIL, "colors.binding", Color.BLACK, Color.WHITE, Color.WHITE);
-		modeButton   = new GuiButton(wID, x, y, 12, 12, LuaValue.NIL, LuaValue.NIL, "colors.binding", Color.BLACK, Color.WHITE, Color.WHITE);
-		moveButton   = new GuiButton(wID, x, y, 12, 12, LuaValue.NIL, LuaValue.NIL, "colors.binding", Color.BLACK, Color.WHITE, Color.WHITE);
-
+		//removeButton = new GuiButton(wID, x, y, 12, 12, LuaValue.NIL, LuaValue.NIL, "colors.binding", Color.BLACK, Color.WHITE, Color.WHITE);
+		removeButton = new GuiButton(x, y, 12, 12, LuaValue.NIL, LuaValue.NIL, "bindings", "removeButton");
+		//enableButton = new GuiButton(wID, x, y, 12, 12, LuaValue.NIL, LuaValue.NIL, "colors.binding", Color.BLACK, Color.WHITE, Color.WHITE);
+		enableButton = new GuiButton(x, y, 12, 12, LuaValue.NIL, LuaValue.NIL, "bindings", "enableButton");
+		//editButton   = new GuiButton(wID, x, y, 12*3, 12, LuaValue.NIL, LuaValue.NIL, "colors.binding", Color.BLACK, Color.WHITE, Color.WHITE);
+		editButton   = new GuiButton(x, y, 12*3, 12, LuaValue.NIL, LuaValue.NIL, "bindings", "editButton");
+		//modeButton   = new GuiButton(wID, x, y, 12, 12, LuaValue.NIL, LuaValue.NIL, "colors.binding", Color.BLACK, Color.WHITE, Color.WHITE);
+		modeButton   = new GuiButton(x, y, 12, 12, LuaValue.NIL, LuaValue.NIL, "bindings", "modeButton");
+		//moveButton   = new GuiButton(wID, x, y, 12, 12, LuaValue.NIL, LuaValue.NIL, "colors.binding", Color.BLACK, Color.WHITE, Color.WHITE);
+		moveButton   = new GuiButton(x, y, 12, 12, LuaValue.NIL, LuaValue.NIL, "bindings", "moveButton");
+		
 		removeButton.setEnabled(true);
 
 		removeButton.changeTexture(Utils.checkTexture(trashTexture));
@@ -79,10 +84,12 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		//		modeButton.doScaleAnimation = false;
 		//		moveButton.doScaleAnimation = false;
 		int remaining = guiWid - 12*7;
-		eventSelector = new GuiDropDown(wID, x, y, remaining/3, 12, 12*5, "colors.binding.event");
+		//eventSelector = new GuiDropDown(wID, x, y, remaining/3, 12, 12*5, "colors.binding.event");
+		eventSelector = new GuiDropDown(x, y, remaining/3, 12, 12*5, "bindings","eventSelector");
 		remaining/=2;
 //		scriptSelector = new GuiDropDown(wID, x, y, remaining, 12, 12*5, "colors.binding.script");
-		pickScript     = new GuiButton(new WidgetID(77), x, y, 12, 12, Settings.getTextureID("resource:whitedowntri.png"), LuaValue.NIL, "colors.binding", Color.BLACK, Color.WHITE, Color.WHITE);
+		//pickScript     = new GuiButton(new WidgetID(77), x, y, 12, 12, Settings.getTextureID("resource:whitedowntri.png"), LuaValue.NIL, "colors.binding", Color.BLACK, Color.WHITE, Color.WHITE);
+		pickScript     = new GuiButton(x, y, 12, 12, Settings.getTextureID("resource:whitedowntri.png"), LuaValue.NIL, "bindings", "pickScript");
 		
 		
 		eventSelector.setScrollSpeed(6);
