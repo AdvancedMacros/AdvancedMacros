@@ -23,7 +23,7 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 	private static final String DEFAULT_PROP = "colors.list";
 	PropertyPalette propertyPalette;
 	public ListManager(int x, int y, int wid, int hei, String...propPath) {
-		this(x, y, wid, hei, propPath.length==0? new PropertyPalette() : new PropertyPalette(propPath, Settings.settings));
+		this(x, y, wid, hei, propPath.length==0? new PropertyPalette() : new PropertyPalette(propPath));
 	}
 	
 	public ListManager(int x, int y, int wid, int hei, PropertyPalette propPalette) {

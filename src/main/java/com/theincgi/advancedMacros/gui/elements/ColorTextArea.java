@@ -96,11 +96,11 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	//private static final String propAddress = "colors.cta.";
 	private static WidgetID wID;
 	private Gui gui;
-	public ColorTextArea(Gui gui, LuaTable settings) {
-		this(gui, settings, new String[] {"editor"});
+	public ColorTextArea(Gui gui) {
+		this(gui, new String[] {"editor"});
 	}
-	public ColorTextArea(Gui gui, LuaTable settings, String... settingsPath) {
-		this( new PropertyPalette(settingsPath, settings), gui);
+	public ColorTextArea(Gui gui, String... settingsPath) {
+		this( new PropertyPalette(settingsPath), gui);
 	}
 	public ColorTextArea(PropertyPalette propPalette, Gui g) {	
 		gui = g;     																 /*AAA, RRR, GGG, BBB*/

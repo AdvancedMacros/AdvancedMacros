@@ -39,7 +39,7 @@ public class GuiButton extends GuiRect implements InputSubscriber, Focusable{
 //	PropertyPalette propertyPalette;
 	/**Blank propPath will create a un bound propPalette*/
 	public GuiButton(int x, int y, int wid, int hei, LuaValue defaultImg, LuaValue defaultText, String... propPath) {
-		this(x, y, wid, hei, propPath.length==0? new PropertyPalette() : new PropertyPalette(propPath, Settings.settings));
+		this(x, y, wid, hei, propPath.length==0? new PropertyPalette() : new PropertyPalette(propPath));
 		texture = Utils.checkTexture(defaultImg);
 		text = defaultText.isnil()?null:defaultText.tojstring();
 	}

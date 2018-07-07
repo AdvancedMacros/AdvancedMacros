@@ -60,7 +60,7 @@ public class ScriptBrowser2 extends Gui{
 
 	Stack<String> history = new Stack<>();
 	private String pathText;
-	public PropertyPalette propertyPalette = new PropertyPalette(new String[] {"scriptBrowser"}, Settings.settings);
+	public PropertyPalette propertyPalette = new PropertyPalette(new String[] {"scriptBrowser"});
 	public ScriptBrowser2() {
 		super();
 		int defWid = 12;
@@ -86,7 +86,7 @@ public class ScriptBrowser2 extends Gui{
 		//		popupPrompt = new PopupPrompt(new WidgetID(404), width/3, 36, width/3, height/3,this);
 		popupPrompt2 = new PopupPrompt2(this, propertyPalette);
 
-		filePreview = new ColorTextArea(this, Settings.settings, "browserTextPreview");
+		filePreview = new ColorTextArea(this, "browserTextPreview");
 		filePreview.setEditable(false);
 		filePreview.setFocused(true);
 

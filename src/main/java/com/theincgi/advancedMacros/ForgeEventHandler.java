@@ -523,7 +523,7 @@ public class ForgeEventHandler {
 				.replaceAll("&r", "&f")   //reset (to white in this case)
 				;
 		formated = formated.substring(0, formated.length()-2);//gets rid of last &f that does nothing for us
-		System.out.println(sEvent.getMessage().getSiblings());
+		//System.out.println(sEvent.getMessage().getSiblings());
 		//TODO simplfy formating
 		e.set(3, formated);
 		e2.set(3, formated);
@@ -867,5 +867,36 @@ public class ForgeEventHandler {
 	public void releaseKeybindAt(int keycode, long l) {
 		//heldKeybinds.add(new HeldKeybinds(keycode, l));
 		keyBindReleaseMap.put(keycode, new HeldKeybinds(keycode, l));
+	}
+	
+	public class GetHeldKeys extends ZeroArgFunction {
+		@Override
+		public LuaValue call() {
+			LuaTable t = new LuaTable();
+			int j = 1;
+			for(int i : heldKeys.keySet()) {
+				t.set(j++, Keyboard.getKeyName(i));
+			}
+			for(int i = 0; i < heldMouseButtons.size(); i++) {
+				String s;
+				switch (i) {
+				case 0:
+					s = "LMB";
+					break;
+				case 1:
+					s = "RMB";
+					break;
+				case 2:
+					s = "MMB";
+					break;
+				default:
+					s = "MOUSE:"+i;
+					break;
+				}
+				if(heldMouseButtons.get(i))
+					t.set(j++, s);
+			}
+			return t;
+		}
 	}
 }

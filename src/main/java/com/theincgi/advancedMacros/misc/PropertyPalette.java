@@ -8,15 +8,18 @@ import com.theincgi.advancedMacros.gui.Color;
 
 public class PropertyPalette{
 	public final String[] key;
-	private LuaTable settings;
+	public LuaTable settings;
 	
 	public PropertyPalette() {
 		settings = new LuaTable();
 		key = null;
 	}
-	public PropertyPalette(String[] key, LuaTable t) {
+//	public PropertyPalette(String[] key, LuaTable t) {
+//		this.key = key;
+//		this.settings = t;
+//	}
+	public PropertyPalette(String[] key) {
 		this.key = key;
-		this.settings = t;
 	}
 	
 	public PropertyPalette addColor( String key, Color c ) {
@@ -48,14 +51,15 @@ public class PropertyPalette{
 	public LuaValue getValue( String...keyPath) {
 		LuaTable t = getTableFromKey();
 		for(int i = 0; i<keyPath.length-1; i++) {
-			if(t.get(keyPath[i]).isnil()) t.set(keyPath[i], new LuaTable());
+			if(t.get(keyPath[i]).isnil()) 
+				t.set(keyPath[i], new LuaTable());
 			t = t.get(keyPath[i]).checktable();
 		}
 		return t.get(keyPath[ keyPath.length -1 ]);
 	}
 	
 	public LuaTable getTableFromKey() {
-		LuaTable t = settings;
+		LuaTable t = settings==null? Settings.settings : settings;
 		if(key != null)
 			for( String k : this.key) {
 				if(t.get(k).isnil()) t.set(k, new LuaTable());
@@ -83,9 +87,11 @@ public class PropertyPalette{
 		return this;
 	}
 	public PropertyPalette propertyPaletteOf(String...keyPath) {
-		LuaValue v = getValue(keyPath);
-		if(v.isnil())
-			setProp(v = new LuaTable(), keyPath);
-		return new PropertyPalette(null, v.checktable());
+		if(key==null)
+			return new PropertyPalette(keyPath);
+		String[] path2 = new String[key.length + keyPath.length];
+		System.arraycopy(key, 0, path2, 0, key.length);
+		System.arraycopy(keyPath, 0, path2, key.length, keyPath.length);
+		return new PropertyPalette(path2);
 	}
 }

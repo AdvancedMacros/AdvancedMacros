@@ -37,7 +37,7 @@ public class GuiRect implements Drawable, Moveable{
 	private static final String defaultPropTableName = "colors.standardRect";
 	
 	public GuiRect(int x, int y, int wid, int hei, String...propPath) {
-		this(x, y, wid, hei, new PropertyPalette(propPath, Settings.settings));
+		this(x, y, wid, hei, new PropertyPalette(propPath));
 	}
 	public GuiRect(int x, int y, int wid, int hei, PropertyPalette propPal) {
 		this.x = x;

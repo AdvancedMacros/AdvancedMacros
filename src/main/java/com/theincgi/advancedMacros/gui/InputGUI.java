@@ -41,7 +41,7 @@ public class InputGUI extends Gui{
 	private String prompt;
 	private boolean answered = true;
 	private LuaValue answer = LuaValue.NIL;
-	PropertyPalette propPalette = new PropertyPalette(new String[] {"promptGui"}, Settings.settings);
+	PropertyPalette propPalette = new PropertyPalette(new String[] {"promptGui"});
 	private ListManager listItemPicker = new ListManager(5, 19, 30, 30, /*new WidgetID(800), "colors.promptGUI"*/ propPalette);
 	private ListManager choices = new ListManager(5, 19, 30, 30, /*new WidgetID(800), "colors.promptGUI"*/ propPalette);
 	private static ItemRenderer itemRenderer = Minecraft.getMinecraft().getItemRenderer();

@@ -15,6 +15,7 @@ import org.luaj.vm2_v3_0_1.Varargs;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
+import com.theincgi.advancedMacros.lua.LuaFunctions.Log;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
 
 import net.minecraft.block.Block;
@@ -696,6 +697,10 @@ public class Utils {
 		for(String s : keySet)
 			t.set(t.length()+1, s);
 		return t;
+	}
+	
+	public static void debugPrint( LuaTable t ) {
+		System.out.println( LuaTableToString(t) );
 	}
 	
 }

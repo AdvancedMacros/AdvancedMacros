@@ -26,7 +26,7 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	PropertyPalette propertyPalette;
 	
 	public GuiScrollBar(int x, int y, int wid, int len, Orientation or, String...propPath) {
-		this(x, y, wid, len, or, propPath.length==0 ? new PropertyPalette() : new PropertyPalette(propPath, Settings.settings));
+		this(x, y, wid, len, or, propPath.length==0 ? new PropertyPalette() : new PropertyPalette(propPath));
 	}
 	
 	public GuiScrollBar(int x, int y, int wid, int len, Orientation or, PropertyPalette propPal) {

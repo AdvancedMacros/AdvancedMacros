@@ -32,10 +32,10 @@ public class GuiDropDown implements Drawable, InputSubscriber, Moveable{
 	
 	
 	public GuiDropDown(int x, int y, int width, int height, int maxHeight, String...propPath) {
-		this(x, y, width, height, maxHeight, propPath.length==0? new PropertyPalette() : new PropertyPalette(propPath, Settings.settings));
+		this(x, y, width, height, maxHeight, propPath.length==0? new PropertyPalette() : new PropertyPalette(propPath));
 	}
-	public GuiDropDown(int x, int y, int width, int height, int maxHeight, LuaTable propHome, String...propPath) {
-		this(x, y, width, height, maxHeight, propPath.length==0? new PropertyPalette() : new PropertyPalette(propPath, propHome));
+	public GuiDropDown(int x, int y, int width, int height, int maxHeight) {
+		this(x, y, width, height, maxHeight, new PropertyPalette());
 	}
 	
 	public GuiDropDown(int x, int y, int width, int height, int maxHeight, PropertyPalette propertyPalette) {

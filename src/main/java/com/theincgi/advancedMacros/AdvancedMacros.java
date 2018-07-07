@@ -144,8 +144,9 @@ public class AdvancedMacros {
 			scriptBrowser2 = new ScriptBrowser2();
 			inputGUI = new InputGUI(debug);
 			runningScriptsGui = new RunningScriptsGui(debug);
+			Settings.save(); //changed order
 			Settings.getProfileList();//generate DEFAULT 
-			Settings.save();
+			
 			loadFunctions();
 			loadLibJars();
 			loadScripts();
@@ -250,6 +251,7 @@ public class AdvancedMacros {
 		globals.set("customizeSkin", new SkinCustomizer());
 		//globals.set("getVillages", new GetVillages());
 		globals.set("isKeyDown", new IsKeyHeld());
+		globals.set("getHeldKeys", new AdvancedMacros().forgeEventHandler.new GetHeldKeys());
 		globals.set("filesystem", new FileSystem());
 		globals.set("prompt", inputGUI.getPrompt());
 

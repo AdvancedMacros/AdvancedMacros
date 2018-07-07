@@ -19,7 +19,7 @@ import net.minecraft.client.gui.GuiTextField;
 
 public class EditorGUI extends Gui{
 
-	ColorTextArea cta = new ColorTextArea(this, Settings.settings, "editor");
+	ColorTextArea cta = new ColorTextArea(this, "editor");
 	GuiTextField gtf;
 	GuiButton save, exit, quickRun;
 	
@@ -36,7 +36,7 @@ public class EditorGUI extends Gui{
 		gtf.setCanLoseFocus(true);
 		
 		{
-			PropertyPalette p = new PropertyPalette(new String[] {"editor"}, Settings.settings);
+			PropertyPalette p = new PropertyPalette(new String[] {"editor"});
 			p.addColor(Color.TEXT_8, "saveButton", "colors", "frame");
 			p.addColor(Color.TEXT_8, "exitButton", "colors", "frame");
 			p.addColor(Color.TEXT_8, "runButton", "colors", "frame");
