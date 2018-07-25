@@ -142,7 +142,7 @@ public class CallableTable extends LuaTable{
 		return temp;
 	}
 	
-	public static JsonObject getDocJson() {
+	public static JsonObject getDocJson() { //TODO default to English on fail
 		String languageCode = Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage().getLanguageCode();
 		
 		if(languageCode.equals(selectedLanguageCode) && json != null)
