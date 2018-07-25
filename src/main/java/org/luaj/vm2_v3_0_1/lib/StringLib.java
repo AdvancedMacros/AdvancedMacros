@@ -474,7 +474,7 @@ public class StringLib extends TwoArgFunction {
 		
 		public void format(Buffer buf, double x) {
 			// TODO
-			buf.append( String.valueOf( x ) );
+			buf.append( String.format("%."+this.precision+"f", x ) );
 		}
 		
 		public void format(Buffer buf, LuaString s) {

@@ -702,5 +702,32 @@ public class Utils {
 	public static void debugPrint( LuaTable t ) {
 		System.out.println( LuaTableToString(t) );
 	}
+	public static String toMinecraftColorCodes(String text) {
+		char sel = '\u00A7';
+		String reset = sel+"r";
+		return reset + sel + "f" +
+			   text.replaceAll("&0", reset + sel + "0")
+				   .replaceAll("&1", reset + sel + "1")
+				   .replaceAll("&2", reset + sel + "2")
+				   .replaceAll("&3", reset + sel + "3")
+				   .replaceAll("&4", reset + sel + "4")
+				   .replaceAll("&5", reset + sel + "5")
+				   .replaceAll("&6", reset + sel + "6")
+				   .replaceAll("&7", reset + sel + "7")
+				   .replaceAll("&8", reset + sel + "8")
+				   .replaceAll("&9", reset + sel + "9")
+				   .replaceAll("&a", reset + sel + "a")
+				   .replaceAll("&b", reset + sel + "b")
+				   .replaceAll("&c", reset + sel + "c")
+				   .replaceAll("&d", reset + sel + "d")
+				   .replaceAll("&e", reset + sel + "e")
+				   .replaceAll("&f", reset + sel + "f")
+				   .replaceAll("&U",         sel + "n")
+				   .replaceAll("&B",         sel + "l")
+				   .replaceAll("&O",         sel + "k")
+				   .replaceAll("&S",         sel + "m")
+				   .replaceAll("&I",         sel + "o")
+				   ;
+	}
 	
 }

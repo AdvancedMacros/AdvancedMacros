@@ -71,6 +71,7 @@ import com.theincgi.advancedMacros.lua.functions.Toast;
 import com.theincgi.advancedMacros.lua.functions.midi.MidiLib2;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
 import com.theincgi.advancedMacros.misc.CustomFontRenderer;
+import com.theincgi.advancedMacros.misc.FontRendererOverride;
 import com.theincgi.advancedMacros.misc.JarLibSearcher;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.publicInterfaces.LuaPlugin;
@@ -92,7 +93,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "4.0.0"; //${version} ??
+	public static final String VERSION = "4.0.1"; //${version} ??
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -110,6 +111,7 @@ public class AdvancedMacros {
 	private static LuaDebug debug = new LuaDebug();
 	public static ForgeEventHandler forgeEventHandler;
 	public static final CustomFontRenderer customFontRenderer = new CustomFontRenderer();
+	public static FontRendererOverride otherCustomFontRenderer;
 	private static final DocumentationManager documentationManager = new DocumentationManager();
 	private JarLibSearcher jarLibSearcher;
 
@@ -137,6 +139,8 @@ public class AdvancedMacros {
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
+			otherCustomFontRenderer = new FontRendererOverride();
+			otherCustomFontRenderer.onResourceManagerReload(null);
 			//Utils.loadTextCodes();
 			macroMenuGui = new MacroMenuGui();
 			editorGUI = new EditorGUI();
@@ -204,6 +208,7 @@ public class AdvancedMacros {
 		LuaTable imgTools = new LuaTable();
 		imgTools.set("new", new BufferedImageControls.CreateImg());
 		imgTools.set("load", new BufferedImageControls.LoadImg());
+		imgTools.set("getFormats", new BufferedImageControls.GetFormats());
 		globals.set("image", imgTools);
 		//math tweaks
 		LuaTable math = globals.get("math").checktable();
@@ -275,7 +280,7 @@ public class AdvancedMacros {
 						if(f.getName().endsWith(".jar")) {
 							JarFile jarFile = new JarFile(f);
 							Enumeration<JarEntry> e = jarFile.entries();
-							URL[] urls = { new URL("jar:file:" + f.getPath() +"!/" )};
+							URL[] urls = { new URL("jar:file:" + f.getPath().replace('\\', '/') +"!/" )};
 							URLClassLoader cl = URLClassLoader.newInstance(urls, LuaPlugin.class.getClassLoader());
 							
 							while(e.hasMoreElements()) {

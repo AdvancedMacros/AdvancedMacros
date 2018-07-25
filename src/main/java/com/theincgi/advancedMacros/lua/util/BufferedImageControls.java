@@ -43,6 +43,21 @@ public class BufferedImageControls extends LuaTable{
 			}
 		}
 	}
+	public static class GetFormats extends ZeroArgFunction {
+		@Override
+		public LuaValue call() {
+			LuaTable out = new LuaTable();
+			LuaTable temp = new LuaTable();
+			for(String s : ImageIO.getReaderFormatNames())
+				temp.set(temp.length()+1, s);
+			out.set("readers", temp);
+			temp = new LuaTable();
+			for(String s : ImageIO.getWriterFormatNames())
+				temp.set(temp.length()+1, s);
+			out.set("writers", temp);
+			return out;
+		}
+	}
 	
 	
 	public BufferedImageControls(BufferedImage img) {
@@ -107,5 +122,11 @@ public class BufferedImageControls extends LuaTable{
 			}
 		});
 		
+		
+		
+	}
+	
+	public BufferedImage getImg() {
+		return img;
 	}
 }
