@@ -496,7 +496,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	}
 
 	private static final String quoteRegEx = "(\"[^\"]*\")|('[^\']*')|(\\[\\[.*?\\]\\])";
-	private static final String variableRegEx = "([_a-zA-Z]+[_a-zA-Z0-9]*(\\[[0-9]+\\])?(\\.{1})?)+";
+	private static final String variableRegEx = "([_a-zA-Z]+[_a-zA-Z0-9]*(\\[[0-9]+\\])?([\\.:]{1})?)+";
 	private Pattern variablePattern = Pattern.compile(variableRegEx);
 
 
@@ -529,14 +529,14 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 			Matcher matcher = variablePattern.matcher(line);
 
 			while(matcher.find()){
-				String m = matcher.group();
+				String m = matcher.group().replace(':', '.');
 
 				int start = matcher.start();
 				int end   = matcher.end();
 
 				if(sLine==hoverCursor.getY()) {
 					if(start<=hoverCursor.getX() && hoverCursor.getX()<end)
-						hoverWord = line.substring(start, end);
+						hoverWord = line.substring(start, end).replace(':', '.');
 				}
 
 				//System.out.printf("Found: %s [%4d - %4d]\n", m, start,end);
@@ -703,7 +703,8 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 
 	@Override
 	public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
-		if(hBar.onMouseClick(gui, x, y, buttonNum)){return textChanged=true;}if(vBar.onMouseClick(gui, x, y, buttonNum)){return textChanged=true;}
+		if(hBar.onMouseClick(gui, x, y, buttonNum)){return textChanged=true;}
+		if(vBar.onMouseClick(gui, x, y, buttonNum)){return textChanged=true;}
 		if(GuiRect.isInBounds(x, y, this.x, this.y, this.wid, this.hei)) {
 			//if(x>this.x && x<this.x+this.wid && y> this.y && y<this.y+this.wid){
 			setFocused(true);
@@ -1259,13 +1260,13 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		LuaValue sKey = t.next(LuaValue.NIL).arg1();
 		LuaValue sVal = t.get(sKey);
 		while(!sKey.isnil()){ //while there is a key in next()
-			if(sVal.type()==luaValType){ //if the value matches the type we want
+			if(sVal.type()==luaValType && !sKey.isnumber()){ //if the value matches the type we want
 				vars.put(tmp+(tmp.length()>0?".":"") + sKey.tojstring(), sVal); //add it to output
 				//System.out.println(tmp+(tmp.length()>0?".":"") + sKey.tojstring());
 			}
 			if(checkTables && sVal.istable() && !added.getOrDefault(sVal, false)){
 				String tmp2 = "";
-				if(sKey.isint()){
+				if(sKey.isnumber()){
 					//					if(tmp.length()==0){
 					//						tmp2 = "_G["+sVal.tojstring()+"].";
 					//					}else{
@@ -1274,7 +1275,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 				}else{
 					tmp2 = tmp+(tmp.length()>0?".":"") + sKey.tojstring();
 				}
-				if(!sKey.isint())
+				if(!sKey.isnumber())
 					vars.putAll(getVariableList(sVal.checktable(), luaValType, checkTables, tmp2, added));
 			}
 			sKey = t.next(sKey).arg1();

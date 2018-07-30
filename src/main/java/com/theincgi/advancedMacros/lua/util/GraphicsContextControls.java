@@ -2,6 +2,10 @@ package com.theincgi.advancedMacros.lua.util;
 
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.image.BufferedImage;
 
 import org.luaj.vm2_v3_0_1.LuaError;
@@ -10,7 +14,9 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
+import com.google.common.base.FinalizableWeakReference;
 import com.theincgi.advancedMacros.gui.Color;
+import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Utils;
 
 public class GraphicsContextControls extends LuaTable{
@@ -25,14 +31,14 @@ public class GraphicsContextControls extends LuaTable{
 		//setColor
 		//draw/fill rect, 
 
-		g.draw
 		//destroy
 	}
 
 
 	private void loadFuncs() {
 		for(Draw op : Draw.values()) {
-			this.set(op.name(), new DrawOp(op));
+			String[] docLocation = op.getDocLocation();
+			this.set(op.name(), new CallableTable(docLocation, new DrawOp(op)));
 		}
 	}
 
@@ -53,13 +59,13 @@ public class GraphicsContextControls extends LuaTable{
 					args = args.subargs(2);
 					switch (args.narg()) {
 					case 2:
-						g.drawImage(bic.getImg(), args.arg(1).checkint(), args.arg(2).checkint(), null);
+						g.drawImage(bic.getImg(), args.arg(1).checkint()-1, args.arg(2).checkint()-1, null);
 						return NONE;
 					case 4:
-						g.drawImage(bic.getImg(), args.checkint(1), args.checkint(2), //dest x, y 1
-								                  args.checkint(3), args.checkint(4), //dest x, y 2
-								                  args.checkint(5), args.checkint(6), //source x, y 1
-								                  args.checkint(7), args.checkint(8), null);  //source x, y 2
+						g.drawImage(bic.getImg(), args.checkint(1)-1, args.checkint(2)-1, //dest x, y 1
+								args.checkint(3)-1, args.checkint(4)-1, //dest x, y 2
+								args.checkint(5)-1, args.checkint(6)-1, //source x, y 1
+								args.checkint(7)-1, args.checkint(8)-1, null);  //source x, y 2
 						return NONE;
 					default:
 						throw new LuaError("Unexpected argument count, 3 or 5, got "+(args.narg()+1));
@@ -71,132 +77,236 @@ public class GraphicsContextControls extends LuaTable{
 			case destroy: //aka dispose
 				g.dispose();
 				return NONE;
-				
+
 			case setColor: {
 				g.setColor(Utils.parseColor(args).toAWTColor());
 				return NONE;
 			}
 			case translate:
-				g.translate(args.checkint(1), args.checkint(2));
+				g.translate(args.checkint(1), args.checkint(2));//TODO 1 index?
 				return NONE;
-				
+
 			case clipRect:
-				g.clipRect(args.checkint(1), args.checkint(2), //x, y
-					       args.checkint(3), args.checkint(4)); //width, height
+				g.clipRect(args.checkint(1)-1, args.checkint(2)-1, //x, y
+						args.checkint(3)-1, args.checkint(4)-1); //width, height
 				return NONE;
 			case getColor:
 				return new Color(g.getColor().getRGB()).toLuaValue();
-				
+
 			case setPaintMode:
 				g.setPaintMode();
 				return NONE;
-				
+
 			case setXORMode:
 				g.setXORMode(Utils.parseColor(args).toAWTColor());
 				return NONE;
-				
+
 			case getFont:{
 				Font f = g.getFont();
 				LuaTable out = new LuaTable();
 				out.set("name", f.getFamily());
 				out.set("size", f.getSize());
-				out.set("isBold",   LuaValue.valueOf(f.isBold()));
-				out.set("isItalic", LuaValue.valueOf(f.isItalic()));
+				out.set("bold",   LuaValue.valueOf(f.isBold()));
+				out.set("italic", LuaValue.valueOf(f.isItalic()));
 				return out; //TODO font measurments
 			}
-			case setFont:
+			case setFont:{
 				//TODO table arg and vararg name, <size>, <bold>, <italic>
-				throw new LuaError("Unimplemented");
-			case getFonts:
-				
-			case getClipBounds:
-				throw new LuaError("Unimplemented");
-				
-			case setClip:
-				throw new LuaError("Unimplemented");
-				
-			case getClip:
-				throw new LuaError("Unimplemented");
-				
+				Font f = null;
+				switch(args.narg()) {
+				case 1:
+					if(args.istable(1)) {
+						LuaTable t = args.arg1().checktable();
+						int flag = t.get("bold").optboolean(false)? Font.BOLD : Font.PLAIN;
+						flag = t.get("italic").optboolean(false)? flag | Font.ITALIC : flag;
+						f = new Font(t.get("name").checkjstring(), flag, t.get("size").optint(12)); //default size 12
+						throw new LuaError("Unimplemented"); //TODO
+					}else{
+						f = Font.getFont(args.checkjstring(1));
+					}
+					break;
+				case 2:
+					f = new Font(args.checkjstring(1), Font.PLAIN, args.checkint(2)); //name, size
+					break;
+				case 3:
+				case 4:
+					int flag = args.optboolean(3, false)? Font.BOLD : Font.PLAIN;
+					flag = args.optboolean(4, false)? flag | Font.ITALIC : flag;
+					f = new Font(args.checkjstring(1), flag, args.checkint(2)); //name, size
+				default:
+					throw new LuaError("Unexpected number of arguments");
+				}
+				g.setFont(f);
+				return NONE;
+			}
+			case getFonts:{
+				LuaTable fonts = new LuaTable();
+				GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+				for (Font font : ge.getAllFonts()) {
+					if(!font.getFontName().toLowerCase().contains("italic") && !font.getFontName().toLowerCase().contains("bold"))
+						fonts.set(fonts.length()+1, font.getFontName());
+				}
+				return fonts;
+			}
+			//case getClipRect:
+			//case getClipBounds:
+			case getClip:{
+
+
+				Rectangle rect = g.getClipBounds();
+				LuaTable out = new LuaTable();
+				out.set(1, LuaValue.valueOf(rect.x     +1));
+				out.set(2, LuaValue.valueOf(rect.y     +1));
+				out.set(3, LuaValue.valueOf(rect.width   ));
+				out.set(4, LuaValue.valueOf(rect.height  ));
+				return out.unpack();
+			}
+
+			case setClip:{
+				Rectangle rect = new Rectangle(args.checkint(1)-1, args.checkint(2)-1, args.checkint(3), args.checkint(4)); //x,y,wid,hei
+				g.setClip(rect);
+				return NONE;
+			}
+
 			case copyArea:
-				throw new LuaError("Unimplemented");
-				
+				g.copyArea(args.checkint(1)-1, args.checkint(2)-1, //x, y
+						args.checkint(3), args.checkint(4), //width, height
+						args.checkint(5)-1, args.checkint(6)-1);//dx, dy
+				return NONE;
+
 			case drawLine:
-				throw new LuaError("Unimplemented");
-				
+				g.drawLine(args.checkint(1)-1, args.checkint(2)-1, //x1, y1
+						args.checkint(3)-1, args.checkint(4)-1);//x2, y1
+				return NONE;
+
 			case fillRect:
-				throw new LuaError("Unimplemented");
-				
+				g.fillRect(args.checkint(1)-1, args.checkint(2)-1,  //x, y
+						args.checkint(3), args.checkint(4)); //width, height
+				return NONE;
+
 			case drawRect:
-				throw new LuaError("Unimplemented");
-				
+				g.drawRect(args.checkint(1)-1, args.checkint(2)-1,  //x, y
+						args.checkint(3), args.checkint(4)); //width, height
+				return NONE;
+
 			case clearRect:
-				throw new LuaError("Unimplemented");
-				
+				g.clearRect(args.checkint(1)-1, args.checkint(2)-1,  //x, y
+						args.checkint(3), args.checkint(4)); //width, height
+				return NONE;
+
 			case drawRoundRect:
-				throw new LuaError("Unimplemented");
-				
+				g.drawRoundRect(args.checkint(1)-1, args.checkint(2)-1, //x, y
+						args.checkint(3), args.checkint(4), //width, height
+						args.checkint(5), args.checkint(6));//arcWidth, arcHeight
+				return NONE;
+
 			case fillRoundRect:
-				throw new LuaError("Unimplemented");
-				
+				g.fillRoundRect(args.checkint(1)-1, args.checkint(2)-1, //x, y
+						args.checkint(3), args.checkint(4), //width, height
+						args.checkint(5), args.checkint(6));//arcWidth, arcHeight
+				return NONE;
+
 			case draw3DRect:
-				throw new LuaError("Unimplemented");
-				
+				g.draw3DRect(args.checkint(1)-1, args.checkint(2)-1,  //x, y
+						args.checkint(3), args.checkint(4), //width, height
+						args.checkboolean(5)); //raised);
+				return NONE;
+
 			case fill3DRect:
-				throw new LuaError("Unimplemented");
-				
+				g.fill3DRect(args.checkint(1)-1, args.checkint(2)-1,  //x, y
+						args.checkint(3), args.checkint(4), //width, height
+						args.checkboolean(5)); //raised);
+				return NONE;
+
 			case drawOval:
-				throw new LuaError("Unimplemented");
-				
+				g.drawOval(args.checkint(1)-1, args.checkint(2)-1,  //x, y
+						args.checkint(3), args.checkint(4)); //width, height
+				return NONE;
+
 			case fillOval:
-				throw new LuaError("Unimplemented");
-				
+				g.fillOval(args.checkint(1)-1, args.checkint(2)-1,  //x, y
+						args.checkint(3), args.checkint(4)); //width, height
+				return NONE;
+
 			case drawArc:
-				throw new LuaError("Unimplemented");
-				
+				g.drawArc(args.checkint(1)-1, args.checkint(2)-1, //x, y
+						args.checkint(3), args.checkint(4), //width, height
+						args.checkint(5), args.checkint(6));//arcStart, arcEnd
+				return NONE;
+
 			case fillArc:
-				throw new LuaError("Unimplemented");
-				
-			case drawPolyline:
-				throw new LuaError("Unimplemented");
-				
-			case drawPolygon:
-				throw new LuaError("Unimplemented");
-				
-			case fillPolygon:
-				throw new LuaError("Unimplemented");
-				
+				g.fillArc(args.checkint(1)-1, args.checkint(2)-1, //x, y
+						args.checkint(3), args.checkint(4), //width, height
+						args.checkint(5), args.checkint(6));//arcStart, arcEnd
+				return NONE;
+			case drawPolyline: {
+				int[] xPoints, yPoints;
+				LuaTable points = args.checktable(1);
+				xPoints = new int[points.length()];
+				yPoints = new int[points.length()];
+				for(int i = 1; i <= points.length(); i++) {
+					xPoints[i-1] = points.get(1).checkint()-1;
+					yPoints[i-1] = points.get(2).checkint()-1;
+				}
+				g.drawPolyline(xPoints, yPoints, xPoints.length);
+				return NONE;
+			}
+			case drawPolygon: {
+				int[] xPoints, yPoints;
+				LuaTable points = args.checktable(1);
+				xPoints = new int[points.length()];
+				yPoints = new int[points.length()];
+				for(int i = 1; i <= points.length(); i++) {
+					xPoints[i-1] = points.get(1).checkint()-1;
+					yPoints[i-1] = points.get(2).checkint()-1;
+				}
+				g.drawPolygon(new Polygon(xPoints, yPoints, xPoints.length));
+				return NONE;
+			}
+			case fillPolygon:{
+				int[] xPoints, yPoints;
+				LuaTable points = args.checktable(1);
+				xPoints = new int[points.length()];
+				yPoints = new int[points.length()];
+				for(int i = 1; i <= points.length(); i++) {
+					xPoints[i-1] = points.get(1).checkint()-1;
+					yPoints[i-1] = points.get(2).checkint()-1;
+				}
+				g.fillPolygon(new Polygon(xPoints, yPoints, xPoints.length));
+				return NONE;
+			}	
 			case drawString:
-				throw new LuaError("Unimplemented");
-				
-			case drawChars:
-				throw new LuaError("Unimplemented");
-				
-			case drawBytes:
-				throw new LuaError("Unimplemented");
-				
-			case getClipRect:
-				throw new LuaError("Unimplemented");
-				
-			case hitClip:
-				throw new LuaError("Unimplemented");
+				g.drawString(args.checkjstring(1), args.checkint(2)-1, args.checkint(3)-1);
+				return NONE;
+				//			case drawChars:
+				//				throw new LuaError("Unimplemented");
+
+				//			case drawBytes:
+				//				throw new LuaError("Unimplemented");
+
+
+
+				//			case hitClip:
+				//				throw new LuaError("Unimplemented");
 				//			case equals:
 				//			  throw new LuaError("Unimplemented");
-			case hashCode:
-				throw new LuaError("Unimplemented");;
-
+				//			case hashCode:
+				//				return LuaValue.valueOf(img.hashCode());
+			default:
+				throw new LuaError("Undefined action for opperation '"+op.name()+"'");
 			}
 		}
 	}
 	public static enum Draw {
 		//getFontMetrics, 
 		drawImage, 
-		hashCode, 
+		//		hashCode, 
 		destroy, 
-		hitClip, 
-		getClipRect, 
-		drawBytes, 
-		drawChars, 
+		//		hitClip, 
+		//getClipRect, 
+		//		drawBytes, 
+		//		drawChars, 
 		drawString, 
 		fillPolygon, 
 		drawPolygon, 
@@ -219,12 +329,57 @@ public class GraphicsContextControls extends LuaTable{
 		fillOval, 
 		getFont, 
 		setFont, 
-		getClipBounds, 
+		//getClipBounds, 
 		setClip, 
 		getClip, 
 		fillRect, 
 		drawRect, 
 		drawRoundRect
 		//equals, 
+		, getFonts;
+
+		public String[] getDocLocation() {
+			//image.new.___
+			String[] arr = new String[3];
+			arr[0] = "image";
+			arr[1] = "new";
+			switch (this) {
+			case getFonts:
+				arr[2] = "getFonts";
+				return arr;
+			case clearRect:
+			case clipRect:
+			case copyArea:
+			case destroy:
+			case draw3DRect:
+			case drawArc:
+			case drawImage:
+			case drawLine:
+			case drawOval:
+			case drawPolygon:
+			case drawPolyline:
+			case drawRect:
+			case drawRoundRect:
+			case drawString:
+			case fill3DRect:
+			case fillArc:
+			case fillOval:
+			case fillPolygon:
+			case fillRect:
+			case fillRoundRect:
+			case getClip:
+			case getColor:
+			case getFont:
+			
+			case setClip:
+			case setColor:
+			case setFont:
+			case setPaintMode:
+			case setXORMode:
+			case translate:
+			default:
+				return null;
+			}
+		}
 	}
 }

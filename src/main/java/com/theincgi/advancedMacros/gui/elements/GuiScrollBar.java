@@ -194,7 +194,7 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 			return (mouseX >= x+1 && 
 					x-1+wid >= mouseX && 
 					mouseY >= buttonY && 
-					y + buttonLen >=mouseY);
+					buttonY + buttonLen >=mouseY);
 		}
 		return mouseX >= getButtonX() && mouseX <= getButtonX()+getButtonLen() && mouseY >= y+1 && mouseY+1 <= y+wid-1;
 	}

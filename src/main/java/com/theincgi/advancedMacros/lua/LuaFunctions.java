@@ -105,6 +105,7 @@ public class LuaFunctions {
 				Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(formatString(arg0));
 			}catch (Throwable e) {
 				//prob tried to log without chat
+				e.printStackTrace();
 			}
 			return LuaValue.NONE;
 		}
@@ -215,7 +216,12 @@ public class LuaFunctions {
 		f+="&f}";
 		return f;
 	} 
-	private static String formatTableForLog(LuaTable t, LinkedList<LuaTable> antiR, int indent){
+	
+	public static boolean tableContainsKeys(LuaTable table) {
+		return !table.next(LuaValue.NIL).arg1().isnil();
+	}
+	
+	private static String formatTableForLog(LuaTable t, LinkedList<LuaTable> antiR, int indent){ //TODO optamize with StringBuilder
 		String s = "";
 		for(LuaValue k : t.keys()){
 			LuaValue v = t.get(k);
@@ -224,10 +230,29 @@ public class LuaFunctions {
 					//repeat subTable
 					s+=rep(" ",indent)+"&f[&c"+k.tojstring()+"&f] = <&4RECURSIVE&f> &e"+v.tojstring()+"&f{&4...&f}\n";
 				}else{
-					antiR.add(v.checktable());
-					s+=rep(" ",indent)+"&f[&c"+k.tojstring()+"&f] = &e"+v.tojstring()+" &f{\n"; //TODO remove \n if no keys of any type
-					s+=formatTableForLog(v.checktable(), antiR, indent+2);
-					s+=rep(" ",indent)+"&f}\n";
+					LuaTable vTab = v.checktable();
+					if(vTab.get("__luaFunction").optboolean(false)) {
+						s+=rep(" ",indent)+"&f[&c"+k.tojstring()+"&f] = &b"+v.tojstring();
+						if(tableContainsKeys(vTab)){
+							s+=" &f{\n";
+							s+=formatTableForLog(vTab, antiR, indent+2);
+							s+=rep(" ",indent)+"&f}\n";
+						}else {
+							s+=" &f{}\n";
+						}
+					}else {
+						antiR.add(vTab);
+						s+=rep(" ",indent)+"&f[&c"+k.tojstring()+"&f] = &e"+v.tojstring(); //TODO remove \n if no keys of any type
+						if(tableContainsKeys(vTab)) {
+							s+=" &f{\n";
+							s+=formatTableForLog(vTab, antiR, indent+2);
+							s+=rep(" ",indent)+"&f}\n";
+						}else {
+							s+=" &f{}\n";
+						}
+					}
+					
+					
 				}
 			}else{
 				s+=rep(" ",indent)+"&f[&c"+k.tojstring()+"&f] = &b";
@@ -239,6 +264,11 @@ public class LuaFunctions {
 				}
 				s+="\n";
 			}
+		}
+		if(t.getmetatable()!=null && t.getmetatable().istable()) {
+			s+=rep(" ",indent)+"&f[&dmetatable&f] = &d"+t.getmetatable().tojstring()+" &f{\n";
+			s+=formatTableForLog(t.getmetatable().checktable(), antiR, indent+4);
+			s+=rep(" ",indent)+"&f}\n";
 		}
 		return s;
 	}

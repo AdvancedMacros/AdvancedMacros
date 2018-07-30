@@ -216,7 +216,7 @@ public abstract class WorldHudItem {
 	}
 	private class GetPos extends VarArgFunction{
 		@Override
-		public Varargs invoke() {
+		public Varargs invoke(Varargs args) {
 			LuaTable table = new LuaTable();
 			table.set(1, LuaValue.valueOf(WorldHudItem.this.getX()));
 			table.set(2, LuaValue.valueOf(WorldHudItem.this.getY()));
@@ -226,7 +226,7 @@ public abstract class WorldHudItem {
 	}
 	private class GetRot extends VarArgFunction{
 		@Override
-		public Varargs invoke() {
+		public Varargs invoke(Varargs args) {
 			LuaTable table = new LuaTable();
 			table.set(1, LuaValue.valueOf(WorldHudItem.this.getYaw()));
 			table.set(2, LuaValue.valueOf(WorldHudItem.this.getPitch()));

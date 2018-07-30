@@ -121,7 +121,7 @@ public class BufferedImageControls extends LuaTable{
 				return temp.unpack();
 			}
 		});
-		
+		set("graphics", new GraphicsContextControls(img));
 		
 		
 	}

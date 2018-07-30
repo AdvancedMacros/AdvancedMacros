@@ -473,7 +473,7 @@ public class StringLib extends TwoArgFunction {
 		}
 		
 		public void format(Buffer buf, double x) {
-			// TODO
+			//todo completed by TheINCGI via java's String format
 			buf.append( String.format("%."+this.precision+"f", x ) );
 		}
 		

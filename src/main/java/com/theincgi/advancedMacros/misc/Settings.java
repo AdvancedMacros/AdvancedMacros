@@ -51,6 +51,8 @@ public class Settings {
 		settings.set("textures", textures);
 		settings.set("save", new Save());
 		settings.set("load", new Load());
+		if(settings.get("chatMaxLines").isnil())
+			settings.set("chatMaxLines", LuaValue.valueOf(100));
 	}
 	//	private static void loadDefaults(boolean force) {
 	//		

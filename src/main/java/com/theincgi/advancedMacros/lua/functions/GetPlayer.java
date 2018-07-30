@@ -32,7 +32,12 @@ public class GetPlayer extends OneArgFunction {
 	}
 
 	public static LuaTable entityPlayerToTable(EntityPlayer player) {
-		LuaTable t = new LuaTable();
+		LuaTable t = new LuaTable() {
+			@Override
+			public LuaValue getmetatable() {
+				return NIL;
+			}
+		};
 		t.set("name", player.getName());
 		t.set("inventory", Utils.inventoryToTable(player.inventory, !(player instanceof EntityPlayerSP)));
 		{
@@ -124,6 +129,7 @@ public class GetPlayer extends OneArgFunction {
 			}
 		}
 		t.set("gamemode", player.isSpectator()?"spectator":player.isCreative()?"creative":"survival");
+		
 		
 		LuaTable meta = new LuaTable();
 		LuaFunction func = new ThreeArgFunction() {

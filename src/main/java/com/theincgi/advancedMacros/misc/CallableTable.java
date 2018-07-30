@@ -35,15 +35,18 @@ public class CallableTable extends LuaTable{
 	public CallableTable(String[] docName, LuaFunction function) {
 		this.docName = docName;
 		this.function = function;
+		this.set("__luaFunction", TRUE);
 		//meta = new LuaTable();
 		//this.setmetatable(meta);
-
+		if (docName == null) {
+			return;
+		}
 		//meta.set("__call", function);
 		this.set("definition", getJsonDefinition());
 		this.set("tooltip",    getJsonTooltip());
 		this.set("luaDoc",     getJsonLuaDoc());
 		this.set("argTypes",   getJsonArgTypes());
-		this.set("__luaFunction", TRUE);
+		
 	}
 
 	@Override
@@ -53,16 +56,16 @@ public class CallableTable extends LuaTable{
 
 	@Override
 	public String tojstring() {
-		return tostring().checkjstring();
+		return (tostring().isnil())? "tableFunction( ? )" : tostring().checkjstring();
 	}
 	@Override
 	public LuaValue tostring() {
 		return (this.get("definition").isnil())? super.tostring() : this.get("definition");
 	}
 	public LuaValue getJsonTooltip() {
-		JsonObject jObj = getObjectFromJson(docName);
-		if(jObj.has("tooltip")) {
-			jObj = jObj.get("tooltip").getAsJsonObject();
+		JsonElement jObj = getObjectFromJson(docName);
+		if(jObj.isJsonObject() && jObj.getAsJsonObject().has("tooltip")) {
+			jObj = jObj.getAsJsonObject().get("tooltip");
 			if(jObj.isJsonArray()) {
 				JsonArray jArr = jObj.getAsJsonArray();
 				LuaTable out = new LuaTable();
@@ -77,9 +80,9 @@ public class CallableTable extends LuaTable{
 			return NIL;
 	}
 	public LuaValue getJsonLuaDoc() {
-		JsonObject jObj = getObjectFromJson(docName);
-		if(jObj.has("luaDoc")) {
-			jObj = jObj.get("luaDoc").getAsJsonObject();
+		JsonElement jObj = getObjectFromJson(docName);
+		if(jObj.isJsonObject() && jObj.getAsJsonObject().has("luaDoc")) {
+			jObj = jObj.getAsJsonObject().get("luaDoc").getAsJsonObject();
 			if(jObj.isJsonArray()) {
 				JsonArray jArr = jObj.getAsJsonArray();
 				LuaTable out = new LuaTable();
@@ -94,9 +97,9 @@ public class CallableTable extends LuaTable{
 			return NIL;
 	}
 	public LuaValue getJsonArgTypes() {
-		JsonObject jObj = getObjectFromJson(docName);
-		if(jObj.has("types")) {
-			jObj = jObj.get("types").getAsJsonObject();
+		JsonElement jObj = getObjectFromJson(docName);
+		if(jObj.isJsonObject() && jObj.getAsJsonObject().has("types")) {
+			jObj = jObj.getAsJsonObject().get("types");
 			if(jObj.isJsonArray()) {
 				JsonArray jArr = jObj.getAsJsonArray();
 				LuaTable out = new LuaTable();
@@ -122,9 +125,9 @@ public class CallableTable extends LuaTable{
 	public LuaValue getJsonDefinition() {
 		JsonObject jObj = getObjectFromJson(docName);
 		if(jObj.has("definition")) {
-			jObj = jObj.get("definition").getAsJsonObject();
-			if(jObj.isJsonPrimitive()) {
-				return LuaString.valueOf( jObj.getAsString() );
+			JsonElement je = jObj.get("definition");
+			if(je.isJsonPrimitive()) {
+				return LuaString.valueOf( je.getAsString() );
 			}else
 				return LuaString.valueOf("err: invalid input");
 		}else
@@ -133,7 +136,7 @@ public class CallableTable extends LuaTable{
 	
 	
 	public static JsonObject getObjectFromJson(String[] path) {
-		JsonObject temp = json;
+		JsonObject temp = getDocJson();
 		for(String s : path)
 			if(temp.has(s))
 				temp = temp.get(s).getAsJsonObject();
@@ -142,20 +145,30 @@ public class CallableTable extends LuaTable{
 		return temp;
 	}
 	
-	public static JsonObject getDocJson() { //TODO default to English on fail
-		String languageCode = Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage().getLanguageCode();
-		
+	public static String getCurrentLanguage() {
+		return Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage().getLanguageCode();
+	}
+	public static JsonObject getDocJson() {
+		return getDocJson( getCurrentLanguage() );
+	}
+	/**defaults to en_us if it cant load any other files, null otherwise*/
+	public static JsonObject getDocJson( String languageCode ) { //TODO default to English on fail
 		if(languageCode.equals(selectedLanguageCode) && json != null)
 			return json;
 		
 		try(
-				InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "docs/"+languageCode+".lang")).getInputStream();
+				InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "newdocs/"+languageCode+".lang")).getInputStream();
 				BufferedReader reader = new BufferedReader(new InputStreamReader(in));){
 			Gson g = new Gson();
 			JsonElement je = g.fromJson(reader, JsonElement.class);
-			return je.getAsJsonObject();
+			return json = je.getAsJsonObject();
 		}catch(Exception e) {
-			return null;
+			if(!languageCode.equals( "en_us" ))
+				return json = getDocJson("en_us");
+			else {
+				e.printStackTrace();
+				return json = null;
+			}
 		}finally {
 			selectedLanguageCode = languageCode;
 		}

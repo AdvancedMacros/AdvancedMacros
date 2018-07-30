@@ -1,0 +1,30 @@
+{
+    "hud2D": {
+        "addText": {
+            "tooltip": [
+                "Returns a text object with functions in it",
+                "Example: hud2D.addText(...).setText(\"Hello!\")"
+            ]
+        },
+        "addText().setText": {
+            "tooltip": [
+                "Sets the text content of the object"
+            ]
+        }
+    },
+    "print": {
+        "tooltip": [
+            "Prints the text given into the function into the Minecraft console",
+            "To show text in the chat, use log(...)"
+        ]
+    },
+    "image": {
+        "new": {
+            "getFonts": {
+                "definition": "getFonts",
+                "tooltip": "Gets a list of available fonts",
+                "types": []
+            }
+        }
+    }
+}
