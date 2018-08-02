@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
+import org.lwjgl.opengl.GL11;
 
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
@@ -153,8 +154,13 @@ public class GuiButton extends GuiRect implements InputSubscriber, Focusable{
 		//shade.scale(getScale());
 		
 		super.onDraw(gui, mouseX, mouseY, partialTicks);
-		if(texture!=null)
+		if(texture!=null) {
+			
+//			GL11.glDisable(GL11.GL_ALPHA_TEST);
+//			GL11.glDepthMask(false);
+//			GL11.glDisable(GL11.GL_LIGHTING);
 			gui.drawImage(texture.getResourceLocation(), getDrawX()+1, getDrawY()+1, getDrawWid()-1, getDrawHei()-1, 0, 0, 1, 1);
+		}
 		if(isInBounds(mouseX, mouseY) && isEnabled){
 			drawShade(gui);
 		}

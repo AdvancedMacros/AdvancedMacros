@@ -93,7 +93,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "4.1.0"; //${version} ?? //previously .1
+	public static final String VERSION = "4.1.1a"; //${version} ?? //previously .1
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");

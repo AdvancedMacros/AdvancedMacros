@@ -10,6 +10,7 @@ import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
+import org.lwjgl.opengl.GL11;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.ForgeEventHandler;
@@ -33,6 +34,7 @@ import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 
 public class MacroMenuGui extends Gui{
 	//BufferedImage img = null;
@@ -41,7 +43,7 @@ public class MacroMenuGui extends Gui{
 	private String propAddress = "colors.bindingsMenu";
 
 	//GuiDropDown profileSelect = new GuiDropDown(new WidgetID(1), 5, 5, width-23, 12, 12*7, propAddress);
-	GuiDropDown profileSelect = new GuiDropDown(5, 5, width-23, 12, 12*7, "bindingsMenu", "profileSelect");
+	GuiDropDown profileSelect = new GuiDropDown(5, 5, width-22, 12, 12*7, "bindingsMenu", "profileSelect");
 	GuiButton   addProfile    = new GuiButton(width-22, 5, 12, 12, Settings.getTextureID("resource:whiteplus.png"), LuaValue.NIL, "bindingsMenu","addProfileButton");
 	//GuiButton   addProifle    = new GuiButton(new WidgetID(2),   width-22, 5, 12, 12, Settings.getTextureID("resource:whiteplus.png"), LuaValue.NIL, propAddress, Color.BLACK, com.theincgi.advancedMacros.gui.Color.WHITE, Color.WHITE);
 	//GuiButton removeProifle   = new GuiButton(new WidgetID(3),   width-22, 5, 12, 12, Settings.getTextureID("resource:trashcan.png"), LuaValue.NIL, propAddress, Color.BLACK, com.theincgi.advancedMacros.gui.Color.WHITE, Color.WHITE);
@@ -49,6 +51,7 @@ public class MacroMenuGui extends Gui{
 	//GuiButton addBinding       = new GuiButton(new WidgetID(4),   5, 17, 36, 12, Settings.getTextureID("resource:whitenewbinding.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE);
 	GuiButton addBinding       = new GuiButton(5, 17, 36, 12, Settings.getTextureID("resource:whitenewbinding.png"), LuaValue.NIL, "bindingsMenu", "addBindingButton");
 	GuiButton showScriptManager=new GuiButton(41, 17, 36, 12, Settings.getTextureID("resource:whitescripts.png"), LuaValue.NIL, "bindingsMenu", "scriptManagerButton");
+	//whitescripts
 	//GuiButton showScriptManager=new GuiButton(new WidgetID(5), 41, 17, 36, 12, Settings.getTextureID("resource:whitescripts.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE); //file browser thing, no folders tho, all macros are in /macros, this will be sepereate gui housing the script manager
 	//GuiButton gotoSettings	  = new GuiButton(new WidgetID(6), width-5-36, 17, 36, 12, Settings.getTextureID("resource:whitesettings.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.BLACK);
 	Prompting prompting;
@@ -341,7 +344,7 @@ public class MacroMenuGui extends Gui{
 		//gotoSettings.setPos(width-5-36, 17);
 		bindingsList.setWidth(w-24);
 		//gotoSettings.setPos(12*6+5, 17);
-		profileSelect.setPos(6, 5);
+		profileSelect.setPos(5, 5);
 		profileSelect.setWidth(w-35);
 		bindingsList.setWidth(width-10);
 		bindingsList.setHeight(h-15-24);
@@ -389,9 +392,12 @@ public class MacroMenuGui extends Gui{
 	//	GuiButton button9  = new GuiButton(new WidgetID(9), 0, 0, 40, 20, LuaValue.NIL, LuaValue.valueOf("Blah9"), null);
 	//	GuiButton button10 = new GuiButton(new WidgetID(9), 0, 0, 40, 20, LuaValue.NIL, LuaValue.valueOf("Blah10"),null);
 	//	
-
+	
+	
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+		
+		
 		for(Moveable m: bindingsList.getItems()){
 			if(m instanceof GuiBinding){
 				GuiBinding b = ((GuiBinding) m);
@@ -403,8 +409,6 @@ public class MacroMenuGui extends Gui{
 		onResize(Minecraft.getMinecraft(), width, height);
 		//gb.setWidth(width-10);
 		super.drawScreen(mouseX, mouseY, partialTicks);
-
-
 	}
 
 	public static void updateScriptList(){

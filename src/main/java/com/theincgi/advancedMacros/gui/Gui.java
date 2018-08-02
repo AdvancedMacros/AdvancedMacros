@@ -6,6 +6,7 @@ import java.util.Stack;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
 
 import com.theincgi.advancedMacros.gui.elements.Drawable;
 
@@ -131,12 +132,18 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	//	public static ResourceLocation TEXTURE = new ResourceLocation("textures/gui/container/hopper.png");
 	public void drawImage(ResourceLocation texture, int x, int y, int wid, int hei, float uMin, float vMin, float uMax, float vMax){
 
+		
+		GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		
 		//GlStateManager.pushMatrix();
 		//GlStateManager.pushAttrib();
 
 		Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
-
-
+		
 		//GlStateManager.enableBlend();
 		//GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		//GlStateManager.color(1F, 1F, 1F, 1F);
@@ -149,6 +156,9 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 		buffer.pos(x+wid, y, 0).tex(uMax, vMin).endVertex();
 		Tessellator.getInstance().draw();
 
+		
+		GL11.glPopAttrib();
+		
 		//Minecraft.getMinecraft().getTextureManager().
 		//GlStateManager.popMatrix();
 		//GlStateManager.popAttrib();
