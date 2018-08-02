@@ -15,6 +15,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 public class GetPlayer extends OneArgFunction {
 
@@ -33,9 +34,18 @@ public class GetPlayer extends OneArgFunction {
 
 	public static LuaTable entityPlayerToTable(EntityPlayer player) {
 		LuaTable t = new LuaTable() {
+			LuaFunction func = new ThreeArgFunction() {
+				@Override public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
+					player.setVelocity(arg1.checkdouble(), arg2.checkdouble(), arg3.checkdouble());
+					return NONE;
+				}
+			};
 			@Override
-			public LuaValue getmetatable() {
-				return NIL;
+			public LuaValue rawget(LuaValue key) {
+				if(key.checkjstring().equals("setVelocity") && player instanceof EntityPlayerSP){
+			         return func;
+				}
+				return super.rawget(key);
 			}
 		};
 		t.set("name", player.getName());
@@ -83,8 +93,8 @@ public class GetPlayer extends OneArgFunction {
 		}
 		t.set("team", player.getTeam()==null?"none":player.getTeam().getName());
 		t.set("luck", player.getLuck());
-		t.set("health", player.getHealth());
-		t.set("hunger", player.getFoodStats().getFoodLevel());
+		t.set("health", MathHelper.ceil(player.getHealth()));
+		t.set("hunger", MathHelper.ceil(player.getFoodStats().getFoodLevel()));
 		t.set("air", player.getAir());
 		t.set("hasNoGravity", LuaValue.valueOf(player.hasNoGravity()));
 		{
@@ -131,25 +141,20 @@ public class GetPlayer extends OneArgFunction {
 		t.set("gamemode", player.isSpectator()?"spectator":player.isCreative()?"creative":"survival");
 		
 		
-		LuaTable meta = new LuaTable();
-		LuaFunction func = new ThreeArgFunction() {
-			@Override public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
-				player.setVelocity(arg1.checkdouble(), arg2.checkdouble(), arg3.checkdouble());
-				return NONE;
-			}
-		};
-		meta.set("__index", new TwoArgFunction() {
-			@Override public LuaValue call(LuaValue arg1, LuaValue arg2) {
-				System.out.println("Check: "+arg1.tojstring()+" : "+arg2.checkjstring());
-				if(arg2.checkjstring().equals("setVelocity") && player instanceof EntityPlayerSP){
-			         return func;
-				}
-				return arg1.rawget(arg2);
-			}
-		});
-		LuaTable blank = new LuaTable();
-		meta.set("__metatable", blank);
-		t.setmetatable(meta);
+//		LuaTable meta = new LuaTable();
+//		
+//		meta.set("__index", new TwoArgFunction() {
+//			@Override public LuaValue call(LuaValue arg1, LuaValue arg2) {
+//				System.out.println("Check: "+arg1.tojstring()+" : "+arg2.checkjstring());
+//				if(arg2.checkjstring().equals("setVelocity") && player instanceof EntityPlayerSP){
+//			         return func;
+//				}
+//				return arg1.rawget(arg2);
+//			}
+//		});
+//		LuaTable blank = new LuaTable();
+//		meta.set("__metatable", blank);
+//		t.setmetatable(meta);
 		
 		return t;
 	}

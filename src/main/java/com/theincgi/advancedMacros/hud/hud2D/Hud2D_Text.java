@@ -56,27 +56,47 @@ public class Hud2D_Text extends Hud2DItem {
 		getControls().set("getWidth", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return LuaValue.valueOf(CustomFontRenderer.measureWidth(text, size));
+				return LuaValue.valueOf(AdvancedMacros.otherCustomFontRenderer.getStringWidth(widestLine(text)));
 			}
 		});
 		getControls().set("getHeight", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return LuaValue.valueOf(CustomFontRenderer.measureHeight(text, size));
+				return LuaValue.valueOf(size*countLines(text));
 			}
 		});
 		getControls().set("getSize", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs args) {
 				LuaTable temp = new LuaTable();
-				temp.set(1, LuaValue.valueOf(CustomFontRenderer.measureWidth(text, size)));
-				temp.set(2, LuaValue.valueOf(CustomFontRenderer.measureHeight(text, size)));
+				temp.set(1, LuaValue.valueOf(AdvancedMacros.otherCustomFontRenderer.getStringWidth(widestLine(text))));
+				temp.set(2, LuaValue.valueOf(size *countLines(text)));
 				return temp.unpack();
 			}
 		});
 	}
+	
+	public String widestLine(String text) {
+		String maxLine = "";
+		Scanner temp = new Scanner(text);
+		while(temp.hasNextLine()) {
+			String m = temp.nextLine().replaceAll(Utils.mcSelectCode+"[0-9a-flkmnor]", "");
+			if( m.length() > maxLine.length() )
+				maxLine = m;
+		}
+		temp.close();
 
+		return maxLine+" ";
+	}
 
+	public int countLines(String text) {
+		int out = 1;
+		for(int i = 0; i<text.length(); i++) {
+			if(text.charAt(i)=='\n')
+				out++;
+		}
+		return out;
+	}
 
 	@Override
 	public void render(float partialTicks) {
@@ -90,9 +110,9 @@ public class Hud2D_Text extends Hud2DItem {
 			AdvancedMacros.customFontRenderer.renderText(dx, dy, z, text, getOpacity(), size);
 		}else {
 			Scanner s = new Scanner(text);
-			GlStateManager.enableBlend();
+			//GlStateManager.enableBlend();
 			GlStateManager.enableAlpha();
-			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+//			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			FontRendererOverride fr = AdvancedMacros.otherCustomFontRenderer;
 			//GlStateManager.bindTexture();
 			float old = fr.FONT_HEIGHT;
@@ -101,6 +121,7 @@ public class Hud2D_Text extends Hud2DItem {
 				fr.renderText(dx, dy+i, z, s.nextLine(), getOpacity(), size);//(text, (int)x, (int)y, color.toInt());
 			fr.FONT_HEIGHT = old;
 			s.close();
+			GlStateManager.disableAlpha();
 		}
 		GlStateManager.bindTexture(0);
 		//		AdvancedMacros.customFontRenderer.renderText(dx, dy, z, text, getOpacity(), size);

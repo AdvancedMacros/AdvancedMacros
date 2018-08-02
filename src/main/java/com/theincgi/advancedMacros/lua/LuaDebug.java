@@ -135,7 +135,7 @@ public class LuaDebug extends DebugLib{
 							status = Status.CRASH;
 							notifyStatusListeners(thread, Status.CRASH);
 							e.printStackTrace();
-							Utils.logError(new LuaError(e.getMessage())); //TODO optional logging
+							Utils.logError(new LuaError(e)); //TODO optional logging
 						}
 					}
 				});

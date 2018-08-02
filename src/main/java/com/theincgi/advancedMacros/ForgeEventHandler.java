@@ -646,14 +646,15 @@ public class ForgeEventHandler {
 
 		//GlStateManager.enableBlend();
 		//GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 1);
-		// GlStateManager.disableAlpha();
+		GlStateManager.disableAlpha();
+//		GlStateManager.enableAlpha();
 		GlStateManager.bindTexture(0);
 		//GlStateManager.enableLighting();
 
 		synchronized (hud2DItems) {
 			for (Hud2DItem hudItem : hud2DItems) {
 				//System.out.println(worldHudItem);
-				GlStateManager.color(1, 1, 1, hudItem.getOpacity());
+				GlStateManager.color(1, 1, 1, hudItem.getOpacity()/255f);
 				hudItem.render(p);
 			}
 		}

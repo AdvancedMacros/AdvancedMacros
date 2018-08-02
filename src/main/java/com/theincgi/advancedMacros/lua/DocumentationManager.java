@@ -92,7 +92,7 @@ public class DocumentationManager {
 					Scanner scan = new Scanner(fis)
 					) {
 				int lineNum = 1;
-				for(int i=0; i<c.p.linedefined-6; i++, lineNum++)
+				for(int i=0; i<c.p.linedefined-11; i++, lineNum++)
 					scan.nextLine();
 				LinkedList<String> lines = new LinkedList<>();
 				while(lineNum!=c.p.linedefined) {

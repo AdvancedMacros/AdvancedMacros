@@ -266,6 +266,7 @@ public class LuaFunctions {
 			}
 		}
 		if(t.getmetatable()!=null && t.getmetatable().istable()) {
+			antiR.add(t.getmetatable().checktable());
 			s+=rep(" ",indent)+"&f[&dmetatable&f] = &d"+t.getmetatable().tojstring()+" &f{\n";
 			s+=formatTableForLog(t.getmetatable().checktable(), antiR, indent+4);
 			s+=rep(" ",indent)+"&f}\n";

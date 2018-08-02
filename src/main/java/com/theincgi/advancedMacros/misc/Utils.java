@@ -702,6 +702,8 @@ public class Utils {
 	public static void debugPrint( LuaTable t ) {
 		System.out.println( LuaTableToString(t) );
 	}
+	
+	public static char mcSelectCode = '\u00A7';
 	public static String toMinecraftColorCodes(String text) {
 		char sel = '\u00A7';
 		String reset = sel+"r";

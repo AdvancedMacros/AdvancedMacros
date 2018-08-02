@@ -3,6 +3,7 @@ package com.theincgi.advancedMacros.hud.hud2D;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
+import org.lwjgl.opengl.GL11;
 
 import com.theincgi.advancedMacros.gui.Color;
 
@@ -50,7 +51,7 @@ public class Hud2D_Rectangle extends Hud2DItem {
 
 	@Override
 	public void render(float partialTicks) {
-		
+			
 		float dx = x, dy = y, dw = wid, dh = hei;
 		if(allowFrameInterpolation) {
 			dx = interpolate(dx, lastX, partialTicks);
@@ -70,24 +71,31 @@ public class Hud2D_Rectangle extends Hud2DItem {
 		
 		
 		
-		//GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+//		//GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+//		
+//		//GlStateManager.enableBlend();
+//        GlStateManager.disableTexture2D();
+//        GlStateManager.bindTexture(0);
+//		//GlStateManager.enableAlpha();
+//		//GL11.glEnable(GL11.GL_ALPHA);
+//        
+		float a = color.getA()/255f;
 		
-		//GlStateManager.enableBlend();
-        GlStateManager.disableTexture2D();
-//		GlStateManager.enableAlpha();
-//		GlStateManager.enableBlend();
-		GlStateManager.color(color.getR()/255f, color.getG()/255f, color.getB()/255f, color.getA()/255f);
+		//a = ((float) ((Math.sin(System.currentTimeMillis()%100000/500f)+1 )/2)) * 1f + .0f;
+		a*=a;
+		//System.out.println(a);
+		GlStateManager.color(color.getR()/255f, color.getG()/255f, color.getB()/255f, a);//color.getA()/255f);
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-		
-		GlStateManager.disableBlend();
-		GlStateManager.enableBlend();
-	    
-		//GlStateManager.disableTexture2D();
-	    GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-	    
-		GlStateManager.enableAlpha();
-		GlStateManager.disableAlpha();
-		
+//		
+//		GlStateManager.disableBlend();
+//		GlStateManager.enableBlend();
+//	    
+//		//GlStateManager.disableTexture2D();
+//		//GlStateManager.glBlendEquation(GL11.GL_ADD);
+//		GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_DST_ALPHA);
+	    //GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+//		GlStateManager.enableAlpha();
+//		GlStateManager.disableAlpha();
 		buffer.begin(7, DefaultVertexFormats.POSITION); //7 is GL_QUADS btw
 		buffer.pos(dx	  	, dy     	, z).endVertex(); //bottom left -> bottom right -> top right -> top left
 		buffer.pos(dx       , dy+dh 	, z).endVertex(); //top left 
