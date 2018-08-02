@@ -5,11 +5,11 @@
   "description": "Macros powered by Lua!\nSpecial thanks to:\n    Meteor6666, Emex ",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
+  "url": "https://discord.gg/ga9Npym",
   "updateUrl": "",
   "authorList": ["TheIncgi"],
-  "credits": "TheIncgi and The Forge and FML guys",
-  "logoFile": "",
+  "credits": "TheIncgi - Code, Emex - Icons and The Forge and FML guys",
+  "logoFile": "/assets/advancedmacros/logo.png",
   "screenshots": [],
   "dependencies": []
 }
