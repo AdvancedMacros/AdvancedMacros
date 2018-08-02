@@ -32,13 +32,13 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 	//							gameEventTexture,;
 	//static Property enableTexProp;
 	//TODO allow property for textures, note use string to change the value for load tex id
-	static LuaValue enableTexture = Settings.getTextureID("resource:greencheck.png"),
-			disableTexture = Settings.getTextureID("resource:redx.png"),
+	static LuaValue enableTexture = Settings.getTextureID("resource:script_enabled.png"),
+			disableTexture = Settings.getTextureID("resource:script_disabled.png"),
 			allKeyEventTexture = Settings.getTextureID("resource:allkeyevent.png"),
 			keyDownEventTexture = Settings.getTextureID("resource:keydownevent.png"),
 			keyUpEventTexture = Settings.getTextureID("resource:keyupevent.png"),
 			gameEventTexture = Settings.getTextureID("resource:gameevent.png"),
-			trashTexture = Settings.getTextureID("resource:trashcan.png"),
+			trashTexture = Settings.getTextureID("resource:remove.png"),
 			editTexture = Settings.getTextureID("resource:whiteedit.png"),
 			moveTexture = Settings.getTextureID("resource:whitemove.png");
 

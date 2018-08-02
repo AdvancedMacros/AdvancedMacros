@@ -93,7 +93,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "4.0.2"; //${version} ?? //previously .1
+	public static final String VERSION = "4.1.0"; //${version} ?? //previously .1
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -153,9 +153,8 @@ public class AdvancedMacros {
 			
 			loadFunctions();
 			loadLibJars();
-			loadScripts();
 			macroMenuGui.loadProfile("DEFAULT");
-
+			loadScripts();
 			//		HudText text = new HudText(true);
 			//		text.setDrawType(DrawType.XRAY);
 			//		text.setPos(0, 5, 0);
@@ -329,6 +328,14 @@ public class AdvancedMacros {
 		try {
 			InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/searcher.lua")).getInputStream();
 			globals.load(in, "searcher", "t", globals).call();
+			in.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/settings_fix.lua")).getInputStream();
+			globals.load(in, "settingsFix", "t", globals).call();
+			in.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
