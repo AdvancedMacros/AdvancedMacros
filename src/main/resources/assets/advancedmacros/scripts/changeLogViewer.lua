@@ -7,19 +7,18 @@ if not cl.showOnStartup then return end
 cl.shownVersions = cl.shownVersions or {}
 if cl.shownVersions[_MOD_VERSION] then return end
 
---Actual program after this--
+-- CHANGE LOG -------------------------------------------------------------------
 local changeLog = {
-  "&eShow on startup? ",
-  "&b&BChange Log: &7version ".._MOD_VERSION
+  "&eShow on startup? ", --do not remove
+  "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  ""
 }
---sample lines
-for i = 1, 100 do
-  changeLog[i+2] = "&fLine "..i
-end
+
+---------------------------------------------------------------------------------
 
 local CHECK = "resource:greencheck.png"
 local X     = "resource:redx.png"
-g = gui.newGui()
+g = gui.new()
 
 local s = g.newScrollBar()
 s.setOrientation("vertical")

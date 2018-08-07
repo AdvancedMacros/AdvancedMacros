@@ -139,7 +139,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				MCTextBar text = new MCTextBar(gui, guiGroup);
 				text.setPos((int)args.optdouble(1, 0) , (int)args.optdouble(2, 0) );
 				text.setWidth(  args.optint(3, 0) );
-				text.setHeight( args.optint(4, 0) );
+				text.setHeight( args.optint(4, 20) );
 				text.setText( args.optstring(5, valueOf("")).tojstring() );
 				return text;
 			}

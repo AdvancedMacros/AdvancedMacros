@@ -1,6 +1,7 @@
 package com.theincgi.advancedMacros.lua.scriptGui;
 
 import org.luaj.vm2_v3_0_1.LuaError;
+import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
@@ -8,6 +9,7 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Gui;
+import com.theincgi.advancedMacros.lua.functions.PCall;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
@@ -17,7 +19,7 @@ import net.minecraftforge.common.MinecraftForge;
 public class MCTextBar extends ScriptGuiElement{
 	GuiTextField textField;
 	public MCTextBar(Gui gui, Group parent) {
-		super(gui, parent, false);
+		super(gui, parent, true);
 		enableSizeControl();
 		textField = new GuiTextField(0, Minecraft.getMinecraft().fontRenderer, 0, 0, 20, 20) {
 			@Override
@@ -26,7 +28,8 @@ public class MCTextBar extends ScriptGuiElement{
 			}
 			@Override
 			public void setFocused(boolean isFocusedIn) {
-				gui.setFocusItem(this);
+				super.setFocused(isFocusedIn);
+				gui.setFocusItem(isFocusedIn? this : null);
 			}
 		};
 		
@@ -143,10 +146,47 @@ public class MCTextBar extends ScriptGuiElement{
 	}
 	
 	@Override
+	public void setX(int x) {
+		textField.x = x;
+	}
+	@Override
+	public void setX(double x) {
+		setX((int)x);
+	}
+	@Override
+	public void setY(int y) {
+		textField.y = y;
+	}
+	@Override
+	public void setPos(int x, int y) {
+		textField.x = x;
+		textField.y = y;
+	}
+	@Override
+	public void setY(double y) {
+		setY((int)y);
+	}
+	
+	
+	@Override
+	public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
+		if(textField.mouseClicked(x, y, buttonNum)) {
+			if (onMouseClick != null) 
+				Utils.pcall(onMouseClick, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(buttonNum));
+			textField.setFocused(true);
+			return true;
+		}
+		return false;
+	}
+	
+	
+	@Override
 	public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
 		if(!textField.isFocused() || !visible)
 			return false;
 		textField.textboxKeyTyped(typedChar, keyCode);
+		if(onKeyPressed!=null)
+			Utils.pcall(onKeyPressed, valueOf(typedChar), valueOf(keyCode));
 		return true;
 	}
 	@Override
@@ -154,6 +194,8 @@ public class MCTextBar extends ScriptGuiElement{
 		if(!textField.isFocused() || !visible)
 			return false;
 		textField.textboxKeyTyped(typedChar, keyCode);
+		if(onKeyRepeated!=null)
+			Utils.pcall(onKeyRepeated, valueOf(typedChar), valueOf(keyCode));
 		return true;
 	}
 	

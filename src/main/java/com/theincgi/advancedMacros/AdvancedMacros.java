@@ -263,7 +263,7 @@ public class AdvancedMacros {
 		globals.set("prompt", inputGUI.getPrompt());
 
 		LuaTable guiStuff = new LuaTable();
-		guiStuff.set("newGui", new ScriptGui.CreateScriptGui());
+		guiStuff.set("new", new ScriptGui.CreateScriptGui());
 		globals.set("gui", guiStuff);
 		
 		LuaTable searchers = globals.get("package").get("searchers").checktable();
