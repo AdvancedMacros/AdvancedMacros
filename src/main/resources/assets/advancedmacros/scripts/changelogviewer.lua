@@ -14,20 +14,18 @@ local changeLog = {
   "&fA clickable link can be found in the Mods menu in this mod's description",
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
   "&f - Textures are now simpler to use.", 
-  "&f   the &bimg.texture.create() &fand &bimg.texture.remove() &fin images have been removed,", 
-  "&f - and &bimg.texture.update() &fis now &bimg.update()", 
-  "&f - If the player hasn't loaded yet, either in a menu or while joining the world it will", 
-  "&f   return nil instead of causing a NullPointerException now",
-  "&f - Added thread.new and thread.current",
-  "&f   thread.new will allow you to create a thread without starting it",
-  "&f   thread.current will return controls for the current thread",
-  "&f   thread controls now contain getID() for comparison",
-  "&f - ",
-  "&f - ",
-  "&f - ",
-  "&f - ",
-  "&f - ",
-  "&f - ",
+  "&f   the &bimg.texture.create() &fand &bimg.texture.remove()",
+  "&f   in images have been removed, and &bimg.texture.update()",
+  "&f   is now &bimg.update()",
+  "",
+  "&f - If the player hasn't loaded yet, either in a menu or while",
+  "&f   joining the world it will", 
+  "&f   return &enil &finstead of causing a &cNullPointerException&f now",
+  "",
+  "&f - Added &bthread.new() &fand &bthread.current()",
+  "&f   &bthread.new() &fwill allow you to create a thread without starting it",
+  "&f   &bthread.current() &fwill return controls for the current thread",
+  "&f   thread controls now contains &bgetID() &ffor comparison"
 }
 
 ---------------------------------------------------------------------------------

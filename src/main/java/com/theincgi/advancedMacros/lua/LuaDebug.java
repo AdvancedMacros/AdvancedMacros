@@ -213,7 +213,7 @@ public class LuaDebug extends DebugLib{
 			set("getStatus", new GetStatus());
 			set("pause", new Pause());
 			set("unpause", new Unpause());
-			set("getID", new GetID())
+			set("getID", new GetID());
 			controlLookup.put(t.thread, this);
 		}
 		class Start extends ZeroArgFunction{

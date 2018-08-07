@@ -96,7 +96,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "5.0.0"; //${version} ?? //previously .1
+	public static final String VERSION = "5.1.0"; //${version} ?? //previously .1
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -193,6 +193,7 @@ public class AdvancedMacros {
 		LuaTable thread = new LuaTable();
 			thread.set("new", new NewThread());
 			thread.set("current", new LuaDebug.GetCurrent());
+		globals.set("thread", thread);
 		
 		globals.set("getProfile", new GetProfile());
 		globals.set("setProfile", new SetProfile());
