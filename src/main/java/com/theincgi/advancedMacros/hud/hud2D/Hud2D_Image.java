@@ -54,18 +54,7 @@ public class Hud2D_Image extends Hud2D_Rectangle {
 	}
 	
 	public void setTexture(LuaValue v) {
-		if(v instanceof LuaValTexture){
-			lvt = (LuaValTexture) v;
-		}if(v instanceof BufferedImageControls) {
-			if(((BufferedImageControls) v).getLuaValTexture() == null) throw new LuaError("Texture not created");
-			lvt = ((BufferedImageControls) v).getLuaValTexture();
-		}else if(v.isstring()){
-			lvt = Utils.checkTexture(Settings.getTextureID(v.checkjstring()));
-		}else{
-			lvt = Utils.checkTexture(Settings.getTextureID("resource:holoblock.png"));
-		}
-		if(lvt == null)
-			lvt = Utils.checkTexture(Settings.getTextureID("resource:holoblock.png"));
+		lvt = Utils.parseTexture(v);
 	}
 
 	public void setUV(float uMin, float vMin, float uMax, float vMax) {

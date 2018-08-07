@@ -14,7 +14,7 @@ import com.theincgi.advancedMacros.lua.LuaDebug;
 import com.theincgi.advancedMacros.lua.LuaDebug.LuaThread;
 import com.theincgi.advancedMacros.lua.LuaDebug.ThreadControls;
 
-public class RunThread extends VarArgFunction{
+public class NewThread extends VarArgFunction{
 	@Override
 	public Varargs invoke(Varargs args) {
 		try {
@@ -30,7 +30,7 @@ public class RunThread extends VarArgFunction{
 				throw new LuaError("Arg 1 must be string or function");
 			}
 			LuaDebug.LuaThread thread = new LuaThread(function, args.subargs(2), args.arg1().tojstring());
-			return thread.start();
+			return ThreadControls.getControls(thread);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			throw new LuaError("No such file: "+args.arg1().tojstring());

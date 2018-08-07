@@ -1,5 +1,7 @@
 package com.theincgi.advancedMacros;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,6 +37,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -409,6 +412,15 @@ public class ForgeEventHandler {
 	
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onJoinedWorld(FMLNetworkEvent.ClientConnectedToServerEvent event){
+		Thread t = new Thread(()->{
+		try {
+			InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/changelogviewer.lua")).getInputStream();
+			AdvancedMacros.globals.load(in, "changeLog", "t", AdvancedMacros.globals).call();
+			in.close();
+		} catch (IOException e) {e.printStackTrace();}
+		});
+		t.start();
+		
 		LuaTable e = createEvent(EventName.JoinWorld);
 		e.set(3, event.getConnectionType()); //yeilded modded
 		e.set(4, LuaValue.valueOf(event.isLocal()?"SP":"MP")); //yeilded false on localhost multiplayer true on single player

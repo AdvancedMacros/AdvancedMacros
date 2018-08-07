@@ -10,8 +10,24 @@ if cl.shownVersions[_MOD_VERSION] then return end
 -- CHANGE LOG -------------------------------------------------------------------
 local changeLog = {
   "&eShow on startup? ", --do not remove
+  "&f&BOffical discord: &7https://discord.gg/ga9Npym",
+  "&fA clickable link can be found in the Mods menu in this mod's description",
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
-  ""
+  "&f - Textures are now simpler to use.", 
+  "&f   the &bimg.texture.create() &fand &bimg.texture.remove() &fin images have been removed,", 
+  "&f - and &bimg.texture.update() &fis now &bimg.update()", 
+  "&f - If the player hasn't loaded yet, either in a menu or while joining the world it will", 
+  "&f   return nil instead of causing a NullPointerException now",
+  "&f - Added thread.new and thread.current",
+  "&f   thread.new will allow you to create a thread without starting it",
+  "&f   thread.current will return controls for the current thread",
+  "&f   thread controls now contain getID() for comparison",
+  "&f - ",
+  "&f - ",
+  "&f - ",
+  "&f - ",
+  "&f - ",
+  "&f - ",
 }
 
 ---------------------------------------------------------------------------------
@@ -59,7 +75,6 @@ for i, text in pairs(changeLog) do
 end
 
 function resize(w, h)
-  log( "New width: "..w)
   s.setHeight(h - 10)
   s.setX( w-5-s.getWidth() )
   s.setVisibleItems( math.min(math.floor((h-10)/12), #changeLog)  )
@@ -70,4 +85,8 @@ g.setOnClose( function(...)
 end)
 g.setOnResize( resize )
 resize( g.getSize() )
+while( getPlayer() == nil)do 
+  sleep(1000) 
+end
+sleep(2000)
 g.open()

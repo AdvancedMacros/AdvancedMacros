@@ -32,7 +32,9 @@ public class GetPlayer extends OneArgFunction {
 		}
 	}
 
-	public static LuaTable entityPlayerToTable(EntityPlayer player) {
+	public static LuaValue entityPlayerToTable(EntityPlayer player) {
+		if(player == null) return NIL;
+		try {
 		LuaTable t = new LuaTable() {
 			LuaFunction func = new ThreeArgFunction() {
 				@Override public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
@@ -157,6 +159,10 @@ public class GetPlayer extends OneArgFunction {
 //		t.setmetatable(meta);
 		
 		return t;
+		}catch (Exception e) {
+			e.printStackTrace();
+			return NIL;
+		}
 	}
 	
 

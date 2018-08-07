@@ -19,6 +19,7 @@ import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaTable;
+import org.luaj.vm2_v3_0_1.LuaThread;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
@@ -35,6 +36,7 @@ import com.theincgi.advancedMacros.hud.hud2D.Hud2D;
 import com.theincgi.advancedMacros.hud.hud3D.Hud3D;
 import com.theincgi.advancedMacros.lua.DocumentationManager;
 import com.theincgi.advancedMacros.lua.LuaDebug;
+import com.theincgi.advancedMacros.lua.LuaDebug.ThreadControls;
 import com.theincgi.advancedMacros.lua.LuaFunctions;
 import com.theincgi.advancedMacros.lua.functions.Action;
 import com.theincgi.advancedMacros.lua.functions.AdvLog;
@@ -59,6 +61,7 @@ import com.theincgi.advancedMacros.lua.functions.HTTP;
 import com.theincgi.advancedMacros.lua.functions.IsKeyHeld;
 import com.theincgi.advancedMacros.lua.functions.LightAt;
 import com.theincgi.advancedMacros.lua.functions.MathPlus;
+import com.theincgi.advancedMacros.lua.functions.NewThread;
 import com.theincgi.advancedMacros.lua.functions.OpenInventory;
 import com.theincgi.advancedMacros.lua.functions.PCall;
 import com.theincgi.advancedMacros.lua.functions.PlaySound;
@@ -93,7 +96,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "4.1.1b"; //${version} ?? //previously .1
+	public static final String VERSION = "5.0.0"; //${version} ?? //previously .1
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -183,9 +186,14 @@ public class AdvancedMacros {
 		globals.load(debug);
 		globals.set("_MOD_VERSION", VERSION);
 		
+		
 		globals.set("run", new Call());
 		globals.set("pRun", new PCall());
 		globals.set("runThread", new RunThread());
+		LuaTable thread = new LuaTable();
+			thread.set("new", new NewThread());
+			thread.set("current", new LuaDebug.GetCurrent());
+		
 		globals.set("getProfile", new GetProfile());
 		globals.set("setProfile", new SetProfile());
 		globals.set("stopAllScripts", new StopAllScripts());

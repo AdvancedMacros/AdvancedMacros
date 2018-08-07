@@ -185,16 +185,7 @@ public class HoloBlock extends WorldHudItem{
 		@Override
 		public LuaValue call(LuaValue arg) {
 			LuaValTexture tex;
-			if(arg instanceof LuaValTexture){
-				tex = (LuaValTexture) arg;
-			}if(arg instanceof BufferedImageControls) {
-				if(((BufferedImageControls) arg).getLuaValTexture() == null) throw new LuaError("Texture not created");
-				tex = ((BufferedImageControls) arg).getLuaValTexture();
-			}else if(arg.isstring()){
-				tex = Utils.checkTexture(Settings.getTextureID(arg.checkjstring()));
-			}else{
-				tex = Utils.checkTexture(Settings.getTextureID("resource:holoblock.png"));
-			}
+			tex = Utils.parseTexture(arg);
 //			setTexture(tex);
 //			if(arg instanceof LuaValTexture)
 //				setTexture(tex = Utils.checkTexture(arg));

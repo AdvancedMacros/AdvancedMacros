@@ -3,6 +3,7 @@ package com.theincgi.advancedMacros.lua;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.WeakHashMap;
 
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
@@ -109,6 +110,12 @@ public class LuaDebug extends DebugLib{
 			this.label = label;
 			this.varagrs = varagrs;
 		}
+		
+		public static LuaThread getCurrent() {
+			return threads.get(Thread.currentThread());
+		}
+		
+		
 		private void register(Thread t){
 			threads.put(t, this);
 		}
@@ -142,46 +149,7 @@ public class LuaDebug extends DebugLib{
 				thread.setName(sFunc.tojstring());
 				thread.start();
 
-				class Stop extends ZeroArgFunction{
-					@Override
-					public LuaValue call() {
-						stop();
-						return LuaValue.NIL;
-					}}
-				class GetStatus extends ZeroArgFunction{
-					@Override
-					public LuaValue call() {
-						return LuaValue.valueOf(status.toString());
-					}
-				}
-				class Pause extends ZeroArgFunction{
-					@Override
-					public LuaValue call() {
-						if(status.equals(Status.RUNNING)){
-							status = Status.PAUSED;
-							notifyStatusListeners(thread, Status.PAUSED);
-							return LuaValue.NONE;
-						}
-						throw new LuaError("Attempt to pause a thread in state '"+status+"'");
-					}
-				}
-				class Unpause extends ZeroArgFunction{
-					@Override
-					public LuaValue call() {
-						if(status.equals(Status.PAUSED)){
-							status = Status.RUNNING;
-							notifyStatusListeners(thread, Status.RUNNING);
-							return LuaValue.NONE;
-						}
-						throw new LuaError("Attempt to unpause a thread in state '"+status+"'");
-					}
-				}
-				LuaTable cntrl = new LuaTable();
-				cntrl.set("stop", new Stop());
-				cntrl.set("getStatus", new GetStatus());
-				cntrl.set("pause", new Pause());
-				cntrl.set("unpause", new Unpause());
-				return cntrl;
+				return ThreadControls.getControls(this);
 			}else{
 				throw new LuaError("Attempt to start a thread in state '"+status+"'");
 			}
@@ -193,6 +161,13 @@ public class LuaDebug extends DebugLib{
 		}
 		public double getUpTime(){
 			return ((int)(System.currentTimeMillis()-launchTime)/10f)/100f;
+		}
+		
+	}
+	public static class GetCurrent extends ZeroArgFunction{
+		@Override
+		public LuaValue call() {
+			return ThreadControls.getControls(LuaThread.getCurrent());
 		}
 	}
 	public static enum Status{
@@ -219,6 +194,80 @@ public class LuaDebug extends DebugLib{
 			}
 		}
 	}
+	
+	public static class ThreadControls extends LuaTable{
+		static final WeakHashMap<Thread, ThreadControls> controlLookup = new WeakHashMap<>();
+		LuaThread t;
+		
+		public static ThreadControls getControls(LuaThread t) {
+			return controlLookup.computeIfAbsent(t.thread, (key)->{
+				return new ThreadControls(t);
+			});
+		}
+		
+		private ThreadControls(LuaThread t) {
+			super();
+			this.t = t;
+			set("start", new Start());
+			set("stop", new Stop());
+			set("getStatus", new GetStatus());
+			set("pause", new Pause());
+			set("unpause", new Unpause());
+			set("getID", new GetID())
+			controlLookup.put(t.thread, this);
+		}
+		class Start extends ZeroArgFunction{
+			@Override
+			public LuaValue call() {
+				t.start();
+				return LuaValue.NIL;
+			}}
+		class Stop extends ZeroArgFunction{
+			@Override
+			public LuaValue call() {
+				t.stop();
+				return LuaValue.NIL;
+			}
+		}
+		class GetID extends ZeroArgFunction{
+			@Override
+			public LuaValue call() {
+				return valueOf(t.thread.getId());
+			}
+		}
+		class GetStatus extends ZeroArgFunction{
+			@Override
+			public LuaValue call() {
+				return LuaValue.valueOf(t.status.toString());
+			}
+		}
+		class Pause extends ZeroArgFunction{
+			@Override
+			public LuaValue call() {
+				if(t.status.equals(Status.RUNNING)){
+					t.status = Status.PAUSED;
+					notifyStatusListeners(t.thread, Status.PAUSED);
+					return LuaValue.NONE;
+				}
+				throw new LuaError("Attempt to pause a thread in state '"+t.status+"'");
+			}
+		}
+		class Unpause extends ZeroArgFunction{
+			@Override
+			public LuaValue call() {
+				if(t.status.equals(Status.PAUSED)){
+					t.status = Status.RUNNING;
+					notifyStatusListeners(t.thread, Status.RUNNING);
+					return LuaValue.NONE;
+				}
+				throw new LuaError("Attempt to unpause a thread in state '"+t.status+"'");
+			}
+		}
+		
+	}
+	
+	
+	
 	public void stopAll() {
 		for (LuaThread t : threads.values()) {
 			t.stop();

@@ -17,6 +17,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.lua.LuaFunctions.Log;
+import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
 
 import net.minecraft.block.Block;
@@ -703,6 +704,25 @@ public class Utils {
 	
 	public static void debugPrint( LuaTable t ) {
 		System.out.println( LuaTableToString(t) );
+	}
+	
+	
+	public static LuaValTexture parseTexture(LuaValue v) {
+		return parseTexture(v, Utils.checkTexture(Settings.getTextureID("resource:holoblock.png")));
+	}
+	public static LuaValTexture parseTexture(LuaValue v, LuaValTexture def) {
+		LuaValTexture lvt;
+		if(v instanceof LuaValTexture){
+			lvt = (LuaValTexture) v;
+		}if(v instanceof BufferedImageControls) {
+			//if(((BufferedImageControls) v).getLuaValTexture() == null) throw new LuaError("Texture not created");
+			lvt = ((BufferedImageControls) v).getLuaValTexture();
+		}else if(v.isstring()){
+			lvt = Utils.checkTexture(Settings.getTextureID(v.checkjstring()));
+		}else{
+			lvt = def;
+		}
+		return lvt;
 	}
 	
 	public static char mcSelectCode = '\u00A7';

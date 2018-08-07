@@ -79,5 +79,14 @@ public class LuaValTexture extends LuaValue{
 	public float vMin() {return v1;}
 	public float vMax() {return v2;}
 	
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
+		if(dTex!=null) {
+			System.out.println("Texture ID " + dTex.getGlTextureId() + " is being removed for object finalization.");
+			deleteTex();
+		}
+			
+	}
 	
 }

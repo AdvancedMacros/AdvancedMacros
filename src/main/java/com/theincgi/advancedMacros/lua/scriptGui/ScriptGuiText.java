@@ -70,6 +70,8 @@ public class ScriptGuiText extends ScriptGuiElement{
 		//FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
 		//FontRenderer fr;
 		if(monospaced) {
+			GlStateManager.enableBlend();
+			GlStateManager.enableAlpha();
 			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			AdvancedMacros.customFontRenderer.renderText(x, y, z, text, color.getA(), textSize);
 		}else {

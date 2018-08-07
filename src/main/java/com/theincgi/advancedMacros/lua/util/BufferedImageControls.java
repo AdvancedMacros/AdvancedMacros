@@ -129,8 +129,7 @@ public class BufferedImageControls extends LuaTable{
 		});
 		set("graphics", new GraphicsContextControls(this));
 		LuaTable texture = new LuaTable();
-		set("texture", texture);
-		texture.set("update", new ZeroArgFunction() {
+		set("update", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
 				if (dynamicTexture != null) { 
@@ -143,28 +142,7 @@ public class BufferedImageControls extends LuaTable{
 				throw new LuaError("Dynamic texture not created yet");
 			}
 		});
-		texture.set("create", new OneArgFunction() { //TODO register in settings.textures
-			@Override
-			public LuaValue call(LuaValue arg) {
-				if (dynamicTexture == null) {
-					createTexture();
-				}
-				return NONE;
-			}
-
-
-		});
-		texture.set("remove", new ZeroArgFunction() {
-			@Override
-			public LuaValue call() {
-				if (dynamicTexture != null) {
-					Utils.runOnMCThreadAndWait(()->{
-						dynamicTexture.deleteGlTexture();
-					});
-				}
-				return NONE;
-			}
-		});
+		
 
 
 	}
@@ -180,12 +158,15 @@ public class BufferedImageControls extends LuaTable{
 	}
 	public DynamicTexture getDynamicTexture() {
 		if (dynamicTexture == null) {
-			throw new LuaError("Dynamic texture not created yet");
+			//throw new LuaError("Dynamic texture not created yet");
 			//dynamicTexture = new DynamicTexture(img);
+			createTexture();
 		}
 		return dynamicTexture;
 	}
 	public LuaValTexture getLuaValTexture() {
+		if(tex==null)
+			createTexture();
 		return tex;
 	}
 }
