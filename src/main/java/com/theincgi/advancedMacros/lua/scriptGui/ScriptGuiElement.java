@@ -61,20 +61,20 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 		this.set("setX", new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg) {
-				x = (float) arg.checkdouble();
+				setX( arg.checkdouble());
 				return LuaValue.NONE;
 			}
 		});
 		this.set("getX", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return LuaValue.valueOf(x);
+				return LuaValue.valueOf(getX());
 			}
 		});
 		this.set("setY", new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg) {
-				y = (float) arg.checkdouble();
+				setY(arg.checkdouble());
 				return LuaValue.NONE;
 			}
 		});
@@ -87,9 +87,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 		this.set("setPos", new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg1, LuaValue arg2) {
-				arg2.checkdouble();
-				x = arg1.checkint();
-				y = arg2.checkint();
+				setPos((int)arg1.checkdouble(), (int)arg2.checkdouble());
 				return LuaValue.NONE;
 			}
 		});
@@ -227,14 +225,14 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 		set("setWidth", new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg) {
-				wid = arg.checkint();
+				setWidth(arg.checkint());;
 				return LuaValue.NONE;
 			}
 		});
 		set("setHeight", new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg) {
-				hei = arg.checkint();
+				setHeight(arg.checkint());
 				return LuaValue.NONE;
 			}
 		});
@@ -319,13 +317,28 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 		this.x = x;
 		this.y = y;
 	}
-
+	
+	@Override
+	public void setX(int x) {
+		this.x = x;
+	}
+	@Override
+	public void setY(int y) {
+		this.y = y;
+	}
+	public void setX(double x) {
+		this.x = (float) x;
+	}
+	public void setY(double y) {
+		this.y = (float) y;
+	}
+	
 	@Override
 	public void setVisible(boolean b) {
 		visible = b;
 	}
 
-
+	
 
 	@Override
 	public int getX() {

@@ -114,7 +114,16 @@ public class RunningScriptsGui extends Gui{
 			this.y = y;
 			stop.setPos(x, y);
 		}
-
+		
+		@Override
+		public void setX(int x) {
+			setPos(x, y);
+		}
+		
+		@Override
+		public void setY(int y) {
+			setPos(x, y);
+		}
 		@Override
 		public void setVisible(boolean b) {
 			this.isVisible = b;

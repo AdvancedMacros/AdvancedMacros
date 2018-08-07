@@ -17,14 +17,20 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
+import com.theincgi.advancedMacros.lua.LuaValTexture;
 import com.theincgi.advancedMacros.lua.functions.FileSystem;
 import com.theincgi.advancedMacros.misc.Utils;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+
 public class BufferedImageControls extends LuaTable{
 	BufferedImage img;
+	DynamicTexture dynamicTexture;
+	LuaValTexture tex;
 	//buffering means multiple objects arn't created and destroyed, but provide a thread safe way to buffer without syncronization
 	ThreadLocal<Color> colorBuffer = new ThreadLocal<Color>() { @Override protected Color initialValue() {return new Color(0);} } ;
-	
+
 	public static class CreateImg extends TwoArgFunction {
 		@Override
 		public LuaValue call(LuaValue arg1, LuaValue arg2) {
@@ -58,8 +64,8 @@ public class BufferedImageControls extends LuaTable{
 			return out;
 		}
 	}
-	
-	
+
+
 	public BufferedImageControls(BufferedImage img) {
 		this.img = img;
 		set("getPixel", new TwoArgFunction() {
@@ -121,12 +127,65 @@ public class BufferedImageControls extends LuaTable{
 				return temp.unpack();
 			}
 		});
-		set("graphics", new GraphicsContextControls(img));
-		
-		
+		set("graphics", new GraphicsContextControls(this));
+		LuaTable texture = new LuaTable();
+		set("texture", texture);
+		texture.set("update", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				if (dynamicTexture != null) { 
+					Utils.runOnMCThreadAndWait(()->{
+						img.getRGB(0, 0, img.getWidth(), img.getHeight(), dynamicTexture.getTextureData(), 0, img.getWidth());
+						dynamicTexture.updateDynamicTexture();
+					});
+					return NONE;
+				}
+				throw new LuaError("Dynamic texture not created yet");
+			}
+		});
+		texture.set("create", new OneArgFunction() { //TODO register in settings.textures
+			@Override
+			public LuaValue call(LuaValue arg) {
+				if (dynamicTexture == null) {
+					createTexture();
+				}
+				return NONE;
+			}
+
+
+		});
+		texture.set("remove", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				if (dynamicTexture != null) {
+					Utils.runOnMCThreadAndWait(()->{
+						dynamicTexture.deleteGlTexture();
+					});
+				}
+				return NONE;
+			}
+		});
+
+
 	}
-	
+
 	public BufferedImage getImg() {
 		return img;
+	}
+	private void createTexture() {
+		Utils.runOnMCThreadAndWait(()->{
+			dynamicTexture = new DynamicTexture(img);
+			tex = new LuaValTexture(dynamicTexture);
+		});
+	}
+	public DynamicTexture getDynamicTexture() {
+		if (dynamicTexture == null) {
+			throw new LuaError("Dynamic texture not created yet");
+			//dynamicTexture = new DynamicTexture(img);
+		}
+		return dynamicTexture;
+	}
+	public LuaValTexture getLuaValTexture() {
+		return tex;
 	}
 }

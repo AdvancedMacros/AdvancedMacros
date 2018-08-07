@@ -403,6 +403,14 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		this.y = y;
 		updatePos(x, y);
 	}
+	@Override
+	public void setX(int x) {
+		setPos(x, y);
+	}
+	@Override
+	public void setY(int y) {
+		setPos(x, y);
+	}
 	private void updatePos(int x, int y){
 		int uw = x;
 		removeButton.setPos(uw,    y);

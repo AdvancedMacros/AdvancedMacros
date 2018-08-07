@@ -15,7 +15,7 @@ public class Hud2D extends LuaTable{
 	public Hud2D() {
 		//rectangle, image, easy progress bar, text[, canvas?]
 		
-		this.set("addRectangle", new VarArgFunction() {
+		this.set("newRectangle", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs var) {
 				Hud2D_Rectangle rect = new Hud2D_Rectangle();
@@ -26,7 +26,7 @@ public class Hud2D extends LuaTable{
 				return rect.controls;
 			}
 		});
-		this.set("addBox", new VarArgFunction() {
+		this.set("newBox", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs var) {
 				Hud2D_Box box = new Hud2D_Box();
@@ -38,7 +38,7 @@ public class Hud2D extends LuaTable{
 				return box.controls;
 			}
 		});
-		this.set("addImage", new VarArgFunction() {
+		this.set("newImage", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs var) {
 				Hud2D_Image img = new Hud2D_Image();
@@ -50,8 +50,8 @@ public class Hud2D extends LuaTable{
 				return img.controls;
 			}
 		});
-		//this.set("addProgressBar", new Hud2D_ProgressBar());
-		this.set("addText", new VarArgFunction() {
+		//this.set("newProgressBar", new Hud2D_ProgressBar());
+		this.set("newText", new VarArgFunction() {
 			@Override
 			public LuaValue call() {
 				return new Hud2D_Text().getControls();
@@ -66,7 +66,7 @@ public class Hud2D extends LuaTable{
 				return text.controls;
 			}
 		});
-		set("addItem", new VarArgFunction() {
+		set("newItem", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs args) {
 				Hud2d_itemIcon gii = new Hud2d_itemIcon();

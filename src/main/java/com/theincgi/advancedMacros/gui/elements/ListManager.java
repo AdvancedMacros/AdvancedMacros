@@ -304,7 +304,14 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 		scrollBar.setPos(x, y+wid-scrollBar.getItemWidth());
 		updateBounds(x, y, wid, hei);
 	}
-
+	@Override
+	public void setX(int x) {
+		setPos(x, y);
+	}
+	@Override
+	public void setY(int y) {
+		setPos(x, y);
+	}
 	private boolean isVisible=true;
 
 	@Override

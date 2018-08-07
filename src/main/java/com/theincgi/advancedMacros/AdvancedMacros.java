@@ -93,7 +93,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "4.1.1a"; //${version} ?? //previously .1
+	public static final String VERSION = "4.1.1b"; //${version} ?? //previously .1
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -114,6 +114,7 @@ public class AdvancedMacros {
 	public static FontRendererOverride otherCustomFontRenderer;
 	private static final DocumentationManager documentationManager = new DocumentationManager();
 	private JarLibSearcher jarLibSearcher;
+	private static Thread minecraftThread;
 
 	//protected static ArrayList customEventNames;
 
@@ -126,6 +127,7 @@ public class AdvancedMacros {
 	public void init(FMLInitializationEvent event){
 		try {
 			if(event.getSide().isServer()){return;}
+			minecraftThread = Thread.currentThread();
 			macrosRootFolder.mkdirs();
 			macrosFolder.mkdirs();
 			macroSoundsFolder.mkdirs();
@@ -179,7 +181,8 @@ public class AdvancedMacros {
 
 	private void loadFunctions() {
 		globals.load(debug);
-
+		globals.set("_MOD_VERSION", VERSION);
+		
 		globals.set("run", new Call());
 		globals.set("pRun", new PCall());
 		globals.set("runThread", new RunThread());
@@ -397,5 +400,8 @@ public class AdvancedMacros {
 			e.printStackTrace();
 		} 
 		return defaultRoot;
+	}
+	public static Thread getMinecraftThread() {
+		return minecraftThread;
 	}
 }

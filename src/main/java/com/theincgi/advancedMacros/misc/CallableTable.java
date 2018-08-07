@@ -31,11 +31,16 @@ public class CallableTable extends LuaTable{
 	LuaFunction function;
 	private static String selectedLanguageCode = null;
 	private static JsonObject json;
+	private static LuaTable META = new LuaTable();
+	static {
+		META.set("__call", new SelfRemover());
+	}
 	//LuaTable meta;
 	public CallableTable(String[] docName, LuaFunction function) {
 		this.docName = docName;
 		this.function = function;
 		this.set("__luaFunction", TRUE);
+		this.setmetatable(META);
 		//meta = new LuaTable();
 		//this.setmetatable(meta);
 		if (docName == null) {
@@ -49,10 +54,30 @@ public class CallableTable extends LuaTable{
 		
 	}
 
-	@Override
-	public Varargs invoke(Varargs args) {
-		return function.invoke(args);
-	}
+//	@Override
+//	public Varargs invoke(Varargs args) {
+//		return function.invoke(args);
+//	}
+//	@Override
+//	public LuaValue call() {
+//		return function.call();
+//	}
+//	@Override
+//	public LuaValue call(LuaValue arg) {
+//		return function.call(arg);
+//	}
+//	@Override
+//	public LuaValue call(LuaValue arg1, LuaValue arg2) {
+//		return function.call(arg1, arg2);
+//	}@Override
+//	public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
+//		return function.call(arg1, arg2, arg3);
+//	}
+//	@Override
+//	public Varargs invoke() {
+//		return function.invoke();
+//	}
+
 
 	@Override
 	public String tojstring() {
@@ -133,8 +158,8 @@ public class CallableTable extends LuaTable{
 		}else
 			return NIL;
 	}
-	
-	
+
+
 	public static JsonObject getObjectFromJson(String[] path) {
 		JsonObject temp = getDocJson();
 		for(String s : path)
@@ -144,7 +169,7 @@ public class CallableTable extends LuaTable{
 				return null;
 		return temp;
 	}
-	
+
 	public static String getCurrentLanguage() {
 		return Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage().getLanguageCode();
 	}
@@ -155,7 +180,7 @@ public class CallableTable extends LuaTable{
 	public static JsonObject getDocJson( String languageCode ) { //TODO default to English on fail
 		if(languageCode.equals(selectedLanguageCode) && json != null)
 			return json;
-		
+
 		try(
 				InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "newdocs/"+languageCode+".lang")).getInputStream();
 				BufferedReader reader = new BufferedReader(new InputStreamReader(in));){
@@ -171,6 +196,25 @@ public class CallableTable extends LuaTable{
 			}
 		}finally {
 			selectedLanguageCode = languageCode;
+		}
+	}
+
+	private static final class SelfRemover extends VarArgFunction {
+		@Override
+		public Varargs invoke(Varargs args) {
+			if(args.arg1() instanceof CallableTable) {
+				CallableTable ct = (CallableTable) args.arg1();
+				return ct.function.invoke(args.subargs(2));
+			}else
+				return super.invoke(args);
+		}
+		@Override
+		public String toString() {
+			return "function";
+		}
+		@Override
+		public String tojstring() {
+			return toString();
 		}
 	}
 }

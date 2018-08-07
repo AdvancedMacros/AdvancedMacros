@@ -193,7 +193,7 @@ public class InputGUI extends Gui{
 
 		@Override
 		public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
-			if(GuiRect.isInBounds(x, y, this.x, this.y, width, 20)) {
+			if(GuiRect.isInBounds(x, y, this.x, this.y, width, 20) && isVisible) {
 				close(Utils.itemStackToLuatable(stack));
 				return true;
 			}return false;
@@ -229,7 +229,14 @@ public class InputGUI extends Gui{
 			this.x = x;
 			this.y = y;
 		}
-
+		@Override
+		public void setX(int x) {
+			this.x = x;
+		}
+		@Override
+		public void setY(int y) {
+			this.y = y;
+		}
 		@Override
 		public void setVisible(boolean b) {
 			isVisible = b;
@@ -298,7 +305,7 @@ public class InputGUI extends Gui{
 
 		@Override
 		public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
-			if(GuiRect.isInBounds(x, y, this.x, this.y, width, 20)) {
+			if(GuiRect.isInBounds(x, y, this.x, this.y, width, 20) && isVisible) {
 				close(LuaValue.valueOf(option));
 				return true;
 			}return false;
@@ -334,7 +341,17 @@ public class InputGUI extends Gui{
 			this.x = x;
 			this.y = y;
 		}
-
+		
+		@Override
+		public void setX(int x) {
+			setPos(x, y);
+		}
+		
+		@Override
+		public void setY(int y) {
+			setPos(x, y);
+		}
+		
 		@Override
 		public void setVisible(boolean b) {
 			isVisible = b;
@@ -420,7 +437,7 @@ public class InputGUI extends Gui{
 						} catch (InterruptedException e) {
 							stoped = true;
 						}
-						setInputType(inputType, arg0.tojstring());
+						setInputType(inputType, arg0.tojstring()); //seems to effect the thread check
 					}
 					Minecraft.getMinecraft().addScheduledTask(new Runnable() {
 						@Override

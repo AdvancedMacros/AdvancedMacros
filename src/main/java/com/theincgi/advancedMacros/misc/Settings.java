@@ -36,7 +36,7 @@ public class Settings {
 	public static LuaTable settings = new LuaTable();
 	private static ProtectedLuaTable textures = new ProtectedLuaTable();
 
-	private static Thread minecraftThread = Thread.currentThread();//should be anyway
+	
 
 	public static void load() throws FileNotFoundException{
 		settings = new LuaTable(); //wipe everything out then read from file
@@ -171,7 +171,7 @@ public class Settings {
 	//	}
 	private static LuaValue loadTex(String file){
 		try {
-			if(Thread.currentThread() != minecraftThread) {
+			if(Thread.currentThread() != AdvancedMacros.getMinecraftThread()) {
 				final String sFile = file;
 				ListenableFuture<LuaValue> future = Minecraft.getMinecraft().addScheduledTask(new Callable<LuaValue>() {
 					@Override

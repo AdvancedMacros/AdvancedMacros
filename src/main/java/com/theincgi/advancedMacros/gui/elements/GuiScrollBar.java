@@ -1,9 +1,12 @@
 package com.theincgi.advancedMacros.gui.elements;
 
+import org.luaj.vm2_v3_0_1.LuaError;
+
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.Focusable;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
+import com.theincgi.advancedMacros.gui.elements.GuiScrollBar.Orientation;
 import com.theincgi.advancedMacros.misc.Property;
 import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Settings;
@@ -103,12 +106,43 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 		public boolean isLEFTRIGHT(){
 			return this.equals(Orientation.LEFTRIGHT);
 		}
+		
+		@Override
+		public String toString() {
+			switch (this) {
+			case LEFTRIGHT:
+				return "horizontal";
+			case UPDOWN:
+				return "vertical";
+			}
+			return null;
+		}
+		public static Orientation from(String str) {
+			switch (str) {
+			case "horizontal":
+			case "horiz":
+			case "h":
+				return LEFTRIGHT;
+				
+			case "vertical":
+			case "vert":
+			case "v":
+				return Orientation.UPDOWN;
+
+			default:
+				throw new LuaError("unknown orientation '"+str+"'");
+			}
+		}
 	}
-
-
+	
+	public boolean isVisible() {
+		return isVisible;
+	}
+	
 	@Override
 	public void onDraw(Gui gui, int mouseX, int mouseY, float partialTicks) {
-		if(!isVisible){return;}
+		if(!isVisible()){return;}
+		
 		int barFrame =   propertyPalette.getColor("colors", "bgFrame").toInt(),
 		    barBG    =   propertyPalette.getColor("colors", "bgFill").toInt(),
 		    buttonFrame= propertyPalette.getColor("colors", "buttonFrame").toInt(),
@@ -326,6 +360,15 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	public int getItemWidth() {
 		return orientation.isUPDOWN()?wid : len;
 	}
+	
+	/**length of scrollbar*/
+	public int getLen() {
+		return len;
+	}
+	/**thickness of scrollbar*/
+	public int getWid() {
+		return wid;
+	}
 	public void resetPos() {
 		setPos(0);
 	}
@@ -380,5 +423,23 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	@Override
 	public void setFocused(boolean unused) {
 		
+	}
+	
+	/**4.0.0b - needs testing*/
+	public void setOrientation(Orientation orientation) {
+		this.orientation = orientation;
+	}
+	public Orientation getOrientation() {
+		return orientation;
+	}
+
+	@Override
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	@Override
+	public void setY(int y) {
+		this.y = y;
 	}
 }

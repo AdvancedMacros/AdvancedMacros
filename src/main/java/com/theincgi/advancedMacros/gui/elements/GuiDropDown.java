@@ -149,6 +149,14 @@ public class GuiDropDown implements Drawable, InputSubscriber, Moveable{
 		listManager.setPos(x, y+txtBG.getHei());
 		//System.out.println("SET "+x);
 	}
+	@Override
+	public void setX(int x) {
+		setPos(x, y);
+	}
+	@Override
+	public void setY(int y) {
+		setPos(x, y);
+	}
 	private boolean isVisible = true;
 	@Override
 	public void setVisible(boolean b) {

@@ -33,10 +33,10 @@ public class GuiBox extends ScriptGuiElement{
 		super.onDraw(g, mouseX, mouseY, partialTicks);
 		if(!visible) return;
 		
-		Hud2D_Rectangle.drawRectangle(x,		y, 			wid, 		thickness, 	color, z);
-		Hud2D_Rectangle.drawRectangle(x, 		y, 			thickness, 	hei, 		color, z);
-		Hud2D_Rectangle.drawRectangle(x+wid-1, 	y, 			thickness, 	hei, 		color, z);
-		Hud2D_Rectangle.drawRectangle(x, 		y+hei-1, 	wid, 		thickness, 	color, z);
+		GuiRectangle.drawRectangle(x,		y, 			wid, 		thickness, 	color, z);
+		GuiRectangle.drawRectangle(x, 		y, 			thickness, 	hei, 		color, z);
+		GuiRectangle.drawRectangle(x+wid-1, 	y, 			thickness, 	hei+thickness-1, 		color, z);
+		GuiRectangle.drawRectangle(x, 		y+hei-1, 	wid+thickness-1, 		thickness, 	color, z);
 	}
 
 	@Override

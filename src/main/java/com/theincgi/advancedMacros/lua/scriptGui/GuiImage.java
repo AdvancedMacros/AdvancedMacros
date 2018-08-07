@@ -13,6 +13,7 @@ import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.elements.GuiRect;
 import com.theincgi.advancedMacros.hud.hud2D.Hud2D_Rectangle;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
+import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -84,7 +85,7 @@ public class GuiImage extends ScriptGuiElement{
 		
 		//GlStateManager.enableColorMaterial();
 		if(lvt!=null)
-		Minecraft.getMinecraft().getTextureManager().bindTexture(lvt.getResourceLocation());
+			lvt.bindTexture();
 		
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
@@ -97,13 +98,16 @@ public class GuiImage extends ScriptGuiElement{
 		GL11.glPopAttrib();
 		
 		if(getHoverTint()!=null && GuiRect.isInBounds(mouseX, mouseY, (int)x, (int)y, (int)wid, (int)hei)) {
-			Hud2D_Rectangle.drawRectangle(x, y, wid, hei, getHoverTint(), z);
+			GuiRectangle.drawRectangle(x, y, wid, hei, getHoverTint(), z);
 		}
 	}
 	
 	public void setTexture(LuaValue v) {
 		if(v instanceof LuaValTexture){
 			lvt = (LuaValTexture) v;
+		}if(v instanceof BufferedImageControls) {
+			if(((BufferedImageControls) v).getLuaValTexture() == null) throw new LuaError("Texture not created");
+			lvt = ((BufferedImageControls) v).getLuaValTexture();
 		}else if(v.isstring()){
 			lvt = Utils.checkTexture(Settings.getTextureID(v.checkjstring()));
 		}else{

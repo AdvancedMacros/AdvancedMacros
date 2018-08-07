@@ -298,7 +298,14 @@ public class GuiRect implements Drawable, Moveable{
 		this.x = x;
 		this.y = y;
 	}
-	
+	@Override
+	public void setX(int x) {
+		setPos(x, y);
+	}
+	@Override
+	public void setY(int y) {
+		setPos(x, y);
+	}
 	@Override
 	public void setVisible(boolean b) {
 		isVisible = b;

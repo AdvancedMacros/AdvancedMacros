@@ -8,8 +8,8 @@ import com.theincgi.advancedMacros.lua.functions.ClearWorldHud;
 
 public class Hud3D extends LuaTable{
 	public Hud3D() {
-		this.set("addBlock", new AddHoloBlock());
-		this.set("addText", new AddHoloText());
+		this.set("newBlock", new AddHoloBlock());
+		this.set("newText", new AddHoloText());
 		this.set("clearAll", new ClearWorldHud());
 	}
 }

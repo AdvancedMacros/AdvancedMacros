@@ -9,6 +9,7 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import org.lwjgl.opengl.GL11;
 
 import com.theincgi.advancedMacros.lua.LuaValTexture;
+import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -55,11 +56,16 @@ public class Hud2D_Image extends Hud2D_Rectangle {
 	public void setTexture(LuaValue v) {
 		if(v instanceof LuaValTexture){
 			lvt = (LuaValTexture) v;
+		}if(v instanceof BufferedImageControls) {
+			if(((BufferedImageControls) v).getLuaValTexture() == null) throw new LuaError("Texture not created");
+			lvt = ((BufferedImageControls) v).getLuaValTexture();
 		}else if(v.isstring()){
 			lvt = Utils.checkTexture(Settings.getTextureID(v.checkjstring()));
 		}else{
 			lvt = Utils.checkTexture(Settings.getTextureID("resource:holoblock.png"));
 		}
+		if(lvt == null)
+			lvt = Utils.checkTexture(Settings.getTextureID("resource:holoblock.png"));
 	}
 
 	public void setUV(float uMin, float vMin, float uMax, float vMax) {
@@ -84,7 +90,8 @@ public class Hud2D_Image extends Hud2D_Rectangle {
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 		
 		//GlStateManager.enableColorMaterial();
-		Minecraft.getMinecraft().getTextureManager().bindTexture(lvt.getResourceLocation());
+		
+		lvt.bindTexture();
 		
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		buffer.begin(7, DefaultVertexFormats.POSITION_TEX);

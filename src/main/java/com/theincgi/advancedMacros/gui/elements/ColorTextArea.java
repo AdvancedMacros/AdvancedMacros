@@ -1139,7 +1139,14 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		hBar.setPos(x, y+hei-7);
 		vBar.setPos(x+wid-7, y);
 	}
-
+	@Override
+	public void setX(int x) {
+		setPos(x, y);
+	}
+	@Override
+	public void setY(int y) {
+		setPos(x, y);
+	}
 	@Override
 	public void setVisible(boolean b) {
 		isVisible = b;
@@ -1505,4 +1512,5 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	public boolean isEditable() {
 		return isEditable;
 	}
+	
 }

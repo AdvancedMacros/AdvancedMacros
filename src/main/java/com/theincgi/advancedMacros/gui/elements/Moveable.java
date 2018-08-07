@@ -2,7 +2,8 @@ package com.theincgi.advancedMacros.gui.elements;
 
 public interface Moveable {
 	void setPos(int x, int y);
-
+	void setX(int x);
+	void setY(int y);
 	/**should not interact with input events when hidden*/
 	void setVisible(boolean b);
 

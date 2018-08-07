@@ -4,6 +4,8 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 
 import com.theincgi.advancedMacros.misc.Settings;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.ResourceLocation;
 
@@ -18,6 +20,10 @@ public class LuaValTexture extends LuaValue{
 		this.dTex = dTex;
 		this.name = name;
 		r = Settings.fromDynamic(name, dTex);
+	}
+	public LuaValTexture(DynamicTexture dTex) {
+		super();
+		this.dTex = dTex;
 	}
 	public LuaValTexture(String name, ResourceLocation r) {
 		super();
@@ -54,6 +60,12 @@ public class LuaValTexture extends LuaValue{
 	}
 	public ResourceLocation getResourceLocation() {
 		return r;
+	}
+	public void bindTexture() {
+		if(r!=null)
+			Minecraft.getMinecraft().getTextureManager().bindTexture(r);
+		else
+			GlStateManager.bindTexture(dTex.getGlTextureId());
 	}
 	public DynamicTexture getDynamicTexture() {
 		return dTex;

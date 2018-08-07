@@ -13,6 +13,7 @@ import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.lua.LuaFunctions.Log;
@@ -20,6 +21,7 @@ import com.theincgi.advancedMacros.lua.LuaValTexture;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -731,5 +733,12 @@ public class Utils {
 				   .replaceAll("&I",         sel + "o")
 				   ;
 	}
-	
+	public static void runOnMCThreadAndWait(Runnable r){
+		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {
+			r.run();
+			return;
+		}
+		ListenableFuture<Object> f = Minecraft.getMinecraft().addScheduledTask(r);
+		while(!f.isDone()) try{Thread.sleep(5);}catch (InterruptedException ie) {return;}
+	}
 }

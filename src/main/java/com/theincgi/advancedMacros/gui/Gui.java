@@ -26,7 +26,7 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	public InputSubscriber nextKeyListen = null;
 	private LinkedList<Drawable> drawables = new LinkedList<>();
 	public volatile Drawable drawLast = null;
-	private Focusable focusItem = null;
+	private Object focusItem = null;
 	/**Strictly key typed and mouse clicked events atm*/
 	public InputSubscriber firstSubsciber;
 
@@ -286,11 +286,11 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 
 	}
 
-	public Focusable getFocusItem() {
+	public Object getFocusItem() {
 		//System.out.println("Foooocas "+focusItem);
 		return focusItem;
 	}
-	public void setFocusItem(Focusable focusItem) {
+	public void setFocusItem(Object focusItem) {
 		this.focusItem = focusItem;
 		//System.out.println("FOCUS: >> "+focusItem);
 	}

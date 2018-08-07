@@ -217,8 +217,16 @@ public class Group extends LuaTable implements Moveable, InputSubscriber, Drawab
 		int dy = y - this.getY();
 		move(dx, dy);
 	}
-
-
+	
+	@Override
+	public void setX(int x) {
+		setPos(x, 0);
+	}
+	@Override
+	public void setY(int y) {
+		setPos(0, y);
+	}
+	
 	@Override
 	public void setVisible(boolean b) {
 		this.groupVisiblity = b;

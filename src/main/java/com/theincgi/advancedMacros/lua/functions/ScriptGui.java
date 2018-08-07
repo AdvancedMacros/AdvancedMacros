@@ -12,12 +12,16 @@ import org.lwjgl.input.Mouse;
 
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
+import com.theincgi.advancedMacros.gui.elements.GuiScrollBar;
+import com.theincgi.advancedMacros.gui.elements.GuiScrollBar.Orientation;
 import com.theincgi.advancedMacros.lua.scriptGui.Group;
 import com.theincgi.advancedMacros.lua.scriptGui.GuiBox;
 import com.theincgi.advancedMacros.lua.scriptGui.GuiCTA;
 import com.theincgi.advancedMacros.lua.scriptGui.GuiImage;
 import com.theincgi.advancedMacros.lua.scriptGui.GuiItemIcon;
 import com.theincgi.advancedMacros.lua.scriptGui.GuiRectangle;
+import com.theincgi.advancedMacros.lua.scriptGui.MCTextBar;
+import com.theincgi.advancedMacros.lua.scriptGui.ScriptGuiScrollBar;
 import com.theincgi.advancedMacros.lua.scriptGui.ScriptGuiText;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -30,7 +34,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 	Gui gui;
 	//LuaTable controls = new LuaTable();
 	LuaFunction onScroll, onMouseClick, onMouseRelease, onMouseDrag, onKeyPressed, onKeyRepeated, onKeyReleased, onGuiClose,
-	onGuiOpen;
+	onGuiOpen, onResize;
 	Group guiGroup = new Group();
 	ScriptGui parentGui = null;
 	public ScriptGui() { 
@@ -53,12 +57,18 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				super.drawScreen(mouseX, mouseY, partialTicks);
 			};
 			@Override
+			public void onResize(Minecraft mcIn, int w, int h) {
+				super.onResize(mcIn, w, h);
+				if(onResize!=null)
+					onResize.call(valueOf(w), valueOf(h));
+			}
+			@Override
 			public String toString() {
 				return "ScriptGui:"+guiName;
 			}
 		};
 		gui.inputSubscribers.add(this); //tell yourself everything!
-		set("addRectangle", new VarArgFunction() {
+		set("newRectangle", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs args) {
 				GuiRectangle r = new GuiRectangle(gui, guiGroup);
@@ -69,7 +79,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				return r;
 			}
 		});
-		set("addBox", new VarArgFunction() {
+		set("newBox", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs args) {
 				GuiBox r = new GuiBox(gui, guiGroup);
@@ -81,13 +91,13 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				return r;
 			}
 		});
-		set("addGroup", new ZeroArgFunction() {
+		set("newGroup", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
 				return new Group(guiGroup);
 			}
 		});
-		set("addText", new VarArgFunction() {
+		set("newText", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs args) {
 				ScriptGuiText t = new ScriptGuiText(gui, guiGroup);
@@ -98,7 +108,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				return t;
 			}
 		});
-		set("addTextArea", new VarArgFunction() {
+		set("newTextArea", new VarArgFunction() {
 			@Override public Varargs invoke(Varargs args) {
 				GuiCTA cta = new GuiCTA(gui, guiGroup);
 				cta.setPos((int)args.optdouble(1, 0) , (int)args.optdouble(2, 0) );
@@ -108,7 +118,33 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				return cta;
 			}
 		});
-		set("addImage", new VarArgFunction() {
+		set("newScrollBar", new VarArgFunction() {
+			@Override
+			public Varargs invoke(Varargs args) {
+				int x = args.optint(1, 0);
+				int y = args.optint(2, 0);
+				int wid = args.optint(3, 0);
+				int len = args.optint(4, 0);
+				Orientation orient = Orientation.from(args.arg(5).optjstring("vertical"));
+				if(orient.isLEFTRIGHT()) {
+					int t = wid;
+					wid = len;
+					len = t;
+				}
+				return new ScriptGuiScrollBar(gui, guiGroup, x, y, wid, len, orient); 
+			}
+		});
+		set("newMinecraftTextField", new VarArgFunction() {
+			@Override public Varargs invoke(Varargs args) {
+				MCTextBar text = new MCTextBar(gui, guiGroup);
+				text.setPos((int)args.optdouble(1, 0) , (int)args.optdouble(2, 0) );
+				text.setWidth(  args.optint(3, 0) );
+				text.setHeight( args.optint(4, 0) );
+				text.setText( args.optstring(5, valueOf("")).tojstring() );
+				return text;
+			}
+		});
+		set("newImage", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs args) {
 				GuiImage t = new GuiImage(gui, guiGroup);
@@ -120,7 +156,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				return t;
 			}
 		});
-		set("addItem", new VarArgFunction() {
+		set("newItem", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs args) {
 				GuiItemIcon gii = new GuiItemIcon(gui, guiGroup);
@@ -196,86 +232,94 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 		addInputControls(this);
 	}
 
-	
-	
-	
-	
-	//TODO resize event
-	
 
-public static class CreateScriptGui extends ZeroArgFunction{
-	@Override
-	public LuaValue call() {
-		return new ScriptGui();
+
+
+
+	//TODO resize event
+
+
+
+	public static class CreateScriptGui extends ZeroArgFunction{
+		@Override
+		public LuaValue call() {
+			return new ScriptGui();
+		}
 	}
-}
 
 
 	public void addInputControls(LuaTable s) {
-	s.set("setOnScroll", new OneArgFunction() {
-		@Override
-		public LuaValue call(LuaValue arg) {
-			onScroll = arg.checkfunction();
-			return LuaValue.NONE;
-		}
-	});
-	s.set("setOnMouseClick", new OneArgFunction() {
-		@Override
-		public LuaValue call(LuaValue arg) {
-			onMouseClick = arg.checkfunction();
-			return LuaValue.NONE;
-		}
-	});
-	s.set("setOnMouseRelease", new OneArgFunction() {
-		@Override
-		public LuaValue call(LuaValue arg) {
-			onMouseRelease = arg.checkfunction();
-			return LuaValue.NONE;
-		}
-	});
-	s.set("setOnMouseDrag", new OneArgFunction() {
-		@Override
-		public LuaValue call(LuaValue arg) {
-			onMouseDrag = arg.checkfunction();
-			return LuaValue.NONE;
-		}
-	});
-	s.set("setOnKeyPressed", new OneArgFunction() {
-		@Override
-		public LuaValue call(LuaValue arg) {
-			onKeyPressed = arg.checkfunction();
-			return LuaValue.NONE;
-		}
-	});
-	s.set("setOnKeyReleased", new OneArgFunction() {
-		@Override
-		public LuaValue call(LuaValue arg) {
-			onKeyReleased = arg.checkfunction();
-			return LuaValue.NONE;
-		}
-	});
-	s.set("setOnKeyRepeated", new OneArgFunction() {
-		@Override
-		public LuaValue call(LuaValue arg) {
-			onKeyRepeated = arg.checkfunction();
-			return LuaValue.NONE;
-		}
-	});
-	s.set("setOnOpen", new OneArgFunction() {
-		@Override
-		public LuaValue call(LuaValue arg) {
-			onGuiOpen = arg.checkfunction();
-			return NONE;
-		}
-	});
-	s.set("setOnClose", new OneArgFunction() {
-		@Override
-		public LuaValue call(LuaValue arg) {
-			onGuiClose = arg.checkfunction();
-			return NONE;
-		}
-	});
-}
+		s.set("setOnResize", new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg) {
+				onResize = arg.checkfunction();
+				return LuaValue.NONE;
+			}
+		});
+		s.set("setOnScroll", new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg) {
+				onScroll = arg.checkfunction();
+				return LuaValue.NONE;
+			}
+		});
+		s.set("setOnMouseClick", new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg) {
+				onMouseClick = arg.checkfunction();
+				return LuaValue.NONE;
+			}
+		});
+		s.set("setOnMouseRelease", new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg) {
+				onMouseRelease = arg.checkfunction();
+				return LuaValue.NONE;
+			}
+		});
+		s.set("setOnMouseDrag", new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg) {
+				onMouseDrag = arg.checkfunction();
+				return LuaValue.NONE;
+			}
+		});
+		s.set("setOnKeyPressed", new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg) {
+				onKeyPressed = arg.checkfunction();
+				return LuaValue.NONE;
+			}
+		});
+		s.set("setOnKeyReleased", new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg) {
+				onKeyReleased = arg.checkfunction();
+				return LuaValue.NONE;
+			}
+		});
+		s.set("setOnKeyRepeated", new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg) {
+				onKeyRepeated = arg.checkfunction();
+				return LuaValue.NONE;
+			}
+		});
+		s.set("setOnOpen", new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg) {
+				onGuiOpen = arg.checkfunction();
+				return NONE;
+			}
+		});
+		s.set("setOnClose", new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg) {
+				onGuiClose = arg.checkfunction();
+				return NONE;
+			}
+		});
+	}
 
 	@Override
 	public boolean onScroll(Gui gui, int i) {
@@ -332,6 +376,6 @@ public static class CreateScriptGui extends ZeroArgFunction{
 			return Utils.pcall(onKeyReleased, LuaValue.valueOf(typedChar+""), LuaValue.valueOf(keyCode)).optboolean(false);
 		return false;
 	}
-	
-	
+
+
 }

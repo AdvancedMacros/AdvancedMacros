@@ -21,10 +21,12 @@ import com.theincgi.advancedMacros.misc.Utils;
 
 public class GraphicsContextControls extends LuaTable{
 	BufferedImage img;
+	BufferedImageControls bic;
 	Graphics g;
-	public GraphicsContextControls(BufferedImage bi) {
-		img = bi;
-		g = bi.getGraphics();
+	public GraphicsContextControls(BufferedImageControls bi) {
+		bic = bi;
+		img = bi.img;
+		g = img.getGraphics();
 
 		loadFuncs();
 
@@ -76,6 +78,7 @@ public class GraphicsContextControls extends LuaTable{
 			}
 			case destroy: //aka dispose
 				g.dispose();
+				bic.getLuaValTexture().deleteTex();
 				return NONE;
 
 			case setColor: {
