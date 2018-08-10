@@ -73,7 +73,7 @@ public class BufferedImageControls extends LuaTable{
 			public LuaValue call(LuaValue x, LuaValue y) {
 				Color b = colorBuffer.get();
 				b.fromHex(img.getRGB(x.checkint()-1, y.checkint()-1));
-				return b.toLuaValue();
+				return b.toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255);
 			}
 		});
 		set("setPixel", new VarArgFunction() {
@@ -82,7 +82,7 @@ public class BufferedImageControls extends LuaTable{
 				int x = args.checkint(1)-1;
 				int y = args.checkint(2)-1;
 				args = args.subargs(3);
-				img.setRGB(x, y, Utils.parseColor(args).toInt());
+				img.setRGB(x, y, Utils.parseColor(args, AdvancedMacros.COLOR_SPACE_IS_255).toInt());
 				return NONE;
 			}
 		});
@@ -111,7 +111,7 @@ public class BufferedImageControls extends LuaTable{
 					cols.set(x+1, sCol);
 					for(int y = 0; y<img.getHeight(); y++) {
 						buf.fromHex( img.getRGB(x, y) );
-						sCol.set(y+1, buf.toLuaValue());
+						sCol.set(y+1, buf.toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255));
 					}
 				}
 				return cols;

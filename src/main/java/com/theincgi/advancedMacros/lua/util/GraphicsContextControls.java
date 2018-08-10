@@ -15,6 +15,7 @@ import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
 import com.google.common.base.FinalizableWeakReference;
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Utils;
@@ -63,14 +64,30 @@ public class GraphicsContextControls extends LuaTable{
 					case 2:
 						g.drawImage(bic.getImg(), args.arg(1).checkint()-1, args.arg(2).checkint()-1, null);
 						return NONE;
+						
 					case 4:
-						g.drawImage(bic.getImg(), args.checkint(1)-1, args.checkint(2)-1, //dest x, y 1
-								args.checkint(3)-1, args.checkint(4)-1, //dest x, y 2
-								args.checkint(5)-1, args.checkint(6)-1, //source x, y 1
-								args.checkint(7)-1, args.checkint(8)-1, null);  //source x, y 2
+					case 6:
+					case 8:
+						int destX = args.checkint(1)-1;
+						int destY = args.checkint(2)-1;
+						int destW = args.checkint(3)-destX + 1;
+						int destH = args.checkint(4)-destY + 1;
+
+						int srcX = args.optint(5, 1) - 1;
+						int srcY = args.optint(6, 1) - 1;
+						int maxW = bic.getImg().getWidth() - srcX + 1;
+						int maxH = bic.getImg().getHeight() - srcY + 1;
+						int srcW = args.optint(7, maxW) - srcX + 1;
+						int srcH = args.optint(8, maxH) - srcY + 1;
+						
+						g.drawImage(bic.getImg(), destX, destY,
+												  destW, destH,
+												  srcX,  srcY,
+												  srcW,  srcH, null);  //source x, y 2
 						return NONE;
+					
 					default:
-						throw new LuaError("Unexpected argument count, 3 or 5, got "+(args.narg()+1));
+						throw new LuaError("Unexpected arguments, expected (pic, x, y, [wid, hei [, srcX, srcY [,srcWid, srcHei]])]");
 					}
 				}else {
 					throw new LuaError("arg 1 is not a usable image");
@@ -82,7 +99,7 @@ public class GraphicsContextControls extends LuaTable{
 				return NONE;
 
 			case setColor: {
-				g.setColor(Utils.parseColor(args).toAWTColor());
+				g.setColor(Utils.parseColor(args, AdvancedMacros.COLOR_SPACE_IS_255).toAWTColor());
 				return NONE;
 			}
 			case translate:
@@ -94,14 +111,14 @@ public class GraphicsContextControls extends LuaTable{
 						args.checkint(3)-1, args.checkint(4)-1); //width, height
 				return NONE;
 			case getColor:
-				return new Color(g.getColor().getRGB()).toLuaValue();
+				return new Color(g.getColor().getRGB()).toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255);
 
 			case setPaintMode:
 				g.setPaintMode();
 				return NONE;
 
 			case setXORMode:
-				g.setXORMode(Utils.parseColor(args).toAWTColor());
+				g.setXORMode(Utils.parseColor(args,AdvancedMacros.COLOR_SPACE_IS_255).toAWTColor());
 				return NONE;
 
 			case getFont:{
@@ -345,7 +362,7 @@ public class GraphicsContextControls extends LuaTable{
 			//image.new.___
 			String[] arr = new String[3];
 			arr[0] = "image";
-			arr[1] = "new";
+			arr[1] = "new()";
 			switch (this) {
 			case getFonts:
 				arr[2] = "getFonts";

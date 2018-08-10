@@ -44,8 +44,7 @@ import com.theincgi.advancedMacros.lua.functions.Call;
 import com.theincgi.advancedMacros.lua.functions.FileSystem;
 import com.theincgi.advancedMacros.lua.functions.GetBiome;
 import com.theincgi.advancedMacros.lua.functions.GetBlock;
-import com.theincgi.advancedMacros.lua.functions.GetEntityData;
-import com.theincgi.advancedMacros.lua.functions.GetEntityList;
+import com.theincgi.advancedMacros.lua.functions.GetBlockList;
 import com.theincgi.advancedMacros.lua.functions.GetInventory;
 import com.theincgi.advancedMacros.lua.functions.GetLoadedPlayers;
 import com.theincgi.advancedMacros.lua.functions.GetOSMilliseconds;
@@ -71,6 +70,8 @@ import com.theincgi.advancedMacros.lua.functions.SetProfile;
 import com.theincgi.advancedMacros.lua.functions.SkinCustomizer;
 import com.theincgi.advancedMacros.lua.functions.StopAllScripts;
 import com.theincgi.advancedMacros.lua.functions.Toast;
+import com.theincgi.advancedMacros.lua.functions.entity.GetEntityData;
+import com.theincgi.advancedMacros.lua.functions.entity.GetEntityList;
 import com.theincgi.advancedMacros.lua.functions.midi.MidiLib2;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
 import com.theincgi.advancedMacros.misc.CustomFontRenderer;
@@ -84,6 +85,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -96,7 +98,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "5.1.0"; //${version} ?? //previously .1
+	public static final String VERSION = "5.2.0"; //${version} ?? //previously .1
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -118,7 +120,8 @@ public class AdvancedMacros {
 	private static final DocumentationManager documentationManager = new DocumentationManager();
 	private JarLibSearcher jarLibSearcher;
 	private static Thread minecraftThread;
-
+	
+	public static final boolean COLOR_SPACE_IS_255 = false;
 	//protected static ArrayList customEventNames;
 
 	//	public static FloatBuffer modelView3d = BufferUtils.createFloatBuffer(16);
@@ -128,6 +131,7 @@ public class AdvancedMacros {
 
 	@EventHandler @SideOnly(Side.CLIENT)//skipped the proxy system, this is only client side
 	public void init(FMLInitializationEvent event){
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		try {
 			if(event.getSide().isServer()){return;}
 			minecraftThread = Thread.currentThread();
@@ -144,6 +148,14 @@ public class AdvancedMacros {
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
+			
+			
+			loadFunctions();
+			loadLibJars();
+			
+			loadScripts();
+			
+			
 			otherCustomFontRenderer = new FontRendererOverride();
 			otherCustomFontRenderer.onResourceManagerReload(null);
 			//Utils.loadTextCodes();
@@ -155,11 +167,9 @@ public class AdvancedMacros {
 			runningScriptsGui = new RunningScriptsGui(debug);
 			Settings.save(); //changed order
 			Settings.getProfileList();//generate DEFAULT 
-			
-			loadFunctions();
-			loadLibJars();
 			macroMenuGui.loadProfile("DEFAULT");
-			loadScripts();
+			
+			globals.set("prompt", inputGUI.getPrompt());
 			//		HudText text = new HudText(true);
 			//		text.setDrawType(DrawType.XRAY);
 			//		text.setPos(0, 5, 0);
@@ -171,6 +181,7 @@ public class AdvancedMacros {
 
 	@SideOnly(Side.CLIENT)
 	public void postInit(FMLPostInitializationEvent event) {
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		editorGUI.postInit();
 
 	}
@@ -204,7 +215,7 @@ public class AdvancedMacros {
 		} catch (NoSuchFieldException | IllegalAccessException | RuntimeException e) {
 			e.printStackTrace();
 		}
-
+		globals.set("getBlockList", new GetBlockList());
 		globals.set("log", logFunc = new LuaFunctions.Log());
 		globals.set("advLog", new AdvLog());
 		globals.set("say", sayFunc = new LuaFunctions.Say());
@@ -269,7 +280,7 @@ public class AdvancedMacros {
 		globals.set("isKeyDown", new IsKeyHeld());
 		globals.set("getHeldKeys", new AdvancedMacros().forgeEventHandler.new GetHeldKeys());
 		globals.set("filesystem", new FileSystem());
-		globals.set("prompt", inputGUI.getPrompt());
+
 
 		LuaTable guiStuff = new LuaTable();
 		guiStuff.set("new", new ScriptGui.CreateScriptGui());
@@ -375,7 +386,7 @@ public class AdvancedMacros {
 		try {
 			FileReader fr = new FileReader(f);
 			LuaValue function = AdvancedMacros.globals.load(fr, scriptName);
-			LuaDebug.LuaThread t = new LuaDebug.LuaThread(function, args, scriptName);
+			LuaDebug.LuaThread t = new LuaDebug.LuaThread(function, args.unpack(), scriptName);
 			t.start();
 		} catch (FileNotFoundException e) {
 			AdvancedMacros.logFunc.call(LuaValue.valueOf("&c"+"Could not find script '"+scriptName+"'"));

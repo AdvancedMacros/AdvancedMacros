@@ -18,6 +18,7 @@ import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.lua.LuaFunctions.Log;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
+import com.theincgi.advancedMacros.lua.util.ContainerControls;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
 
 import net.minecraft.block.Block;
@@ -26,6 +27,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagByte;
@@ -87,7 +89,44 @@ public class Utils {
 		return out;
 	}
 
-	public static Color parseColor(Varargs v){
+	public static Color parseColor(Varargs v, boolean use255Space) {
+		if(use255Space)
+			return parseColor(v);
+		else {
+			float a=1,r,g,b;
+			switch (v.narg()) {
+
+			case 1:
+				LuaValue val = v.arg1();
+				if(val.isnumber()){
+					return new Color(val.checkint());
+				}else if(val.istable()){
+					if(val.get("r").isint()&&val.get("g").isint()&&val.get("b").isint()){
+						r = (float) val.get("r").checkdouble();
+						g = (float) val.get("g").checkdouble();
+						b = (float) val.get("b").checkdouble();
+						if(val.get("a").isint()){
+							a = val.get("a").checkint();
+						}
+						return new Color(a, r, g, b);
+					}else{
+						return parseColor(val.checktable().unpack(), use255Space);
+					}
+				}
+				break;
+			case 4:
+
+				a = (float) v.arg(4).checkdouble();
+			case 3:
+				r = (float) v.arg(1).checkdouble();
+				g = (float) v.arg(2).checkdouble();
+				b = (float) v.arg(3).checkdouble();
+				return new Color(a, r, g, b);
+			}
+			return new Color(0xFF000000);	
+		}
+	}
+	private static Color parseColor(Varargs v){
 		int a=255,r,g,b;
 		switch (v.narg()) {
 
@@ -275,7 +314,8 @@ public class Utils {
 		return t;
 	}
 
-	public static LuaTable entityToTable(Entity entity) {
+	public static LuaValue entityToTable(Entity entity) {
+		if(entity==null) return LuaValue.FALSE;
 		LuaTable t = new LuaTable();
 		t.set("name", entity.getName());
 		t.set("class", entity.getClass().getName());
@@ -346,7 +386,7 @@ public class Utils {
 		t.set("isImmuneToExplosion", LuaValue.valueOf(entity.isImmuneToExplosions()));
 		t.set("isOnFire", LuaValue.valueOf(entity.isBurning()));
 		t.set("isSprinting", LuaValue.valueOf(entity.isSprinting()));
-
+		t.set("entityRiding", Utils.entityToTable(entity.getRidingEntity()));
 		t.set("isInvisible", LuaValue.valueOf(entity.isInvisible()));
 		t.set("uuid", LuaValue.valueOf(entity.getUniqueID().toString()));
 		{
@@ -695,7 +735,7 @@ public class Utils {
 			return LuaValue.NIL;
 		}
 	}
-	public static LuaValue toLuaTable(Set<String> keySet) {
+	public static LuaValue toTable(Set<String> keySet) {
 		LuaTable t = new LuaTable();
 		for(String s : keySet)
 			t.set(t.length()+1, s);
@@ -719,7 +759,9 @@ public class Utils {
 			lvt = ((BufferedImageControls) v).getLuaValTexture();
 		}else if(v.isstring()){
 			lvt = Utils.checkTexture(Settings.getTextureID(v.checkjstring()));
-		}else{
+//		}else if(v.isnil()){
+//			lvt = null;
+		}else {
 			lvt = def;
 		}
 		return lvt;
@@ -760,5 +802,15 @@ public class Utils {
 		}
 		ListenableFuture<Object> f = Minecraft.getMinecraft().addScheduledTask(r);
 		while(!f.isDone()) try{Thread.sleep(5);}catch (InterruptedException ie) {return;}
+	}
+	public static LuaValue toTable(Container container) {
+		LuaTable out = new LuaTable();
+		LuaTable slots = new LuaTable();
+		for(int i = 0; i<container.inventoryItemStacks.size(); i++) {
+			out.set(i, itemStackToLuatable(container.inventoryItemStacks.get(i)));
+		}
+		out.set("slots", slots);
+		out.set("controls", new ContainerControls(container));
+		return out;
 	}
 }

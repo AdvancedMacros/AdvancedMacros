@@ -5,15 +5,19 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Scanner;
 
 import org.luaj.vm2_v3_0_1.LuaClosure;
 import org.luaj.vm2_v3_0_1.LuaFunction;
+import org.luaj.vm2_v3_0_1.LuaTable;
+import org.luaj.vm2_v3_0_1.LuaValue;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
+import com.theincgi.advancedMacros.misc.CallableTable;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
@@ -57,16 +61,26 @@ public class DocumentationManager {
 
 		LinkedList<String> commentDoc = checkForCommentDocumentation(withCase);
 		if(commentDoc!=null) return lastResponseL1 = commentDoc;
+		try {
+			in = new FileInputStream(new File(AdvancedMacros.customDocsFolder, fName+".txt"));
+		} catch (FileNotFoundException e) {//this is fine, no custom doc made
+			//System.out.println("No custom doc");
+		}
+		if(in==null) {
 			try {
-				in = new FileInputStream(new File(AdvancedMacros.customDocsFolder, fName+".txt"));
-			} catch (FileNotFoundException e) {//this is fine, no custom doc made
-				//System.out.println("No custom doc");
+				LinkedList<String> lines = checkForTableDoc(withCase);
+				if(lines!=null)
+					return lastResponseL1 = lines;
+			} catch (Exception e) {
+				e.printStackTrace();
+				//return last
 			}
+		}
 		if(in==null) {
 			try {
 				in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "docs/"+fName+".txt")).getInputStream();
 			} catch (IOException e) {
-				return lastResponseL1 = null;
+				//return lastResponseL1 = null; set in the last one
 			}
 		}
 		if(in==null) {/*System.out.println("No resource! ("+fName+")");*/return lastResponseL1 = null;}
@@ -81,6 +95,29 @@ public class DocumentationManager {
 		}while(lines.size() < 3);
 		scany.close();
 		return lastResponseL1=lines;
+	}
+	private LinkedList<String> checkForTableDoc(String fName) {
+		LinkedList<String> out = new LinkedList<>();
+		HashMap<String, Object> map = AdvancedMacros.editorGUI.getCta().getTablesMap();
+		
+		LuaTable t = (LuaTable) map.get(fName);
+		if(t==null) return null;
+		if(t.getmetatable() == null) return null;
+		t = t.getmetatable().checktable();
+		if(t.get(CallableTable.LUA_FUNCTION_KEY).optboolean(false)) {
+			out.add(t.get(CallableTable.DEFINITION).checkjstring());
+			LuaValue temp = t.get(CallableTable.TOOLTIP);
+			if(temp.istable()) {
+				LuaTable tooltip = t.get(CallableTable.TOOLTIP).checktable();
+				for(int i = 1; i<=tooltip.length(); i++) {
+					out.add(tooltip.get(i).checkjstring());
+				}
+			}else {
+				out.add(temp.checkjstring());
+			}
+			return out;
+		}
+		return null;
 	}
 	private LinkedList<String> checkForCommentDocumentation(String fName) {
 		LuaFunction f = (LuaFunction) AdvancedMacros.editorGUI.getCta().getFunctionsMap().get(fName);
@@ -105,7 +142,7 @@ public class DocumentationManager {
 				}
 				if(lines.size()>0)
 					return lines;
-				
+
 			}catch (IOException e) {
 				e.printStackTrace();
 			}

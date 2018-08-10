@@ -2,6 +2,7 @@ package com.theincgi.advancedMacros.lua.functions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaValue;
@@ -14,7 +15,7 @@ public class IsKeyHeld  extends OneArgFunction{
 	@Override
 	public LuaValue call(LuaValue arg0) {
 		String s = arg0.checkjstring();
-		HashMap<Integer, Boolean> heldKeys = AdvancedMacros.forgeEventHandler.getHeldKeys();
+		ConcurrentHashMap<Integer, Boolean> heldKeys = AdvancedMacros.forgeEventHandler.getHeldKeys();
 		ArrayList<Boolean> heldMouseButtons = AdvancedMacros.forgeEventHandler.getHeldMouseButtons();
 		switch (s) {
 		case "LMB":

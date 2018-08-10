@@ -7,6 +7,7 @@ import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.misc.Property;
@@ -198,21 +199,21 @@ public class GuiRect implements Drawable, Moveable{
 	private class SetFill extends VarArgFunction{
 		@Override
 		public Varargs invoke(Varargs args) {
-			fill = Utils.parseColor(args);
+			fill = Utils.parseColor(args, AdvancedMacros.COLOR_SPACE_IS_255);
 			return LuaValue.NONE;
 		}
 	}
 	private class SetFrame extends VarArgFunction{
 		@Override
 		public Varargs invoke(Varargs args) {
-			frame = Utils.parseColor(args);
+			frame = Utils.parseColor(args, AdvancedMacros.COLOR_SPACE_IS_255);
 			return LuaValue.NONE;
 		}
 	}
 	private class SetShade extends VarArgFunction{
 		@Override
 		public Varargs invoke(Varargs args) {
-			shade = Utils.parseColor(args);
+			shade = Utils.parseColor(args, AdvancedMacros.COLOR_SPACE_IS_255);
 			return LuaValue.NONE;
 		}
 	}
@@ -235,13 +236,13 @@ public class GuiRect implements Drawable, Moveable{
 	private class GetFill extends ZeroArgFunction{
 		@Override
 		public LuaValue call() {
-			return fill.toLuaValue();
+			return fill.toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255);
 		}
 	}
 	private class GetFrame extends ZeroArgFunction{
 		@Override
 		public LuaValue call() {
-			return frame.toLuaValue();
+			return frame.toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255);
 		}
 	}
 	
@@ -266,15 +267,15 @@ public class GuiRect implements Drawable, Moveable{
 	private class GetShade extends ZeroArgFunction{
 		@Override
 		public LuaValue call() {
-			return shade.toLuaValue();
+			return shade.toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255);
 		}
 	}
 	
 	public static LuaTable getDefaultColorScheme(){
 		LuaTable buttonColors = new LuaTable();
-		buttonColors.set("frame", new Color(255, 255, 255).toLuaValue());
-		buttonColors.set("fill", new Color(100, 100, 100).toLuaValue());
-		buttonColors.set("shade", new Color(0, 0, 0, 0).toLuaValue());
+		buttonColors.set("frame", new Color(255, 255, 255).toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255));
+		buttonColors.set("fill", new Color(100, 100, 100).toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255));
+		buttonColors.set("shade", new Color(0, 0, 0, 0).toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255));
 		//buttonColors.set("text", new Color(255, 255, 255).toLuaValue());
 		return buttonColors;
 	}

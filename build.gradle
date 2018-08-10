@@ -11,7 +11,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 //apply plugin: 'com.theincgi.advancedMacros.asm'
 
-version = "5.1.0"
+version = "5.3.0"
 group = "com.theincgi.advancedMacros" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "advancedmacros"
 
@@ -31,6 +31,13 @@ minecraft {
     // simply re-run your setup task after changing the mappings to update your workspace.
     mappings = "snapshot_20171003"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+}
+
+jar {
+    manifest {
+        attributes 'FMLCorePlugin': 'com.theincgi.asm.AdvancedMacrosCorePlugin'
+        attributes 'FMLCorePluginContainsMod': 'true'
+    }
 }
 
 dependencies {

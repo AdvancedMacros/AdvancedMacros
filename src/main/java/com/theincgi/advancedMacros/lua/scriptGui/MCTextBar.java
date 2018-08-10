@@ -98,7 +98,7 @@ public class MCTextBar extends ScriptGuiElement{
 				textField.setCursorPosition(args.arg1().checkint());
 				return NONE;
 			case setDisabledTxtColor:
-				textField.setDisabledTextColour(Utils.parseColor(args).toInt());
+				textField.setDisabledTextColour(Utils.parseColor(args, AdvancedMacros.COLOR_SPACE_IS_255).toInt());
 				return NONE;
 			case setEnabled:
 				textField.setEnabled(args.arg1().checkboolean());
@@ -116,7 +116,7 @@ public class MCTextBar extends ScriptGuiElement{
 				textField.setText(args.arg1().checkjstring());
 				return NONE;
 			case setTextColor:
-				textField.setTextColor(Utils.parseColor(args).toInt());
+				textField.setTextColor(Utils.parseColor(args, AdvancedMacros.COLOR_SPACE_IS_255).toInt());
 			default:
 				throw new LuaError("Unimplemented");
 			}

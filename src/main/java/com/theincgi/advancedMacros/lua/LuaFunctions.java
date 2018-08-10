@@ -10,6 +10,8 @@ import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
+import com.theincgi.advancedMacros.misc.CallableTable;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.ITextComponent.Serializer;
@@ -231,7 +233,7 @@ public class LuaFunctions {
 					s+=rep(" ",indent)+"&f[&c"+k.tojstring()+"&f] = <&4RECURSIVE&f> &e"+v.tojstring()+"&f{&4...&f}\n";
 				}else{
 					LuaTable vTab = v.checktable();
-					if(vTab.get("__luaFunction").optboolean(false)) {
+					if(vTab.getmetatable()!=null && vTab.getmetatable().istable() && vTab.getmetatable().get(CallableTable.LUA_FUNCTION_KEY).optboolean(false)) {
 						s+=rep(" ",indent)+"&f[&c"+k.tojstring()+"&f] = &b"+v.tojstring();
 						if(tableContainsKeys(vTab)){
 							s+=" &f{\n";

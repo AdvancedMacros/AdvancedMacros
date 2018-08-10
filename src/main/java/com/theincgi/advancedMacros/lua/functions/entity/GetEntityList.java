@@ -1,4 +1,4 @@
-package com.theincgi.advancedMacros.lua.functions;
+package com.theincgi.advancedMacros.lua.functions.entity;
 
 import java.util.HashMap;
 import java.util.List;

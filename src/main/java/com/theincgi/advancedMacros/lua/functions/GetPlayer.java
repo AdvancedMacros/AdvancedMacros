@@ -124,6 +124,7 @@ public class GetPlayer extends OneArgFunction {
 			}
 			t.set("potionEffects", effects);
 		}
+		t.set("entityRiding", Utils.entityToTable(player.getRidingEntity()));
 		t.set("isSleeping", LuaValue.valueOf(player.isPlayerSleeping()));
 		t.set("isInvisible", LuaValue.valueOf(player.isInvisible()));
 		t.set("uuid", LuaValue.valueOf(player.getUniqueID().toString()));

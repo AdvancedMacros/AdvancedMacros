@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.WeakHashMap;
 
 import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaString;
@@ -26,11 +27,18 @@ import net.minecraft.client.resources.LanguageManager;
 import net.minecraft.util.ResourceLocation;
 
 public class CallableTable extends LuaTable{
+	public static final String LUA_FUNCTION_KEY = "luaFunction",
+			DEFINITION 	    = "definition",
+			TOOLTIP          = "tooltip",
+			LUA_DOC          = "luaDoc",
+			ARG_TYPES        = "argTypes";
 
 	String[] docName;
 	LuaFunction function;
 	private static String selectedLanguageCode = null;
 	private static JsonObject json;
+
+	static WeakHashMap<String, LuaTable> metaCache = new WeakHashMap<>();
 	private static LuaTable META = new LuaTable();
 	static {
 		META.set("__call", new SelfRemover());
@@ -39,44 +47,64 @@ public class CallableTable extends LuaTable{
 	public CallableTable(String[] docName, LuaFunction function) {
 		this.docName = docName;
 		this.function = function;
-		this.set("__luaFunction", TRUE);
-		this.setmetatable(META);
+		
+
+		LuaTable meta;
+		if(docName != null) {
+			StringBuilder metaKey = new StringBuilder();
+			for(String s : docName) {
+				metaKey.append(s);
+				
+			}
+
+			meta = metaCache.computeIfAbsent(metaKey.toString(), (key)->{
+				return new LuaTable();
+			});
+		}else{
+			meta = META;
+		}
+		this.setmetatable(meta);
+		meta.set(LUA_FUNCTION_KEY, TRUE);
 		//meta = new LuaTable();
 		//this.setmetatable(meta);
 		if (docName == null) {
 			return;
 		}
-		//meta.set("__call", function);
-		this.set("definition", getJsonDefinition());
-		this.set("tooltip",    getJsonTooltip());
-		this.set("luaDoc",     getJsonLuaDoc());
-		this.set("argTypes",   getJsonArgTypes());
-		
+		meta.set("__call", new SelfRemover());
+		try {
+			meta.set(DEFINITION, getJsonDefinition());
+			meta.set(TOOLTIP,    getJsonTooltip());
+			meta.set(LUA_DOC,     getJsonLuaDoc());
+			meta.set(ARG_TYPES,   getJsonArgTypes());
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 
-//	@Override
-//	public Varargs invoke(Varargs args) {
-//		return function.invoke(args);
-//	}
-//	@Override
-//	public LuaValue call() {
-//		return function.call();
-//	}
-//	@Override
-//	public LuaValue call(LuaValue arg) {
-//		return function.call(arg);
-//	}
-//	@Override
-//	public LuaValue call(LuaValue arg1, LuaValue arg2) {
-//		return function.call(arg1, arg2);
-//	}@Override
-//	public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
-//		return function.call(arg1, arg2, arg3);
-//	}
-//	@Override
-//	public Varargs invoke() {
-//		return function.invoke();
-//	}
+	//	@Override
+	//	public Varargs invoke(Varargs args) {
+	//		return function.invoke(args);
+	//	}
+	//	@Override
+	//	public LuaValue call() {
+	//		return function.call();
+	//	}
+	//	@Override
+	//	public LuaValue call(LuaValue arg) {
+	//		return function.call(arg);
+	//	}
+	//	@Override
+	//	public LuaValue call(LuaValue arg1, LuaValue arg2) {
+	//		return function.call(arg1, arg2);
+	//	}@Override
+	//	public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
+	//		return function.call(arg1, arg2, arg3);
+	//	}
+	//	@Override
+	//	public Varargs invoke() {
+	//		return function.invoke();
+	//	}
 
 
 	@Override

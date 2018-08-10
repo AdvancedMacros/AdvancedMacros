@@ -4,6 +4,7 @@ import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 
 public class PropertyPalette{
@@ -23,11 +24,11 @@ public class PropertyPalette{
 	}
 	
 	public PropertyPalette addColor( String key, Color c ) {
-		getTableFromKey().set(key, c.toLuaValue());
+		getTableFromKey().set(key, c.toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255));
 		return this;
 	}
 	public PropertyPalette addColor( Color c, String...keyPath) {
-		setProp(c.toLuaValue(), keyPath); return this;
+		setProp(c.toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255), keyPath); return this;
 	}
 	public PropertyPalette setProp ( LuaValue c, String...keyPath) {
 		LuaTable t = getTableFromKey();
@@ -40,10 +41,10 @@ public class PropertyPalette{
 	}
 	
 	public Color getColor( String key ) {
-		return Utils.parseColor( getTableFromKey().get(key) );
+		return Utils.parseColor( getTableFromKey().get(key), AdvancedMacros.COLOR_SPACE_IS_255 );
 	}
 	public Color getColor(String...keyPath) {
-		return Utils.parseColor(getValue(keyPath));
+		return Utils.parseColor(getValue(keyPath), AdvancedMacros.COLOR_SPACE_IS_255);
 	}
 	public LuaValue getValue( String key ) {
 		return getTableFromKey().get(key);
@@ -70,11 +71,11 @@ public class PropertyPalette{
 	public PropertyPalette addColorIfNil(String key, Color color) {
 		LuaTable t = getTableFromKey();
 		if(t.get(key).isnil())
-			t.set(key, color.toLuaValue());
+			t.set(key, color.toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255));
 		return this;
 	}
 	public PropertyPalette addColorIfNil( Color color, String...keyPath) {
-		return setPropIfNil(color.toLuaValue(), keyPath);
+		return setPropIfNil(color.toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255), keyPath);
 	}
 	public PropertyPalette setPropIfNil(LuaValue prop, String... keyPath) {
 		LuaTable t = getTableFromKey();

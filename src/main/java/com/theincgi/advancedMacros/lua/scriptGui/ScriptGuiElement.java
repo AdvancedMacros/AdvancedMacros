@@ -10,6 +10,7 @@ import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
@@ -145,7 +146,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 		this.set("setHoverTint", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs args) {
-				hoverTint = Utils.parseColor(args);
+				hoverTint = Utils.parseColor(args, AdvancedMacros.COLOR_SPACE_IS_255);
 				colorTintInt = hoverTint.toInt();
 				return LuaValue.NONE;
 			}
@@ -153,7 +154,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 		this.set("getHoverTint", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return hoverTint.toLuaValue();
+				return hoverTint.toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255);
 			}
 		});
 
@@ -208,7 +209,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 		set("setColor", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs args) {
-				color = Utils.parseColor(args);
+				color = Utils.parseColor(args, AdvancedMacros.COLOR_SPACE_IS_255);
 				colorInt = color.toInt();
 				return LuaValue.NONE;
 			}
@@ -216,7 +217,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 		set("getColor", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return color.toLuaValue();
+				return color.toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255);
 			}
 		});
 	}

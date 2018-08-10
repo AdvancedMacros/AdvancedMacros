@@ -143,7 +143,7 @@ public abstract class Hud2DItem {
 		getControls().set("setColor", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs args) {
-				color = Utils.parseColor(args);
+				color = Utils.parseColor(args, AdvancedMacros.COLOR_SPACE_IS_255);
 				//colorInt = color.toInt();
 				return LuaValue.NONE;
 			}
@@ -151,7 +151,7 @@ public abstract class Hud2DItem {
 		getControls().set("getColor", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return color.toLuaValue();
+				return color.toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255);
 			}
 		});
 	}

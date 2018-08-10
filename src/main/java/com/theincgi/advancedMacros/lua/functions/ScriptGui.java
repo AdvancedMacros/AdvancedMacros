@@ -23,6 +23,7 @@ import com.theincgi.advancedMacros.lua.scriptGui.GuiRectangle;
 import com.theincgi.advancedMacros.lua.scriptGui.MCTextBar;
 import com.theincgi.advancedMacros.lua.scriptGui.ScriptGuiScrollBar;
 import com.theincgi.advancedMacros.lua.scriptGui.ScriptGuiText;
+import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
@@ -68,20 +69,41 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 			}
 		};
 		gui.inputSubscribers.add(this); //tell yourself everything!
-		set("newRectangle", new VarArgFunction() {
-			@Override
-			public Varargs invoke(Varargs args) {
-				GuiRectangle r = new GuiRectangle(gui, guiGroup);
-				r.x = (float)args.optdouble(1, 0);
-				r.y = (float)args.optdouble(2, 0);
-				r.wid = (float)args.optdouble(3, 0);
-				r.hei = (float)args.optdouble(4, 0);
-				return r;
+		
+		for(OpCodes op : OpCodes.values()) {
+			set(op.name(), new CallableTable( op.getDocLocation() , new DoOperation( op ) ));
+		}
+		
+		addInputControls(this);
+	}
+	
+	public class DoOperation extends VarArgFunction {
+		OpCodes opCode;
+		
+		public DoOperation(OpCodes opCode) {
+			super();
+			this.opCode = opCode;
+		}
+
+		@Override
+		public Varargs invoke(Varargs args) {
+			switch (opCode) {
+			case close:
+				Minecraft.getMinecraft().displayGuiScreen(null);
+				return NONE;
+			case getName:
+				return LuaValue.valueOf(guiName);
+			case getParentGui:
+				return parentGui;
+			case getSize:{
+				LuaTable temp = new LuaTable();
+				Minecraft mc = Minecraft.getMinecraft();
+				ScaledResolution scaled = new ScaledResolution(mc);
+				temp.set(1, LuaValue.valueOf(scaled.getScaledWidth()));
+				temp.set(2, LuaValue.valueOf(scaled.getScaledHeight()));
+				return temp.unpack();
 			}
-		});
-		set("newBox", new VarArgFunction() {
-			@Override
-			public Varargs invoke(Varargs args) {
+			case newBox:
 				GuiBox r = new GuiBox(gui, guiGroup);
 				r.x = (float)args.optdouble(1, 0);
 				r.y = (float)args.optdouble(2, 0);
@@ -89,64 +111,9 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				r.hei = (float)args.optdouble(4, 0);
 				r.thickness = (float)args.optdouble(5, 1);
 				return r;
-			}
-		});
-		set("newGroup", new ZeroArgFunction() {
-			@Override
-			public LuaValue call() {
+			case newGroup:
 				return new Group(guiGroup);
-			}
-		});
-		set("newText", new VarArgFunction() {
-			@Override
-			public Varargs invoke(Varargs args) {
-				ScriptGuiText t = new ScriptGuiText(gui, guiGroup);
-				t.setText(args.optjstring(1, ""));
-				t.x = (float)args.optdouble(2, 0);
-				t.y = (float)args.optdouble(3, 0);
-				t.textSize = args.optint(4, 12);
-				return t;
-			}
-		});
-		set("newTextArea", new VarArgFunction() {
-			@Override public Varargs invoke(Varargs args) {
-				GuiCTA cta = new GuiCTA(gui, guiGroup);
-				cta.setPos((int)args.optdouble(1, 0) , (int)args.optdouble(2, 0) );
-				cta.setWidth(  args.optint(3, 0) );
-				cta.setHeight( args.optint(4, 0) );
-				cta.getCTA().setText( args.optstring(5, valueOf("")).tojstring() );
-				return cta;
-			}
-		});
-		set("newScrollBar", new VarArgFunction() {
-			@Override
-			public Varargs invoke(Varargs args) {
-				int x = args.optint(1, 0);
-				int y = args.optint(2, 0);
-				int wid = args.optint(3, 0);
-				int len = args.optint(4, 0);
-				Orientation orient = Orientation.from(args.arg(5).optjstring("vertical"));
-				if(orient.isLEFTRIGHT()) {
-					int t = wid;
-					wid = len;
-					len = t;
-				}
-				return new ScriptGuiScrollBar(gui, guiGroup, x, y, wid, len, orient); 
-			}
-		});
-		set("newMinecraftTextField", new VarArgFunction() {
-			@Override public Varargs invoke(Varargs args) {
-				MCTextBar text = new MCTextBar(gui, guiGroup);
-				text.setPos((int)args.optdouble(1, 0) , (int)args.optdouble(2, 0) );
-				text.setWidth(  args.optint(3, 0) );
-				text.setHeight( args.optint(4, 20) );
-				text.setText( args.optstring(5, valueOf("")).tojstring() );
-				return text;
-			}
-		});
-		set("newImage", new VarArgFunction() {
-			@Override
-			public Varargs invoke(Varargs args) {
+			case newImage:{
 				GuiImage t = new GuiImage(gui, guiGroup);
 				t.setTexture(args.optvalue(1, LuaValue.NIL));
 				t.x = (float)args.optdouble(2, 0);
@@ -155,21 +122,55 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				t.hei = (float)args.optdouble(5, 0);
 				return t;
 			}
-		});
-		set("newItem", new VarArgFunction() {
-			@Override
-			public Varargs invoke(Varargs args) {
+			case newItem:
 				GuiItemIcon gii = new GuiItemIcon(gui, guiGroup);
 				if(!args.arg1().isnil())
 					gii.setStack(args.checkjstring(1));
 				gii.setPos(args.optint(2, 0), args.optint(3, 0));
 				gii.setCount(args.optint(4, 1));
 				return gii;
+			case newMinecraftTextField:
+				MCTextBar text = new MCTextBar(gui, guiGroup);
+				text.setPos((int)args.optdouble(1, 0) , (int)args.optdouble(2, 0) );
+				text.setWidth(  args.optint(3, 0) );
+				text.setHeight( args.optint(4, 20) );
+				text.setText( args.optstring(5, valueOf("")).tojstring() );
+				return text;
+			case newRectangle:
+				GuiRectangle rect = new GuiRectangle(gui, guiGroup);
+				rect.x = (float)args.optdouble(1, 0);
+				rect.y = (float)args.optdouble(2, 0);
+				rect.wid = (float)args.optdouble(3, 0);
+				rect.hei = (float)args.optdouble(4, 0);
+				return rect;
+			case newScrollBar:
+				int x = args.optint(1, 0);
+				int y = args.optint(2, 0);
+				int wid = args.optint(3, 0);
+				int len = args.optint(4, 0);
+				Orientation orient = Orientation.from(args.arg(5).optjstring("vertical"));
+				if(orient.isLEFTRIGHT()) {
+					int swap = wid;
+					wid = len;
+					len = swap;
+				}
+				return new ScriptGuiScrollBar(gui, guiGroup, x, y, wid, len, orient);
+			case newText:{
+				ScriptGuiText t = new ScriptGuiText(gui, guiGroup);
+				t.setText(args.optjstring(1, ""));
+				t.x = (float)args.optdouble(2, 0);
+				t.y = (float)args.optdouble(3, 0);
+				t.textSize = args.optint(4, 12);
+				return t;
 			}
-		});
-		set("open", new ZeroArgFunction() {
-			@Override
-			public LuaValue call() {
+			case newTextArea:
+				GuiCTA cta = new GuiCTA(gui, guiGroup);
+				cta.setPos((int)args.optdouble(1, 0) , (int)args.optdouble(2, 0) );
+				cta.setWidth(  args.optint(3, 0) );
+				cta.setHeight( args.optint(4, 0) );
+				cta.getCTA().setText( args.optstring(5, valueOf("")).tojstring() );
+				return cta;
+			case open:
 				Minecraft.getMinecraft().displayGuiScreen(gui);
 				Minecraft.getMinecraft().addScheduledTask(()->{
 					Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
@@ -177,18 +178,11 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				if(onGuiOpen!=null)
 					onGuiOpen.call();
 				return LuaValue.NONE;
-			}
-		});
-		set("close", new ZeroArgFunction() {
-			@Override
-			public LuaValue call() {
-				Minecraft.getMinecraft().displayGuiScreen(null);
+			case setName:
+				guiName = args.arg1().checkjstring();
 				return NONE;
-			}
-		});
-		set("setParentGui", new OneArgFunction() {
-			@Override
-			public LuaValue call(LuaValue arg) {
+			case setParentGui:{
+				LuaValue arg = args.arg1();
 				if(arg.isnil()) {
 					parentGui = null;
 				}else if(arg instanceof ScriptGui){
@@ -198,42 +192,40 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				}
 				return NONE;
 			}
-		});
-		this.set("getParentGui", new ZeroArgFunction() {
-			@Override
-			public LuaValue call() {
-				return parentGui;
+			default:
+				throw new LuaError("This function hasn't been implemented D:");
 			}
-		});
-		this.set("getSize", new VarArgFunction() {
-			@Override
-			public Varargs invoke(Varargs v) {
-				LuaTable temp = new LuaTable();
-				Minecraft mc = Minecraft.getMinecraft();
-				ScaledResolution scaled = new ScaledResolution(mc);
-				temp.set(1, LuaValue.valueOf(scaled.getScaledWidth()));
-				temp.set(2, LuaValue.valueOf(scaled.getScaledHeight()));
-				return temp.unpack();
-			}
-		});
-		this.set("setName", new OneArgFunction() {
-			@Override
-			public LuaValue call(LuaValue arg) {
-				guiName = arg.checkjstring();
-				return NONE;
-			}
-		});
-		this.set("getName", new ZeroArgFunction() {
-			@Override
-			public LuaValue call() {
-				return LuaValue.valueOf(guiName);
-			}
-		});
-		addInputControls(this);
+		}
 	}
 
-
-
+	public static enum OpCodes {
+		newRectangle,
+		newBox,
+		newGroup,
+		newText,
+		newTextArea,
+		newScrollBar,
+		newMinecraftTextField,
+		newImage,
+		newItem,
+		open,
+		close,
+		setParentGui,
+		getParentGui,
+		getSize,
+		setName,
+		getName;
+		
+		public String[] getDocLocation() {
+			String[] out = new String[3];
+			out[0] = "gui";
+			out[1] = "new()";
+			out[2] = this.name();
+			return out;
+		}
+		
+		
+	}
 
 
 	//TODO resize event

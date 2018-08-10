@@ -390,7 +390,8 @@ public class Settings {
 		@Override
 		public LuaValue call() {
 			save();
-			AdvancedMacros.macroMenuGui.reloadCurrentProfile();
+			if(AdvancedMacros.macroMenuGui!=null)
+				AdvancedMacros.macroMenuGui.reloadCurrentProfile();
 			return LuaValue.NIL;
 		}
 	}

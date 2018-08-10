@@ -10,13 +10,13 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions
  * Don't let any access transformer stuff accidentally modify our classes. A list of package prefixes for FML to ignore
  */
 @TransformerExclusions({ "com.theincgi.advancedMacros.asm" })
-@MCVersion(value = "1.12.2-14.23.1.2587")
+@MCVersion(value = "1.12.2")
 
 public class AdvancedMacrosCorePlugin implements IFMLLoadingPlugin{
 	
 	@Override
 	public String[] getASMTransformerClass() {
-		return new String[] { "com.theincgi.advancedMacros.asm.ChatLinesEditThing" };
+		return new String[] { "com.theincgi.advancedMacros.asm.ChatLinesEditThingAndOthers" };
 	}
 
 	@Override

@@ -144,10 +144,10 @@ public class GuiCTA extends ScriptGuiElement{
 		set("getKeywords", new ZeroArgFunction() {
 			@Override public LuaValue call() {
 				LuaTable kw = new LuaTable();
-				kw.set("tables", Utils.toLuaTable(cta.tables.keySet()));
-				kw.set("functions", Utils.toLuaTable(cta.functions.keySet())); //TODO control tooltip
-				kw.set("variables", Utils.toLuaTable(cta.variables.keySet()));
-				kw.set("keywords", Utils.toLuaTable(cta.keywords.keySet()));
+				kw.set("tables", Utils.toTable(cta.tables.keySet()));
+				kw.set("functions", Utils.toTable(cta.functions.keySet())); //TODO control tooltip
+				kw.set("variables", Utils.toTable(cta.variables.keySet()));
+				kw.set("keywords", Utils.toTable(cta.keywords.keySet()));
 				return kw;
 			}
 		});

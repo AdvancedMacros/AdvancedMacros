@@ -25,29 +25,29 @@ public class Color {
 	 * E-Yellow<br>
 	 * F-White<br>*/
 	public static final Color
-		
-		TEXT_0 = new Color(  0,   0,   0),
-		TEXT_1 = new Color(  0,   0, 170),
-		TEXT_2 = new Color(  0, 170,   0),
-		TEXT_3 = new Color(  0, 170, 170),
-		TEXT_4 = new Color(170,   0,   0),
-		TEXT_5 = new Color(170,   0, 170),
-		TEXT_6 = new Color(255, 170,   0),
-		TEXT_7 = new Color(170, 170, 170),
-		TEXT_8 = new Color(85,85,85),
-		TEXT_9 = new Color(85,85,255),
-		TEXT_a = new Color(85,255,85),
-		TEXT_b = new Color(85,255,255),
-		TEXT_c = new Color(255,85,85),
-		TEXT_d = new Color(255,85,255),
-		TEXT_e = new Color(255,255,85),
-		TEXT_f = new Color(255,255,255);
+
+	TEXT_0 = new Color(  0,   0,   0),
+	TEXT_1 = new Color(  0,   0, 170),
+	TEXT_2 = new Color(  0, 170,   0),
+	TEXT_3 = new Color(  0, 170, 170),
+	TEXT_4 = new Color(170,   0,   0),
+	TEXT_5 = new Color(170,   0, 170),
+	TEXT_6 = new Color(255, 170,   0),
+	TEXT_7 = new Color(170, 170, 170),
+	TEXT_8 = new Color(85 ,  85,  85),
+	TEXT_9 = new Color(85,   85, 255),
+	TEXT_a = new Color(85,  255,  85),
+	TEXT_b = new Color(85,  255, 255),
+	TEXT_c = new Color(255,  85,  85),
+	TEXT_d = new Color(255,  85, 255),
+	TEXT_e = new Color(255, 255,  85),
+	TEXT_f = new Color(255, 255, 255);
 	public static final Color CLEAR = new Color(0x00_00_00_00);
-	
-	
+
+
 	public Color(int a, int r, int g, int b) {
 		if(a < 0   || r < 0   || g < 0   || b < 0 || 
-		   a > 255 || r > 255 || g > 255 || b > 255) {
+				a > 255 || r > 255 || g > 255 || b > 255) {
 			throw new IllegalArgumentException("Value out of range 0-255");
 		}
 		this.a = a;
@@ -64,6 +64,13 @@ public class Color {
 		fromHex(hexCode);
 	}
 
+	public Color(float r, float g, float b) {
+		this(1, r, g, b);
+	}
+	public Color(float a, float r, float g, float b) {
+		this((int)(a*255),(int)(r*255),(int)(g*255),(int)(b*255));
+	}
+	
 	/**Sets this color from the hex code given*/
 	public void fromHex(int hexCode) {
 		this.r = (hexCode >> 16 & 255);
@@ -71,7 +78,7 @@ public class Color {
 		this.g = (hexCode >> 8 & 255);
 		this.a = (hexCode >> 24 & 255);		
 	}
-	
+
 	public static int getA(int hexCode) {
 		return (hexCode >> 24 & 255);
 	}
@@ -132,18 +139,29 @@ public class Color {
 		i+= r<<16;
 		i+= b<<0;
 		i+= g<<8;
-//		this.red = (float)(color >> 16 & 255) / 255.0F;
-//        this.blue = (float)(color >> 8 & 255) / 255.0F;
-//        this.green = (float)(color & 255) / 255.0F;
-//        this.alpha = (float)(color >> 24 & 255) / 255.0F;
+		//		this.red = (float)(color >> 16 & 255) / 255.0F;
+		//        this.blue = (float)(color >> 8 & 255) / 255.0F;
+		//        this.green = (float)(color & 255) / 255.0F;
+		//        this.alpha = (float)(color >> 24 & 255) / 255.0F;
 		return i;
 	}
-	public LuaTable toLuaValue(){
+	public LuaTable toLuaValue(boolean use255Space){
 		LuaTable t = new LuaTable();
-		t.set("r", LuaValue.valueOf(r));
-		t.set("g", LuaValue.valueOf(g));
-		t.set("b", LuaValue.valueOf(b));
-		t.set("a", LuaValue.valueOf(a));
+		//		t.set("r", LuaValue.valueOf(r));
+		//		t.set("g", LuaValue.valueOf(g));
+		//		t.set("b", LuaValue.valueOf(b));//TODO niceify output
+		//		t.set("a", LuaValue.valueOf(a));
+		if(use255Space) {
+			t.set(1, LuaValue.valueOf(r));
+			t.set(2, LuaValue.valueOf(g));
+			t.set(3, LuaValue.valueOf(b));
+			t.set(4, LuaValue.valueOf(a));
+		}else {
+			t.set(1, LuaValue.valueOf(r/255f));
+			t.set(2, LuaValue.valueOf(g/255f));
+			t.set(3, LuaValue.valueOf(b/255f));
+			t.set(4, LuaValue.valueOf(a/255f));
+		}
 		return t;
 	}
 	public Color copy(){
@@ -170,5 +188,5 @@ public class Color {
 	public java.awt.Color toAWTColor() {
 		return new java.awt.Color(r, g, b, a);
 	}
-	
+
 }

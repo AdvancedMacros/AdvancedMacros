@@ -494,6 +494,9 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	public static HashMap<String, Object> getFunctionsMap() {
 		return functions;
 	}
+	public static HashMap<String, Object> getTablesMap() {
+		return tables;
+	}
 
 	private static final String quoteRegEx = "(\"[^\"]*\")|('[^\']*')|(\\[\\[.*?\\]\\])";
 	private static final String variableRegEx = "([_a-zA-Z]+[_a-zA-Z0-9]*(\\[[0-9]+\\])?([\\.:]{1})?)+";

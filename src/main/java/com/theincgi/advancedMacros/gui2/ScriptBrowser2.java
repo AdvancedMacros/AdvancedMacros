@@ -481,7 +481,7 @@ public class ScriptBrowser2 extends Gui{
 		}
 		@Override
 		public boolean onMouseClickMove(Gui gui, int x, int y, int buttonNum, long timeSinceClick) {
-			System.out.println("Passing mouse Event");
+			//System.out.println("Passing mouse Event");
 			for (int i = 0; i < fileElements.length; i++) {
 				if(fileElements[i].button.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))
 					return true;

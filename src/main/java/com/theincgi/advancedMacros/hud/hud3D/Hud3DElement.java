@@ -5,6 +5,7 @@ import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.lwjgl.opengl.GL11;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -38,7 +39,7 @@ public class Hud3DElement{
 		}else{
 			LuaValue v = Utils.tableFromProp(t, "opts.color", LuaValue.NIL);
 			if(!v.isnil()){
-				Color c = Utils.parseColor(v);
+				Color c = Utils.parseColor(v, AdvancedMacros.COLOR_SPACE_IS_255);
 				GlStateManager.color(c.getR()/255f, c.getG()/255f, c.getB()/255f, c.getA()/255f);
 			}
 		}

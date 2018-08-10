@@ -1,30 +1,262 @@
 {
-    "hud2D": {
-        "addText": {
-            "tooltip": [
-                "Returns a text object with functions in it",
-                "Example: hud2D.addText(...).setText(\"Hello!\")"
-            ]
-        },
-        "addText().setText": {
-            "tooltip": [
-                "Sets the text content of the object"
-            ]
-        }
+  "hud2D": {
+    "addText": {
+      "tooltip": [
+        "Returns a text object with functions in it",
+        "Example: hud2D.addText(...).setText(\"Hello!\")"
+      ]
     },
-    "print": {
+    "addText()": {
+      "setText": {
         "tooltip": [
-            "Prints the text given into the function into the Minecraft console",
-            "To show text in the chat, use log(...)"
+          "Sets the text content of the object"
         ]
-    },
-    "image": {
-        "new": {
-            "getFonts": {
-                "definition": "getFonts",
-                "tooltip": "Gets a list of available fonts",
-                "types": []
-            }
-        }
+      }
     }
+  },
+  "print": {
+    "tooltip": [
+      "Prints the text given into the function into the Minecraft console",
+      "To show text in the chat, use log(...)"
+    ]
+  },
+  "image": {
+    "new()": {
+      "getFonts": {
+        "definition": "getFonts",
+        "tooltip": "Gets a list of available fonts",
+        "types": []
+      }
+    }
+  },
+  "gui": {
+    "new()": {
+      "newRectangle": {
+        "definition": "newRectangle([x, y, width, height])",
+        "tooltip": [
+          "create a new rectangle with",
+          "default position of 0, 0",
+          "and default size of 0, 0"
+        ],
+        "types": [
+          [
+            "opt_number",
+            "opt_number",
+            "opt_number",
+            "opt_number"
+          ]
+        ]
+      },
+      "newBox": {
+        "definition": "newBox([x, y, width, height, thickness])",
+        "tooltip": [
+          "create a new outline of a rectangle with",
+          "default position of 0, 0",
+          "default size of 0, 0",
+          "and default thickness of 1"
+        ],
+        "types": [
+          [
+            "opt_number",
+            "opt_number",
+            "opt_number",
+            "opt_number",
+            "opt_number"
+          ]
+        ]
+      },
+      "newGroup": {
+        "definition": "newGroup()",
+        "tooltip": [
+          "create a new group to manager multiple",
+          "gui elements at the same time."
+        ],
+        "types": []
+      },
+      "newText": {
+        "definition": "newText([text, x, y, size])",
+        "tooltip": [
+          "create a new text element with",
+          "default text \"\"",
+          "default position of 0,0",
+          "default size of 12"
+        ],
+        "types": [
+          [
+            "opt_string",
+            "opt_number",
+            "opt_number",
+            "opt_number"
+          ]
+        ]
+      },
+      "newTextArea": {
+        "definition": "newTextArea([x, y, width, height, text])",
+        "tooltip": [
+          "create a text area like the one in the editor",
+          "default position is 0, 0",
+          "default size is 0, 0",
+          "defaut text is \"\""
+        ],
+        "types": [
+          [
+            "opt_number",
+            "opt_number",
+            "opt_number",
+            "opt_number",
+            "opt_string"
+          ]
+        ]
+      },
+      "newScrollBar": {
+        "definition": "newScrollBar([x, y, width, height, orientation])",
+        "tooltip": [
+          "create a scrollbar defaults 0, 0, 0, 0, \"vertical\"",
+          "default position 0, 0",
+          "default size 0, 0",
+          "default orientation \"vertical\"",
+          "\"h\", \"horiz\", \"horizontal\", \"v\", \"vert\", \"vertical\"",
+          "are all valid orientations"
+        ],
+        "types": [
+          [
+            "opt_number",
+            "opt_number",
+            "opt_number",
+            "opt_number",
+            "opt_string"
+          ]
+        ]
+      },
+      "newMinecraftTextField": {
+        "definition": "newMinecraftTextField([x, y, width, height, text])",
+        "tooltip": [
+          "create a text field like the ones MC uses",
+          "default position 0, 0",
+          "default size 0, 20",
+          "default text \"\""
+        ],
+        "types": [
+          [
+            "opt_number",
+            "opt_number",
+            "opt_number",
+            "opt_number",
+            "opt_string"
+          ]
+        ]
+      },
+      "newImage": {
+        "definition": "newImage([image, x, y, width, height])",
+        "tooltip": [
+          "create a new image element",
+          "default image nil, may be an image",
+          "  from image library or path to image (include drive letter)",
+          "default pos 0, 0",
+          "default size 0, 0"
+        ],
+        "types": [
+          [
+            "opt_table",
+            "opt_number",
+            "opt_number",
+            "opt_number",
+            "opt_number"
+          ],
+          [
+            "opt_string",
+            "opt_number",
+            "opt_number",
+            "opt_number",
+            "opt_number"
+          ]
+        ]
+      },
+      "newItem": {
+        "definition": "newItem([stack, x, y, count])",
+        "tooltip": [
+          "create an item icon",
+          "stack is a string with the format",
+          "\"modid:item_id\" or",
+          "\"modid:item_id:damage\"",
+          "defaults nil, 0, 0, 1"
+        ],
+        "types": [
+          [
+            "opt_string",
+            "opt_number",
+            "opt_number",
+            "opt_number"
+          ]
+        ]
+      },
+      "open": {
+        "definition": "open()",
+        "tooltip": [
+          "opens the gui"
+        ],
+        "types": [
+          []
+        ]
+      },
+      "close": {
+        "definition": "close()",
+        "tooltip": [
+          "closes the gui"
+        ],
+        "types": [
+          []
+        ]
+      },
+      "setParentGui": {
+        "definition": "setParentGui( [gui] )",
+        "tooltip": [
+          "sets the gui to render behind this one",
+          "argument may be nil"
+        ],
+        "types": [
+          "opt_table"
+        ]
+      },
+      "getParentGui": {
+        "definition": "getParentGui()",
+        "tooltip": [
+          "returns the gui behind this gui",
+          "returns nil if none is set"
+        ],
+        "types": [
+          []
+        ]
+      },
+      "getSize": {
+        "definition": "getSize()",
+        "tooltip": [
+          "returns the dimenisons of this gui",
+          "ex: width, height = getSize()"
+        ],
+        "types": [
+          []
+        ]
+      },
+      "setName": {
+        "definition": "setName( name )",
+        "tooltip": [
+          "sets the name of this gui",
+          "this is used in the GUIOpened event"
+        ],
+        "types": [
+          "string"
+        ]
+      },
+      "getName": {
+        "definition": "getName()",
+        "tooltip": [
+          "returns this gui's name"
+        ],
+        "types": [
+          []
+        ]
+      }
+    }
+  }
 }
