@@ -26,6 +26,7 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import org.luaj.vm2_v3_0_1.lib.jse.JsePlatform;
 import org.lwjgl.input.Keyboard;
 
+import com.theincgi.advancedMacros.asm.AdvancedMacrosCorePlugin;
 import com.theincgi.advancedMacros.gui.EditorGUI;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.InputGUI;
@@ -98,7 +99,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "5.2.0"; //${version} ?? //previously .1
+	public static final String VERSION = "5.3.0"; //${version} ?? //previously .1
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -211,7 +212,7 @@ public class AdvancedMacros {
 		globals.set("stopAllScripts", new StopAllScripts());
 
 		try {
-			globals.set("listTextures", new GetTextureList());
+			globals.set("listTextures", new GetTextureList(AdvancedMacrosCorePlugin.isObfuscated));
 		} catch (NoSuchFieldException | IllegalAccessException | RuntimeException e) {
 			e.printStackTrace();
 		}

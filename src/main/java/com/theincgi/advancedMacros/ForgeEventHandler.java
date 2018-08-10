@@ -56,6 +56,7 @@ import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
+import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.SaveToFile;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
@@ -548,8 +549,10 @@ public class ForgeEventHandler {
 	}
 	
 	
-	//called from asm via digital sorcery (src-ry)
-	public void onItemBreak(ItemStack yeWhoBrokeith) {
+	@SubscribeEvent @SideOnly(Side.CLIENT)
+	public void onItemBreak(PlayerDestroyItemEvent event) {
+		ItemStack yeWhoBrokeith = event.getOriginal(); 
+		//if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		LuaTable e = createEvent(EventName.BreakItem);
 		e.set(3, Utils.itemStackToLuatable(yeWhoBrokeith));
 		fireEvent(EventName.BreakItem, e);

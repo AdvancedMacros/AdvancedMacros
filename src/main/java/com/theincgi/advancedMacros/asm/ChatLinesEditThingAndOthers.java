@@ -27,8 +27,8 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 	 * {@link GuiNewChat}
 	 * */
 	public static String[] editedClasses = {
-			"net.minecraft.client.gui.GuiNewChat",
-			"net.minecraft.item.ItemStack"
+			"net.minecraft.client.gui.GuiNewChat"//,
+			//"net.minecraft.item.ItemStack"
 	};
 
 	@Override
@@ -36,6 +36,7 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 		if(basicClass == null) return null;
 
 		boolean isObf = !name.equals(transformedName);
+		AdvancedMacrosCorePlugin.isObfuscated |= isObf;
 		int index = Arrays.asList(editedClasses).indexOf(transformedName);
 
 
@@ -56,7 +57,7 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 	}
 
 	private static byte[] transform(int index, byte[] basicClass, boolean isObf) {
-		System.out.printf("Transforming '%s'", editedClasses[index]);
+		System.out.printf("AdvancedMacros is transforming '%s'\n", editedClasses[index]);
 		try {
 			ClassNode	node   = new ClassNode();
 			ClassReader reader = new ClassReader(basicClass);
@@ -67,9 +68,9 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 			case 0: //gui new chat
 				transformGuiNewChat(node, isObf);
 				break;
-			case 1: //itemTool
-				transormItemTool(node, isObf);
-				break;
+//			case 1: //itemTool
+//				transormItemTool(node, isObf);
+//				break;
 			default:
 				break;
 			}
@@ -79,58 +80,61 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 			node.accept(writer);
 			return writer.toByteArray();
 
-		} catch (Exception e) {
+		} catch (Exception|Error e) {
 			e.printStackTrace();
 		}
 		return basicClass;
 	} 
 
 
-	private static void transormItemTool(ClassNode node, boolean isObf) {
-		final String DAMAGE_ITEM = isObf? "a" : "damageItem";
-		final String DESC = isObf? "(ILvn;)V" : "(ILnet/minecraft/entity/EntityLivingBase;)V"; 
-
-		for(MethodNode method : node.methods) {
-			if(method.name.equals(DAMAGE_ITEM) && method.desc.equals(DESC)) {
-				for( AbstractInsnNode instr : method.instructions.toArray()) {
-//					Target:
-//						Label l7 = new Label(); [AFTER THIS]
-//						mv.visitLabel(l7);
-//						mv.visitLineNumber(397, l7);
-//						mv.visitVarInsn(ALOAD, 0);
-//						mv.visitInsn(ICONST_1);
-//						mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/item/ItemStack", "shrink", "(I)V", false);
-//					Label l8 = new Label();
-					if(instr.getOpcode()==ALOAD && instr.getNext().getOpcode()==ICONST_1 && instr.getNext().getNext().getOpcode()==INVOKEVIRTUAL) {
-						VarInsnNode aloadIns = (VarInsnNode) instr;
-						if(aloadIns.var!=0) 
-							break;
-						InsnList actions = new InsnList();
-						//GETSTATIC AdvancedMacros.forgeEventHandler : ForgeEventHandler
-						//mv.visitFieldInsn(GETSTATIC, "com/theincgi/advancedMacros/AdvancedMacros", "forgeEventHandler", "Lcom/theincgi/advancedMacros/ForgeEventHandler;");
-						actions.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(AdvancedMacros.class), "forgeEventHandler", "Lcom/theincgi/advancedMacros/ForgeEventHandler;"));
-						actions.add(new VarInsnNode(ALOAD, 0));
-						actions.add(new MethodInsnNode(INVOKEVIRTUAL, 
-										"com/theincgi/advancedMacros/ForgeEventHandler",
-										"onItemBreak", 
-										isObf?"(Lain;)V":"(Lnet/minecraft/item/ItemStack;)V", 
-										false)
-								);
+//	private static void transormItemTool(ClassNode node, boolean isObf) {
+//		final String DAMAGE_ITEM = isObf? "a" : "damageItem";
+//		final String DESC = isObf? "(ILvn;)V" : "(ILnet/minecraft/entity/EntityLivingBase;)V"; 
+//
+//		for(MethodNode method : node.methods) {
+//			if(method.name.equals(DAMAGE_ITEM) )
+//				System.out.println("AdvancedMacros transformer: Located matching method name '"+method.desc+"'");
+//			if(method.desc.equals(DESC)) {
+//				System.out.println("AdvancedMacros: located ItemStack's damageItem");
+//				for( AbstractInsnNode instr : method.instructions.toArray()) {
+//					//					Target:
+//					//						Label l7 = new Label(); [AFTER THIS]
+//					//						mv.visitLabel(l7);
+//					//						mv.visitLineNumber(397, l7);
+//					//						mv.visitVarInsn(ALOAD, 0);
+//					//						mv.visitInsn(ICONST_1);
+//					//						mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/item/ItemStack", "shrink", "(I)V", false);
+//					//					Label l8 = new Label();
+//					if(instr.getOpcode()==ALOAD && instr.getNext().getOpcode()==ICONST_1 && instr.getNext().getNext().getOpcode()==INVOKEVIRTUAL) {
+//						VarInsnNode aloadIns = (VarInsnNode) instr;
+//						if(aloadIns.var!=0) 
+//							break;
+//						InsnList actions = new InsnList();
+//						//GETSTATIC AdvancedMacros.forgeEventHandler : ForgeEventHandler
+//						//mv.visitFieldInsn(GETSTATIC, "com/theincgi/advancedMacros/AdvancedMacros", "forgeEventHandler", "Lcom/theincgi/advancedMacros/ForgeEventHandler;");
+//						actions.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(AdvancedMacros.class), "forgeEventHandler", "Lcom/theincgi/advancedMacros/ForgeEventHandler;"));
 //						actions.add(new VarInsnNode(ALOAD, 0));
-//						actions.add(new MethodInsnNode(INVOKEDYNAMIC, 
+//						actions.add(new MethodInsnNode(INVOKEVIRTUAL, 
 //								"com/theincgi/advancedMacros/ForgeEventHandler",
-//								"helloByteCode", 
-//								isObf?"()V":"()V", 
-//								false)
-//						);
-						method.instructions.insertBefore(instr, actions);
-						System.out.println("Added call to AdvancedMacros.forgeEventHandler#onBreakItem before this.shrink(1)");
-						break;
-					}
-				}
-			}
-		}
-	}
+//								"onItemBreak", 
+//								isObf?"(Lain;)V":"(Lnet/minecraft/item/ItemStack;)V", 
+//										false)
+//								);
+//						//						actions.add(new VarInsnNode(ALOAD, 0));
+//						//						actions.add(new MethodInsnNode(INVOKEDYNAMIC, 
+//						//								"com/theincgi/advancedMacros/ForgeEventHandler",
+//						//								"helloByteCode", 
+//						//								isObf?"()V":"()V", 
+//						//								false)
+//						//						);
+//						method.instructions.insertBefore(instr, actions);
+//						System.out.println("Added call to AdvancedMacros.forgeEventHandler#onBreakItem before ItemStack this.shrink(1)");
+//						break;
+//					}
+//				}
+//			}
+//		}
+//	}
 
 	private static void transformGuiNewChat(ClassNode node, boolean isObf) {
 		final String SET_CHAT_LINE = isObf? "a" : "setChatLine";
@@ -165,7 +169,7 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 									false); //not interface
 							method.instructions.insertBefore(target, myMethod);
 							method.instructions.remove(target);
-							if(maxOps==0) break;
+							if(maxOps==0) { System.out.println("AdvancedMacros: max chat lines is now editable");break; }
 						}
 					}
 				}
@@ -178,7 +182,11 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 		AdvancedMacros.forgeEventHandler.onItemBreak(null);
 	}
 	public static int getMaxLineCount() {
-		return Settings.settings.get("chatMaxLines").optint(100);
+		try {
+			return Settings.settings.get("chatMaxLines").optint(100);
+		}catch (Exception | Error e) {
+			return 100;
+		}
 	}
 
 

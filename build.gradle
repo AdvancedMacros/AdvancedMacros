@@ -35,8 +35,8 @@ minecraft {
 
 jar {
     manifest {
-        attributes 'FMLCorePlugin': 'com.theincgi.asm.AdvancedMacrosCorePlugin'
-        attributes 'FMLCorePluginContainsMod': 'true'
+        attributes 'FMLCorePlugin': 'com.theincgi.advancedMacros.asm.AdvancedMacrosCorePlugin'
+        attributes 'FMLCorePluginContainsFMLMod': 'true'
     }
 }
 
