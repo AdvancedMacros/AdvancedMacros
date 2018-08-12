@@ -13,7 +13,7 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions
 @MCVersion(value = "1.12.2")
 
 public class AdvancedMacrosCorePlugin implements IFMLLoadingPlugin{
-	
+	public static boolean isObfuscated = false;
 	@Override
 	public String[] getASMTransformerClass() {
 		return new String[] { "com.theincgi.advancedMacros.asm.ChatLinesEditThingAndOthers" };

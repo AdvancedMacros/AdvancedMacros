@@ -1,11 +1,28 @@
 package com.theincgi.advancedMacros.asm;
 
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiNewChat;
+import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraft.network.play.server.SPacketCollectItem;
+import net.minecraft.network.play.server.SPacketConfirmTransaction;
+import net.minecraft.network.play.server.SPacketMultiBlockChange;
+import net.minecraft.network.play.server.SPacketOpenWindow;
+import net.minecraft.network.play.server.SPacketParticles;
+import net.minecraft.network.play.server.SPacketPlayerListItem;
+import net.minecraft.network.play.server.SPacketRespawn;
+import net.minecraft.network.play.server.SPacketSetSlot;
+import net.minecraft.network.play.server.SPacketSpawnObject;
+import net.minecraft.network.play.server.SPacketWindowItems;
+import net.minecraft.util.EnumParticleTypes;
+import scala.util.control.Exception.Catch;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Set;
 
+import org.luaj.vm2_v3_0_1.LuaValue;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -18,7 +35,11 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.event.PacketEventHandler;
 import com.theincgi.advancedMacros.misc.Settings;
+import com.theincgi.advancedMacros.misc.Utils;
+
+import io.netty.util.IllegalReferenceCountException;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -27,8 +48,7 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 	 * {@link GuiNewChat}
 	 * */
 	public static String[] editedClasses = {
-			"net.minecraft.client.gui.GuiNewChat",
-			"net.minecraft.item.ItemStack"
+			"net.minecraft.client.gui.GuiNewChat"
 	};
 
 	@Override
@@ -36,27 +56,15 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 		if(basicClass == null) return null;
 
 		boolean isObf = !name.equals(transformedName);
+		AdvancedMacrosCorePlugin.isObfuscated |= isObf;
 		int index = Arrays.asList(editedClasses).indexOf(transformedName);
 
 
 		return index==-1 ? basicClass : transform(index, basicClass, isObf);
-
-
-
-
-
-		//		ClassReader reader = new ClassReader(basicClass);
-		//		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-		//
-		//		ClassVisitor visitor = writer;
-		//		visitor = new ChatLinesVisitor( visitor );
-		//		
-		//		reader.accept(visitor, 0);
-		//		return writer.toByteArray();
 	}
 
 	private static byte[] transform(int index, byte[] basicClass, boolean isObf) {
-		System.out.printf("Transforming '%s'", editedClasses[index]);
+		System.out.printf("AdvancedMacros is transforming '%s'\n", editedClasses[index]);
 		try {
 			ClassNode	node   = new ClassNode();
 			ClassReader reader = new ClassReader(basicClass);
@@ -67,9 +75,6 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 			case 0: //gui new chat
 				transformGuiNewChat(node, isObf);
 				break;
-			case 1: //itemTool
-				transormItemTool(node, isObf);
-				break;
 			default:
 				break;
 			}
@@ -79,58 +84,14 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 			node.accept(writer);
 			return writer.toByteArray();
 
-		} catch (Exception e) {
+		} catch (Exception|Error e) {
 			e.printStackTrace();
 		}
 		return basicClass;
 	} 
 
-
-	private static void transormItemTool(ClassNode node, boolean isObf) {
-		final String DAMAGE_ITEM = isObf? "a" : "damageItem";
-		final String DESC = isObf? "(ILvn;)V" : "(ILnet/minecraft/entity/EntityLivingBase;)V"; 
-
-		for(MethodNode method : node.methods) {
-			if(method.name.equals(DAMAGE_ITEM) && method.desc.equals(DESC)) {
-				for( AbstractInsnNode instr : method.instructions.toArray()) {
-//					Target:
-//						Label l7 = new Label(); [AFTER THIS]
-//						mv.visitLabel(l7);
-//						mv.visitLineNumber(397, l7);
-//						mv.visitVarInsn(ALOAD, 0);
-//						mv.visitInsn(ICONST_1);
-//						mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/item/ItemStack", "shrink", "(I)V", false);
-//					Label l8 = new Label();
-					if(instr.getOpcode()==ALOAD && instr.getNext().getOpcode()==ICONST_1 && instr.getNext().getNext().getOpcode()==INVOKEVIRTUAL) {
-						VarInsnNode aloadIns = (VarInsnNode) instr;
-						if(aloadIns.var!=0) 
-							break;
-						InsnList actions = new InsnList();
-						//GETSTATIC AdvancedMacros.forgeEventHandler : ForgeEventHandler
-						//mv.visitFieldInsn(GETSTATIC, "com/theincgi/advancedMacros/AdvancedMacros", "forgeEventHandler", "Lcom/theincgi/advancedMacros/ForgeEventHandler;");
-						actions.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(AdvancedMacros.class), "forgeEventHandler", "Lcom/theincgi/advancedMacros/ForgeEventHandler;"));
-						actions.add(new VarInsnNode(ALOAD, 0));
-						actions.add(new MethodInsnNode(INVOKEVIRTUAL, 
-										"com/theincgi/advancedMacros/ForgeEventHandler",
-										"onItemBreak", 
-										isObf?"(Lain;)V":"(Lnet/minecraft/item/ItemStack;)V", 
-										false)
-								);
-//						actions.add(new VarInsnNode(ALOAD, 0));
-//						actions.add(new MethodInsnNode(INVOKEDYNAMIC, 
-//								"com/theincgi/advancedMacros/ForgeEventHandler",
-//								"helloByteCode", 
-//								isObf?"()V":"()V", 
-//								false)
-//						);
-						method.instructions.insertBefore(instr, actions);
-						System.out.println("Added call to AdvancedMacros.forgeEventHandler#onBreakItem before this.shrink(1)");
-						break;
-					}
-				}
-			}
-		}
-	}
+	
+	
 
 	private static void transformGuiNewChat(ClassNode node, boolean isObf) {
 		final String SET_CHAT_LINE = isObf? "a" : "setChatLine";
@@ -165,7 +126,7 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 									false); //not interface
 							method.instructions.insertBefore(target, myMethod);
 							method.instructions.remove(target);
-							if(maxOps==0) break;
+							if(maxOps==0) { System.out.println("AdvancedMacros: max chat lines is now editable");break; }
 						}
 					}
 				}
@@ -173,12 +134,14 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 			}
 		}
 	}
-	int value;
-	public void whatWouldItLookLike() {
-		AdvancedMacros.forgeEventHandler.onItemBreak(null);
-	}
+	
+	
 	public static int getMaxLineCount() {
-		return Settings.settings.get("chatMaxLines").optint(100);
+		try {
+			return Utils.tableFromProp(Settings.settings, "chat.maxLines", LuaValue.valueOf(100)).checkint();
+		}catch (Exception | Error e) {
+			return 100;
+		}
 	}
 
 

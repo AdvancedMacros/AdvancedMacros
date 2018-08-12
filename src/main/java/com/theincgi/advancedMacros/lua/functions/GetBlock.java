@@ -16,7 +16,7 @@ public class GetBlock extends ThreeArgFunction{
 	public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
 		int x = (arg1.checkint()), y = arg2.checkint(), z = (arg3.checkint());
 		BlockPos pos = new BlockPos(x,y,z);
-		Chunk chunk = Minecraft.getMinecraft().world.getChunkFromBlockCoords(pos);
+		Chunk chunk = Minecraft.getMinecraft().world.getChunk(pos);
 		TileEntity te = Minecraft.getMinecraft().world.getTileEntity(pos);
 		if(!chunk.isLoaded()){
 			return LuaValue.FALSE;

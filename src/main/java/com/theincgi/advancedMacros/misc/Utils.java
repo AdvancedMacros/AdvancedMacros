@@ -804,13 +804,17 @@ public class Utils {
 		while(!f.isDone()) try{Thread.sleep(5);}catch (InterruptedException ie) {return;}
 	}
 	public static LuaValue toTable(Container container) {
+		return toTable(container, false);
+	}
+	public static LuaValue toTable(Container container, boolean isReady) {
 		LuaTable out = new LuaTable();
 		LuaTable slots = new LuaTable();
 		for(int i = 0; i<container.inventoryItemStacks.size(); i++) {
-			out.set(i, itemStackToLuatable(container.inventoryItemStacks.get(i)));
+			slots.set(i, itemStackToLuatable(container.inventoryItemStacks.get(i)));
 		}
 		out.set("slots", slots);
 		out.set("controls", new ContainerControls(container));
+		out.set("isReady", LuaValue.valueOf(isReady));
 		return out;
 	}
 }

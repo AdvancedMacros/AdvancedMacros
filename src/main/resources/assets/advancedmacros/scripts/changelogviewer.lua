@@ -7,7 +7,8 @@ if not cl.showOnStartup then return end
 cl.shownVersions = cl.shownVersions or {}
 if cl.shownVersions[_MOD_VERSION] then return end
 
-local DIVIDER = String.rep("-", 32)
+local DIVIDER =
+"--------------------------------------------------------------------------------"
 -- CHANGE LOG -------------------------------------------------------------------
 local changeLog = {
   "&eShow on startup? ", --do not remove
@@ -18,17 +19,17 @@ local changeLog = {
   "&f - A script included in the startup should have updated your color settings",
   "&f   to the 0 <-> 1 format",
   "&f - When colors are returned from functions they will now return in the",
-  "&f   format {r, g, b, a} &7(instead of {r=r, g=g, b=b, a=a})"
+  "&f   format {r, g, b, a} &7(instead of {r=r, g=g, b=b, a=a})",
   "&f - Added &bgetBlockList() &freturns a list of minecraft block ID's",
   "&f - Scripts fired from the editor now has the correct argument",
   "&f - &bgetSettings().chatMaxLines&f will now change the maximum number of",
   "&f   lines in your chat. Useful for large logs like &bgetPlayer()",
-  "&f - &BAll events &fhave been implemented",
-  "&f - Added the event &eWakeUp",
+  "&f - Attempted to implement more events, currently",
+  "&f   many only trigger inside the server.... working on it",
   "&f - The XP event now detects changes to levels",
   "&f - Arrow fired has more detail",
   "&f - &bgetSettings().events.potionStatusFrequency &fwill control how often",
-  "&f   the event is called, (default 20, fastest = 1)
+  "&f   the event is called, (default 20, fastest = 1)",
   "&f - &bgetSettings().events.useItemFrequency &fwill control how often",
   "&f   the UseItem event will trigger.",
   "&f   It will always trigger on start and finish",
@@ -46,7 +47,7 @@ local changeLog = {
   "&f     - \"south\"",
   "&f - Tooltips will now show from tables with the meta table containing:",
   "&f   - luaFunction = true",
-  "&f   - definition=\"someFunction(a, b, c)\""",
+  "&f   - definition=\"someFunction(a, b, c)\"",
   "&f   - tooltip={\"line 1\", \"line 2\"....} or \"single line\"",
   "&f   - luaDoc={\"line 1\", \"line 2\"....} or \"single line\"",
   "&f     this will be used for an in game help page later",
@@ -64,6 +65,7 @@ local changeLog = {
   "&f - image.graphics.drawImage now allows additional arguments for",
   "&f   source location and scaling",
   "&f   drawImage(img, x, y, wid, hei, srcX, srcY, srcWid, srcHei)",
+  "&f - now built on a newer version of forge",
   
   "&7"..DIVIDER,
   

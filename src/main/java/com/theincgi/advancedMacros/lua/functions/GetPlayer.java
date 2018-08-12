@@ -43,7 +43,7 @@ public class GetPlayer extends OneArgFunction {
 				}
 			};
 			@Override
-			public LuaValue rawget(LuaValue key) {
+			public LuaValue rawget(LuaValue key) { //secret function
 				if(key.checkjstring().equals("setVelocity") && player instanceof EntityPlayerSP){
 			         return func;
 				}
@@ -60,7 +60,7 @@ public class GetPlayer extends OneArgFunction {
 			t.set("pos", pos);
 		}
 		t.set("mainHand", Utils.itemStackToLuatable(player.getHeldItemMainhand()));
-		t.set("offHand", Utils.itemStackToLuatable(player.getHeldItemMainhand()));
+		t.set("offHand", Utils.itemStackToLuatable(player.getHeldItemOffhand()));
 		if(player instanceof EntityPlayerSP)
 			t.set("invSlot", ((EntityPlayerSP)player).inventory.currentItem+1);
 		
@@ -144,20 +144,6 @@ public class GetPlayer extends OneArgFunction {
 		t.set("gamemode", player.isSpectator()?"spectator":player.isCreative()?"creative":"survival");
 		
 		
-//		LuaTable meta = new LuaTable();
-//		
-//		meta.set("__index", new TwoArgFunction() {
-//			@Override public LuaValue call(LuaValue arg1, LuaValue arg2) {
-//				System.out.println("Check: "+arg1.tojstring()+" : "+arg2.checkjstring());
-//				if(arg2.checkjstring().equals("setVelocity") && player instanceof EntityPlayerSP){
-//			         return func;
-//				}
-//				return arg1.rawget(arg2);
-//			}
-//		});
-//		LuaTable blank = new LuaTable();
-//		meta.set("__metatable", blank);
-//		t.setmetatable(meta);
 		
 		return t;
 		}catch (Exception e) {

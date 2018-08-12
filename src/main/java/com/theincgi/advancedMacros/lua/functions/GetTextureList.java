@@ -14,9 +14,9 @@ import net.minecraft.client.renderer.texture.TextureMap;
 public class GetTextureList extends ZeroArgFunction{
 	private final Map<String, TextureAtlasSprite> mapRegisteredSprites;
 	
-	public GetTextureList() throws NoSuchFieldException, RuntimeException, IllegalAccessException {
+	public GetTextureList(boolean isObf) throws NoSuchFieldException, RuntimeException, IllegalAccessException {
 		TextureMap map = Minecraft.getMinecraft().getTextureMapBlocks();
-		Field f = TextureMap.class.getDeclaredField("mapRegisteredSprites");
+		Field f = TextureMap.class.getDeclaredField(isObf?"j":"mapRegisteredSprites");
 		f.setAccessible(true);
 		mapRegisteredSprites = (Map<String, TextureAtlasSprite>) f.get(map);
 	}

@@ -7,7 +7,7 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
-import com.theincgi.advancedMacros.ForgeEventHandler;
+import com.theincgi.advancedMacros.event.ForgeEventHandler;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;

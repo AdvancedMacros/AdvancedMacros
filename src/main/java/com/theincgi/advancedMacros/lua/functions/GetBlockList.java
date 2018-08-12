@@ -19,7 +19,7 @@ public class GetBlockList extends ZeroArgFunction{
 	public LuaValue call() {
 		LuaTable t = new LuaTable();
 		for(ResourceLocation r : Block.REGISTRY.getKeys()) {
-			t.set(t.length()+1, r.getResourcePath());
+			t.set(t.length()+1, r.getNamespace());
 		}
 		return t;
 	}

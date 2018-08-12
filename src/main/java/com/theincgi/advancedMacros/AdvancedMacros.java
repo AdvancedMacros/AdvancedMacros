@@ -26,6 +26,8 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import org.luaj.vm2_v3_0_1.lib.jse.JsePlatform;
 import org.lwjgl.input.Keyboard;
 
+import com.theincgi.advancedMacros.asm.AdvancedMacrosCorePlugin;
+import com.theincgi.advancedMacros.event.ForgeEventHandler;
 import com.theincgi.advancedMacros.gui.EditorGUI;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.InputGUI;
@@ -98,7 +100,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "5.2.0"; //${version} ?? //previously .1
+	public static final String VERSION = "5.3.0"; //${version} ??
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -106,7 +108,6 @@ public class AdvancedMacros {
 	public static KeyBinding modKeybind;
 	public static MacroMenuGui macroMenuGui;
 	public static EditorGUI editorGUI;
-	//public static ScriptBrowser scriptBrowser;
 	public static ScriptBrowser2 scriptBrowser2;
 	public static RunningScriptsGui runningScriptsGui;
 	public static Gui lastGui;
@@ -122,12 +123,7 @@ public class AdvancedMacros {
 	private static Thread minecraftThread;
 	
 	public static final boolean COLOR_SPACE_IS_255 = false;
-	//protected static ArrayList customEventNames;
 
-	//	public static FloatBuffer modelView3d = BufferUtils.createFloatBuffer(16);
-	//	public static FloatBuffer projView3d = BufferUtils.createFloatBuffer(16);
-	//	public static FloatBuffer modelView2d = BufferUtils.createFloatBuffer(16);
-	//	public static FloatBuffer projView2d = BufferUtils.createFloatBuffer(16);
 
 	@EventHandler @SideOnly(Side.CLIENT)//skipped the proxy system, this is only client side
 	public void init(FMLInitializationEvent event){
@@ -170,10 +166,6 @@ public class AdvancedMacros {
 			macroMenuGui.loadProfile("DEFAULT");
 			
 			globals.set("prompt", inputGUI.getPrompt());
-			//		HudText text = new HudText(true);
-			//		text.setDrawType(DrawType.XRAY);
-			//		text.setPos(0, 5, 0);
-			//		forgeEventHandler.addWorldHudItem(text);
 		}catch (Throwable t) {
 			t.printStackTrace();
 		}
@@ -211,7 +203,7 @@ public class AdvancedMacros {
 		globals.set("stopAllScripts", new StopAllScripts());
 
 		try {
-			globals.set("listTextures", new GetTextureList());
+			globals.set("listTextures", new GetTextureList(AdvancedMacrosCorePlugin.isObfuscated));
 		} catch (NoSuchFieldException | IllegalAccessException | RuntimeException e) {
 			e.printStackTrace();
 		}
@@ -257,9 +249,6 @@ public class AdvancedMacros {
 		globals.set("getEntityList", new GetEntityList());
 		globals.set("getEntity", new GetEntityData());
 		globals.set("getScreen", new GetScreen());
-		//		globals.set("addHoloBlock", new AddHoloBlock());
-		//		globals.set("addHoloText", new AddHoloText());
-		//		globals.set("clearWorldHud", new ClearWorldHud());
 
 		globals.set("hud2D", new Hud2D());
 		globals.set("hud3D", new Hud3D());
@@ -276,7 +265,7 @@ public class AdvancedMacros {
 		globals.set("playSound", new PlaySound.FromFile());
 		globals.set("midi", new MidiLib2());
 		globals.set("customizeSkin", new SkinCustomizer());
-		//globals.set("getVillages", new GetVillages());
+		
 		globals.set("isKeyDown", new IsKeyHeld());
 		globals.set("getHeldKeys", new AdvancedMacros().forgeEventHandler.new GetHeldKeys());
 		globals.set("filesystem", new FileSystem());
@@ -289,7 +278,6 @@ public class AdvancedMacros {
 		LuaTable searchers = globals.get("package").get("searchers").checktable();
 		searchers.set(searchers.length() + 1, jarLibSearcher = new JarLibSearcher());
 		globals.set("getJarLibLoaders", new ZeroArgFunction() {public LuaValue call() {return jarLibSearcher.loaders;}});
-		//System.out.println("FUNCTIONS:\n"+ColorTextArea.getVariableList(globals.checktable(), LuaValue.TFUNCTION, true, "", new HashMap<LuaTable, Boolean>()));
 	}
 
 	private void loadLibJars() {
@@ -400,8 +388,8 @@ public class AdvancedMacros {
 		}
 	}
 	private static File getRootFolder() {
-		File defaultRoot = new File(Minecraft.getMinecraft().mcDataDir,"mods/advancedMacros");
-		File f = new File(Minecraft.getMinecraft().mcDataDir,"config/advancedMacros.cfg");
+		File defaultRoot = new File(Minecraft.getMinecraft().gameDir,"mods/advancedMacros");
+		File f = new File(Minecraft.getMinecraft().gameDir,"config/advancedMacros.cfg");
 		if(!f.exists()) {
 			try (PrintWriter pw = new PrintWriter(f)){
 				pw.write("advancedMacrosRootFolder=" +defaultRoot.toString()+"\n");
@@ -423,5 +411,9 @@ public class AdvancedMacros {
 	}
 	public static Thread getMinecraftThread() {
 		return minecraftThread;
+	}
+
+	public static boolean isServerSide() {
+		return (FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER); //lik srsly;
 	}
 }
