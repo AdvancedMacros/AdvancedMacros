@@ -24,8 +24,8 @@ local changeLog = {
   "&f - Scripts fired from the editor now has the correct argument",
   "&f - &bgetSettings().chatMaxLines&f will now change the maximum number of",
   "&f   lines in your chat. Useful for large logs like &bgetPlayer()",
-  "&f - &BAll events &fhave been implemented",
-  "&f - Added the event &eWakeUp",
+  "&f - Attempted to implement more events, currently",
+  "&f   many only trigger inside the server.... working on it",
   "&f - The XP event now detects changes to levels",
   "&f - Arrow fired has more detail",
   "&f - &bgetSettings().events.potionStatusFrequency &fwill control how often",
@@ -65,6 +65,7 @@ local changeLog = {
   "&f - image.graphics.drawImage now allows additional arguments for",
   "&f   source location and scaling",
   "&f   drawImage(img, x, y, wid, hei, srcX, srcY, srcWid, srcHei)",
+  "&f - now built on a newer version of forge",
   
   "&7"..DIVIDER,
   

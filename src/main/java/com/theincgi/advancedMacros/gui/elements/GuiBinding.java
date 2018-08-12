@@ -8,8 +8,8 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.lwjgl.input.Keyboard;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
-import com.theincgi.advancedMacros.ForgeEventHandler;
-import com.theincgi.advancedMacros.ForgeEventHandler.EventName;
+import com.theincgi.advancedMacros.event.ForgeEventHandler;
+import com.theincgi.advancedMacros.event.ForgeEventHandler.EventName;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;

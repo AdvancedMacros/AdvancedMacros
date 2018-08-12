@@ -13,8 +13,8 @@ import org.luaj.vm2_v3_0_1.Varargs;
 import org.lwjgl.opengl.GL11;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
-import com.theincgi.advancedMacros.ForgeEventHandler;
-import com.theincgi.advancedMacros.ForgeEventHandler.EventName;
+import com.theincgi.advancedMacros.event.ForgeEventHandler;
+import com.theincgi.advancedMacros.event.ForgeEventHandler.EventName;
 import com.theincgi.advancedMacros.gui.elements.GuiBinding;
 import com.theincgi.advancedMacros.gui.elements.GuiBinding.EventMode;
 import com.theincgi.advancedMacros.gui.elements.GuiButton;

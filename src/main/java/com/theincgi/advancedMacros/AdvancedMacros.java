@@ -27,6 +27,7 @@ import org.luaj.vm2_v3_0_1.lib.jse.JsePlatform;
 import org.lwjgl.input.Keyboard;
 
 import com.theincgi.advancedMacros.asm.AdvancedMacrosCorePlugin;
+import com.theincgi.advancedMacros.event.ForgeEventHandler;
 import com.theincgi.advancedMacros.gui.EditorGUI;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.InputGUI;
@@ -401,8 +402,8 @@ public class AdvancedMacros {
 		}
 	}
 	private static File getRootFolder() {
-		File defaultRoot = new File(Minecraft.getMinecraft().mcDataDir,"mods/advancedMacros");
-		File f = new File(Minecraft.getMinecraft().mcDataDir,"config/advancedMacros.cfg");
+		File defaultRoot = new File(Minecraft.getMinecraft().gameDir,"mods/advancedMacros");
+		File f = new File(Minecraft.getMinecraft().gameDir,"config/advancedMacros.cfg");
 		if(!f.exists()) {
 			try (PrintWriter pw = new PrintWriter(f)){
 				pw.write("advancedMacrosRootFolder=" +defaultRoot.toString()+"\n");
@@ -424,5 +425,9 @@ public class AdvancedMacros {
 	}
 	public static Thread getMinecraftThread() {
 		return minecraftThread;
+	}
+
+	public static boolean isServerSide() {
+		return (FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER); //lik srsly;
 	}
 }

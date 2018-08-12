@@ -24,7 +24,7 @@ public class LightAt{
 			}else {
 				throw new LuaError("Invalid args: NONE or X,Y,Z");
 			}
-			Chunk c = Minecraft.getMinecraft().player.getEntityWorld().getChunkFromBlockCoords(pos);
+			Chunk c = Minecraft.getMinecraft().player.getEntityWorld().getChunk(pos);
 			int overall = c.getLightSubtracted(pos, 0);
 			int block = LightAt.getBlockLight(c, pos);
 			int sky = LightAt.getSkyLight(c, pos);
@@ -46,7 +46,7 @@ public class LightAt{
 			}else {
 				throw new LuaError("Invalid args: NONE or X,Y,Z");
 			}
-			Chunk c = Minecraft.getMinecraft().player.getEntityWorld().getChunkFromBlockCoords(pos);
+			Chunk c = Minecraft.getMinecraft().player.getEntityWorld().getChunk(pos);
 			return LuaValue.valueOf(getBlockLight(c, pos));
 		}
 	}
@@ -61,7 +61,7 @@ public class LightAt{
 			}else {
 				throw new LuaError("Invalid args: NONE or X,Y,Z");
 			}
-			Chunk c = Minecraft.getMinecraft().player.getEntityWorld().getChunkFromBlockCoords(pos);
+			Chunk c = Minecraft.getMinecraft().player.getEntityWorld().getChunk(pos);
 			return LuaValue.valueOf(getSkyLight(c, pos));
 		}
 	}

@@ -1,13 +1,14 @@
-package com.theincgi.advancedMacros;
+package com.theincgi.advancedMacros.event;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentHashMap.KeySetView;
 
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
@@ -16,12 +17,14 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.MacroMenuGui;
 import com.theincgi.advancedMacros.gui.elements.ColorTextArea;
 import com.theincgi.advancedMacros.hud.hud2D.Hud2DItem;
 import com.theincgi.advancedMacros.hud.hud3D.WorldHudItem;
 import com.theincgi.advancedMacros.lua.LuaDebug.OnScriptFinish;
+import com.theincgi.advancedMacros.lua.util.ContainerControls;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -38,7 +41,6 @@ import net.minecraft.client.renderer.GlStateManager.DestFactor;
 import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemMultiTexture;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumHand;
@@ -55,11 +57,9 @@ import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.SaveToFile;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -69,19 +69,21 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import scala.util.control.TailCalls.Cont;
 
 public class ForgeEventHandler {
 	ConcurrentHashMap<Integer, Boolean> heldKeys = new ConcurrentHashMap<>(10);
 	int lastAir, lastHealth,
 	lastItemDurablity, lastHotbar, lastHunger;
-	boolean playerWasNull = true;
-	
+	boolean playerWasNull = true, lastSleepingState = false;
+
 	//added lastSwingProgress even though it exists in the player because it would fire multiple times
 	float lastSaturation, lastSwingProgress;
 	ItemStack lastHeldItem;
 	//int lastDimension;
 	int[] lastArmourDurability = new int[4];
 	int lastXP, lastXPLevel;
+	int lastDim;
 	boolean wasRaining, wasThundering;
 	/**Keeping this syncronized!*/
 	private LinkedList<WorldHudItem> worldHudItems = new LinkedList<>();
@@ -90,11 +92,13 @@ public class ForgeEventHandler {
 	private ConcurrentHashMap<String, Boolean> lastPlayerList;
 	private ConcurrentHashMap<String, Boolean> nowPlayerList = new ConcurrentHashMap<>();
 	private boolean wasOnFire = false;
+	//private Queue<List<ItemStack>> receivedInventories = new LinkedList<>();
 	public ForgeEventHandler() {
 		heldMouseButtons = new ArrayList<>(Mouse.getButtonCount());
 		for(int i = 0; i<Mouse.getButtonCount(); i++)
 			heldMouseButtons.add(false);
 	}
+
 
 
 	/**These enums contain lowercase letters because they're names get used directly*/
@@ -220,6 +224,7 @@ public class ForgeEventHandler {
 	public void onPlayerTick(TickEvent.PlayerTickEvent event){
 		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) 
 			return; //lik srsly
+		if(event.phase.equals(TickEvent.Phase.START)) return; //only do on the second half of tick after all stuff happens
 		for(int i = 0; i<Mouse.getButtonCount(); i++) {
 			boolean b = Mouse.isButtonDown(i);
 			if(b!=heldMouseButtons.get(i)) {
@@ -249,6 +254,22 @@ public class ForgeEventHandler {
 		if(playerWasNull){
 			resetLastStats();
 			playerWasNull=false;
+		}
+
+		if(player.dimension != lastDim) {
+			LuaTable e = createEvent(EventName.DimensionChanged);
+			e.set(3, LuaValue.valueOf(player.dimension));
+			e.set(4, LuaValue.valueOf(lastDim));
+			fireEvent(EventName.DimensionChanged, e);
+			lastDim = player.dimension;
+		}
+		if(player.isPlayerSleeping() != lastSleepingState) {
+			if(player.isPlayerSleeping())
+				fireEvent(EventName.UseBed, createEvent(EventName.UseBed));
+			else {
+				fireEvent(EventName.WakeUp, createEvent(EventName.WakeUp));
+			}
+			lastSleepingState = player.isPlayerSleeping();
 		}
 
 		//AirChanged
@@ -296,21 +317,21 @@ public class ForgeEventHandler {
 			LuaTable evnt = createEvent(EventName.PotionStatus);
 			int dur = e.getDuration()-1;
 			int ddur = (dur) / potionUpdateFrequency;
-			
+
 			if(dur % potionUpdateFrequency == 0) {
 				evnt.set(3, Utils.effectToTable(e));
 				fireEvent(EventName.PotionStatus, evnt);
 			}
 
 		}
-//		String[] keys = potionEffects.keySet().toArray(new String[potionEffects.size()]);
-//		for(int i = 0; i<keys.length; i++) {
-//			if(potionEffects.get(keys[i]).getDuration() == 0) {
-//				LuaTable e = createEvent(EventName.PotionStatus);
-//				e.set(3, Utils.effectToTable( potionEffects.remove(keys[i]) ));
-//				fireEvent(EventName.PotionStatus, e);
-//			}
-//		}
+		//		String[] keys = potionEffects.keySet().toArray(new String[potionEffects.size()]);
+		//		for(int i = 0; i<keys.length; i++) {
+		//			if(potionEffects.get(keys[i]).getDuration() == 0) {
+		//				LuaTable e = createEvent(EventName.PotionStatus);
+		//				e.set(3, Utils.effectToTable( potionEffects.remove(keys[i]) ));
+		//				fireEvent(EventName.PotionStatus, e);
+		//			}
+		//		}
 
 		if(wasOnFire!=player.isBurning()) {
 			wasOnFire = player.isBurning();
@@ -443,7 +464,7 @@ public class ForgeEventHandler {
 				lastPlayerList.remove(s);
 			}//else System.out.println("Stayed");
 		}
-		
+
 	}
 
 	//	@SubscribeEvent @SideOnly(Side.CLIENT)
@@ -451,7 +472,7 @@ public class ForgeEventHandler {
 	//		fireEvent(EventName.Respawn, createEvent(EventName.Respawn));
 	//	}
 	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onArrowFired(ArrowLooseEvent event){
+	public void onArrowFired(ArrowLooseEvent event){//CONFIRMED MP
 		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		LuaTable e = createEvent(EventName.ArrowFired);
 		e.set(3, Utils.itemStackToLuatable(event.getBow()));
@@ -466,19 +487,19 @@ public class ForgeEventHandler {
 		e.set(3, Utils.entityToTable(event.getTarget()));
 		fireEvent(EventName.AttackEntity, e);
 	}
+	//	@SubscribeEvent @SideOnly(Side.CLIENT)
+	//	public void onEntityInteract(EntityInteract event) {  //DEAD
+	//		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
+	//		LuaTable e = createEvent(EventName.EntityInteract);
+	//		e.set(3, Utils.entityToTable(event.getTarget()));
+	//		e.set(4, Utils.itemStackToLuatable(event.getItemStack()));
+	//		e.set(5, event.getHand().equals(EnumHand.MAIN_HAND)?"main hand":"off hand");
+	//		if(event.getFace()!=null)
+	//			e.set(6, LuaValue.valueOf(event.getFace().getName()));
+	//		fireEvent(EventName.EntityInteract, e);
+	//	}
 	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onAttackInteract(EntityInteract event) {
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
-		LuaTable e = createEvent(EventName.EntityInteract);
-		e.set(3, Utils.entityToTable(event.getTarget()));
-		e.set(4, Utils.itemStackToLuatable(event.getItemStack()));
-		e.set(5, event.getHand().equals(EnumHand.MAIN_HAND)?"main hand":"off hand");
-		if(event.getFace()!=null)
-			e.set(6, LuaValue.valueOf(event.getFace().getName()));
-		fireEvent(EventName.EntityInteract, e);
-	}
-	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onBlockInteract(PlayerInteractEvent event) {
+	public void onBlockInteract(PlayerInteractEvent event) { //CONFIRMED MP
 		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		if(event.getFace()==null) return;
 		LuaTable e = createEvent(EventName.BlockInteract);
@@ -489,14 +510,14 @@ public class ForgeEventHandler {
 			e.set(6, LuaValue.valueOf(event.getFace().getName()));
 		fireEvent(EventName.BlockInteract, e);
 	}
-//	@SubscribeEvent @SideOnly(Side.CLIENT)
-//	public void onContainerOpen(PlayerContainerEvent event) {
-//		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
-//		LuaTable e = createEvent(EventName.ContainerOpen);
-//		e.set(3, Utils.blockPosToTable(event.getEntity().getPosition()));
-//		e.set(4, Utils.toTable( event.getContainer() ));
-//		fireEvent(EventName.ContainerOpen, e);
-//	}
+	//	@SubscribeEvent @SideOnly(Side.CLIENT)
+	//	public void onContainerOpen(PlayerContainerEvent event) {
+	//		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
+	//		LuaTable e = createEvent(EventName.ContainerOpen);
+	//		e.set(3, Utils.blockPosToTable(event.getEntity().getPosition()));
+	//		e.set(4, Utils.toTable( event.getContainer() ));
+	//		fireEvent(EventName.ContainerOpen, e);
+	//	}
 	//	@SubscribeEvent @SideOnly(Side.CLIENT) this seems to only work for the host for some reason....
 	//	public void onLoggedIn(PlayerEvent.PlayerLoggedInEvent event){ //seems to be 
 	//		LuaTable e = createEvent(EventName.LoggedIn);
@@ -511,20 +532,22 @@ public class ForgeEventHandler {
 	//	}
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onItemPickup(PlayerEvent.ItemPickupEvent event) {
+	public void onItemPickup(PlayerEvent.ItemPickupEvent event) { //DEAD //FIXME
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		LuaTable e = createEvent(EventName.ItemPickup);
 		e.set(3, Utils.itemStackToLuatable(event.getStack()));
 		fireEvent(EventName.ItemPickup, e);
 	}
 	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onDimChange(PlayerEvent.PlayerChangedDimensionEvent event) {
+	public void onDimChange(PlayerEvent.PlayerChangedDimensionEvent event) { //DEAD //FIXME
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		LuaTable e = createEvent(EventName.DimensionChanged);
 		e.set(3, LuaValue.valueOf(event.toDim));
 		e.set(4, LuaValue.valueOf(event.fromDim));
 		fireEvent(EventName.DimensionChanged, e);
 	}
 	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onCraft(PlayerEvent.ItemCraftedEvent event) {
+	public void onCraft(PlayerEvent.ItemCraftedEvent event) { //CONFIRMED MP
 		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		System.out.println(event.getPhase());
 		LuaTable e = createEvent(EventName.ItemCrafted);
@@ -541,26 +564,45 @@ public class ForgeEventHandler {
 		e.set(4, matrix);
 		fireEvent(EventName.ItemCrafted, e);
 	}
+
 	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onItemToss(ItemTossEvent event) {
+	public void onItemToss(ItemTossEvent event) {//FIXME DEAD
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		LuaTable e = createEvent(EventName.ItemTossed);
 		e.set(3, Utils.itemStackToLuatable(event.getEntityItem().getItem()));
 		fireEvent(EventName.ItemTossed, e);
 	}
-	
-	
-	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onItemBreak(PlayerDestroyItemEvent event) {
-		ItemStack yeWhoBrokeith = event.getOriginal(); 
-		//if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
-		LuaTable e = createEvent(EventName.BreakItem);
-		e.set(3, Utils.itemStackToLuatable(yeWhoBrokeith));
-		fireEvent(EventName.BreakItem, e);
-	}
-	
-	
+
+//  have to disable this because apparently it works client side for flint and steel, but not say a wooden shovel >.>
+//	@SubscribeEvent @SideOnly(Side.CLIENT)
+//	public void onItemBreak(PlayerDestroyItemEvent event) { //FIXME ULTRA DEAD
+//		ItemStack yeWhoBrokeith = event.getOriginal(); 
+//		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
+//		LuaTable e = createEvent(EventName.BreakItem);
+//		e.set(3, Utils.itemStackToLuatable(yeWhoBrokeith));
+//		fireEvent(EventName.BreakItem, e);
+//	}
+
+	//	public void asmOnItemBreak(ItemStack yeWhoBrokeith) {//DEAD
+	//		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
+	//		LuaTable e = createEvent(EventName.BreakItem);
+	//		e.set(3, Utils.itemStackToLuatable(yeWhoBrokeith));
+	//		fireEvent(EventName.BreakItem, e);
+	//	}
+	//	
+	//	public static void onBreakItem(ItemStack yeWhoBrokeith) {
+	//		AdvancedMacros.forgeEventHandler.onItemBreak(yeWhoBrokeith);
+	//	}
+	//	public void onItemBreak(ItemStack yeWhoBrokeith) {
+	//		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
+	//		LuaTable e = createEvent(EventName.BreakItem);
+	//		e.set(3, Utils.itemStackToLuatable(yeWhoBrokeith));
+	//		fireEvent(EventName.BreakItem, e);
+	//	}
+
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onJoinedWorld(FMLNetworkEvent.ClientConnectedToServerEvent event){
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		Thread t = new Thread(()->{
 			try {
 				InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/changelogviewer.lua")).getInputStream();
@@ -588,16 +630,17 @@ public class ForgeEventHandler {
 	}
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void OnLeaveWorld(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		LuaTable e = createEvent(EventName.LeaveWorld);
 		fireEvent(EventName.LeaveWorld, e);
 		lastPlayerList = null;
 	}
-	
+
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void  onWorldSaved(SaveToFile event) {
 		fireEvent(EventName.WorldSaved, createEvent(EventName.WorldSaved));
 	}
-	
+
 	private boolean startupHasFired = false;
 	@SubscribeEvent
 	public void onGuiStartup(GuiScreenEvent.InitGuiEvent.Post sEvent) {
@@ -644,22 +687,66 @@ public class ForgeEventHandler {
 					}
 				}
 			}
+			if(sGui instanceof GuiContainer) {
+//				final GuiContainer gCon = (GuiContainer) sGui; 
+//
+//				List<ItemStack> stacks = gCon.inventorySlots.getInventory(); receivedInventories.poll();
+//				LuaTable e = createEvent(EventName.ContainerOpen);
+//				LuaTable items = new LuaTable();
+//				if(stacks!=null) {
+//					for(int i = 0; i<stacks.size(); i++) {
+//						items.set(i+1, Utils.itemStackToLuatable(stacks.get(i)));
+//					}
+//					e.set(3, items);
+//				}else{
+//					e.set(3, LuaValue.FALSE);
+//				}
+//				System.out.println(Minecraft.getMinecraft().ingameGUI.getClass());
+//				fireEvent(EventName.ContainerOpen, e);
+//				
+				Thread test = new Thread(()->{
+					GuiContainer gCon = (GuiContainer) sGui; 
+
+					List<ItemStack> stacks = gCon.inventorySlots.getInventory(); 
+					LuaTable e = createEvent(EventName.ContainerOpen);
+					LuaTable items = new LuaTable();
+					if(stacks!=null) {
+						for(int i = 0; i<stacks.size(); i++) {
+							items.set(i+1, Utils.itemStackToLuatable(stacks.get(i)));
+						}
+						e.set(3, items);
+					}else{
+						e.set(3, LuaValue.FALSE);
+					}
+					System.out.println(Minecraft.getMinecraft().ingameGUI.getClass());
+					fireEvent(EventName.ContainerOpen, e);
+//					try {
+//						Thread.sleep(3000);
+//					} catch (InterruptedException e1) {}
+//					LuaTable item = new LuaTable();
+//					NonNullList<ItemStack> staks = gCon.inventorySlots.getInventory();
+//					for(int i = 0; i<staks.size(); i++) {
+//						item.set(i+1, Utils.itemStackToLuatable(staks.get(i)));
+//					}
+//					AdvancedMacros.globals.get("log").call(item);
+				});
+				test.start();
+
+			}
 			//System.out.println(sGui.getClass());
 			LuaTable args = createEvent(EventName.GUIOpened);
 			args.set(3, name);
 			fireEvent(EventName.GUIOpened, args);
-			
-			if(sGui instanceof GuiContainer) {
-				GuiContainer gContainer = (GuiContainer) sGui;
-				LuaTable e = createEvent(EventName.ContainerOpen);
-				e.set(3, Utils.toTable(gContainer.inventorySlots));
-				fireEvent(EventName.ContainerOpen, e);
-			}
+
 		}
 	}
-	
+
+//	public void notifyContainerReady(int id, List<ItemStack> stacks) {
+//		receivedInventories.offer(stacks);
+//	}
+
 	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onUseItem( LivingEntityUseItemEvent event) {
+	public void onUseItem( LivingEntityUseItemEvent event) {//CONFIRMED MP
 		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		if(!event.getEntity().equals(Minecraft.getMinecraft().player)) return;
 		int useItemFrequency = 1;
@@ -676,15 +763,15 @@ public class ForgeEventHandler {
 		e.set(5, event.getClass().getSimpleName().toLowerCase());
 		fireEvent(EventName.UseItem, e);
 	}
-	
-	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onSleepInBed(PlayerSleepInBedEvent event) {
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
-		LuaTable e = createEvent(EventName.UseBed);
-		e.set(3, Utils.blockPosToTable(event.getPos()));
-		fireEvent(EventName.UseBed, e);
-	}
-	
+
+	//	@SubscribeEvent @SideOnly(Side.CLIENT)
+	//	public void onSleepInBed(PlayerSleepInBedEvent event) {//FIXME DEAD packet exists
+	//		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
+	//		LuaTable e = createEvent(EventName.UseBed);
+	//		e.set(3, Utils.blockPosToTable(event.getPos()));
+	//		fireEvent(EventName.UseBed, e);
+	//	}
+
 	@SubscribeEvent
 	public void onSound(PlaySoundEvent pse) {
 		LuaTable event = createEvent(EventName.Sound);
@@ -709,7 +796,7 @@ public class ForgeEventHandler {
 	}
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onChat(ClientChatReceivedEvent sEvent){
+	public void onChat(ClientChatReceivedEvent sEvent){//TODO out going chat msg filter
 		final ClientChatReceivedEvent event = sEvent; //arg not final because it's acquired thru reflection
 		LuaTable e = createEvent(EventName.Chat);
 		LuaTable e2 = createEvent(EventName.ChatFilter);
@@ -759,6 +846,7 @@ public class ForgeEventHandler {
 	//		e.set(4, Utils.itemStackToLuatable(ipe.getItem().getEntityItem()));
 	//		fireEvent(EventName.ItemPickup, e);
 	//	}
+
 
 	//+===================================================================================================+
 	//|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~END OF FORGE EVENTS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|

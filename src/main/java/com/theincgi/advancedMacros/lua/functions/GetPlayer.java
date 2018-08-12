@@ -60,7 +60,7 @@ public class GetPlayer extends OneArgFunction {
 			t.set("pos", pos);
 		}
 		t.set("mainHand", Utils.itemStackToLuatable(player.getHeldItemMainhand()));
-		t.set("offHand", Utils.itemStackToLuatable(player.getHeldItemMainhand()));
+		t.set("offHand", Utils.itemStackToLuatable(player.getHeldItemOffhand()));
 		if(player instanceof EntityPlayerSP)
 			t.set("invSlot", ((EntityPlayerSP)player).inventory.currentItem+1);
 		
