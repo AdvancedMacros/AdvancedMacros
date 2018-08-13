@@ -49,6 +49,7 @@ public class HoloBlock extends WorldHudItem{
 		width = 1;
 
 	}
+	
 
 	/**flip'd with 1-# for the way I like it, 0,0 in top left*/
 	public void setUV(float uMin,float vMin, float uMax, float vMax){

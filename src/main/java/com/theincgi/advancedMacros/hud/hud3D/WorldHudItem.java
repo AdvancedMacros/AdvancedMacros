@@ -1,5 +1,6 @@
 package com.theincgi.advancedMacros.hud.hud3D;
 
+import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
@@ -10,10 +11,12 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.hud.hud3D.HoloBlock.DrawType;
+import com.theincgi.advancedMacros.misc.CallableTable;
 
 public abstract class WorldHudItem {
 	protected DrawType drawType = DrawType.NO_XRAY;
 	private LuaValue controls;
+	
 	public DrawType getDrawType() {
 		return drawType;
 	}
@@ -121,124 +124,120 @@ public abstract class WorldHudItem {
 		
 	}
 	public void loadControls(LuaValue t) {
-		t.set("destroy", new Destroy());
-		t.set("setPos", new SetPos());
-		t.set("setX", new SetX());
-		t.set("setY", new SetY());
-		t.set("setZ", new SetZ());
-		t.set("setRot", new SetRotation());
-		t.set("setOpacity", new SetOpacity());
-		t.set("getOpacity", new GetOpacity());
-		t.set("getPos", new GetPos());
-		t.set("getRot", new GetRot());
-		t.set("enableDraw", new EnableDraw());
-		t.set("disableDraw", new DisableDraw());
-		t.set("isDrawing", new IsDrawing());
-		t.set("xray", new XRay());
-	}
-	private class SetPos extends ThreeArgFunction{
-		@Override
-		public LuaValue call(LuaValue x, LuaValue y, LuaValue z) {
-			WorldHudItem.this.setPos((float)x.checkdouble(), (float)y.checkdouble(), (float)z.checkdouble());
-			return LuaValue.NONE;
+		for (Hud3DElementOp op : Hud3DElementOp.values()) {
+			t.set(op.toString(), new CallableTable(op.getDocLocation(), new DoOp(op)));
 		}
 	}
-	private class SetX extends OneArgFunction{
-		@Override
-		public LuaValue call(LuaValue arg) {
-			setX((float)arg.checkdouble());
-			return LuaValue.NONE;
+	
+	private enum Hud3DElementOp{
+		destroy,
+		setPos,
+		setX,
+		setY,
+		setZ,
+		setRot,
+		setOpacity,
+		getOpacity,
+		getPos,
+		getRot,
+		enableDraw,
+		disableDraw,
+		isDrawing,
+		xray;
+		
+		String[] getDocLocation() {
+			String[] loc = new String[3];
+			loc[0] = "hud3D";
+			loc[1] = "hudItem"; //end user won't see this value
+			switch (this) {
+			case destroy:
+			case disableDraw:
+			case enableDraw:
+			case getOpacity:
+			case getPos:
+			case getRot:
+			case isDrawing:
+			case setOpacity:
+			case setPos:
+			case setRot:
+			case setX:
+			case setY:
+			case setZ:
+			case xray:
+				loc[2] = this.toString();
+			default:
+				return null;
+			}
 		}
 	}
-	private class SetY extends OneArgFunction{
-		@Override
-		public LuaValue call(LuaValue arg) {
-			setY((float) arg.checkdouble());
-			return LuaValue.NONE;
+	
+	private class DoOp extends VarArgFunction {
+		Hud3DElementOp op;
+		public DoOp(Hud3DElementOp op) {
+			super();
+			this.op = op;
 		}
-	}
-	private class SetZ extends OneArgFunction{
-		@Override
-		public LuaValue call(LuaValue arg) {
-			setZ((float) arg.todouble());
-			return LuaValue.NONE;
-		}
-	}
-	private class SetRotation extends ThreeArgFunction{
-		@Override
-		public LuaValue call(LuaValue yaw, LuaValue pitch, LuaValue roll) {
-			WorldHudItem.this.setRotation((float)yaw.checkdouble(), (float)pitch.checkdouble(), (float)roll.checkdouble());
-			return LuaValue.NONE;
-		}
-	}
-	private class EnableDraw extends OneArgFunction{
-		@Override
-		public LuaValue call(LuaValue arg0) {
-			if(arg0.optboolean(true))
-				WorldHudItem.this.enableDraw();
-			else
-				WorldHudItem.this.disableDraw();
-			return LuaValue.NONE;
-		}
-	}
-	private class DisableDraw extends ZeroArgFunction{
-		@Override
-		public LuaValue call() {
-			disableDraw();
-			return LuaValue.NONE;
-		}
-	}
-	private class Destroy extends ZeroArgFunction{
-		@Override
-		public LuaValue call() {
-			destroy();
-			return LuaValue.NONE;
-		}
-	}
-	private class IsDrawing extends ZeroArgFunction{
-		@Override
-		public LuaValue call() {
-			return LuaValue.valueOf(isDrawing);
-		}
-	}
-	private class SetOpacity extends OneArgFunction{
-		@Override
-		public LuaValue call(LuaValue arg0) {
-			WorldHudItem.this.setOpacity((float)arg0.checkdouble());
-			return LuaValue.NONE;
-		}
-	}
-	private class GetOpacity extends ZeroArgFunction{
-		@Override
-		public LuaValue call() {
-			return LuaValue.valueOf(WorldHudItem.this.getOpacity());
-		}
-	}
-	private class GetPos extends VarArgFunction{
 		@Override
 		public Varargs invoke(Varargs args) {
-			LuaTable table = new LuaTable();
-			table.set(1, LuaValue.valueOf(WorldHudItem.this.getX()));
-			table.set(2, LuaValue.valueOf(WorldHudItem.this.getY()));
-			table.set(3, LuaValue.valueOf(WorldHudItem.this.getZ()));
-			return table.unpack();
+			switch (op) {
+			case destroy:
+				destroy();
+				return LuaValue.NONE;
+			case disableDraw:
+				disableDraw();
+				return LuaValue.NONE;
+			case enableDraw:
+				if(args.arg1().optboolean(true))
+					WorldHudItem.this.enableDraw();
+				else
+					WorldHudItem.this.disableDraw();
+				return LuaValue.NONE;
+			case getOpacity:
+				return LuaValue.valueOf(WorldHudItem.this.getOpacity());
+			case getPos:{
+				LuaTable table = new LuaTable();
+				table.set(1, LuaValue.valueOf(WorldHudItem.this.getX()));
+				table.set(2, LuaValue.valueOf(WorldHudItem.this.getY()));
+				table.set(3, LuaValue.valueOf(WorldHudItem.this.getZ()));
+				return table.unpack();
+			}
+			case getRot:{
+				LuaTable table = new LuaTable();
+				table.set(1, LuaValue.valueOf(WorldHudItem.this.getYaw()));
+				table.set(2, LuaValue.valueOf(WorldHudItem.this.getPitch()));
+				table.set(3, LuaValue.valueOf(WorldHudItem.this.getRoll()));
+				return table.unpack();
+			}
+			case isDrawing:
+				return LuaValue.valueOf(isDrawing);
+			case setOpacity:
+				WorldHudItem.this.setOpacity((float)args.arg1().checkdouble());
+				return LuaValue.NONE;
+			case setPos:
+				WorldHudItem.this.setPos((float)args.arg(1).checkdouble(),
+						                 (float)args.arg(2).checkdouble(),
+						                 (float)args.arg(3).checkdouble());
+				return LuaValue.NONE;
+			case setRot:
+				WorldHudItem.this.setRotation((float)args.arg1().checkdouble(), (float)args.arg(2).checkdouble(), (float)args.arg(3).checkdouble());
+				return LuaValue.NONE;
+			case setX:
+				setX((float)args.arg1().checkdouble());
+				return LuaValue.NONE;
+			case setY:
+				setY((float) args.arg1().checkdouble());
+				return LuaValue.NONE;
+			case setZ:
+				setZ((float) args.arg1().checkdouble());
+				return LuaValue.NONE;
+			case xray:
+				WorldHudItem.this.setDrawType(args.arg1().optboolean(true)?DrawType.XRAY:DrawType.NO_XRAY);
+				return LuaValue.NONE;
+			default:
+				throw new LuaError("unimplemented function "+op);
+			}
 		}
 	}
-	private class GetRot extends VarArgFunction{
-		@Override
-		public Varargs invoke(Varargs args) {
-			LuaTable table = new LuaTable();
-			table.set(1, LuaValue.valueOf(WorldHudItem.this.getYaw()));
-			table.set(2, LuaValue.valueOf(WorldHudItem.this.getPitch()));
-			table.set(3, LuaValue.valueOf(WorldHudItem.this.getRoll()));
-			return table.unpack();
-		}
-	}
-	private class XRay extends OneArgFunction{
-		@Override
-		public LuaValue call(LuaValue bool) {
-			WorldHudItem.this.setDrawType(bool.optboolean(true)?DrawType.XRAY:DrawType.NO_XRAY);
-			return LuaValue.NONE;
-		}
-	}
+	
+	
 }

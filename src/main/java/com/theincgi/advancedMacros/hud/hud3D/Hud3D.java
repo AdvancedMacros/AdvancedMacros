@@ -1,15 +1,84 @@
 package com.theincgi.advancedMacros.hud.hud3D;
 
+import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
+import org.luaj.vm2_v3_0_1.LuaValue;
+import org.luaj.vm2_v3_0_1.Varargs;
+import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.lua.LuaValTexture;
 import com.theincgi.advancedMacros.lua.functions.AddHoloBlock;
 import com.theincgi.advancedMacros.lua.functions.AddHoloText;
 import com.theincgi.advancedMacros.lua.functions.ClearWorldHud;
+import com.theincgi.advancedMacros.misc.CallableTable;
+import com.theincgi.advancedMacros.misc.Settings;
+import com.theincgi.advancedMacros.misc.Utils;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 
 public class Hud3D extends LuaTable{
 	public Hud3D() {
-		this.set("newBlock", new AddHoloBlock());
-		this.set("newText", new AddHoloText());
-		this.set("clearAll", new ClearWorldHud());
+		for (Hud3DOpCode op : Hud3DOpCode.values()) {
+			this.set(op.toString(), new CallableTable(op.getDocLocation(), new DoOp(op)));
+		}
+		
+	}
+	
+	private class DoOp extends VarArgFunction {
+		Hud3DOpCode op;
+		public DoOp(Hud3DOpCode op) {
+			super();
+			this.op = op;
+		}
+		@Override
+		public Varargs invoke(Varargs args) {
+			EntityPlayerSP p = Minecraft.getMinecraft().player;
+			switch (op) {
+			case clearAll:{
+				AdvancedMacros.forgeEventHandler.clearWorldHud();
+				return LuaValue.NONE;
+			}
+			case newBlock:{
+				HoloBlock hb = new HoloBlock();
+				hb.setPos(args.optint(1, (int) Math.floor(p.posX)),
+						  args.optint(2, (int) Math.floor(p.posY)),
+						  args.optint(3, (int) Math.floor(p.posZ)));
+				hb.setTexture(Utils.parseTexture(args.arg(4)));
+				return hb.getControls();
+			}
+			case newText:{
+				HudText text = new HudText();
+				text.setText(args.arg1().optjstring(""));
+				text.setPos(args.optint(2, (int) Math.floor(p.posX)),
+						  args.optint(3, (int) Math.floor(p.posY)),
+						  args.optint(4, (int) Math.floor(p.posZ)));
+				return text.getControls();
+			}
+			default:
+				throw new LuaError("Unimplemented function "+op);
+			}
+		}
+	}
+	
+	private static enum Hud3DOpCode {
+		newBlock,
+		newText,
+		clearAll;
+		
+		public String[] getDocLocation(){
+			String[] loc = new String[2];
+			loc[0] = "hud3D";
+			switch (this) {
+			case clearAll:
+			case newBlock:
+			case newText:
+				loc[2] = this.toString();
+				return loc;
+			default:
+				return null;
+			}
+		}
 	}
 }

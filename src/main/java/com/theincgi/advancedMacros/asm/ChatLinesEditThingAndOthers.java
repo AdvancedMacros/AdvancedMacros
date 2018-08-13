@@ -35,7 +35,6 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
-import com.theincgi.advancedMacros.event.PacketEventHandler;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -106,6 +105,8 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
     		INVOKEINTERFACE List.size() : int
     		BIPUSH 100
     		IF_ICMPLE L15
+    		
+    		This is where the constant 100 is loaded when the line counts are checked
 		 * */
 		for(MethodNode method : node.methods) {
 			if(method.name.equals(SET_CHAT_LINE) && method.desc.equals(DESCRIPTOR)) {
