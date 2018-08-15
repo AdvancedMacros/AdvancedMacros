@@ -109,7 +109,7 @@ public class Hud2D extends LuaTable{
 			case newItem:
 			case newRectangle:
 			case newText:
-				loc[2] = this.toString();
+				loc[1] = this.toString();
 				return loc;
 			default:
 				return null;
