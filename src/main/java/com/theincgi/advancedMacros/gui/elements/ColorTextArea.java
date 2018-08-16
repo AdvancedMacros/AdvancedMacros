@@ -1289,7 +1289,8 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 					vars.putAll(getVariableList(sVal.checktable(), luaValType, checkTables, tmp2, added));
 			}
 			sKey = t.next(sKey).arg1();
-			sVal = t.get(sKey);
+			if(!sKey.isnil())
+				sVal = t.get(sKey);
 		}
 
 		return vars;
