@@ -74,7 +74,7 @@ public class Hud3D extends LuaTable{
 			case clearAll:
 			case newBlock:
 			case newText:
-				loc[2] = this.toString();
+				loc[1] = this.toString();
 				return loc;
 			default:
 				return null;

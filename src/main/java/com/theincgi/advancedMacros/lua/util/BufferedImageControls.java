@@ -89,16 +89,13 @@ public class BufferedImageControls extends LuaTable{
 		set("save", new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg, LuaValue optFormat) {
-				File f = new File(AdvancedMacros.macrosRootFolder, arg.checkjstring());
-				if(FileSystem.isValidAddress(arg.checkjstring()))
 					try {
+						File f = FileSystem.parseFileLocation(arg);
 						ImageIO.write(img, optFormat.optjstring("png"), f);
 					} catch (IOException e) {
 						throw new LuaError("IOException occurred, "+e.getMessage());
 					}
-				else
-					throw new LuaError("Invalid address");
-				return null;
+				return NONE;
 			}
 		});
 		set("convertToTable", new ZeroArgFunction() {

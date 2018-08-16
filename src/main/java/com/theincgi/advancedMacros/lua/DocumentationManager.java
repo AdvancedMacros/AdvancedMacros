@@ -99,24 +99,26 @@ public class DocumentationManager {
 	private LinkedList<String> checkForTableDoc(String fName) {
 		LinkedList<String> out = new LinkedList<>();
 		HashMap<String, Object> map = AdvancedMacros.editorGUI.getCta().getTablesMap();
-		
-		LuaTable t = (LuaTable) map.get(fName);
-		if(t==null) return null;
-		if(t.getmetatable() == null) return null;
-		t = t.getmetatable().checktable();
-		if(t.get(CallableTable.LUA_FUNCTION_KEY).optboolean(false)) {
-			out.add(t.get(CallableTable.DEFINITION).checkjstring());
-			LuaValue temp = t.get(CallableTable.TOOLTIP);
-			if(temp.istable()) {
-				LuaTable tooltip = t.get(CallableTable.TOOLTIP).checktable();
-				for(int i = 1; i<=tooltip.length(); i++) {
-					out.add(tooltip.get(i).checkjstring());
+		try {
+			LuaTable t = (LuaTable) map.get(fName);
+			if(t==null) return null;
+			if(t.getmetatable() == null) return null;
+			t = t.getmetatable().checktable();
+			if(t.get(CallableTable.LUA_FUNCTION_KEY).optboolean(false)) {
+				out.add(t.get(CallableTable.DEFINITION).checkjstring());
+				LuaValue temp = t.get(CallableTable.TOOLTIP);
+				if(temp.istable()) {
+					LuaTable tooltip = t.get(CallableTable.TOOLTIP).checktable();
+					for(int i = 1; i<=tooltip.length(); i++) {
+						out.add(tooltip.get(i).checkjstring());
+					}
+				}else {
+					out.add(temp.checkjstring());
 				}
-			}else {
-				out.add(temp.checkjstring());
+				return out;
 			}
-			return out;
-		}
+		}catch (Exception e) {}
+
 		return null;
 	}
 	private LinkedList<String> checkForCommentDocumentation(String fName) {

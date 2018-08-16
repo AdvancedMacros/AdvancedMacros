@@ -8,16 +8,19 @@ import java.io.FileOutputStream;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
 
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
+import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
-import com.google.common.io.Files;
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.lua.LuaDebug;
+import com.theincgi.advancedMacros.lua.LuaFunctions.Log;
 
 public class FileSystem extends LuaTable{
 	public FileSystem() {
@@ -40,20 +43,20 @@ public class FileSystem extends LuaTable{
 	private static class Open extends TwoArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg0, LuaValue arg1) {
-			LuaTable controls;
+			LuaTable controls = new ClosingLuaTable();
 			String mode = arg1.checkjstring();
-			assertAddress(arg0);
-			if(arg0.tojstring().isEmpty()) {throw new LuaError("No File name given");}
-			File file = new File(AdvancedMacros.macrosRootFolder, arg0.checkjstring());
+			//assertAddress(arg0);
+
+			File file = parseFileLocation(arg0);
+
 			if(!mode.equals("r")) {
 				file.getParentFile().mkdirs();
 			}
-				
+
 			if(mode.equals("r")) {
 				try {
 					FileInputStream fis = new FileInputStream(file);
 					Object syncLock = new Object();
-					controls = new LuaTable();
 					controls.set("readByte", new ReadByte(fis, syncLock));
 					controls.set("readLine", new Read(fis, syncLock, true));
 					controls.set("read", new Read(fis, syncLock, false));
@@ -74,7 +77,6 @@ public class FileSystem extends LuaTable{
 			}else if(mode.equals("w")||mode.equals("a")) {
 				try {
 					FileOutputStream fos = new FileOutputStream(file, mode.equals("a"));
-					controls = new LuaTable();
 					Object syncLock = new Object();
 					controls.set("write",     new Write(fos,syncLock));    //"Blah"
 					controls.set("writeLine", new WriteLine(fos,syncLock));//"Blah"+\n
@@ -87,9 +89,45 @@ public class FileSystem extends LuaTable{
 				throw new LuaError("Unsupported mode '"+mode+"'. Try 'r', 'w', 'a' or 'raf'");
 			}
 			return controls;
+
 		}
+
 	}
 	//TODO move syncLock to the open class so we dont keep so many unnecessary copies
+
+	
+	private static class ClosingLuaTable extends LuaTable{
+		boolean hasClosed = false;
+		
+		public ClosingLuaTable() {
+			super();
+		}
+
+		public ClosingLuaTable(int narray, int nhash) {
+			super(narray, nhash);
+		}
+
+		public ClosingLuaTable(LuaValue[] named, LuaValue[] unnamed, Varargs lastarg) {
+			super(named, unnamed, lastarg);
+		}
+
+		public ClosingLuaTable(Varargs varargs, int firstarg) {
+			super(varargs, firstarg);
+		}
+
+		public ClosingLuaTable(Varargs varargs) {
+			super(varargs);
+		}
+		
+		@Override
+		protected void finalize() throws Throwable {
+			if(!hasClosed && this.get("close").isfunction()) {
+				AdvancedMacros.logFunc.call(LuaValue.valueOf("&gWarning: file was not closed in '" + LuaDebug.getLabel(Thread.currentThread()) + "' &cclosing now..."));
+				this.get("close").call();
+			}
+			super.finalize();
+		}
+	}
 	
 	private static class ReadAll extends ZeroArgFunction{
 		Object syncLock;
@@ -113,7 +151,7 @@ public class FileSystem extends LuaTable{
 			}
 		}
 	}
-	
+
 	private static class Read extends ZeroArgFunction{
 		FileInputStream fis;
 		Object syncLock;
@@ -200,10 +238,11 @@ public class FileSystem extends LuaTable{
 		}
 	}
 
-	
+
 	private static class Close extends ZeroArgFunction{
 		private Object syncLock;
 		private Closeable[] closeables;
+		protected boolean hasClosed = false;
 		public Close(Object syncLock, Closeable...closeables) {
 			this.syncLock = syncLock;
 			this.closeables = closeables;
@@ -211,16 +250,17 @@ public class FileSystem extends LuaTable{
 		@Override
 		public LuaValue call() {
 			synchronized(syncLock) {
-			for(int i = 0; i<closeables.length; i++) {
-				try {
-					if(closeables[i] instanceof Flushable) {
-						((Flushable)closeables[i]).flush();
-					}
-					closeables[i].close();
-				}catch (Exception e) {
+				for(int i = 0; i<closeables.length; i++) {
+					try {
+						if(closeables[i] instanceof Flushable) {
+							((Flushable)closeables[i]).flush();
+						}
+						closeables[i].close();
+						hasClosed = true;
+					}catch (Exception e) {
 
+					}
 				}
-			}
 			}
 			return LuaValue.NONE;
 		}
@@ -298,22 +338,22 @@ public class FileSystem extends LuaTable{
 	private static class Exists extends OneArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg0) {
-			assertAddress(arg0);
-			return LuaValue.valueOf(new File(AdvancedMacros.macrosRootFolder, arg0.checkjstring()).exists());
+			File f = parseFileLocation(arg0);
+			return LuaValue.valueOf( f.exists() );
 		}
 	}
 	private static class Copy extends TwoArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg0, LuaValue arg1) {
-			assertAddress(arg0);
-			assertAddress(arg1);
-			if(arg0.eq(arg1).checkboolean()){
-				throw new LuaError("Source and destination can not be the same.");
-			}
-			File from = new File(AdvancedMacros.macrosRootFolder, arg0.checkjstring());
-			File to  = new File(AdvancedMacros.macrosRootFolder, arg1.checkjstring());
+			File from = parseFileLocation(arg0);
+			File to   = parseFileLocation(arg1);
+			
 			try {
-				Files.copy(from, to);
+				if(Files.isSameFile(from.toPath(), to.toPath())){
+					throw new LuaError("Source and destination can not be the same.");
+				}
+
+				Files.copy(from.toPath(), to.toPath());
 				return LuaValue.TRUE;
 			} catch (IOException e) {
 				throw new LuaError("IOExeption occurred trying to copy ("+e.getMessage()+")");
@@ -323,39 +363,37 @@ public class FileSystem extends LuaTable{
 	private static class Delete extends OneArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg0) {
-			assertAddress(arg0);
-			return LuaValue.valueOf(new File(AdvancedMacros.macrosRootFolder, arg0.checkjstring()).delete());
+			File file = parseFileLocation(arg0);
+			return LuaValue.valueOf( file.delete() );
 		}
 	}
 	private static class Rename extends TwoArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg0, LuaValue arg1) {
-			assertAddress(arg0);
-			assertAddress(arg1);
-			return LuaValue.valueOf(new File(AdvancedMacros.macrosRootFolder, arg0.checkjstring()).renameTo(new File(AdvancedMacros.macrosRootFolder, arg1.checkjstring())));
+			File from = parseFileLocation(arg0);
+			File to   = parseFileLocation(arg1);
+			return LuaValue.valueOf(from.renameTo(to));
 		}
 	}
 	private static class MkDir extends OneArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg0) {
-			assertAddress(arg0);
-			File f = new File(AdvancedMacros.macrosRootFolder, arg0.checkjstring());
+			File f = parseFileLocation(arg0);
 			return LuaValue.valueOf(f.mkdir());
 		}
 	}
 	private static class MkDirs extends OneArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg0) {
-			assertAddress(arg0);
-			File f = new File(AdvancedMacros.macrosRootFolder, arg0.checkjstring());
+			File f = parseFileLocation(arg0);
 			return LuaValue.valueOf(f.mkdirs());
 		}
 	}
 	private static class IsDir extends OneArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg0) {
-			assertAddress(arg0);
-			return LuaValue.valueOf(new File(AdvancedMacros.macrosRootFolder, arg0.checkjstring()).isDirectory());
+			File f = parseFileLocation(arg0);
+			return LuaValue.valueOf(f.isDirectory());
 		}
 	}//TODO Check list("") or list()
 	private static class List extends OneArgFunction{
@@ -364,9 +402,8 @@ public class FileSystem extends LuaTable{
 			if(arg0.isnil()) {
 				arg0 = LuaValue.valueOf("");
 			}
-			assertAddress(arg0);
 			LuaTable t = new LuaTable();
-			File f = new File(AdvancedMacros.macrosRootFolder, arg0.checkjstring());
+			File f = parseFileLocation(arg0);
 			if(!f.isDirectory()){
 				return LuaValue.FALSE;
 			}
@@ -377,20 +414,32 @@ public class FileSystem extends LuaTable{
 			return t;
 		}
 	}
-	private static void assertAddress(LuaValue arg) {
-		if(!isValidAddress(arg.checkjstring())){
-			throw new LuaError("File may not be accessed, move/copy into the advanced macros folder to use this file.");
-		}
-		return;
+
+	public static File parseFileLocation(LuaValue arg0) {
+		if(arg0.isnil())
+			arg0 =  LuaValue.valueOf("");
+		
+		File file = null;
+		if(arg0.tojstring().startsWith("/") || arg0.tojstring().startsWith("\\"))
+			file = new File(arg0.checkjstring().substring(1));
+		else
+			file = new File(AdvancedMacros.macrosRootFolder, arg0.checkjstring());
+		return file;
 	}
-	/**
-	 * @param path the path inside the root folder of {@link AdvancedMacros}*/
-	public static boolean isValidAddress(String path) {
-		try {
-			File f = new File(AdvancedMacros.macrosRootFolder,path);
-			return f.getCanonicalPath().startsWith(AdvancedMacros.macrosRootFolder.getCanonicalPath());
-		} catch (IOException e) {
-			return false;
-		}
-	}
+	//	private static void assertAddress(LuaValue arg) {
+	//		if(!isValidAddress(arg.checkjstring())){
+	//			throw new LuaError("File may not be accessed, move/copy into the advanced macros folder to use this file.");
+	//		}
+	//		return;
+	//	}
+	//	/**
+	//	 * @param path the path inside the root folder of {@link AdvancedMacros}*/
+	//	public static boolean isValidAddress(String path) {
+	//		try {
+	//			File f = new File(AdvancedMacros.macrosRootFolder,path);
+	//			return f.getCanonicalPath().startsWith(AdvancedMacros.macrosRootFolder.getCanonicalPath());
+	//		} catch (IOException e) {
+	//			return false;
+	//		}
+	//	}
 }

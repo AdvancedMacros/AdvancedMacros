@@ -1,19 +1,4 @@
 {
-  "hud2D": {
-    "addText": {
-      "tooltip": [
-        "Returns a text object with functions in it",
-        "Example: hud2D.addText(...).setText(\"Hello!\")"
-      ]
-    },
-    "addText()": {
-      "setText": {
-        "tooltip": [
-          "Sets the text content of the object"
-        ]
-      }
-    }
-  },
   "print": {
     "tooltip": [
       "Prints the text given into the function into the Minecraft console",
@@ -25,7 +10,9 @@
       "getFonts": {
         "definition": "getFonts",
         "tooltip": "Gets a list of available fonts",
-        "types": []
+        "types": [
+          []
+        ]
       }
     }
   },
@@ -255,6 +242,424 @@
         ],
         "types": [
           []
+        ]
+      }
+    }
+  },
+  "hud2D": {
+    "clearAll": {
+      "definition": "clearAll()",
+      "tooltip": "removes all 2D hud elements",
+      "types": [
+        []
+      ]
+    },
+    "getSize": {
+      "definition": "getSize()",
+      "tooltip": [
+        "returns the scaled resolution",
+        "of the Minecraft HUD"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "newBox": {
+      "definition": "newBox( [x, y, wid, hei, thickness] )",
+      "tooltip": [
+        "Creates a rectangular frame",
+        "Default values x,y,wid, hei is 0",
+        "Default thickness is 1",
+        "Returns a table with controls"
+      ],
+      "types": [
+        [
+          "opt_number",
+          "opt_number",
+          "opt_number",
+          "opt_number",
+          "opt_number"
+        ]
+      ]
+    },
+    "newImage": {
+      "definitions": "newImage( [img, x, y, wid, hei] )",
+      "tooltip": [
+        "Creates an image on your 2D hud",
+        "Returns a table with controls"
+      ],
+      "types": [
+        [
+          "opt_number",
+          "opt_number",
+          "opt_number",
+          "opt_number"
+        ]
+      ]
+    },
+    "newItem": {
+      "definition": "newItem([stack, x, y, count])",
+      "tooltip": [
+        "create an item icon",
+        "stack is a string with the format",
+        "\"modid:item_id\" or",
+        "\"modid:item_id:damage\"",
+        "defaults nil, 0, 0, 1"
+      ],
+      "types": [
+        [
+          "opt_string",
+          "opt_number",
+          "opt_number",
+          "opt_number"
+        ]
+      ]
+    },
+    "newRectangle": {
+      "definition": "newRectangle([x, y, width, height])",
+      "tooltip": [
+        "create a new rectangle with",
+        "default position of 0, 0",
+        "and default size of 0, 0"
+      ],
+      "types": [
+        [
+          "opt_number",
+          "opt_number",
+          "opt_number",
+          "opt_number"
+        ]
+      ]
+    },
+    "newText": {
+      "definition": "newText([text, x, y, size])",
+      "tooltip": [
+        "create a new text element with",
+        "default text \"\"",
+        "default position of 0,0",
+        "default size of 12"
+      ],
+      "types": [
+        [
+          "opt_string",
+          "opt_number",
+          "opt_number",
+          "opt_number"
+        ]
+      ]
+    }
+  },
+  "hud3D": {
+    "hudItem": {
+      "destroy": {
+        "definition": "destroy()",
+        "tooltip": [
+          "Deletes this element",
+          "(also stops drawing)"
+        ],
+        "types": [
+          []
+        ]
+      },
+      "setPos": {
+        "definition": "setPos( x, y, z )",
+        "tooltip": [
+          "Sets this elements position"
+        ],
+        "types": [
+          [
+            "number",
+            "number",
+            "number"
+          ]
+        ]
+      },
+      "setX": {
+        "definition": "setX( x )",
+        "tooltip": [
+          "Set this elements x position"
+        ],
+        "types": [
+          [
+            "number"
+          ]
+        ]
+      },
+      "setY": {
+        "definition": "setY( y )",
+        "tooltip": [
+          "Set this elements y position"
+        ],
+        "types": [
+          [
+            "number"
+          ]
+        ]
+      },
+      "setZ": {
+        "definition": "setZ( z )",
+        "tooltip": [
+          "Set this elements z position"
+        ],
+        "types": [
+          [
+            "number"
+          ]
+        ]
+      },
+      "setRot": {
+        "definition": "setRot( yaw, pitch, roll )",
+        "tooltip": [
+          "Set this elements rotation"
+        ],
+        "types": [
+          [
+            "number",
+            "number",
+            "number"
+          ]
+        ]
+      },
+      "setOpacity": {
+        "definition": "setOpacity( amount )",
+        "tooltip": [
+          "Sets the opacity of this element's color",
+          "Values range 0 to 1"
+        ],
+        "types": [
+          [
+            "number"
+          ]
+        ]
+      },
+      "getOpacity": {
+        "definition": "getOpacity()",
+        "tooltip": [
+          "Return this element's opacity from its color"
+        ],
+        "types": [
+          []
+        ]
+      },
+      "getPos": {
+        "definition": "getPos()",
+        "tooltip": [
+          "Return this elements position"
+        ],
+        "types": [
+          []
+        ]
+      },
+      "getRot": {
+        "definition": "getRot()",
+        "tooltip": [
+          "Returns this elements rotation",
+          "(yaw, pitch, roll)"
+        ],
+        "types": [
+          []
+        ]
+      },
+      "enableDraw": {
+        "definition": "enableDraw( [bool] )",
+        "tooltip": [
+          "Set if the hud should render this element",
+          "(Default value true)"
+        ],
+        "types": [
+          [
+            "opt_boolean"
+          ]
+        ]
+      },
+      "disableDraw": {
+        "definition": "disableDraw()",
+        "tooltip": [
+          "Set this element to stop rendering"
+        ],
+        "types": [
+          []
+        ]
+      },
+      "isDrawing": {
+        "definition": "isDrawing()",
+        "tooltip": [
+          "Check if this element is set to render",
+          "Returns boolean"
+        ],
+        "types": [
+          []
+        ]
+      },
+      "xray": {
+        "definition": "xray( [bool] )",
+        "tooltip": [
+          "Set this element to render over the world",
+          "This makes it effectivly 'always on top'",
+          "(Default value true)"
+        ],
+        "types": [
+          [
+            "opt_boolean"
+          ]
+        ]
+      }
+    },
+    "clearAll": {
+      "definition": "\"clearAll()\"",
+      "tooltip": "\"removes all 2D hud elements\"",
+      "types": [
+        []
+      ]
+    },
+    "newBlock": {
+      "definition": "newBlock( [x, y, z, texture] )",
+      "tooltip": [
+        "Create a new cube.",
+        "Default pos at Player x, y, z",
+        "Default texture is the Hud Block texture"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "newBlock()": {
+      "setWidth": {
+        "definition": "setWidth( width )",
+        "tooltip": [
+          "Set the width of this cube",
+          "(all sides)"
+        ],
+        "types": [
+          [
+            "number"
+          ]
+        ]
+      },
+      "changeTexture": {
+        "definition": "changeTexture( texture[, side] )",
+        "tooltip": [
+          "Set the default texture or on a single side.",
+          "Valid sides:",
+          "up/top, north, south, east",
+          "west, south, down/bottom"
+        ],
+        "types": [
+          [
+            "table",
+            "opt_string"
+          ],
+          [
+            "string",
+            "opt_string"
+          ]
+        ]
+      },
+      "setUV": {
+        "definition": "setUV( uMin, vMin, uMax, vMax )",
+        "tooltip": [
+          "UV coordinates define where in your texture",
+          "is displayed",
+          "Values should range between 0 and 1",
+          "Default mins are 0, maxs are 1"
+        ],
+        "types": [
+          [
+            "number",
+            "number",
+            "number",
+            "number"
+          ]
+        ]
+      },
+      "overlay": {
+        "definition": "overlay( [x, y, z] )",
+        "tooltip": [
+          "Quickly makes this block slightly larger than",
+          "a normal block, this will stop it from looking",
+          "weird where it interescts a normal block.",
+          "Opt args are a new position."
+        ],
+        "types": [
+          [
+            "opt_number",
+            "opt_number",
+            "opt_number"
+          ]
+        ]
+      },
+      "setColor": {
+        "definition": "setColor( color[, side] )",
+        "tooltip": [
+          "Sets tint for the color for either the",
+          "whole cube, or just one side",
+          "Valid sides: up/top, down/bottom,",
+          "north, south, east, west"
+        ],
+        "types": [
+          [
+            "table",
+            "opt_string"
+          ],
+          [
+            "number",
+            "opt_string"
+          ]
+        ]
+      },
+      "getColor": {
+        "definition": "getColor( [side] )",
+        "tooltip": [
+          "For no arg:",
+          "Returns the default color",
+          "With arg:",
+          "up/top, north, south, east",
+          "west, south, down/bottom",
+          "Returns the color on that side."
+        ],
+        "types": [
+          [
+            "opt_string"
+          ]
+        ]
+      }
+    },
+    "newText": {
+      "definition": "newText( [text, x, y, z] )",
+      "tooltip": [
+        "Create a 3D text element",
+        "Default text is \"\"",
+        "Default pos is player x, y, z"
+      ],
+      "types": [
+        [
+          "opt_string",
+          "opt_number",
+          "opt_number",
+          "opt_number"
+        ]
+      ]
+    },
+    "newText()": {
+      "getText": {
+        "definition": "getText()",
+        "tooltip": [
+          "Returns the current text"
+        ],
+        "types": [
+          []
+        ]
+      },
+      "setText": {
+        "definition": "setText( text )",
+        "tooltip": [
+          "Sets the text",
+          "(Tip: & codes will work here)"
+        ],
+        "types": [
+          [
+            "string"
+          ]
         ]
       }
     }

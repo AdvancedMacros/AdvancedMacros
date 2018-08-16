@@ -5,6 +5,7 @@ import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.misc.CallableTable;
 
 import net.minecraft.client.Minecraft;
 
@@ -16,14 +17,11 @@ public class HudText extends WorldHudItem{
 	public HudText() {
 		//this.is3D = is3D;
 	}
-	@Override
-	public float getOpacity() {
-		return opacity;
-	}
+	
 	@Override
 	public void render(double playerX, double playerY, double playerZ) {
 		//if(is3D)
-			AdvancedMacros.customFontRenderer.renderText(playerX, playerY, playerZ, x, y, z, yaw, pitch, roll, text, opacity);
+			AdvancedMacros.customFontRenderer.renderText(playerX, playerY, playerZ, x, y, z, yaw, pitch, roll, text, color.getAFloat());
 		//else
 		//	AdvancedMacros.customFontRenderer.renderText(x, y, text);
 	}
@@ -46,8 +44,8 @@ public class HudText extends WorldHudItem{
 	@Override
 	public void loadControls(LuaValue t) {
 		super.loadControls(t);
-		t.set("setText", new SetText());
-		t.set("getText", new GetText());
+		t.set("setText", new CallableTable(new String[] {"hud3D","newText()","setText"}, new SetText()));
+		t.set("getText", new CallableTable(new String[] {"hud3D","newText()","getText"}, new GetText()));
 	}
 	
 	//Definitly stolen from the FontRenderer class

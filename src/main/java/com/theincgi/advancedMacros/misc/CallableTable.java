@@ -44,7 +44,7 @@ public class CallableTable extends LuaTable{
 		META.set("__call", new SelfRemover());
 	}
 	//LuaTable meta;
-	public CallableTable(String[] docName, LuaFunction function) {
+	public CallableTable(final String[] docName, LuaFunction function) {
 		this.docName = docName;
 		this.function = function;
 		
@@ -52,33 +52,31 @@ public class CallableTable extends LuaTable{
 		LuaTable meta;
 		if(docName != null) {
 			StringBuilder metaKey = new StringBuilder();
-			for(String s : docName) {
-				metaKey.append(s);
-				
+			for(int i = 0; i<docName.length; i++) {
+				metaKey.append(docName[i]);
+				if(i != docName.length-1)
+					metaKey.append(".");
 			}
-
+			
 			meta = metaCache.computeIfAbsent(metaKey.toString(), (key)->{
-				return new LuaTable();
+				LuaTable m = new LuaTable();
+				m.set(LUA_FUNCTION_KEY, TRUE);
+				m.set("__call", new SelfRemover());
+				try {
+					m.set(DEFINITION, getJsonDefinition());
+					m.set(TOOLTIP,    getJsonTooltip());
+					m.set(LUA_DOC,     getJsonLuaDoc());
+					m.set(ARG_TYPES,   getJsonArgTypes());
+				}catch (Exception e) {
+					e.printStackTrace();
+				}
+				return m;
 			});
 		}else{
 			meta = META;
 		}
 		this.setmetatable(meta);
-		meta.set(LUA_FUNCTION_KEY, TRUE);
-		//meta = new LuaTable();
-		//this.setmetatable(meta);
-		if (docName == null) {
-			return;
-		}
-		meta.set("__call", new SelfRemover());
-		try {
-			meta.set(DEFINITION, getJsonDefinition());
-			meta.set(TOOLTIP,    getJsonTooltip());
-			meta.set(LUA_DOC,     getJsonLuaDoc());
-			meta.set(ARG_TYPES,   getJsonArgTypes());
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
+		
 
 	}
 
@@ -113,7 +111,7 @@ public class CallableTable extends LuaTable{
 	}
 	@Override
 	public LuaValue tostring() {
-		return (this.get("definition").isnil())? super.tostring() : this.get("definition");
+		return (this.getmetatable().get("definition").isnil())? super.tostring() : this.getmetatable().get("definition");
 	}
 	public LuaValue getJsonTooltip() {
 		JsonElement jObj = getObjectFromJson(docName);

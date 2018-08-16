@@ -240,7 +240,7 @@ public class LuaFunctions {
 							s+=formatTableForLog(vTab, antiR, indent+2);
 							s+=rep(" ",indent)+"&f}\n";
 						}else {
-							s+=" &f{}\n";
+							s+="&f\n";
 						}
 					}else {
 						antiR.add(vTab);

@@ -1,5 +1,7 @@
 package com.theincgi.advancedMacros.misc;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Scanner;
@@ -199,9 +201,15 @@ public class Utils {
 		}
 		return null;
 	}
-	public static void logError(LuaError le){
-		AdvancedMacros.logFunc.call("&c"+le.toString());
-		le.printStackTrace();
+	public static void logError(Throwable le){
+		if(le instanceof LuaError) {
+			AdvancedMacros.logFunc.call("&c"+le.toString());			
+		}else {
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			le.printStackTrace(pw);
+			AdvancedMacros.logFunc.call("&c"+sw.toString());
+		}
 	}
 	public static String normalizeText(String keyName) {
 		return keyName.charAt(0)+(keyName.substring(1).toLowerCase());
@@ -460,24 +468,24 @@ public class Utils {
 			}
 			String actType = clickDetails.get("type").checkjstring();
 			switch(clickDetails.get("type").checkjstring()) {
-				case "url":
-				case "open_url":
-					actType="open_url";
-					break;
-				case "suggestCommand":
-				case "suggest_command":
-					actType="suggest_command";
-					break;
-				case "runCommand":
-				case "run_command":
-					actType="run_command";
-					break;
-//				case "suggestText":
-//				case "insertion":
-//					actType="insertion";
-//					break;
-				default:
-					throw new LuaError("Invalid click type ("+clickDetails.get("type").tojstring()+") use: [url/suggestCommand/runCommand]");
+			case "url":
+			case "open_url":
+				actType="open_url";
+				break;
+			case "suggestCommand":
+			case "suggest_command":
+				actType="suggest_command";
+				break;
+			case "runCommand":
+			case "run_command":
+				actType="run_command";
+				break;
+				//				case "suggestText":
+				//				case "insertion":
+				//					actType="insertion";
+				//					break;
+			default:
+				throw new LuaError("Invalid click type ("+clickDetails.get("type").tojstring()+") use: [url/suggestCommand/runCommand]");
 			}
 			msg+=",\"clickEvent\":{\"action\":\"" + actType + "\",\"value\":\""+ clickDetails.get("value").checkjstring() +"\"}";
 		}
@@ -522,7 +530,7 @@ public class Utils {
 			return "white";
 		return null;
 	}
-	
+
 	public static class NBTUtils{
 		private static LuaTable fromCompound(NBTTagCompound comp) {
 			LuaTable out = new LuaTable();
@@ -580,127 +588,127 @@ public class Utils {
 			}
 			return table;
 		}
-//		private static LuaValue compoundToTable(NBTTagCompound tileData) {
-//			LuaTable t = new LuaTable();
-//			for(String k : tileData.getKeySet()) {
-//				t.set(k, valueFromCompound(tileData, k));
-//			}
-//			return t;
-//		}
-//
-//		private static LuaTable NBT2Table(NBTTagList nbt) {
-//			if(nbt == null){
-//				return new LuaTable();
-//			}
-//			LuaTable tags = new LuaTable();
-//			for(int i = 0; i < nbt.tagCount(); i++){
-//				NBTBase b = nbt.get(i);
-//				tags.set(i+1, NBTBase2LuaValue(b));
-//			}
-//			return tags;
-//		}
-//
-//		private static LuaValue NBTBase2LuaValue(NBTBase b) {
-//			LuaValue thisTag;
-//			if(b instanceof NBTTagByte){
-//				thisTag = LuaValue.valueOf(((NBTTagByte) b).getByte());
-//			}else if(b instanceof NBTTagShort){
-//				thisTag = LuaValue.valueOf(((NBTTagShort) b).getShort());
-//			}else if(b instanceof NBTTagInt){
-//				thisTag = LuaValue.valueOf(((NBTTagInt) b).getInt());
-//			}else if(b instanceof NBTTagLong){
-//				thisTag = LuaValue.valueOf(((NBTTagLong) b).getLong());
-//			}else if(b instanceof NBTTagFloat){
-//				thisTag = LuaValue.valueOf(((NBTTagFloat) b).getFloat());
-//			}else if(b instanceof NBTTagDouble){
-//				thisTag = LuaValue.valueOf(((NBTTagDouble) b).getDouble());
-//			}else if(b instanceof NBTTagByteArray){
-//				byte[] bytes = ((NBTTagByteArray) b).getByteArray();
-//				thisTag = new LuaTable();
-//				for(int j = 0; j<bytes.length; j++){
-//					thisTag.set(j+1, LuaValue.valueOf(bytes[j]));
-//				}
-//			}else if(b instanceof NBTTagString){
-//				thisTag = LuaValue.valueOf(((NBTTagString) b).getString());
-//			}else if(b instanceof NBTTagList){
-//				thisTag = NBT2Table((NBTTagList) b);
-//			}else if(b instanceof NBTTagCompound){
-//				thisTag = new LuaTable();
-//				Set<String> keys = ((NBTTagCompound) b).getKeySet();
-//				for (String key : keys) {
-//					thisTag.set(key, valueFromCompound((NBTTagCompound) b, key));
-//				}
-//			}else if(b instanceof NBTTagIntArray){
-//				int[] ints = ((NBTTagIntArray) b).getIntArray();
-//				thisTag = new LuaTable();
-//				for(int j = 0; j<ints.length; j++){
-//					thisTag.set(j+1, LuaValue.valueOf(ints[j]));
-//				}
-//			}else{
-//				thisTag = LuaValue.NIL;
-//			}
-//			return thisTag;
-//		}
-//
-//		private static LuaValue valueFromCompound(NBTTagCompound b, String key) {
-//			switch (b.getTagId(key)) {
-//			case Constants.NBT.TAG_BYTE: //byte
-//				return LuaValue.valueOf(b.getByte(key));
-//			case Constants.NBT.TAG_SHORT: //short
-//				return LuaValue.valueOf(b.getShort(key));
-//			case Constants.NBT.TAG_INT: //int
-//				return LuaValue.valueOf(b.getInteger(key));
-//			case Constants.NBT.TAG_LONG: //long
-//				return LuaValue.valueOf(b.getLong(key));
-//			case Constants.NBT.TAG_FLOAT: //float
-//				return LuaValue.valueOf(b.getFloat(key));
-//			case Constants.NBT.TAG_DOUBLE: //double
-//				return LuaValue.valueOf(b.getDouble(key));
-//			case Constants.NBT.TAG_BYTE_ARRAY:{ //byte array
-//				LuaTable t = new LuaTable();
-//				byte[] bArry = b.getByteArray(key);
-//				for (int i = 0; i < bArry.length; i++) {
-//					t.set(i+1, LuaValue.valueOf(bArry[i]));
-//				}
-//				return t;
-//			}
-//			case Constants.NBT.TAG_STRING: //string
-//				return LuaValue.valueOf(b.getString(key));
-//			case Constants.NBT.TAG_LIST:{ //tagList
-//					NBTTagList list = (NBTTagList) b.getTag(key);
-//					Iterator<NBTBase> iter = list.iterator();
-//					LuaTable list = new LuaTable();
-//					while(iter.hasNext()) {
-//						NBTBase tag = iter.next();
-//						list.set(list.length()+1, NBTUtils.NBTBase2LuaValue(tag));
-//					}
-//			}
-//			case 10://compound
-//				LuaTable sTable = new LuaTable();
-//				for(String sKey : b.getCompoundTag(key).getKeySet()){
-//					sTable.set(sKey, valueFromCompound(b, sKey));
-//				}
-//				return sTable;
-//			case 11://int array
-//				LuaTable t2 = new LuaTable();
-//				byte[] iArry = b.getByteArray(key);
-//				for (int i = 0; i < iArry.length; i++) {
-//					t2.set(i+1, LuaValue.valueOf(iArry[i]));
-//				}
-//				return t2;
-//		
-//		
-//			default:
-//				return LuaValue.NIL;
-//			}
-//		}
-		
+		//		private static LuaValue compoundToTable(NBTTagCompound tileData) {
+		//			LuaTable t = new LuaTable();
+		//			for(String k : tileData.getKeySet()) {
+		//				t.set(k, valueFromCompound(tileData, k));
+		//			}
+		//			return t;
+		//		}
+		//
+		//		private static LuaTable NBT2Table(NBTTagList nbt) {
+		//			if(nbt == null){
+		//				return new LuaTable();
+		//			}
+		//			LuaTable tags = new LuaTable();
+		//			for(int i = 0; i < nbt.tagCount(); i++){
+		//				NBTBase b = nbt.get(i);
+		//				tags.set(i+1, NBTBase2LuaValue(b));
+		//			}
+		//			return tags;
+		//		}
+		//
+		//		private static LuaValue NBTBase2LuaValue(NBTBase b) {
+		//			LuaValue thisTag;
+		//			if(b instanceof NBTTagByte){
+		//				thisTag = LuaValue.valueOf(((NBTTagByte) b).getByte());
+		//			}else if(b instanceof NBTTagShort){
+		//				thisTag = LuaValue.valueOf(((NBTTagShort) b).getShort());
+		//			}else if(b instanceof NBTTagInt){
+		//				thisTag = LuaValue.valueOf(((NBTTagInt) b).getInt());
+		//			}else if(b instanceof NBTTagLong){
+		//				thisTag = LuaValue.valueOf(((NBTTagLong) b).getLong());
+		//			}else if(b instanceof NBTTagFloat){
+		//				thisTag = LuaValue.valueOf(((NBTTagFloat) b).getFloat());
+		//			}else if(b instanceof NBTTagDouble){
+		//				thisTag = LuaValue.valueOf(((NBTTagDouble) b).getDouble());
+		//			}else if(b instanceof NBTTagByteArray){
+		//				byte[] bytes = ((NBTTagByteArray) b).getByteArray();
+		//				thisTag = new LuaTable();
+		//				for(int j = 0; j<bytes.length; j++){
+		//					thisTag.set(j+1, LuaValue.valueOf(bytes[j]));
+		//				}
+		//			}else if(b instanceof NBTTagString){
+		//				thisTag = LuaValue.valueOf(((NBTTagString) b).getString());
+		//			}else if(b instanceof NBTTagList){
+		//				thisTag = NBT2Table((NBTTagList) b);
+		//			}else if(b instanceof NBTTagCompound){
+		//				thisTag = new LuaTable();
+		//				Set<String> keys = ((NBTTagCompound) b).getKeySet();
+		//				for (String key : keys) {
+		//					thisTag.set(key, valueFromCompound((NBTTagCompound) b, key));
+		//				}
+		//			}else if(b instanceof NBTTagIntArray){
+		//				int[] ints = ((NBTTagIntArray) b).getIntArray();
+		//				thisTag = new LuaTable();
+		//				for(int j = 0; j<ints.length; j++){
+		//					thisTag.set(j+1, LuaValue.valueOf(ints[j]));
+		//				}
+		//			}else{
+		//				thisTag = LuaValue.NIL;
+		//			}
+		//			return thisTag;
+		//		}
+		//
+		//		private static LuaValue valueFromCompound(NBTTagCompound b, String key) {
+		//			switch (b.getTagId(key)) {
+		//			case Constants.NBT.TAG_BYTE: //byte
+		//				return LuaValue.valueOf(b.getByte(key));
+		//			case Constants.NBT.TAG_SHORT: //short
+		//				return LuaValue.valueOf(b.getShort(key));
+		//			case Constants.NBT.TAG_INT: //int
+		//				return LuaValue.valueOf(b.getInteger(key));
+		//			case Constants.NBT.TAG_LONG: //long
+		//				return LuaValue.valueOf(b.getLong(key));
+		//			case Constants.NBT.TAG_FLOAT: //float
+		//				return LuaValue.valueOf(b.getFloat(key));
+		//			case Constants.NBT.TAG_DOUBLE: //double
+		//				return LuaValue.valueOf(b.getDouble(key));
+		//			case Constants.NBT.TAG_BYTE_ARRAY:{ //byte array
+		//				LuaTable t = new LuaTable();
+		//				byte[] bArry = b.getByteArray(key);
+		//				for (int i = 0; i < bArry.length; i++) {
+		//					t.set(i+1, LuaValue.valueOf(bArry[i]));
+		//				}
+		//				return t;
+		//			}
+		//			case Constants.NBT.TAG_STRING: //string
+		//				return LuaValue.valueOf(b.getString(key));
+		//			case Constants.NBT.TAG_LIST:{ //tagList
+		//					NBTTagList list = (NBTTagList) b.getTag(key);
+		//					Iterator<NBTBase> iter = list.iterator();
+		//					LuaTable list = new LuaTable();
+		//					while(iter.hasNext()) {
+		//						NBTBase tag = iter.next();
+		//						list.set(list.length()+1, NBTUtils.NBTBase2LuaValue(tag));
+		//					}
+		//			}
+		//			case 10://compound
+		//				LuaTable sTable = new LuaTable();
+		//				for(String sKey : b.getCompoundTag(key).getKeySet()){
+		//					sTable.set(sKey, valueFromCompound(b, sKey));
+		//				}
+		//				return sTable;
+		//			case 11://int array
+		//				LuaTable t2 = new LuaTable();
+		//				byte[] iArry = b.getByteArray(key);
+		//				for (int i = 0; i < iArry.length; i++) {
+		//					t2.set(i+1, LuaValue.valueOf(iArry[i]));
+		//				}
+		//				return t2;
+		//		
+		//		
+		//			default:
+		//				return LuaValue.NIL;
+		//			}
+		//		}
+
 	}
-	
+
 	public static LuaError toLuaError(Throwable t) {
 		return new LuaError(t);
 	}
-	
+
 	public static Varargs pinvoke(LuaFunction func, LuaValue...luaValues) {
 		try {
 			return func.invoke(luaValues);
@@ -741,12 +749,12 @@ public class Utils {
 			t.set(t.length()+1, s);
 		return t;
 	}
-	
+
 	public static void debugPrint( LuaTable t ) {
 		System.out.println( LuaTableToString(t) );
 	}
-	
-	
+
+
 	public static LuaValTexture parseTexture(LuaValue v) {
 		return parseTexture(v, Utils.checkTexture(Settings.getTextureID("resource:holoblock.png")));
 	}
@@ -759,41 +767,41 @@ public class Utils {
 			lvt = ((BufferedImageControls) v).getLuaValTexture();
 		}else if(v.isstring()){
 			lvt = Utils.checkTexture(Settings.getTextureID(v.checkjstring()));
-//		}else if(v.isnil()){
-//			lvt = null;
+			//		}else if(v.isnil()){
+			//			lvt = null;
 		}else {
 			lvt = def;
 		}
 		return lvt;
 	}
-	
+
 	public static char mcSelectCode = '\u00A7';
 	public static String toMinecraftColorCodes(String text) {
 		char sel = '\u00A7';
 		String reset = sel+"r";
 		return reset + sel + "f" +
-			   text.replaceAll("&0", reset + sel + "0")
-				   .replaceAll("&1", reset + sel + "1")
-				   .replaceAll("&2", reset + sel + "2")
-				   .replaceAll("&3", reset + sel + "3")
-				   .replaceAll("&4", reset + sel + "4")
-				   .replaceAll("&5", reset + sel + "5")
-				   .replaceAll("&6", reset + sel + "6")
-				   .replaceAll("&7", reset + sel + "7")
-				   .replaceAll("&8", reset + sel + "8")
-				   .replaceAll("&9", reset + sel + "9")
-				   .replaceAll("&a", reset + sel + "a")
-				   .replaceAll("&b", reset + sel + "b")
-				   .replaceAll("&c", reset + sel + "c")
-				   .replaceAll("&d", reset + sel + "d")
-				   .replaceAll("&e", reset + sel + "e")
-				   .replaceAll("&f", reset + sel + "f")
-				   .replaceAll("&U",         sel + "n")
-				   .replaceAll("&B",         sel + "l")
-				   .replaceAll("&O",         sel + "k")
-				   .replaceAll("&S",         sel + "m")
-				   .replaceAll("&I",         sel + "o")
-				   ;
+		text.replaceAll("&0", reset + sel + "0")
+		.replaceAll("&1", reset + sel + "1")
+		.replaceAll("&2", reset + sel + "2")
+		.replaceAll("&3", reset + sel + "3")
+		.replaceAll("&4", reset + sel + "4")
+		.replaceAll("&5", reset + sel + "5")
+		.replaceAll("&6", reset + sel + "6")
+		.replaceAll("&7", reset + sel + "7")
+		.replaceAll("&8", reset + sel + "8")
+		.replaceAll("&9", reset + sel + "9")
+		.replaceAll("&a", reset + sel + "a")
+		.replaceAll("&b", reset + sel + "b")
+		.replaceAll("&c", reset + sel + "c")
+		.replaceAll("&d", reset + sel + "d")
+		.replaceAll("&e", reset + sel + "e")
+		.replaceAll("&f", reset + sel + "f")
+		.replaceAll("&U",         sel + "n")
+		.replaceAll("&B",         sel + "l")
+		.replaceAll("&O",         sel + "k")
+		.replaceAll("&S",         sel + "m")
+		.replaceAll("&I",         sel + "o")
+		;
 	}
 	public static void runOnMCThreadAndWait(Runnable r){
 		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {

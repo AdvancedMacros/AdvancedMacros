@@ -273,9 +273,6 @@ public class MacroMenuGui extends Gui{
 								} catch (FileNotFoundException e) {
 									e.printStackTrace();
 								}catch (LuaError le){
-									//TODO allow for option to not log error to chat
-									le.printStackTrace();
-									//AdvancedMacros.logFunc.call(LuaValue.valueOf("&c"+le.toString()));
 									Utils.logError(le);
 								}
 							}
@@ -284,6 +281,20 @@ public class MacroMenuGui extends Gui{
 				}
 			}
 		}
+	}
+	
+	public LinkedList<String> getMatchingScripts(boolean isKey, String eventName, boolean isKeyDown) {
+		LinkedList<String> out = new LinkedList<>();
+		for(Moveable m : bindingsList.getItems()){
+			if(m instanceof GuiBinding){
+				GuiBinding g = (GuiBinding) m;
+				if(g.isDisabled()) continue;
+				if(g.getTriggerName().equals(eventName) &&
+				   !g.getEventMode().isKeyType())
+					out.add(g.getScriptName());
+			}
+		}
+		return out;
 	}
 
 	public boolean loadProfile(String profile){

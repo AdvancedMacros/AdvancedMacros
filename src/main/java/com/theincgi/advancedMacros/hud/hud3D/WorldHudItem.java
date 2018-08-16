@@ -10,12 +10,15 @@ import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.hud.hud3D.HoloBlock.DrawType;
 import com.theincgi.advancedMacros.misc.CallableTable;
+import com.theincgi.advancedMacros.misc.Utils;
 
 public abstract class WorldHudItem {
 	protected DrawType drawType = DrawType.NO_XRAY;
 	private LuaValue controls;
+	Color color = Color.WHITE;
 	
 	public DrawType getDrawType() {
 		return drawType;
@@ -23,7 +26,7 @@ public abstract class WorldHudItem {
 	public void setDrawType(DrawType drawType) {
 		this.drawType = drawType;
 	}
-	protected float x,y,z,yaw,pitch,roll,opacity=1;
+	protected float x,y,z,yaw,pitch,roll;
 	protected boolean isDrawing;
 	/**should call to {@link #disableDraw()} and to make all functions un-usable as it is no longer in use*/
 	public void destroy() {
@@ -106,10 +109,10 @@ public abstract class WorldHudItem {
 	}
 	public abstract void render(double playerX, double playerY, double playerZ);
 	public float getOpacity() {
-		return opacity;
+		return color.getAFloat();
 	}
 	public void setOpacity(float opacity) {
-		this.opacity = opacity;
+		this.color.setA(opacity);
 	}
 	
 	
@@ -124,12 +127,18 @@ public abstract class WorldHudItem {
 		
 	}
 	public void loadControls(LuaValue t) {
-		for (Hud3DElementOp op : Hud3DElementOp.values()) {
+		for (Hud3DElementOp op : Hud3DElementOp.defValues) {
 			t.set(op.toString(), new CallableTable(op.getDocLocation(), new DoOp(op)));
 		}
 	}
 	
-	private enum Hud3DElementOp{
+	public void enableColorControls(LuaValue t) {
+		for (Hud3DElementOp op : Hud3DElementOp.colorControls) {
+			t.set(op.toString(), new CallableTable(op.getDocLocation(), new DoOp(op)));
+		}
+	}
+	
+	private static enum Hud3DElementOp{
 		destroy,
 		setPos,
 		setX,
@@ -143,7 +152,19 @@ public abstract class WorldHudItem {
 		enableDraw,
 		disableDraw,
 		isDrawing,
-		xray;
+		xray,
+		
+		setColor,
+		getColor;
+		
+		public static final Hud3DElementOp[] defValues = {
+				destroy, setPos, setX, setY, setZ, setRot, setOpacity, getOpacity,
+				getPos, getRot, enableDraw, disableDraw, isDrawing, xray
+		};
+		
+		public static final Hud3DElementOp[] colorControls = {
+			setColor, getColor
+		};
 		
 		String[] getDocLocation() {
 			String[] loc = new String[3];
@@ -164,7 +185,10 @@ public abstract class WorldHudItem {
 			case setY:
 			case setZ:
 			case xray:
-				loc[2] = this.toString();
+			case setColor:
+			case getColor:
+				loc[2] = this.name();
+				return loc;
 			default:
 				return null;
 			}
@@ -233,6 +257,11 @@ public abstract class WorldHudItem {
 			case xray:
 				WorldHudItem.this.setDrawType(args.arg1().optboolean(true)?DrawType.XRAY:DrawType.NO_XRAY);
 				return LuaValue.NONE;
+			case getColor:
+				return color.toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255);
+			case setColor:
+				color = Utils.parseColor(args, AdvancedMacros.COLOR_SPACE_IS_255);
+				return NONE;
 			default:
 				throw new LuaError("unimplemented function "+op);
 			}

@@ -3,6 +3,8 @@ package com.theincgi.advancedMacros.gui;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 
+import net.minecraft.client.renderer.GlStateManager;
+
 public class Color {
 	int a,r,g,b;
 	//public boolean quoteMode;
@@ -96,17 +98,29 @@ public class Color {
 		return a;
 	}
 
+	public float getAFloat() {
+		return a/255f;
+	}
+	
 	public Color setA(int a) {
 		this.a = a;
 		return this;
 	}
-
+	public Color setA(float a) {
+		this.a = (int) Math.floor(a*255);
+		return this;
+	}
+	
 	public int getR() {
 		return r;
 	}
 
 	public Color setR(int r) {
 		this.r = r;
+		return this;
+	}
+	public Color setR(float r) {
+		this.r = (int) Math.floor(r*255);
 		return this;
 	}
 
@@ -118,6 +132,10 @@ public class Color {
 		this.g = g;
 		return this;
 	}
+	public Color setG(float g) {
+		this.g = (int) Math.floor(g*255);
+		return this;
+	}
 
 	public int getB() {
 		return b;
@@ -127,7 +145,15 @@ public class Color {
 		this.b = b;
 		return this;
 	}
-
+	public Color setB(float b) {
+		this.b = (int) Math.floor(b*255);
+		return this;
+	}
+	
+	public void apply() {
+		GlStateManager.color(r/255f, g/255f, b/255f, a/255f);
+	}
+	
 	@Override
 	public String toString() {
 		return "Color [a=" + a + ", r=" + r + ", g=" + g + ", b=" + b + "]";

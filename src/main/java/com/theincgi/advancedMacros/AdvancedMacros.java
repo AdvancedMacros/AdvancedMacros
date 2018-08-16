@@ -80,6 +80,7 @@ import com.theincgi.advancedMacros.misc.CustomFontRenderer;
 import com.theincgi.advancedMacros.misc.FontRendererOverride;
 import com.theincgi.advancedMacros.misc.JarLibSearcher;
 import com.theincgi.advancedMacros.misc.Settings;
+import com.theincgi.advancedMacros.misc.Utils;
 import com.theincgi.advancedMacros.publicInterfaces.LuaPlugin;
 
 import net.minecraft.client.Minecraft;
@@ -100,7 +101,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "5.3.0"; //${version} ??
+	public static final String VERSION = "5.4.0"; //${version} ??
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -203,7 +204,7 @@ public class AdvancedMacros {
 		globals.set("stopAllScripts", new StopAllScripts());
 
 		try {
-			globals.set("listTextures", new GetTextureList(AdvancedMacrosCorePlugin.isObfuscated));
+			globals.set("listTextures", new GetTextureList());
 		} catch (NoSuchFieldException | IllegalAccessException | RuntimeException e) {
 			e.printStackTrace();
 		}
@@ -377,14 +378,13 @@ public class AdvancedMacros {
 			LuaDebug.LuaThread t = new LuaDebug.LuaThread(function, args.unpack(), scriptName);
 			t.start();
 		} catch (FileNotFoundException e) {
+			Utils.logError(new LuaError("Could not find script '"+scriptName+"'"));
 			AdvancedMacros.logFunc.call(LuaValue.valueOf("&c"+"Could not find script '"+scriptName+"'"));
 			e.printStackTrace();
 		}catch (LuaError le){
-			//TODO allow for option to not log error to chat
-			le.printStackTrace();
-			AdvancedMacros.logFunc.call(LuaValue.valueOf("&c"+le.toString()));
+			Utils.logError(le);
 		}catch (Throwable e) {
-			AdvancedMacros.logFunc.call(LuaValue.valueOf("&c"+e.toString()));
+			Utils.logError(e);
 		}
 	}
 	private static File getRootFolder() {

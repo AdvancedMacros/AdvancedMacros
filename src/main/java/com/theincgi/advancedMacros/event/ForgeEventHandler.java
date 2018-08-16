@@ -1,5 +1,8 @@
 package com.theincgi.advancedMacros.event;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -10,6 +13,7 @@ import java.util.Queue;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
@@ -24,6 +28,9 @@ import com.theincgi.advancedMacros.gui.MacroMenuGui;
 import com.theincgi.advancedMacros.gui.elements.ColorTextArea;
 import com.theincgi.advancedMacros.hud.hud2D.Hud2DItem;
 import com.theincgi.advancedMacros.hud.hud3D.WorldHudItem;
+import com.theincgi.advancedMacros.lua.LuaDebug;
+import com.theincgi.advancedMacros.lua.LuaDebug.JavaThread;
+import com.theincgi.advancedMacros.lua.LuaDebug.LuaThread;
 import com.theincgi.advancedMacros.lua.LuaDebug.OnScriptFinish;
 import com.theincgi.advancedMacros.lua.util.ContainerControls;
 import com.theincgi.advancedMacros.misc.Settings;
@@ -674,14 +681,7 @@ public class ForgeEventHandler {
 		}
 	}
 	
-	@SubscribeEvent //TODO
-	public void sendingChat(ClientChatEvent event) {
-		LuaTable e = createEvent(EventName.ChatSendFilter);
-		e.set(3, LuaValue.valueOf(event.getMessage()));
-		LuaValue maxTime       = Utils.tableFromProp(Settings.settings, "chat.maxFilterTime", LuaValue.valueOf(500));
-		LuaValue timeoutAciton = Utils.tableFromProp(Settings.settings, "chat.cancelOnTimeout", LuaValue.TRUE);
-		
-	}
+	
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onUseItem( LivingEntityUseItemEvent event) {//CONFIRMED MP
@@ -759,10 +759,55 @@ public class ForgeEventHandler {
 		fireEvent(EventName.Chat, e);
 		if(event.isCanceled())
 			fireEvent(EventName.ChatFilter, e2);
-
+	}
+	@SubscribeEvent //TODO
+	public void sendingChat(final ClientChatEvent event) {
+		JavaThread thread = new JavaThread(() -> {
+			LuaTable e = createEvent(EventName.ChatSendFilter);
+			e.set(3, LuaValue.valueOf(event.getMessage()));
+//			LuaValue maxTime       = Utils.tableFromProp(Settings.settings, "chat.maxFilterTime", LuaValue.valueOf(500));
+//			LuaValue timeoutAciton = Utils.tableFromProp(Settings.settings, "chat.cancelOnTimeout", LuaValue.TRUE);
+			
+			LinkedList<String> toRun = AdvancedMacros.macroMenuGui.getMatchingScripts(false, EventName.ChatSendFilter.name(), false);
+			
+			for (String script : toRun) {
+				if(script==null) return;
+				File f = new File(AdvancedMacros.macrosFolder, script);
+				if(f.exists() && f.isFile()) {
+					try {
+						FileReader fr = new FileReader(f);
+						Thread.currentThread().setName("ChatSendFilter - " + script);
+						LuaValue function = AdvancedMacros.globals.load(fr, script);
+						Varargs ret = function.invoke(e.unpack());
+						if(!ret.toboolean(1)) 
+							return;
+						e = createEvent(EventName.ChatSendFilter);
+						for(int i = 1; i<= ret.narg(); i++)
+							e.set(2+i, ret.arg(i));
+					} catch (FileNotFoundException ex) {
+						ex.printStackTrace();
+					}catch (LuaError le){
+						Utils.logError(le);
+					}
+				}
+			}
+			forceSendMsg(e.get(3).tojstring(), true);
+		});
+		thread.start();
+		event.setCanceled( true );
 	}
 
+	private void forceSendMsg(String msg, boolean addToChat) {
+		Minecraft mc = Minecraft.getMinecraft();
+		if (msg.isEmpty()) return;
+		if (addToChat)
+        {
+            mc.ingameGUI.getChatGUI().addToSentMessages(msg);
+        }
+        if (net.minecraftforge.client.ClientCommandHandler.instance.executeCommand(mc.player, msg) != 0) return;
 
+        mc.player.sendChatMessage(msg);
+	}
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onItemPickup(EntityItemPickupEvent ipe){

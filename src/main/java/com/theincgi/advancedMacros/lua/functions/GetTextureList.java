@@ -10,13 +10,15 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 public class GetTextureList extends ZeroArgFunction{
 	private final Map<String, TextureAtlasSprite> mapRegisteredSprites;
 	
-	public GetTextureList(boolean isObf) throws NoSuchFieldException, RuntimeException, IllegalAccessException {
+	public GetTextureList() throws NoSuchFieldException, RuntimeException, IllegalAccessException {
 		TextureMap map = Minecraft.getMinecraft().getTextureMapBlocks();
-		Field f = TextureMap.class.getDeclaredField(isObf?"j":"mapRegisteredSprites");
+		Field f = ReflectionHelper.findField(TextureMap.class, "mapRegisteredSprites", "field_110574_e", "j");
+		//Field f = TextureMap.class.getDeclaredField(isObf?"j":"mapRegisteredSprites");
 		f.setAccessible(true);
 		mapRegisteredSprites = (Map<String, TextureAtlasSprite>) f.get(map);
 	}

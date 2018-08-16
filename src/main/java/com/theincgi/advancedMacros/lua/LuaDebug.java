@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.WeakHashMap;
 
+import javax.management.RuntimeErrorException;
+
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaTable;
@@ -62,30 +64,31 @@ public class LuaDebug extends DebugLib{
 	}
 	
 	
+	
 //	public Set<Thread> getThreads(){
 //		return threads.keySet();
 //	}
-	public double getUptime(Thread thread){
+	public static double getUptime(Thread thread){
 		LuaThread lt = threads.get(thread);
 		if(lt==null){return Double.NaN;}
 		return lt.getUpTime();
 	}
-	public String getLabel(Thread thread){
+	public static String getLabel(Thread thread){
 		LuaThread lt = threads.get(thread);
 		if(lt==null){return "";}
 		return lt.label;
 	}
-	public LuaValue getLuaStatus(Thread thread){
+	public static LuaValue getLuaStatus(Thread thread){
 		LuaThread lt = threads.get(thread);
 		if(lt==null){return LuaValue.NIL;}
 		return LuaValue.valueOf(lt.status.toString().toLowerCase());
 	}
-	public Status getStatus(Thread thread){
+	public static Status getStatus(Thread thread){
 		LuaThread lt = threads.get(thread);
 		if(lt==null){return null;}
 		return lt.status;
 	}
-	public void stop(Thread thread) {
+	public static void stop(Thread thread) {
 		LuaThread lt = threads.get(thread);
 		if(lt==null){return;}
 		lt.stop();
@@ -100,8 +103,10 @@ public class LuaDebug extends DebugLib{
 		protected long launchTime;
 		protected Status status = Status.NEW;
 		private String label;
-		private Thread thread;
-
+		protected Thread thread;
+		
+		private LuaThread() {}
+		
 		public LuaThread(LuaValue sFunc, String label) {
 			this(sFunc, new LuaTable(), label);
 		}
@@ -116,7 +121,7 @@ public class LuaDebug extends DebugLib{
 		}
 		
 		
-		private void register(Thread t){
+		protected void register(Thread t){
 			threads.put(t, this);
 		}
 		/**returns a LuaTable for controlling this thread*/
@@ -142,7 +147,7 @@ public class LuaDebug extends DebugLib{
 							status = Status.CRASH;
 							notifyStatusListeners(thread, Status.CRASH);
 							e.printStackTrace();
-							Utils.logError(new LuaError(e)); //TODO optional logging
+							Utils.logError(e);
 						}
 					}
 				});
@@ -163,6 +168,51 @@ public class LuaDebug extends DebugLib{
 			return ((int)(System.currentTimeMillis()-launchTime)/10f)/100f;
 		}
 		
+	}
+	/**Added for the ChatSendFilter which will go through multiple filters, this occurs in a runnable<br>
+	 * This will allow it to show up inside the running scripts list and be cancel-able*/
+	public static class JavaThread extends LuaThread{
+		Runnable r;
+		public JavaThread(Runnable r) {
+			this.r = r;
+		}
+		
+		@Override
+		public LuaTable start(OnScriptFinish unused) {
+			if(status.equals(Status.NEW)){
+				thread = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try{
+							register(thread);
+							status = Status.RUNNING;
+							notifyStatusListeners(thread, Status.RUNNING);
+							launchTime = System.currentTimeMillis();
+							
+							r.run();
+							
+							status = Status.DONE;
+							notifyStatusListeners(thread, Status.DONE);
+						}catch (Throwable e) {
+							status = Status.CRASH;
+							notifyStatusListeners(thread, Status.CRASH);
+							e.printStackTrace();
+							Utils.logError(e);
+						}
+					}
+				});
+				
+				thread.start();
+
+				return ThreadControls.getControls(this);
+			}else{
+				throw new LuaError("Attempt to start a thread in state '"+status+"'");
+			}
+		}
+		
+		public void setName(String s) {
+			thread.setName(s);
+		}
 	}
 	public static class GetCurrent extends ZeroArgFunction{
 		@Override
