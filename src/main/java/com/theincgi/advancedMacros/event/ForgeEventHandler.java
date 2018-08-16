@@ -5,12 +5,15 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Stack;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.luaj.vm2_v3_0_1.LuaError;
@@ -47,6 +50,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.GlStateManager.CullFace;
 import net.minecraft.client.renderer.GlStateManager.DestFactor;
 import net.minecraft.client.renderer.GlStateManager.SourceFactor;
+import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.Container;
@@ -63,6 +67,7 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
@@ -81,8 +86,10 @@ import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import scala.actors.threadpool.Arrays;
 import scala.util.control.TailCalls.Cont;
 
 public class ForgeEventHandler {
@@ -105,6 +112,7 @@ public class ForgeEventHandler {
 	int sTick = 0;
 	private ConcurrentHashMap<String, Boolean> lastPlayerList;
 	private ConcurrentHashMap<String, Boolean> nowPlayerList = new ConcurrentHashMap<>();
+	public WeakHashMap<Entity, RenderFlags> entityRenderFlags = new WeakHashMap<>();
 	private boolean wasOnFire = false;
 	//private Queue<List<ItemStack>> receivedInventories = new LinkedList<>();
 	public ForgeEventHandler() {
@@ -680,8 +688,8 @@ public class ForgeEventHandler {
 
 		}
 	}
-	
-	
+
+
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onUseItem( LivingEntityUseItemEvent event) {//CONFIRMED MP
@@ -765,11 +773,11 @@ public class ForgeEventHandler {
 		JavaThread thread = new JavaThread(() -> {
 			LuaTable e = createEvent(EventName.ChatSendFilter);
 			e.set(3, LuaValue.valueOf(event.getMessage()));
-//			LuaValue maxTime       = Utils.tableFromProp(Settings.settings, "chat.maxFilterTime", LuaValue.valueOf(500));
-//			LuaValue timeoutAciton = Utils.tableFromProp(Settings.settings, "chat.cancelOnTimeout", LuaValue.TRUE);
-			
+			//			LuaValue maxTime       = Utils.tableFromProp(Settings.settings, "chat.maxFilterTime", LuaValue.valueOf(500));
+			//			LuaValue timeoutAciton = Utils.tableFromProp(Settings.settings, "chat.cancelOnTimeout", LuaValue.TRUE);
+
 			LinkedList<String> toRun = AdvancedMacros.macroMenuGui.getMatchingScripts(false, EventName.ChatSendFilter.name(), false);
-			
+
 			for (String script : toRun) {
 				if(script==null) return;
 				File f = new File(AdvancedMacros.macrosFolder, script);
@@ -797,16 +805,55 @@ public class ForgeEventHandler {
 		event.setCanceled( true );
 	}
 
+	@SubscribeEvent @SideOnly(Side.CLIENT)
+	public void onEntityRender(RenderLivingEvent.Pre event) {
+		RenderFlags r = entityRenderFlags.get(event.getEntity());
+		if(r==null) return;
+
+		//event.getRenderer().setRenderOutlines(true);
+		if(r.changed) {
+			try {
+				Method m = ReflectionHelper.findMethod(Entity.class, "setFlag", "func_70052_a", int.class, boolean.class);
+
+				m.setAccessible(true);
+				m.invoke(event.getEntity(), 6, r.glow);
+
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			r.reset();
+			
+		}
+		if(r.xray) {
+			GlStateManager.disableDepth();
+		}
+	}
+	@SubscribeEvent @SideOnly(Side.CLIENT)
+	public void onEntityRender(RenderLivingEvent.Post event) {
+		RenderFlags r = entityRenderFlags.get(event.getEntity());
+		if(r==null) return;
+		if(r.xray)
+			GlStateManager.enableDepth();
+	}
+
 	private void forceSendMsg(String msg, boolean addToChat) {
 		Minecraft mc = Minecraft.getMinecraft();
 		if (msg.isEmpty()) return;
 		if (addToChat)
-        {
-            mc.ingameGUI.getChatGUI().addToSentMessages(msg);
-        }
-        if (net.minecraftforge.client.ClientCommandHandler.instance.executeCommand(mc.player, msg) != 0) return;
+		{
+			mc.ingameGUI.getChatGUI().addToSentMessages(msg);
+		}
+		if (net.minecraftforge.client.ClientCommandHandler.instance.executeCommand(mc.player, msg) != 0) return;
 
-        mc.player.sendChatMessage(msg);
+		mc.player.sendChatMessage(msg);
 	}
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)
@@ -1159,6 +1206,25 @@ public class ForgeEventHandler {
 					t.set(j++, s);
 			}
 			return t;
+		}
+	}
+
+	public static class RenderFlags{
+		private boolean xray = false;
+		private boolean glow = false;
+		private boolean changed = false;
+		public void setXray(boolean xray) {
+			this.xray = xray;
+		}
+		public void setGlow(boolean glow) {
+			this.glow = glow;
+			changed = true;
+		}
+		public void reset() {
+			changed = false;
+		}
+		public boolean isChanged() {
+			return changed;
 		}
 	}
 }

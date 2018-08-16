@@ -74,8 +74,10 @@ import com.theincgi.advancedMacros.lua.functions.StopAllScripts;
 import com.theincgi.advancedMacros.lua.functions.Toast;
 import com.theincgi.advancedMacros.lua.functions.entity.GetEntityData;
 import com.theincgi.advancedMacros.lua.functions.entity.GetEntityList;
+import com.theincgi.advancedMacros.lua.functions.entity.HighlightEntity;
 import com.theincgi.advancedMacros.lua.functions.midi.MidiLib2;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
+import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.CustomFontRenderer;
 import com.theincgi.advancedMacros.misc.FontRendererOverride;
 import com.theincgi.advancedMacros.misc.JarLibSearcher;
@@ -247,8 +249,11 @@ public class AdvancedMacros {
 		globals.set("getPlayerPos", new GetPlayerPos());
 		globals.set("getPlayerBlockPos", new GetPlayerBlockPos());
 
+		
 		globals.set("getEntityList", new GetEntityList());
 		globals.set("getEntity", new GetEntityData());
+		globals.set("highlightEntity", new CallableTable(new String[] {"highlightEntity"}, new HighlightEntity()));
+		
 		globals.set("getScreen", new GetScreen());
 
 		globals.set("hud2D", new Hud2D());

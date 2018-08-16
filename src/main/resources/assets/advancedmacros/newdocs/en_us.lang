@@ -5,6 +5,20 @@
       "To show text in the chat, use log(...)"
     ]
   },
+  "highlightEntity": {
+    "definition": "highlightEntity( id, prop[, flag])",
+    "tooltip": [
+      "Force an entity to render with",
+      "'xray' or 'glow' (prop)"
+    ],
+    "types": [
+      [
+        "number",
+        "string",
+        "opt_boolean"
+      ]
+    ]
+  },
   "image": {
     "new()": {
       "getFonts": {
