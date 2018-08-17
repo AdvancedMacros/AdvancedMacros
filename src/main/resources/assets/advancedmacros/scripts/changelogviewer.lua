@@ -16,6 +16,19 @@ local changeLog = {
   "&fA clickable link can be found in the Mods menu in this mod's description",
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
   
+  "&f - Fixed &bfilesystem &fclose warning showing when a file DOES close",
+  "&f   It also includes a stack trace. This triggers when garbage collection",
+  "&f   occurs in java",
+  "&f - &bgetPlayer() &fnow includes the entityID property",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 5.4.1",
+  "&f - Fixed a potential crash from the ingame editor",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 5.4.0",
   "&f - New event! &bChatSendFilter",
   "&f   if the script called returns &enil &for &efalse&f then the message",
   "&f   will not send. If a string is returned that will be sent instead.",
@@ -125,7 +138,7 @@ local changeLog = {
 
 local CHECK = "resource:greencheck.png"
 local X     = "resource:redx.png"
-g = gui.new()
+local g = gui.new()
 
 local s = g.newScrollBar()
 s.setOrientation("vertical")

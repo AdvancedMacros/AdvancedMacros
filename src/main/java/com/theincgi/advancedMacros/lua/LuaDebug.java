@@ -168,6 +168,7 @@ public class LuaDebug extends DebugLib{
 			return ((int)(System.currentTimeMillis()-launchTime)/10f)/100f;
 		}
 		
+		
 	}
 	/**Added for the ChatSendFilter which will go through multiple filters, this occurs in a runnable<br>
 	 * This will allow it to show up inside the running scripts list and be cancel-able*/

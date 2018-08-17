@@ -141,6 +141,7 @@ public class GetPlayer extends OneArgFunction {
 				}
 			}
 		}
+		t.set("entityID", valueOf(player.getEntityId()));
 		t.set("gamemode", player.isSpectator()?"spectator":player.isCreative()?"creative":"survival");
 		
 		

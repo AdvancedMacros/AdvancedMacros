@@ -15,6 +15,8 @@ import org.lwjgl.opengl.GL11;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.event.ForgeEventHandler;
 import com.theincgi.advancedMacros.event.ForgeEventHandler.EventName;
+import com.theincgi.advancedMacros.gui.IBindingsGui.IBinding;
+import com.theincgi.advancedMacros.gui.elements.Drawable;
 import com.theincgi.advancedMacros.gui.elements.GuiBinding;
 import com.theincgi.advancedMacros.gui.elements.GuiBinding.EventMode;
 import com.theincgi.advancedMacros.gui.elements.GuiButton;
@@ -36,7 +38,7 @@ import com.theincgi.advancedMacros.misc.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 
-public class MacroMenuGui extends Gui{
+public class MacroMenuGui extends Gui implements IBindingsGui{
 	//BufferedImage img = null;
 	//GuiDropDown guiDropDown = new GuiDropDown(new WidgetID(10), 5, 5, 150, 12, 150, null);
 
@@ -200,6 +202,7 @@ public class MacroMenuGui extends Gui{
 	}
 	
 	
+	
 	public void reloadCurrentProfile() {
 		loadProfile(profileSelect.getSelection());
 	}
@@ -210,14 +213,27 @@ public class MacroMenuGui extends Gui{
 			profileSelect.addOption(profile);
 		}		
 	}
-
-	public void removeBinding(GuiBinding guib) {
-		removeDrawables(guib);
-		inputSubscribers.remove(guib);
-		bindingsList.remove(guib);
-		markDirty();
-		//TODO save remove
-	}
+	
+    @Override
+    public void removeBinding(IBinding binding) {
+    	Drawable drawable = binding.getDrawableElement();
+    	removeDrawables(drawable);
+    	inputSubscribers.remove(drawable);
+    	bindingsList.remove(drawable);
+    	markDirty();
+    }
+//    @Override
+//    public void removeBinding(int index) {
+//    	Moveable d = bindingsList.getItem(index);
+//    	
+//    }
+//	public void removeBinding(GuiBinding guib) {
+//		removeDrawables(guib);
+//		inputSubscribers.remove(guib);
+//		bindingsList.remove(guib);
+//		markDirty();
+//		//TODO save remove
+//	}
 
 	/**Ignore isKeydown for non key events, doesn't matter, 
 	 * @param isKey simply, is this a key event?<br>
@@ -231,13 +247,13 @@ public class MacroMenuGui extends Gui{
 	/**Exists, and is enabled*/
 	public boolean doesEventExist(String eventName){
 		for(Moveable m : bindingsList.getItems()){
-			if(m instanceof GuiBinding){
-				GuiBinding b = (GuiBinding) m;
+			if(m instanceof IBinding){
+				IBinding b = (IBinding) m;
 				if(b.isDisabled()) 
 					continue; //disabled, skip
 				//System.out.println("Event type matched");
 				//System.out.println("Not key or keyAllowed");
-				if(b.getTriggerName().equals(eventName) && !b.getEventMode().isKeyType()){ //right event
+				if(b.getEventName().equals(eventName) && !b.getEventMode().isKeyType()){ //right event
 					return true;
 				}
 			}
@@ -246,11 +262,11 @@ public class MacroMenuGui extends Gui{
 	}
 	public void fireEvent(boolean isKey, String eventName, Varargs args, boolean isKeyDown, OnScriptFinish onScriptFinish){
 		for(Moveable m : bindingsList.getItems()){
-			if(m instanceof GuiBinding){
-				GuiBinding b = (GuiBinding) m;
+			if(m instanceof IBinding){
+				IBinding b = (IBinding) m;
 				if(b.isDisabled()) 
 					continue; //disabled, skip
-				boolean override = b.getEventMode().equals(EventMode.EVENT) && b.getTriggerName().equals(ForgeEventHandler.EventName.Anything.name());
+				boolean override = b.getEventMode().equals(EventMode.EVENT) && b.getEventName().equals(ForgeEventHandler.EventName.Anything.name());
 				if(eventName.equals(EventName.Chat.name())){
 					override = false;
 				}
@@ -258,7 +274,7 @@ public class MacroMenuGui extends Gui{
 					//System.out.println("Event type matched");
 					if(override || (!isKey || (isKey &&	(b.getEventMode().isKeyAllowed(isKeyDown))))){ //right mode
 						//System.out.println("Not key or keyAllowed");
-						if(override || b.getTriggerName().equals(eventName)){ //right event
+						if(override || b.getEventName().equals(eventName)){ //right event
 							//System.out.println("Trigger matched!");
 
 							//TODO pcall of some kind
@@ -286,10 +302,10 @@ public class MacroMenuGui extends Gui{
 	public LinkedList<String> getMatchingScripts(boolean isKey, String eventName, boolean isKeyDown) {
 		LinkedList<String> out = new LinkedList<>();
 		for(Moveable m : bindingsList.getItems()){
-			if(m instanceof GuiBinding){
-				GuiBinding g = (GuiBinding) m;
+			if(m instanceof IBinding){
+				IBinding g = (IBinding) m;
 				if(g.isDisabled()) continue;
-				if(g.getTriggerName().equals(eventName) &&
+				if(g.getEventName().equals(eventName) &&
 				   !g.getEventMode().isKeyType())
 					out.add(g.getScriptName());
 			}
@@ -444,7 +460,7 @@ public class MacroMenuGui extends Gui{
 	}
 
 	public static void showMenu(){
-		Minecraft.getMinecraft().displayGuiScreen(AdvancedMacros.macroMenuGui);
+		Minecraft.getMinecraft().displayGuiScreen(AdvancedMacros.macroMenuGui.getGui());
 		AdvancedMacros.macroMenuGui.onGuiOpened();
 	}
 	private enum Prompting{
@@ -453,7 +469,12 @@ public class MacroMenuGui extends Gui{
 		CONFIRM_DELETE_FILE,
 		CONFIRM_DELETE_PROFILE;
 	}
-	public String getProfileName() {
+	@Override
+	public String getSelectedProfile() {
 		return profileSelect.getSelection();
+	}
+	@Override
+	public Gui getGui() {
+		return this;
 	}
 }

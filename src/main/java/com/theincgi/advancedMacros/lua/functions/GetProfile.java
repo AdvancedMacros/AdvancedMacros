@@ -8,6 +8,6 @@ import com.theincgi.advancedMacros.AdvancedMacros;
 public class GetProfile extends ZeroArgFunction{
 	@Override
 	public LuaValue call() {
-		return LuaValue.valueOf(AdvancedMacros.macroMenuGui.getProfileName());
+		return LuaValue.valueOf(AdvancedMacros.macroMenuGui.getSelectedProfile());
 	}
 }

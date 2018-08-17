@@ -13,6 +13,7 @@ import com.theincgi.advancedMacros.event.ForgeEventHandler.EventName;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
+import com.theincgi.advancedMacros.gui.IBindingsGui.IBinding;
 import com.theincgi.advancedMacros.gui.MacroMenuGui;
 import com.theincgi.advancedMacros.gui.elements.GuiDropDown.OnSelectHandler;
 import com.theincgi.advancedMacros.gui2.PopupPrompt2.Result;
@@ -20,7 +21,7 @@ import com.theincgi.advancedMacros.gui2.PopupPrompt2.ResultHandler;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
-public class GuiBinding implements Moveable, Drawable, InputSubscriber{
+public class GuiBinding implements Moveable, Drawable, InputSubscriber, IBinding{
 	//[enable] [key/event] [detail]  [script] [edit] [move:up/down] [remove]
 	//move by drag
 	//needs a drag grid tool
@@ -117,7 +118,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 						AdvancedMacros.editorGUI.updateKeywords();
 						AdvancedMacros.editorGUI.openScript(script);
 						((MacroMenuGui)gui).updateProfileChanges();
-						ForgeEventHandler.showMenu(AdvancedMacros.editorGUI, AdvancedMacros.macroMenuGui);
+						ForgeEventHandler.showMenu(AdvancedMacros.editorGUI, AdvancedMacros.macroMenuGui.getGui());
 					}
 				}else if(sButton.equals(moveButton)){
 					container.grab(GuiBinding.this);
@@ -198,7 +199,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		pickScript.setOnClick((int mb, GuiButton button)->{
 			AdvancedMacros.scriptBrowser2.setActivePath(scriptHome(script));  //FIXME NullPointerException
 			AdvancedMacros.scriptBrowser2.setSelectedFile(script);
-			AdvancedMacros.scriptBrowser2.getSelection(AdvancedMacros.macroMenuGui, new ResultHandler() {
+			AdvancedMacros.scriptBrowser2.getSelection(AdvancedMacros.macroMenuGui.getGui(), new ResultHandler() {
 				@Override public boolean onResult(Result r) {
 					if(r.isCanceled()) return true;
 					script = r.getResult();
@@ -471,10 +472,13 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 	}
 
 	
+	@Override
 	public EventMode getEventMode() {
 		return eventMode;
 	}
-
+	
+	
+	@Override
 	public boolean isEnabled(){
 		return enable;
 	}
@@ -482,10 +486,14 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 		return !enable;
 	}
 
-	public String getTriggerName() {
+	@Override
+	public String getEventName() {
 		return eventSelector.dispText;
 	}
-
+//	public String getTriggerName() {
+//		return eventSelector.dispText;
+//	}
+	@Override
 	public String getScriptName() {
 		return script;
 	}
@@ -614,5 +622,11 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber{
 				return false;
 			return (this.equals(KEY_DOWN))==keyDown;
 		}
+	}
+	
+	
+	@Override
+	public Drawable getDrawableElement() {
+		return this;
 	}
 }

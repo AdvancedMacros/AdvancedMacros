@@ -95,12 +95,13 @@ public class FileSystem extends LuaTable{
 	}
 	//TODO move syncLock to the open class so we dont keep so many unnecessary copies
 
-	
+
 	private static class ClosingLuaTable extends LuaTable{
-		boolean hasClosed = false;
-		
+		String traceback;
 		public ClosingLuaTable() {
 			super();
+			LuaValue v = AdvancedMacros.globals.get("debug").get("getinfo").call(valueOf(1), valueOf("Sl"));
+			traceback = String.format("[%s]:%d", v.get("short_src").tojstring(), v.get("currentline").toint());
 		}
 
 		public ClosingLuaTable(int narray, int nhash) {
@@ -118,17 +119,22 @@ public class FileSystem extends LuaTable{
 		public ClosingLuaTable(Varargs varargs) {
 			super(varargs);
 		}
-		
+
 		@Override
 		protected void finalize() throws Throwable {
-			if(!hasClosed && this.get("close").isfunction()) {
-				AdvancedMacros.logFunc.call(LuaValue.valueOf("&gWarning: file was not closed in '" + LuaDebug.getLabel(Thread.currentThread()) + "' &cclosing now..."));
-				this.get("close").call();
+			LuaValue v = this.get("close");
+			if(v instanceof Close) {
+				Close c = (Close) v;
+				if(!c.hasClosed && this.get("close").isfunction()) {
+					AdvancedMacros.logFunc.call(LuaValue.valueOf("&eWarning: file was not closed in '"+traceback+"' &6closing now..."));
+					c.close();
+				}
+
 			}
 			super.finalize();
 		}
 	}
-	
+
 	private static class ReadAll extends ZeroArgFunction{
 		Object syncLock;
 		FileInputStream fis;
@@ -249,6 +255,12 @@ public class FileSystem extends LuaTable{
 		}
 		@Override
 		public LuaValue call() {
+
+			close();
+
+			return LuaValue.NONE;
+		}
+		public void close() {
 			synchronized(syncLock) {
 				for(int i = 0; i<closeables.length; i++) {
 					try {
@@ -256,13 +268,12 @@ public class FileSystem extends LuaTable{
 							((Flushable)closeables[i]).flush();
 						}
 						closeables[i].close();
-						hasClosed = true;
 					}catch (Exception e) {
-
+						e.printStackTrace();
 					}
 				}
+				hasClosed = true;
 			}
-			return LuaValue.NONE;
 		}
 	}
 
@@ -347,7 +358,7 @@ public class FileSystem extends LuaTable{
 		public LuaValue call(LuaValue arg0, LuaValue arg1) {
 			File from = parseFileLocation(arg0);
 			File to   = parseFileLocation(arg1);
-			
+
 			try {
 				if(Files.isSameFile(from.toPath(), to.toPath())){
 					throw new LuaError("Source and destination can not be the same.");
@@ -418,7 +429,7 @@ public class FileSystem extends LuaTable{
 	public static File parseFileLocation(LuaValue arg0) {
 		if(arg0.isnil())
 			arg0 =  LuaValue.valueOf("");
-		
+
 		File file = null;
 		if(arg0.tojstring().startsWith("/") || arg0.tojstring().startsWith("\\"))
 			file = new File(arg0.checkjstring().substring(1));

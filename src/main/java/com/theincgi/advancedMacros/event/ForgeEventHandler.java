@@ -191,7 +191,7 @@ public class ForgeEventHandler {
 					Minecraft.getMinecraft().displayGuiScreen(AdvancedMacros.runningScriptsGui);
 				}
 			}else if(ColorTextArea.isShiftDown()){
-				showMenu(AdvancedMacros.scriptBrowser2, AdvancedMacros.macroMenuGui);
+				showMenu(AdvancedMacros.scriptBrowser2, AdvancedMacros.macroMenuGui.getGui());
 			}else{
 				if(AdvancedMacros.lastGui!=null){
 					AdvancedMacros.lastGui.showGui();
@@ -215,7 +215,7 @@ public class ForgeEventHandler {
 			eventDat.set(2, Keyboard.getKeyName(eventKey));
 			eventDat.set(3, LuaValue.valueOf(Keyboard.isKeyDown(eventKey)?"down":"up"));
 			eventDat.set(4, LuaValue.valueOf(eventKey));
-			AdvancedMacros.macroMenuGui.fireEvent(true, Keyboard.getKeyName(eventKey), eventDat.unpack(), Keyboard.isKeyDown(eventKey));
+			AdvancedMacros.macroMenuGui.fireEvent(true, Keyboard.getKeyName(eventKey), eventDat.unpack(), Keyboard.isKeyDown(eventKey), null);
 		}
 	}
 
@@ -240,7 +240,7 @@ public class ForgeEventHandler {
 		eDat.set(1, LuaValue.valueOf("mouse"));
 		eDat.set(2, buttonName);
 		eDat.set(3, state?"down":"up");
-		AdvancedMacros.macroMenuGui.fireEvent(true, buttonName, eDat.unpack(), state);
+		AdvancedMacros.macroMenuGui.fireEvent(true, buttonName, eDat.unpack(), state, null);
 	}
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)
@@ -1004,10 +1004,10 @@ public class ForgeEventHandler {
 		return createEvent(eventName.name());
 	}
 	public void fireEvent(EventName event, LuaTable args){
-		AdvancedMacros.macroMenuGui.fireEvent(false, event.name(), args.unpack(), false);
+		AdvancedMacros.macroMenuGui.fireEvent(false, event.name(), args.unpack(), false, null);
 	}
 	public void fireEvent(String eventString, LuaTable args){
-		AdvancedMacros.macroMenuGui.fireEvent(false, eventString, args.unpack(), false);
+		AdvancedMacros.macroMenuGui.fireEvent(false, eventString, args.unpack(), false, null);
 	}
 	public void fireEvent(EventName event, LuaTable args, OnScriptFinish onScriptFinish){
 		AdvancedMacros.macroMenuGui.fireEvent(false, event.name(), args.unpack(), false, onScriptFinish);
@@ -1019,7 +1019,7 @@ public class ForgeEventHandler {
 
 	/*the main menu for this mod*/
 	public static void showMenu(){
-		showMenu(AdvancedMacros.macroMenuGui);
+		showMenu(AdvancedMacros.macroMenuGui.getGui());
 	}
 	public static void closeMenu() {
 		Minecraft.getMinecraft().displayGuiScreen(null);
@@ -1041,7 +1041,7 @@ public class ForgeEventHandler {
 	}
 	public static void showPrevMenu(){
 		if(AdvancedMacros.prevGui==null){
-			AdvancedMacros.prevGui=AdvancedMacros.macroMenuGui;
+			AdvancedMacros.prevGui=AdvancedMacros.macroMenuGui.getGui();
 		}
 		showMenu(AdvancedMacros.prevGui);
 		AdvancedMacros.prevGui = null;

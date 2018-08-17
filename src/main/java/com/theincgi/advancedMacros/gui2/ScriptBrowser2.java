@@ -553,7 +553,7 @@ public class ScriptBrowser2 extends Gui{
 							if(isSelectionMode()) {
 								selectionMode = false;
 								if(requester==null) {//FIXME
-									Minecraft.getMinecraft().displayGuiScreen(AdvancedMacros.macroMenuGui);
+									Minecraft.getMinecraft().displayGuiScreen(AdvancedMacros.macroMenuGui.getGui());
 								}else {
 									Minecraft.getMinecraft().displayGuiScreen(requester);
 								}

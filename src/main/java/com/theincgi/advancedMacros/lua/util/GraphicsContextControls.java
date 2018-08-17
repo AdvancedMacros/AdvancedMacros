@@ -172,9 +172,8 @@ public class GraphicsContextControls extends LuaTable{
 			//case getClipRect:
 			//case getClipBounds:
 			case getClip:{
-
-
 				Rectangle rect = g.getClipBounds();
+				if(rect == null) return FALSE;
 				LuaTable out = new LuaTable();
 				out.set(1, LuaValue.valueOf(rect.x     +1));
 				out.set(2, LuaValue.valueOf(rect.y     +1));
@@ -184,6 +183,10 @@ public class GraphicsContextControls extends LuaTable{
 			}
 
 			case setClip:{
+				if(args.arg1().isnil() || args.arg1().isboolean() && args.arg1().checkboolean()==false) {
+					g.setClip(null);
+					return NONE;
+				}
 				Rectangle rect = new Rectangle(args.checkint(1)-1, args.checkint(2)-1, args.checkint(3), args.checkint(4)); //x,y,wid,hei
 				g.setClip(rect);
 				return NONE;
@@ -266,8 +269,8 @@ public class GraphicsContextControls extends LuaTable{
 				xPoints = new int[points.length()];
 				yPoints = new int[points.length()];
 				for(int i = 1; i <= points.length(); i++) {
-					xPoints[i-1] = points.get(1).checkint()-1;
-					yPoints[i-1] = points.get(2).checkint()-1;
+					xPoints[i-1] = points.get(i).get(1).checkint()-1;
+					yPoints[i-1] = points.get(i).get(2).checkint()-1;
 				}
 				g.drawPolyline(xPoints, yPoints, xPoints.length);
 				return NONE;
@@ -278,8 +281,8 @@ public class GraphicsContextControls extends LuaTable{
 				xPoints = new int[points.length()];
 				yPoints = new int[points.length()];
 				for(int i = 1; i <= points.length(); i++) {
-					xPoints[i-1] = points.get(1).checkint()-1;
-					yPoints[i-1] = points.get(2).checkint()-1;
+					xPoints[i-1] = points.get(i).get(1).checkint()-1;
+					yPoints[i-1] = points.get(i).get(2).checkint()-1;
 				}
 				g.drawPolygon(new Polygon(xPoints, yPoints, xPoints.length));
 				return NONE;
@@ -290,8 +293,8 @@ public class GraphicsContextControls extends LuaTable{
 				xPoints = new int[points.length()];
 				yPoints = new int[points.length()];
 				for(int i = 1; i <= points.length(); i++) {
-					xPoints[i-1] = points.get(1).checkint()-1;
-					yPoints[i-1] = points.get(2).checkint()-1;
+					xPoints[i-1] = points.get(i).get(1).checkint()-1;
+					yPoints[i-1] = points.get(i).get(2).checkint()-1;
 				}
 				g.fillPolygon(new Polygon(xPoints, yPoints, xPoints.length));
 				return NONE;

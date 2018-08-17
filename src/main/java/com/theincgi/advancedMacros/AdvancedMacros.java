@@ -30,6 +30,7 @@ import com.theincgi.advancedMacros.asm.AdvancedMacrosCorePlugin;
 import com.theincgi.advancedMacros.event.ForgeEventHandler;
 import com.theincgi.advancedMacros.gui.EditorGUI;
 import com.theincgi.advancedMacros.gui.Gui;
+import com.theincgi.advancedMacros.gui.IBindingsGui;
 import com.theincgi.advancedMacros.gui.InputGUI;
 import com.theincgi.advancedMacros.gui.MacroMenuGui;
 import com.theincgi.advancedMacros.gui.RunningScriptsGui;
@@ -103,13 +104,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "5.4.0"; //${version} ??
+	public static final String VERSION = "5.4.2"; //${version} ??
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
 	public static final File customDocsFolder = new File(macrosRootFolder, "docs");
 	public static KeyBinding modKeybind;
-	public static MacroMenuGui macroMenuGui;
+	public static IBindingsGui macroMenuGui;
 	public static EditorGUI editorGUI;
 	public static ScriptBrowser2 scriptBrowser2;
 	public static RunningScriptsGui runningScriptsGui;
@@ -117,7 +118,7 @@ public class AdvancedMacros {
 	public static Gui prevGui;
 	public static InputGUI inputGUI;
 	public static Globals globals = JsePlatform.standardGlobals();
-	private static LuaDebug debug = new LuaDebug();
+	public static final LuaDebug debug = new LuaDebug();
 	public static ForgeEventHandler forgeEventHandler;
 	public static final CustomFontRenderer customFontRenderer = new CustomFontRenderer();
 	public static FontRendererOverride otherCustomFontRenderer;
