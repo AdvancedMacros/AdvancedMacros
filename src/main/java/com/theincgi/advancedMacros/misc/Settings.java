@@ -22,6 +22,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
 import com.theincgi.advancedMacros.lua.ProtectedLuaTable;
+import com.theincgi.advancedMacros.lua.functions.MinecraftSettings;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -51,6 +52,7 @@ public class Settings {
 		settings.set("textures", textures);
 		settings.set("save", new Save());
 		settings.set("load", new Load());
+		settings.set("minecraft", new MinecraftSettings());
 		if(settings.get("chatMaxLines").isnil())
 			settings.set("chatMaxLines", LuaValue.valueOf(100));
 	}

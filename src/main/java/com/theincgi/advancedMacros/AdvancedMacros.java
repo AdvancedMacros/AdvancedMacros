@@ -73,6 +73,7 @@ import com.theincgi.advancedMacros.lua.functions.SetProfile;
 import com.theincgi.advancedMacros.lua.functions.SkinCustomizer;
 import com.theincgi.advancedMacros.lua.functions.StopAllScripts;
 import com.theincgi.advancedMacros.lua.functions.Toast;
+import com.theincgi.advancedMacros.lua.functions.entity.GetAABB;
 import com.theincgi.advancedMacros.lua.functions.entity.GetEntityData;
 import com.theincgi.advancedMacros.lua.functions.entity.GetEntityList;
 import com.theincgi.advancedMacros.lua.functions.entity.HighlightEntity;
@@ -104,7 +105,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "5.4.3"; //${version} ??
+	public static final String VERSION = "5.5.1"; //${version} ??
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -253,6 +254,7 @@ public class AdvancedMacros {
 		
 		globals.set("getEntityList", new GetEntityList());
 		globals.set("getEntity", new GetEntityData());
+		globals.set("getBoundingBox", new GetAABB().getFunc()); 
 		globals.set("highlightEntity", new CallableTable(new String[] {"highlightEntity"}, new HighlightEntity()));
 		
 		globals.set("getScreen", new GetScreen());

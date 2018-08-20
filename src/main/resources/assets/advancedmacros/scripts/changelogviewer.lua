@@ -15,13 +15,19 @@ local changeLog = {
   "&f&BOffical discord: &7https://discord.gg/ga9Npym",
   "&fA clickable link can be found in the Mods menu in this mod's description",
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  
+  "&f - Fixed null pointer from &bgetBoundingBox()",
+  "&f - Fixed &bgetBlockList()",
+  "&f - Added some Minecraft settings under &bgetSettings().minecraft",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 5.5.0",
   "&f - Fixed a startup error that crashed for fresh installs. Welcome!",
   "&f - ChatFilter now works like ChatSendFilter so they will be chained.",
   "&f   if the last ChatFilter returns nothing it will cancel the message",
-  "&f - ",
-  "&f - ",
-  "&f - ",
-  "&f - ",
+  "&f - &bgetBoundingBox(x, y, z)&f or &b(entityID)&f returns a bounding box.",
+  "&f   &7Used by minecraft to check for collisions.",
     
   "&7"..DIVIDER,
   

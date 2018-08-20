@@ -36,7 +36,7 @@ public class GetAABB {
 		 * */
 		@Override
 		public Varargs invoke(Varargs args) {
-			
+			world = mc.world;
 			if(args.narg()==3 || args.arg1().istable()) {
 				BlockPos pos;
 				if(args.arg1().istable()) { LuaValue t = args.arg1();
@@ -44,12 +44,12 @@ public class GetAABB {
 				}else {
 					pos = new BlockPos(args.arg(1).checkdouble(), args.arg(2).checkdouble(), args.arg(3).checkdouble());
 				}
-				AxisAlignedBB bb = world.getBlockState(pos).getCollisionBoundingBox(world, pos);
+				AxisAlignedBB bb = world.getBlockState(pos).getSelectedBoundingBox(world, pos);
 				if(bb==null) return FALSE;
 				return new AABB(bb);
 			}else if(args.narg() == 1) {
 				Entity e = world.getEntityByID(args.arg1().checkint());
-				AxisAlignedBB bb = e.getCollisionBoundingBox();
+				AxisAlignedBB bb = e.getEntityBoundingBox();
 				if(bb==null) return FALSE;
 				return new AABB(bb);
 			}else {

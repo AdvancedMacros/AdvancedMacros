@@ -1218,6 +1218,22 @@ public class LuaValue extends Varargs {
 	 * or there is no {@link #NEWINDEX} metatag  
 	 */
 	public void set( int key, int value ) { set(valueOf(key), valueOf(value) ); }
+	
+	/** Set a value in a table without metatag processing using {@link #NEWINDEX}.
+	 * @param key the key to use, must not be null
+	 * @param value the value to use
+	 * @throws LuaError if {@code this} is not a table, 
+	 * or there is no {@link #NEWINDEX} metatag  
+	 */
+	public void set( int key, boolean value ) { set(valueOf(key), valueOf(value) ); }
+	
+	/** Set a value in a table without metatag processing using {@link #NEWINDEX}.
+	 * @param key the key to use, must not be null
+	 * @param value the value to use
+	 * @throws LuaError if {@code this} is not a table, 
+	 * or there is no {@link #NEWINDEX} metatag  
+	 */
+	public void set( String key, boolean value ) { set(valueOf(key), valueOf(value) ); }
 	//End of edit
 	
 	/** Set a value in a table without metatag processing using {@link #NEWINDEX}.
