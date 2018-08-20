@@ -219,7 +219,7 @@ public class Settings {
 		while(s.hasNext()){
 			String key = s.findWithinHorizon(regEx,0);
 			LuaValue luaKey, luaVal = LuaValue.NIL;
-			boolean keyIsString = false;
+			//boolean keyIsString = false;
 			if(key.startsWith("\"")){
 				key = key.substring(1, key.length()-1).replaceAll("\\\"", "\"");
 				luaKey = LuaValue.valueOf(key);
@@ -332,7 +332,7 @@ public class Settings {
 				pw.println(line + "\""+escQuotes(val.toString())+"\"");
 			}else if(val.istable()){
 				if(tables.indexOf(val.checktable())>=0){
-					pw.println("recursive "+tables.indexOf(val.checktable()));
+					pw.println(line + "recursive "+tables.indexOf(val.checktable()));
 				}else{
 					//System.out.println(tables);
 					if(val.getClass().equals(ProtectedLuaTable.class)){continue;}

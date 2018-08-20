@@ -15,7 +15,12 @@ local changeLog = {
   "&f&BOffical discord: &7https://discord.gg/ga9Npym",
   "&fA clickable link can be found in the Mods menu in this mod's description",
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  "&f - Fixed Settings serialization bug with re-used/recursive tables",
+  "&f   that caused the file to become un-usable",
+   
+  "&7"..DIVIDER,
   
+  "&b&BChange Log: &7version 5.5.1",
   "&f - Fixed null pointer from &bgetBoundingBox()",
   "&f - Fixed &bgetBlockList()",
   "&f - Added some Minecraft settings under &bgetSettings().minecraft",
