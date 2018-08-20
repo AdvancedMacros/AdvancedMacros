@@ -43,7 +43,7 @@ public class FileSystem extends LuaTable{
 	private static class Open extends TwoArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg0, LuaValue arg1) {
-			LuaTable controls = new ClosingLuaTable();
+			LuaTable controls = new ClosingLuaTable("file");
 			String mode = arg1.checkjstring();
 			//assertAddress(arg0);
 
@@ -98,10 +98,14 @@ public class FileSystem extends LuaTable{
 
 	private static class ClosingLuaTable extends LuaTable{
 		String traceback;
-		public ClosingLuaTable() {
+		String objName;
+		public ClosingLuaTable(String objectName) {
 			super();
+			objName = objectName;
 			LuaValue v = AdvancedMacros.globals.get("debug").get("getinfo").call(valueOf(1), valueOf("Sl"));
-			traceback = String.format("[%s]:%d", v.get("short_src").tojstring(), v.get("currentline").toint());
+			int line = v.get("currentline").toint();
+			
+			traceback = String.format("[%s]:%s", v.get("short_src").tojstring(), line==-1?"?":String.valueOf(line));
 		}
 
 		public ClosingLuaTable(int narray, int nhash) {
@@ -126,7 +130,7 @@ public class FileSystem extends LuaTable{
 			if(v instanceof Close) {
 				Close c = (Close) v;
 				if(!c.hasClosed && this.get("close").isfunction()) {
-					AdvancedMacros.logFunc.call(LuaValue.valueOf("&eWarning: file was not closed in '"+traceback+"' &6closing now..."));
+					AdvancedMacros.logFunc.call(LuaValue.valueOf("&6Warning: "+objName+" was not closed in '"+traceback+"' &7closing now..."));
 					c.close();
 				}
 

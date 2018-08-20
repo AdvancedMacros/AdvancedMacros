@@ -17,6 +17,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.luaj.vm2_v3_0_1.LuaError;
+import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
@@ -32,6 +33,7 @@ import com.theincgi.advancedMacros.gui.elements.ColorTextArea;
 import com.theincgi.advancedMacros.hud.hud2D.Hud2DItem;
 import com.theincgi.advancedMacros.hud.hud3D.WorldHudItem;
 import com.theincgi.advancedMacros.lua.LuaDebug;
+import com.theincgi.advancedMacros.lua.LuaFunctions;
 import com.theincgi.advancedMacros.lua.LuaDebug.JavaThread;
 import com.theincgi.advancedMacros.lua.LuaDebug.LuaThread;
 import com.theincgi.advancedMacros.lua.LuaDebug.OnScriptFinish;
@@ -53,6 +55,7 @@ import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.IInventory;
@@ -97,7 +100,8 @@ public class ForgeEventHandler {
 	int lastAir, lastHealth,
 	lastItemDurablity, lastHotbar, lastHunger;
 	boolean playerWasNull = true, lastSleepingState = false;
-
+	/**Used for glowing, sneaking breaks it*/
+	private boolean wasSneaking = false;
 	//added lastSwingProgress even though it exists in the player because it would fire multiple times
 	float lastSaturation, lastSwingProgress;
 	ItemStack lastHeldItem;
@@ -211,7 +215,7 @@ public class ForgeEventHandler {
 			else
 				heldKeys.remove(eventKey);
 			LuaTable eventDat = new LuaTable();
-			eventDat.set(1, LuaValue.valueOf("key"));
+			eventDat.set(1, "key");
 			eventDat.set(2, Keyboard.getKeyName(eventKey));
 			eventDat.set(3, LuaValue.valueOf(Keyboard.isKeyDown(eventKey)?"down":"up"));
 			eventDat.set(4, LuaValue.valueOf(eventKey));
@@ -237,7 +241,7 @@ public class ForgeEventHandler {
 			buttonName = "MOUSE:"+mButton;
 		}
 		LuaTable eDat = new LuaTable();
-		eDat.set(1, LuaValue.valueOf("mouse"));
+		eDat.set(1, "mouse");
 		eDat.set(2, buttonName);
 		eDat.set(3, state?"down":"up");
 		AdvancedMacros.macroMenuGui.fireEvent(true, buttonName, eDat.unpack(), state, null);
@@ -736,39 +740,76 @@ public class ForgeEventHandler {
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onChat(ClientChatReceivedEvent sEvent){//TODO out going chat msg filter
 		final ClientChatReceivedEvent event = sEvent; //arg not final because it's acquired thru reflection
-		LuaTable e = createEvent(EventName.Chat);
-		LuaTable e2 = createEvent(EventName.ChatFilter);
-		String unformated = event.getMessage().getUnformattedText();
-		String formated   = "&f"+event.getMessage().getFormattedText()
-				.replaceAll("&", "&&")
-				.replaceAll("\u00A7", "&")
-				.replaceAll("&k", "&O") //Obfuscated
-				.replaceAll("&l", "&B") //Bold
-				.replaceAll("&m", "&S") //Strikethru
-				.replaceAll("&o", "&I") //Italics
-				.replaceAll("&r", "&f")   //reset (to white in this case)
-				;
-		formated = formated.substring(0, formated.length()-2);//gets rid of last &f that does nothing for us
-		//System.out.println(sEvent.getMessage().getSiblings());
-		//TODO simplfy formating
-		e.set(3, formated);
-		e2.set(3, formated);
-		e.set(4, unformated);
-		e2.set(4,unformated);
-		event.setCanceled(event.isCancelable() && eventExists(EventName.ChatFilter));
-		//		OnScriptFinish afterFormating = new OnScriptFinish() {
-		//			@Override
-		//			public void onFinish(Varargs v) {
-		//				if(v.narg()>0){
-		//					event.setMessage(advancedMacros.logFunc.formatString(v));
-		//				}
-		//			}
-		//		};
-		fireEvent(EventName.Chat, e);
-		if(event.isCanceled())
-			fireEvent(EventName.ChatFilter, e2);
+		
+
+		JavaThread t = new JavaThread(()->{
+			
+			LuaTable e = createEvent(EventName.Chat);
+			LuaTable e2 = createEvent(EventName.ChatFilter);
+			String unformated = event.getMessage().getUnformattedText();
+			String formated   = "&f"+event.getMessage().getFormattedText()
+					.replaceAll("&", "&&")
+					.replaceAll("\u00A7", "&")
+					.replaceAll("&k", "&O") //Obfuscated
+					.replaceAll("&l", "&B") //Bold
+					.replaceAll("&m", "&S") //Strikethru
+					.replaceAll("&o", "&I") //Italics
+					.replaceAll("&r", "&f")   //reset (to white in this case)
+					;
+			formated = formated.substring(0, formated.length()-2);//gets rid of last &f that does nothing for us
+			//System.out.println(sEvent.getMessage().getSiblings());
+			//TODO simplfy formating
+			e.set(3, formated);
+			e2.set(3, formated);
+			e.set(4, unformated);
+			e2.set(4,unformated);
+			
+			LinkedList<String> toRun = AdvancedMacros.macroMenuGui.getMatchingScripts(false, EventName.ChatFilter.name(), false);
+			for (String script : toRun) {
+				if(script==null) return;
+				File f = new File(AdvancedMacros.macrosFolder, script);
+				if(f.exists() && f.isFile()) {
+					try {
+						FileReader fr = new FileReader(f);
+						Thread.currentThread().setName("ChatFilter - " + script);
+						LuaValue function = AdvancedMacros.globals.load(fr, script);
+						Varargs ret = function.invoke(e2.unpack());
+						if(!ret.toboolean(1)) 
+							return;
+						e2 = createEvent(EventName.ChatFilter);
+						for(int i = 1; i<= ret.narg(); i++)
+							e2.set(2+i, ret.arg(i));
+					} catch (FileNotFoundException ex) {
+						ex.printStackTrace();
+					}catch (LuaError le){
+						Utils.logError(le);
+					}
+				}
+			}
+			e.set(5, e2.get(3));
+			
+			if(e2.get(3).toboolean())
+				AdvancedMacros.logFunc.call(e2.get(3));
+			
+			fireEvent(EventName.Chat, e);
+		});
+		t.start();
+
+//		event.setCanceled(event.isCancelable() && eventExists(EventName.ChatFilter));
+//		//		OnScriptFinish afterFormating = new OnScriptFinish() {
+//		//			@Override
+//		//			public void onFinish(Varargs v) {
+//		//				if(v.narg()>0){
+//		//					event.setMessage(advancedMacros.logFunc.formatString(v));
+//		//				}
+//		//			}
+//		//		};
+//		fireEvent(EventName.Chat, e);
+//		if(event.isCanceled())
+//			fireEvent(EventName.ChatFilter, e2);
+		sEvent.setCanceled(true);
 	}
-	@SubscribeEvent //TODO
+	@SubscribeEvent 
 	public void sendingChat(final ClientChatEvent event) {
 		JavaThread thread = new JavaThread(() -> {
 			LuaTable e = createEvent(EventName.ChatSendFilter);
@@ -811,31 +852,40 @@ public class ForgeEventHandler {
 		if(r==null) return;
 
 		//event.getRenderer().setRenderOutlines(true);
-		if(r.changed) {
+		boolean flag = false;
+		if(event.getEntity() instanceof EntityPlayer) {
+			EntityPlayer p = (EntityPlayer) event.getEntity();
+			flag = p.isSneaking() | wasSneaking;
+			wasSneaking = p.isSneaking();
+		}
+
+		Method m = getGlowMethod();
+		if(m!=null) {
+			m.setAccessible(true);
 			try {
-				Method m = ReflectionHelper.findMethod(Entity.class, "setFlag", "func_70052_a", int.class, boolean.class);
-
-				m.setAccessible(true);
 				m.invoke(event.getEntity(), 6, r.glow);
-
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				e.printStackTrace();
 			}
-			r.reset();
-			
 		}
+		r.reset();
+
 		if(r.xray) {
 			GlStateManager.disableDepth();
 		}
 	}
+
+	private static Method glowMethod;
+	private static Method getGlowMethod() {
+		if(glowMethod!=null)return glowMethod;
+		try {
+			return ReflectionHelper.findMethod(Entity.class, "setFlag", "func_70052_a", int.class, boolean.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onEntityRender(RenderLivingEvent.Post event) {
 		RenderFlags r = entityRenderFlags.get(event.getEntity());

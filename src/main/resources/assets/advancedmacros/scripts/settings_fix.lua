@@ -1,3 +1,4 @@
+if(getSettings()==nil or getSettings().bindingsMenu ==nil)then return end
 local color = getSettings().bindingsMenu.profileSelect.colors.text
 color = color or {1, 1, 1, 1} --rgba --{a=255, r=255,g=255, b=255}
 getSettings().bindingsMenu.profileSelect.colors.text = color

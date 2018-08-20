@@ -258,7 +258,7 @@ public class LuaTable extends LuaValue implements Metatable {
 		}
 		return NIL;
 	}
-
+	
 	public void set( int key, LuaValue value ) {
 		if ( m_metatable==null || ! rawget(key).isnil() || ! settable(this,LuaInteger.valueOf(key),value) )
 			rawset(key, value);

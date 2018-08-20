@@ -145,7 +145,6 @@ public class GetPlayer extends OneArgFunction {
 		t.set("gamemode", player.isSpectator()?"spectator":player.isCreative()?"creative":"survival");
 		
 		
-		
 		return t;
 		}catch (Exception e) {
 			e.printStackTrace();

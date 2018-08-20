@@ -15,10 +15,29 @@ local changeLog = {
   "&f&BOffical discord: &7https://discord.gg/ga9Npym",
   "&fA clickable link can be found in the Mods menu in this mod's description",
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  "&f - Fixed a startup error that crashed for fresh installs. Welcome!",
+  "&f - ChatFilter now works like ChatSendFilter so they will be chained.",
+  "&f   if the last ChatFilter returns nothing it will cancel the message",
+  "&f - ",
+  "&f - ",
+  "&f - ",
+  "&f - ",
+    
+  "&7"..DIVIDER,
   
-  "&f - Fixed &bfilesystem &fclose warning showing when a file DOES close",
+  "&b&BChange Log: &7version 5.4.3",
+  "&f - Fixed &bfilesystem &fbug with close warning",
+  "&f   Also, if the line number cant be found (-1)",
+  "&f   it should show &6'?' &finstead now",
+  "&f - Fixed a bug where you sneak and stop glowing",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 5.4.2",
+  "&f - &b&Sfilesystem &f&Sclose warning shows when a file isn't closed",
   "&f   It also includes a stack trace. This triggers when garbage collection",
   "&f   occurs in java",
+  "&f   &7Edit: this version had a bug where it always showed the warning",
   "&f - &bgetPlayer() &fnow includes the entityID property",
   
   "&7"..DIVIDER,
