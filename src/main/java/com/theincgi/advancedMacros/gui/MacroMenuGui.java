@@ -60,7 +60,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 	PopupPrompt prompt;
 
 
-
+	
 	ListManager bindingsList = new ListManager(5, 33, 100, 12*10, /*new WidgetID(33), propAddress*/ new PropertyPalette());
 	//	GuiBinding gb = new GuiBinding(new WidgetID(11), 5, 5, 300, bindingsList, this);
 	//	GuiBinding gb2 = new GuiBinding(new WidgetID(11), 5, 5, 300, bindingsList, this);
@@ -79,7 +79,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 		bindingsList.setSpacing(8);
 
 		bindingsList.setScrollSpeed(4);
-
+		
 		prompt = new PopupPrompt(new WidgetID(303), width/3, height/3, width/3, height/3, this);
 
 
@@ -195,8 +195,8 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 		//drawables.add(gotoSettings);
 		addDrawable(addBinding);
 
-		updateProfileList();
-		profileSelect.select("DEFAULT");
+		//updateProfileList();
+//		profileSelect.select("DEFAULT"); done in INIT
 		onResize(Minecraft.getMinecraft(), width, height);
 
 	}
@@ -207,7 +207,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 		loadProfile(profileSelect.getSelection());
 	}
 	
-	private void updateProfileList() {
+	public void updateProfileList() {
 		profileSelect.clear(false);
 		for(String profile : Settings.getProfileList()){
 			profileSelect.addOption(profile);

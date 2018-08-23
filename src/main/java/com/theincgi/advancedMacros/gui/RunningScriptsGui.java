@@ -83,7 +83,6 @@ public class RunningScriptsGui extends Gui{
 	}
 	
 	private class Script implements Drawable, Moveable, InputSubscriber{
-		String label;
 		Thread thread;
 		GuiButton stop;
 		int labelColor = Status.NEW.getStatusColor().toInt();
@@ -91,7 +90,7 @@ public class RunningScriptsGui extends Gui{
 		boolean isVisible;
 		public Script(final Thread thread) {
 			this.thread = thread;
-			label = luaDebug.getLabel(thread);
+			
 			//stop = new GuiButton(new WidgetID(701), 0, 0, 20, 12, LuaValue.NIL, LuaValue.valueOf("[X]"), "colors.runningScript", 
 			//		Color.BLACK, Color.WHITE, Color.TEXT_c);
 			stop = new GuiButton(0, 0, 20, 12, LuaValue.NIL, LuaValue.valueOf("[X]"), "runningScript","stopButton");
@@ -169,6 +168,8 @@ public class RunningScriptsGui extends Gui{
 							timeFormat.days*24 + timeFormat.hours,
 							timeFormat.mins, timeFormat.seconds, timeFormat.millis), m, dY, Color.TEXT_7.toInt());
 			m = g.drawMonospaceString("] ", m, dY, Color.WHITE.toInt());
+			String label = luaDebug.getLabel(thread);
+			label = label==null? "?" : label;
 			g.drawMonospaceString(label, m, dY, labelColor);
 		}
 

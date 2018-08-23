@@ -40,6 +40,7 @@ public class Settings {
 	
 
 	public static void load() throws FileNotFoundException{
+		System.out.println("Loading Advanced Macros settings...");
 		settings = new LuaTable(); //wipe everything out then read from file
 		if(settingsFile.exists()){
 			Scanner s = new Scanner(settingsFile);

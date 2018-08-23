@@ -9,18 +9,19 @@ import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.misc.Utils;
 
 public class Call extends VarArgFunction{
 	@Override
 	public Varargs invoke(Varargs arg0) {
 		try {
-			File f = new File(AdvancedMacros.macrosFolder, arg0.tojstring());
+			File f = new File(AdvancedMacros.macrosFolder, arg0.arg1().tojstring());
 			FileReader fr = new FileReader(f);
-			LuaValue function = AdvancedMacros.globals.load(fr, arg0.tojstring());
+			LuaValue function = AdvancedMacros.globals.load(fr, arg0.arg1().tojstring());
 			Varargs args = function.invoke(arg0.subargs(2));
 			return args;
 		} catch (Exception e) {
-			throw new LuaError(e.getMessage());
+			throw new LuaError(e);
 		}
 	}
 }

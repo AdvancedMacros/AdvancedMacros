@@ -277,7 +277,7 @@ public class Utils {
 		String tool = block.getHarvestTool(blockState);
 		if(tool!=null)
 			out.set("harvestTool", tool);
-
+		
 		return out;
 	}
 	public static boolean itemsEqual(ItemStack sourceStack, ItemStack sinkStack) {
@@ -769,6 +769,8 @@ public class Utils {
 			lvt = Utils.checkTexture(Settings.getTextureID(v.checkjstring()));
 			//		}else if(v.isnil()){
 			//			lvt = null;
+			if(lvt==null)
+				return def;
 		}else {
 			lvt = def;
 		}

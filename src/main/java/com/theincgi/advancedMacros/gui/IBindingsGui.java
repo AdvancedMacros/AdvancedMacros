@@ -21,7 +21,7 @@ public interface IBindingsGui {
 	 * @param isKeyDown, if key is down for key event*/
 	public void fireEvent(boolean isKeyEvent, String eventName, Varargs args, boolean isKeyDown, OnScriptFinish osf);
 	public LinkedList<String> getMatchingScripts(boolean isKey, String EventName, boolean isKeyDown);
-	
+	public void updateProfileList();
 	/**False if none found by that name*/
 	public boolean loadProfile(String profile);
 	public String getSelectedProfile();

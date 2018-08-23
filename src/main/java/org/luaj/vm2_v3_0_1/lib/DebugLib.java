@@ -734,6 +734,9 @@ public class DebugLib extends TwoArgFunction {
 			return new NameWhat(frame.f.classnamestub(), "Java");
 		Prototype p = frame.f.checkclosure().p;
 		int pc = frame.pc;
+		if(pc >= p.code.length) { //TheINCGI's patch
+			return null;
+		}
 		int i = p.code[pc]; /* calling instruction */
 		LuaString tm;
 		switch (Lua.GET_OPCODE(i)) {

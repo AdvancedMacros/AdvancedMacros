@@ -315,7 +315,8 @@ public class HoloBlock extends WorldHudItem{
 //				setTexture(tex = Utils.checkTexture(arg));
 //			else
 //				setTexture(tex = Utils.checkTexture(Settings.getTextureID(arg.checkjstring())));
-			setUV(texture.uMin(), texture.vMin(), texture.uMax(), texture.vMax());
+			if(texture!=null)
+				setUV(texture.uMin(), texture.vMin(), texture.uMax(), texture.vMax());
 			return LuaValue.NONE;
 		}
 	}

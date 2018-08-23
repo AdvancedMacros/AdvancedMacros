@@ -8,6 +8,7 @@ import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
 import com.theincgi.advancedMacros.misc.CallableTable;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -44,9 +45,13 @@ public class GetAABB {
 				}else {
 					pos = new BlockPos(args.arg(1).checkdouble(), args.arg(2).checkdouble(), args.arg(3).checkdouble());
 				}
-				AxisAlignedBB bb = world.getBlockState(pos).getSelectedBoundingBox(world, pos);
+				IBlockState block = world.getBlockState(pos);
+				AxisAlignedBB bb = block.getSelectedBoundingBox(world, pos);
 				if(bb==null) return FALSE;
-				return new AABB(bb);
+				LuaTable out = new LuaTable();
+				out.set(1, new AABB(bb));
+				out.set(2, !block.getBlock().isPassable(world, pos));
+				return out.unpack();
 			}else if(args.narg() == 1) {
 				Entity e = world.getEntityByID(args.arg1().checkint());
 				AxisAlignedBB bb = e.getEntityBoundingBox();

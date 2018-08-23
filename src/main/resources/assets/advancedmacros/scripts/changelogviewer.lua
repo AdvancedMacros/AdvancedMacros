@@ -15,6 +15,26 @@ local changeLog = {
   "&f&BOffical discord: &7https://discord.gg/ga9Npym",
   "&fA clickable link can be found in the Mods menu in this mod's description",
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  "&f - Fixed &brun &fnot working with args",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 5.5.4",
+  "&f - Scripts missing names will show ? in the running script gui",
+  "&f - hud3D block wont cause an error when an unknown texture name is given",
+  "&f - getBoundingBox now returns a second value for blocks indicating",
+  "&f   if the block is solid (collidable)",
+  "&f - Patch for LuaJ's DebugLib where it fail's to get a function name",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 5.5.3",
+  "&f - Fixed a bug where default color settings wouldn't be saved during init",
+  "&f   You should be able to see the profile text in fresh installs now.",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 5.5.2",
   "&f - Fixed Settings serialization bug with re-used/recursive tables",
   "&f   that caused the file to become un-usable",
    
