@@ -14,7 +14,17 @@ local changeLog = {
   "&eShow on startup? ", --do not remove
   "&f&BOffical discord: &7https://discord.gg/ga9Npym",
   "&fA clickable link can be found in the Mods menu in this mod's description",
+  "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  
+  "&f - Fixed &blook&f. Smooth, no unneeded spinning",
+  "&f - Caught error from &bFileSystem.open &f when preparing a stacktrace",
+  "&f   for unclosed files",
+  "&f - Added &brayTrace&f(&7<yaw, pitch>, <from xyz>, <dist>, <includeLiquid>&f)",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 5.5.5",
   "&f - Fixed &brun &fnot working with args",
   
   "&7"..DIVIDER,

@@ -18,10 +18,9 @@ import org.luaj.vm2_v3_0_1.Varargs;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
-import com.theincgi.advancedMacros.lua.LuaFunctions.Log;
+import com.theincgi.advancedMacros.lua.LuaValTexture;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
 import com.theincgi.advancedMacros.lua.util.ContainerControls;
-import com.theincgi.advancedMacros.lua.LuaValTexture;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -46,7 +45,9 @@ import net.minecraft.nbt.NBTTagString;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.ITextComponent.Serializer;
 import net.minecraftforge.oredict.OreDictionary;
@@ -277,7 +278,7 @@ public class Utils {
 		String tool = block.getHarvestTool(blockState);
 		if(tool!=null)
 			out.set("harvestTool", tool);
-		
+
 		return out;
 	}
 	public static boolean itemsEqual(ItemStack sourceStack, ItemStack sinkStack) {
@@ -826,5 +827,38 @@ public class Utils {
 		out.set("controls", new ContainerControls(container));
 		out.set("isReady", LuaValue.valueOf(isReady));
 		return out;
+	}
+	/**
+	 * @param if not optional LuaError may be thrown, null in pair if unable to make a vector otherwise.
+	 * @param isAngular defines if this vector uses yaw,pitch or x,y,z to define it.
+	 * */
+	public static Pair<Vec3d, Varargs> consumeVector(Varargs args, boolean optional, boolean isAngular) {
+		if(args.istable(1) && !args.arg1().get(1).istable()) { //is table, but does not contain table
+			Pair<Vec3d, Varargs> p = consumeVector(args.checktable(1).unpack(), optional, isAngular);
+			p.b = args.subargs(2);
+			return p;
+		}else if(args.isnumber(1) && args.isnumber(2) && args.isnumber(3) && !isAngular) {
+			Vec3d v = new Vec3d(args.checkdouble(1), args.checkdouble(2), args.checkdouble(3));
+			return new Pair<Vec3d, Varargs>(v, args.subargs(4));
+		}else if(args.isnumber(1) && args.isnumber(2) && isAngular) {
+						float yaw = (float) args.checkdouble(1), pitch = (float) args.checkdouble(2);
+						//yaw = Math.toRadians(yaw);
+			//			pitch = Math.toRadians(pitch);
+			////			double x = Math.cos(yaw), z = Math.sin(yaw);
+			////			double y = -Math.sin(pitch);
+			////			Vec3d v = new Vec3d(x, y, z);
+			//			Entity
+			//			v = v.rotateYaw((float) Math.toRadians(-90));
+			//			v = v.normalize();
+			float f = MathHelper.cos(-yaw * 0.017453292F - (float)Math.PI);
+			float f1 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
+			float f2 = -MathHelper.cos(-pitch * 0.017453292F);
+			float f3 = MathHelper.sin(-pitch * 0.017453292F);
+			Vec3d v = new Vec3d((f1 * f2), f3, (f * f2));
+			return new Pair<Vec3d, Varargs>(v, args.subargs(3));
+		}
+		if(!optional)
+			throw new LuaError(isAngular?"Invalid direction, must be {yaw, pitch} or yaw, pitch":"Invalid vector, must be {x,y,z} or x,y,z");
+		return new Pair<Vec3d, Varargs>(null, args);
 	}
 }

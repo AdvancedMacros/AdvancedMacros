@@ -67,6 +67,7 @@ import com.theincgi.advancedMacros.lua.functions.NewThread;
 import com.theincgi.advancedMacros.lua.functions.OpenInventory;
 import com.theincgi.advancedMacros.lua.functions.PCall;
 import com.theincgi.advancedMacros.lua.functions.PlaySound;
+import com.theincgi.advancedMacros.lua.functions.RayTrace;
 import com.theincgi.advancedMacros.lua.functions.RunThread;
 import com.theincgi.advancedMacros.lua.functions.ScriptGui;
 import com.theincgi.advancedMacros.lua.functions.SetProfile;
@@ -105,7 +106,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "5.5.5"; //${version} ??
+	public static final String VERSION = "5.6.0"; //${version} ??
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -262,6 +263,8 @@ public class AdvancedMacros {
 
 		globals.set("hud2D", new Hud2D());
 		globals.set("hud3D", new Hud3D());
+		
+		globals.set("rayTrace", RayTrace.getFunc());
 
 		new Action().getKeybindFuncts(globals);
 		globals.set("getInventory", new GetInventory());

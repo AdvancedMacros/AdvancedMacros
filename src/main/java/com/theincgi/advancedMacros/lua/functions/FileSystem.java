@@ -101,11 +101,21 @@ public class FileSystem extends LuaTable{
 		String objName;
 		public ClosingLuaTable(String objectName) {
 			super();
+			try {
 			objName = objectName;
-			LuaValue v = AdvancedMacros.globals.get("debug").get("getinfo").call(valueOf(1), valueOf("Sl"));
-			int line = v.get("currentline").toint();
-			
-			traceback = String.format("[%s]:%s", v.get("short_src").tojstring(), line==-1?"?":String.valueOf(line));
+			LuaValue v = AdvancedMacros.globals.debuglib.get("getinfo").call(valueOf(1), valueOf("Sl"));
+			int line = -1;
+			String name = "?";
+			if(!v.isnil()) {
+				line = v.get("currentline").toint();
+				name = v.get("short_src").tojstring();
+			}
+			traceback = String.format("[%s]:%s", name, line==-1?"?":String.valueOf(line));
+			}catch (Throwable e) {
+				System.err.println("Notice:");
+				e.printStackTrace();
+				traceback = "[?]:?";
+			}
 		}
 
 		public ClosingLuaTable(int narray, int nhash) {

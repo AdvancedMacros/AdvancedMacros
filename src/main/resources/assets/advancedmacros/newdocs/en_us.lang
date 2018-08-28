@@ -677,5 +677,26 @@
         ]
       }
     }
+  },
+  "rayTrace": {
+    "definition": "rayTrace( <yaw, pitch>, <from xyz>, <dist>, <includeLiquid> )",
+    "tooltip": [
+      "Raytrace to get a block or entity",
+      "Defaults:  yaw, pitch is player rotation",
+      "from x,y,z is player's eye position (x, y+eyeHeight, z)",
+      "dist is your reach distance (normaly 5)",
+      "includeLiquid is false"
+    ],
+    "types": [
+      [
+        "opt_number",
+        "opt_number",
+        "opt_number",
+        "opt_number",
+        "opt_number",
+        "opt_number",
+        "opt_boolean"
+      ]
+    ]
   }
 }

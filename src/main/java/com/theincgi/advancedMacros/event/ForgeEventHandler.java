@@ -1150,28 +1150,43 @@ public class ForgeEventHandler {
 		long time, start;
 		public Look(float fromYaw, float fromPitch, float toYaw, float toPitch, long time) {
 			super();
+			fromYaw = fixYaw(fromYaw);
+			toYaw = fixYaw(toYaw);
 			this.fromYaw = fromYaw;
+			
 			this.fromPitch = fromPitch;
 			this.toYaw = toYaw;
 			this.toPitch = toPitch;
-
-			double b = toYaw%360-fromYaw%360;
-			double a = fromYaw%360+360-toYaw%360;
-			if(a<b){//better to turn other way
-				fromYaw+=360;
+			
+			EntityPlayerSP player = Minecraft.getMinecraft().player;
+			player.rotationYaw = fixYaw( player.rotationYaw );
+			player.prevRotationYaw = fixYaw( player.prevRotationYaw );
+			
+			double b = toYaw-fromYaw;
+			double a = 360-b;
+			a%=360;
+			boolean flag = Math.abs(b) > 180;
+			if(flag){//better to turn other way
+				float amount =  (float) (360 * Math.signum(b));
+				this.fromYaw += amount;
+				player.rotationYaw += amount;
+				player.prevRotationYaw +=amount;
 				//System.out.println("Reverse spin");
 			}else if(fromYaw%360==toYaw%360){ //same do nothing really
 				fromYaw=toYaw;
 			}
-
+			//AdvancedMacros.logFunc.call(String.format("%f, %f -> %f, %f (&%s%f, %f&f)", this.fromYaw, fromPitch, toYaw, toPitch, flag?"a":"c" , a, b));
 			start = System.currentTimeMillis();
 			this.time = time;
+		}
+		private float fixYaw(float yaw) {
+			return (yaw + 540) %360 -180;
 		}
 		public void look(){
 			if(System.currentTimeMillis()<=time+start){
 				EntityPlayerSP player = Minecraft.getMinecraft().player;
-
-
+				
+				
 				player.rotationYaw = interpolate(fromYaw, toYaw);
 				player.rotationPitch = interpolate(fromPitch, toPitch);
 			}
