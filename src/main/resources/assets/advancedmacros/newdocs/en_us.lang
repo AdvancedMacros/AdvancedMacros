@@ -698,5 +698,545 @@
         "opt_boolean"
       ]
     ]
+  },
+  "openInventory()": {
+    "close": {
+      "definition": "close()",
+      "tooltip": [
+        "closes the inventory interface"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "closeAndDrop": {
+      "definition": "closeAndDrop()",
+      "tooltip": [
+        "closes the inventory interface and",
+        "tosses any item held by the mouse"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "swap": {
+      "definition": "swap( slot1, slot2 )",
+      "tooltip": [
+        "Swap 2 stacks in an inventory"
+      ],
+      "types": [
+        [
+          "number",
+          "number"
+        ]
+      ]
+    },
+    "split": {
+      "definition": "split( slot1, slot2 )",
+      "tooltip": [
+        "split the stack in slot 1 and put the other half in slot 2"
+      ],
+      "types": [
+        [
+          "number",
+          "number"
+        ]
+      ]
+    },
+    "getHeld": {
+      "definition": "getHeld()",
+      "tooltip": [
+        "returns the item held by the mouse"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "getSlot": {
+      "definition": "getSlot( slot )",
+      "tooltip": [
+        "gets the item in given slot number"
+      ],
+      "types": [
+        [
+          "number"
+        ]
+      ]
+    },
+    "quick": {
+      "definition": "quick( slot )",
+      "tooltip": [
+        "preforms a shift click on the given slot"
+      ],
+      "types": [
+        [
+          "number"
+        ]
+      ]
+    },
+    "grabAll": {
+      "definition": "grabAll( slot )",
+      "tooltip": [
+        "preforms a double click to collect matching items",
+        "items are left in the mouse"
+      ],
+      "types": [
+        [
+          "number"
+        ]
+      ]
+    },
+    "click": {
+      "definition": "click( slot <, button> )",
+      "tooltip": [
+        "Preform a click on a slot",
+        "button number defaults to LMB"
+      ],
+      "types": [
+        [
+          "number",
+          "opt_number"
+        ]
+      ]
+    }
+  },
+  "guiEvent#anvil": {
+    "setName": {
+      "definition": "setName( itemName )",
+      "tooltip": [
+        "Set the name for the item in the anvil"
+      ],
+      "types": [
+        [
+          "string"
+        ]
+      ]
+    },
+    "getName": {
+      "definition": "getName()",
+      "tooltip": [
+        "Returns the current value of the anvil's",
+        "text field"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "getCost": {
+      "definition": "getCost()",
+      "tooltip": [
+        "Returns the cost to change the item."
+      ],
+      "types": [
+        []
+      ]
+    }
+  },
+  "guiEvent#villager": {
+    "getTrades": {
+      "definition": "getTrades()",
+      "tooltip": [
+        "Return a table listing available trades."
+      ],
+      "types": [
+        []
+      ]
+    },
+    "getType": {
+      "definition": "getType()",
+      "tooltip": [
+        "Return the type of villager"
+      ],
+      "types": [
+        []
+      ]
+    }
+  },
+  "guiEvent#enchant": {
+    "pickOption": {
+      "definition": "pickOption( optionNumber )",
+      "tooltip": [
+        "Enchants the item with the given option number."
+      ],
+      "types": [
+        [
+          "number"
+        ]
+      ]
+    },
+    "getOptions": {
+      "definition": "getOptions()",
+      "tooltip": [
+        "Returns a table with the current",
+        "enchantmetn options."
+      ],
+      "types": [
+        []
+      ]
+    }
+  },
+  "guiEvent#sign": {
+    "setLine": {
+      "definition": "setLine( lineNum, text )",
+      "tooltip": [
+        "Sets the text on the given line number",
+        "Default text is \"\""
+      ],
+      "types": [
+        [
+          "number",
+          "opt_string"
+        ]
+      ]
+    },
+    "setLines": {
+      "definition": "setLines( ... )",
+      "tooltip": [
+        "Set all the lines for the sign.",
+        "Arg 1 may be a table containing all 4 lines.",
+        "4 args containg the lines may be used.",
+        "Default text is \"\""
+      ],
+      "types": [
+        [
+          "table"
+        ],
+        [
+          "opt_string",
+          "opt_string",
+          "opt_string",
+          "opt_string"
+        ]
+      ]
+    },
+    "done": {
+      "definition": "done()",
+      "tooltip": [
+        "Saves changes and exits gui"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "getLines": {
+      "definition": "getLines()",
+      "tooltip": [
+        "Returns the lines from this sign in",
+        "vararg form"
+      ],
+      "types": [
+        []
+      ]
+    }
+  },
+  "guiEvent#book": {
+    "setText": {
+      "definition": "setText( text )",
+      "tooltip": [
+        "Set the text on the current page"
+      ],
+      "types": [
+        [
+          "string"
+        ]
+      ]
+    },
+    "getText": {
+      "definition": "getText()",
+      "tooltip": [
+        "Get the text on the current page"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "getPages": {
+      "definition": "getPages()",
+      "tooltip": [
+        "Return a table containing",
+        "text from all pages"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "getAuthor": {
+      "definition": "getAuthor()",
+      "tooltip": [
+        "Return the author of this book",
+        "Unsigned books will return \"\""
+      ],
+      "types": [
+        []
+      ]
+    },
+    "addPage": {
+      "definition": "addPage()",
+      "tooltip": [
+        "Add another page to the end of this book",
+        "Returns false if it could not create the page",
+        "Page limit is 50"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "nextPage": {
+      "definition": "nextPage()",
+      "tooltip": [
+        "Go to the next page in the book.",
+        "Creates a page if it doesn't exist yet.",
+        "Returns false if the page could not be created",
+        "Page limit is 50"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "prevPage": {
+      "definition": "prevPage",
+      "tooltip": [
+        "Go to the previous page",
+        "Returns false if the page does not exist",
+        "(out of bounds)"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "save": {
+      "definition": "save()",
+      "tooltip": [
+        "Save changes to the book without signing it."
+      ],
+      "types": [
+        []
+      ]
+    },
+    "getTitle": {
+      "definition": "getTitle()",
+      "tooltip": [
+        "Returns the title of this book",
+        "Returns \"\" for unsigned books"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "sign": {
+      "definition": "sign( title )",
+      "tooltip": [
+        "Sign the book with the given title.",
+        "Also closes the gui",
+        "Char limit 16"
+      ],
+      "types": [
+        [],
+        "string"
+      ]
+    },
+    "currentPage": {
+      "definition": "currentPage()",
+      "tooltip": [
+        "Returns the current page number"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "gotoPage": {
+      "definition": "gotoPage( number )",
+      "tooltip": [
+        "Goes to the given page number"
+      ],
+      "types": [
+        [
+          "number"
+        ]
+      ]
+    },
+    "pageCount": {
+      "definition": "pageCount()",
+      "tooltip": [
+        "Returns the number of pages in",
+        "this book"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "isSigned": {
+      "definition": "isSigned()",
+      "tooltip": [
+        "Check if this book has been signed"
+      ],
+      "types": [
+        []
+      ]
+    }
+  },
+  "guiEvent#commandBlock": {
+    "getText": {
+      "definition": "getText()",
+      "tooltip": [
+        "Returns the text in the command field",
+        "of this command block"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "setText": {
+      "definition": "setText( cmd )",
+      "tooltip": [
+        "Set the text in the command field of",
+        "this command block"
+      ],
+      "types": [
+        [
+          "string"
+        ]
+      ]
+    },
+    "getMode": {
+      "definition": "getMode()",
+      "tooltip": [
+        "Returns \"impulse\", \"chain\" or \"repeat\"",
+        "depending on the command blocks mode"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "setImpulse": {
+      "definition": "setImpulse()",
+      "tooltip": [
+        "Set this command block to",
+        "\"impulse\" mode"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "setChain": {
+      "definition": "setChain()",
+      "tooltip": [
+        "Set this command block to",
+        "\"chain\" mode"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "setRepeat": {
+      "definition": "setRepeat()",
+      "tooltip": [
+        "Set this command block to",
+        "\"repeat\" mode"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "setConditional": {
+      "definition": "setConditional( <boolean> )",
+      "tooltip": [
+        "Sets if this command block is",
+        "conditional",
+        "Defaults true"
+      ],
+      "types": [
+        [
+          "opt_boolean"
+        ]
+      ]
+    },
+    "getOutput": {
+      "definition": "getOutput()",
+      "tooltip": [
+        "Return the text from the output field"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "isConditional": {
+      "definition": "isConditional()",
+      "tooltip": [
+        "Return if this command block is",
+        "conditional"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "setNeedsRedstone": {
+      "definition": "setNeedsRedstone( <boolean> )",
+      "tooltip": [
+        "Set if this command block needs redstone to",
+        "activate",
+        "Defaults true"
+      ],
+      "types": [
+        [
+          "opt_boolean"
+        ]
+      ]
+    },
+    "isNeedsRedstone": {
+      "definition": "isNeedsRedstone()",
+      "tooltip": [
+        "Returns if this command block",
+        "needs redstone power to activate"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "setTrackOutput": {
+      "definition": "setTrackOutput( <boolean> )",
+      "tooltip": [
+        "Set if this command block should",
+        "track its output",
+        "Defaults true"
+      ],
+      "types": [
+        [
+          "opt_boolean"
+        ]
+      ]
+    },
+    "isTrackOutput": {
+      "definition": "isTrackOutput()",
+      "tooltip": [
+        "Returns if this command block",
+        "is tracking its output"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "done": {
+      "definition": "done()",
+      "tooltip": [
+        "Saves changes and exits"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "setMode": {
+      "definition": "setMode( mode )",
+      "tooltip": [
+        "Set this command block's mode",
+        "Valid modes are:",
+        "\"impulse\", \"chain\", or \"repeat\""
+      ],
+      "types": [
+        [
+          "string"
+        ]
+      ]
+    }
   }
 }

@@ -106,7 +106,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "5.6.0"; //${version} ??
+	public static final String VERSION = "5.7.0"; //${version} ??
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -190,6 +190,7 @@ public class AdvancedMacros {
 	public static LuaFunctions.Say sayFunc;
 	public static LuaFunctions.Sleep sleepFunc;
 	public static LuaFunctions.Debug debugFunc;
+	public static OpenInventory openInventory;
 
 
 	private void loadFunctions() {
@@ -268,7 +269,7 @@ public class AdvancedMacros {
 
 		new Action().getKeybindFuncts(globals);
 		globals.set("getInventory", new GetInventory());
-		globals.set("openInventory", new OpenInventory());
+		globals.set("openInventory", openInventory = new OpenInventory());
 
 		globals.set("getLight", new LightAt.AllLight());
 		globals.set("getBlockLight", new LightAt.BlockLight());

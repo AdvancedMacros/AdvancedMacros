@@ -37,15 +37,33 @@ import com.theincgi.advancedMacros.lua.LuaFunctions;
 import com.theincgi.advancedMacros.lua.LuaDebug.JavaThread;
 import com.theincgi.advancedMacros.lua.LuaDebug.LuaThread;
 import com.theincgi.advancedMacros.lua.LuaDebug.OnScriptFinish;
+import com.theincgi.advancedMacros.lua.functions.GuiControls;
 import com.theincgi.advancedMacros.lua.util.ContainerControls;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
+import net.minecraft.block.BlockAnvil.Anvil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiCommandBlock;
+import net.minecraft.client.gui.GuiEnchantment;
+import net.minecraft.client.gui.GuiHopper;
 import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.gui.GuiMerchant;
+import net.minecraft.client.gui.GuiRepair;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiScreenBook;
+import net.minecraft.client.gui.inventory.GuiBeacon;
+import net.minecraft.client.gui.inventory.GuiBrewingStand;
+import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.inventory.GuiCrafting;
+import net.minecraft.client.gui.inventory.GuiDispenser;
+import net.minecraft.client.gui.inventory.GuiEditSign;
+import net.minecraft.client.gui.inventory.GuiFurnace;
+import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.gui.inventory.GuiScreenHorseInventory;
+import net.minecraft.client.gui.inventory.GuiShulkerBox;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.GlStateManager;
@@ -644,42 +662,106 @@ public class ForgeEventHandler {
 				if(name.startsWith("class ")) {
 					name = name.substring(6);
 				}
-				if(name.startsWith("net.minecraft.client.gui")) {
-					name = "Minecraft:"+name.substring(name.lastIndexOf('.'));
-				}else {
-					switch (name) {
-					case "com.theincgi.advancedMacros.gui.MacroMenuGui":
-						name = "AdvancedMacros:BindingsMenu";
-						break;
-					case "com.theincgi.advancedMacros.gui2.ScriptBrowser2":
-						name = "AdvancedMacros:ScriptBrowser";
-						break;
-					case "com.theincgi.advancedMacros.gui.RunningScriptsGui":
-						name = "AdvancedMacros:RunningScripts";
-						break;
-					case "com.theincgi.advancedMacros.gui.EditorGUI":
-						name = "AdvancedMacros:Editor";
-						break;
-					default:
-						break; //defaults to full class name
+
+				switch (name) {
+				case "com.theincgi.advancedMacros.gui.MacroMenuGui":
+					name = "AdvancedMacros:BindingsMenu";
+					break;
+				case "com.theincgi.advancedMacros.gui2.ScriptBrowser2":
+					name = "AdvancedMacros:ScriptBrowser";
+					break;
+				case "com.theincgi.advancedMacros.gui.RunningScriptsGui":
+					name = "AdvancedMacros:RunningScripts";
+					break;
+				case "com.theincgi.advancedMacros.gui.EditorGUI":
+					name = "AdvancedMacros:Editor";
+					break;
+				case "net.minecraft.client.gui.inventory.GuiInventory":
+					name = "inventory";
+					break;
+				case "net.minecraft.client.gui.GuiEnchantment":
+					name = "enchantment table";
+					break;
+				case "net.minecraft.client.gui.GuiMerchant":
+					name = "villager";
+					break;
+				case "net.minecraft.client.gui.GuiRepair":
+					name = "anvil";
+					break;
+				case "net.minecraft.client.gui.inventory.GuiBeacon":
+					name = "beacon";
+					break;
+				case "net.minecraft.client.gui.inventory.GuiBrewingStand":
+					name = "brewing stand";
+					break;
+				case "net.minecraft.client.gui.inventory.GuiChest":
+					name = "chest";
+					break;
+				case "net.minecraft.client.gui.inventory.GuiCrafting":
+					name = "crafting table";
+					break;
+				case "net.minecraft.client.gui.inventory.GuiDispenser":
+					name = "dispenser";
+					break;
+				case "net.minecraft.client.gui.inventory.GuiFurnace":
+					name = "furnace";
+					break;
+				case "net.minecraft.client.gui.GuiHopper":
+					name = "hopper";
+					break;
+				case "net.minecraft.client.gui.inventory.GuiScreenHorseInventory":
+					name = "horse inventory";
+					break;
+				case "net.minecraft.client.gui.inventory.GuiShulkerBox":
+					name = "shulker box";
+					break;
+				case "net.minecraft.client.gui.inventory.GuiEditSign":
+					name = "sign";
+					break;
+				case "net.minecraft.client.gui.GuiScreenBook":
+					name = "book";
+					break;
+				case "net.minecraft.client.gui.GuiCommandBlock":
+					name = "command block";
+					break;
+				default:
+					if(name.startsWith("net.minecraft.client.gui")) {
+						name = "Minecraft:"+name.substring(name.lastIndexOf('.'));
 					}
+					break; //defaults to full class name
 				}
 			}
+
+			final String fName = name;
+			final LuaValue controls = GuiControls.load(sGui);
+
 			if(sGui instanceof GuiContainer) {
 				Thread test = new Thread(()->{
 					GuiContainer gCon = (GuiContainer) sGui; 
 					List<ItemStack> stacks = gCon.inventorySlots.getInventory(); 
 					LuaTable e = createEvent(EventName.ContainerOpen);
-					LuaTable items = new LuaTable();
-					if(stacks!=null) {
-						for(int i = 0; i<stacks.size(); i++) {
-							items.set(i+1, Utils.itemStackToLuatable(stacks.get(i)));
-						}
-						e.set(3, items);
-					}else{
-						e.set(3, LuaValue.FALSE);
-					}
-					System.out.println(Minecraft.getMinecraft().ingameGUI.getClass());
+
+					LuaTable ctrl;
+					if(controls.isnil())
+						ctrl = new LuaTable();
+					else
+						ctrl = controls.checktable();
+
+					ctrl.set("inventory", AdvancedMacros.openInventory.call());
+					e.set(3, ctrl);
+					e.set(4, fName);
+					//					LuaTable items = new LuaTable();
+					//					if(stacks!=null) {
+					//						for(int i = 0; i<stacks.size(); i++) {
+					//							items.set(i+1, Utils.itemStackToLuatable(stacks.get(i)));
+					//						}
+					//						e.set(3, items);
+					//					}else{
+					//						e.set(3, LuaValue.FALSE);
+					//					}
+					//					
+					//System.out.println(Minecraft.getMinecraft().ingameGUI.getClass());
+					
 					fireEvent(EventName.ContainerOpen, e);
 
 				});
@@ -687,7 +769,11 @@ public class ForgeEventHandler {
 
 			}
 			LuaTable args = createEvent(EventName.GUIOpened);
-			args.set(3, name);
+
+			args.set(3, controls);
+			args.set(4, name);
+
+			
 			fireEvent(EventName.GUIOpened, args);
 
 		}
@@ -740,10 +826,10 @@ public class ForgeEventHandler {
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onChat(ClientChatReceivedEvent sEvent){//TODO out going chat msg filter
 		final ClientChatReceivedEvent event = sEvent; //arg not final because it's acquired thru reflection
-		
+
 
 		JavaThread t = new JavaThread(()->{
-			
+
 			LuaTable e = createEvent(EventName.Chat);
 			LuaTable e2 = createEvent(EventName.ChatFilter);
 			String unformated = event.getMessage().getUnformattedText();
@@ -763,7 +849,7 @@ public class ForgeEventHandler {
 			e2.set(3, formated);
 			e.set(4, unformated);
 			e2.set(4,unformated);
-			
+
 			LinkedList<String> toRun = AdvancedMacros.macroMenuGui.getMatchingScripts(false, EventName.ChatFilter.name(), false);
 			for (String script : toRun) {
 				if(script==null) return;
@@ -787,26 +873,26 @@ public class ForgeEventHandler {
 				}
 			}
 			e.set(5, e2.get(3));
-			
+
 			if(e2.get(3).toboolean())
 				AdvancedMacros.logFunc.call(e2.get(3));
-			
+
 			fireEvent(EventName.Chat, e);
 		});
 		t.start();
 
-//		event.setCanceled(event.isCancelable() && eventExists(EventName.ChatFilter));
-//		//		OnScriptFinish afterFormating = new OnScriptFinish() {
-//		//			@Override
-//		//			public void onFinish(Varargs v) {
-//		//				if(v.narg()>0){
-//		//					event.setMessage(advancedMacros.logFunc.formatString(v));
-//		//				}
-//		//			}
-//		//		};
-//		fireEvent(EventName.Chat, e);
-//		if(event.isCanceled())
-//			fireEvent(EventName.ChatFilter, e2);
+		//		event.setCanceled(event.isCancelable() && eventExists(EventName.ChatFilter));
+		//		//		OnScriptFinish afterFormating = new OnScriptFinish() {
+		//		//			@Override
+		//		//			public void onFinish(Varargs v) {
+		//		//				if(v.narg()>0){
+		//		//					event.setMessage(advancedMacros.logFunc.formatString(v));
+		//		//				}
+		//		//			}
+		//		//		};
+		//		fireEvent(EventName.Chat, e);
+		//		if(event.isCanceled())
+		//			fireEvent(EventName.ChatFilter, e2);
 		sEvent.setCanceled(true);
 	}
 	@SubscribeEvent 
@@ -1153,15 +1239,15 @@ public class ForgeEventHandler {
 			fromYaw = fixYaw(fromYaw);
 			toYaw = fixYaw(toYaw);
 			this.fromYaw = fromYaw;
-			
+
 			this.fromPitch = fromPitch;
 			this.toYaw = toYaw;
 			this.toPitch = toPitch;
-			
+
 			EntityPlayerSP player = Minecraft.getMinecraft().player;
 			player.rotationYaw = fixYaw( player.rotationYaw );
 			player.prevRotationYaw = fixYaw( player.prevRotationYaw );
-			
+
 			double b = toYaw-fromYaw;
 			double a = 360-b;
 			a%=360;
@@ -1185,8 +1271,8 @@ public class ForgeEventHandler {
 		public void look(){
 			if(System.currentTimeMillis()<=time+start){
 				EntityPlayerSP player = Minecraft.getMinecraft().player;
-				
-				
+
+
 				player.rotationYaw = interpolate(fromYaw, toYaw);
 				player.rotationPitch = interpolate(fromPitch, toPitch);
 			}

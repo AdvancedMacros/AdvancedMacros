@@ -499,7 +499,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	}
 
 	private static final String quoteRegEx = "(\"[^\"]*\")|('[^\']*')|(\\[\\[.*?\\]\\])";
-	private static final String variableRegEx = "([_a-zA-Z]+[_a-zA-Z0-9]*(\\[[0-9]+\\])?([\\.:]{1})?)+";
+	private static final String variableRegEx = "([_a-zA-Z]+[_a-zA-Z0-9]*([\\.:]{1})?)+"; //(\\[[0-9]+\\])? removed
 	private Pattern variablePattern = Pattern.compile(variableRegEx);
 
 

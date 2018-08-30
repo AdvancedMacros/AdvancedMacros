@@ -806,6 +806,17 @@ public class Utils {
 		.replaceAll("&I",         sel + "o")
 		;
 	}
+	public static String fromMinecraftColorCodes(String text) {
+		return text
+		.replaceAll("&", "&&")
+		.replaceAll("\u00A7", "&")
+		.replaceAll("&k", "&O") //Obfuscated
+		.replaceAll("&l", "&B") //Bold
+		.replaceAll("&m", "&S") //Strikethru
+		.replaceAll("&o", "&I") //Italics
+		.replaceAll("&r", "&f")   //reset (to white in this case)
+		;
+	}
 	public static void runOnMCThreadAndWait(Runnable r){
 		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {
 			r.run();

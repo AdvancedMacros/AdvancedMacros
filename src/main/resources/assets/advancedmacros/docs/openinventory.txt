@@ -1,6 +1,6 @@
 openInventory()
 "opens" your inventory so you can move items around.
-Returns a table with controls. See full doc for help.
+Returns a table with controls. (If gui is already open that will be used)
 
 Controls:
   swapStack(slot1, slot2) simulates clicking slot1, then 2 than 1 again

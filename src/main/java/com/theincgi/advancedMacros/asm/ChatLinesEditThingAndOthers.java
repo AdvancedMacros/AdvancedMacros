@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiNewChat;
 import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraft.network.play.client.CPacketClickWindow;
 import net.minecraft.network.play.server.SPacketCollectItem;
 import net.minecraft.network.play.server.SPacketConfirmTransaction;
 import net.minecraft.network.play.server.SPacketMultiBlockChange;
@@ -16,10 +17,12 @@ import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.network.play.server.SPacketSpawnObject;
 import net.minecraft.network.play.server.SPacketWindowItems;
 import net.minecraft.util.EnumParticleTypes;
+import scala.collection.mutable.Stack;
 import scala.util.control.Exception.Catch;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 
 import org.luaj.vm2_v3_0_1.LuaValue;
@@ -48,6 +51,7 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 	 * */
 	public static String[] editedClasses = {
 			"net.minecraft.client.gui.GuiNewChat"
+			//,"io.netty.channel.local.LocalChannel"
 	};
 
 	@Override
@@ -74,6 +78,9 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 			case 0: //gui new chat
 				transformGuiNewChat(node, isObf);
 				break;
+//			case 1:
+//				transformLocalChannelWrite(node, isObf);
+//				break;
 			default:
 				break;
 			}
@@ -89,8 +96,8 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 		return basicClass;
 	} 
 
-	
-	
+
+
 
 	private static void transformGuiNewChat(ClassNode node, boolean isObf) {
 		final String SET_CHAT_LINE = isObf? "a" : "setChatLine";
@@ -105,7 +112,7 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
     		INVOKEINTERFACE List.size() : int
     		BIPUSH 100
     		IF_ICMPLE L15
-    		
+
     		This is where the constant 100 is loaded when the line counts are checked
 		 * */
 		for(MethodNode method : node.methods) {
@@ -135,8 +142,8 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 			}
 		}
 	}
-	
-	
+
+
 	public static int getMaxLineCount() {
 		try {
 			return Utils.tableFromProp(Settings.settings, "chat.maxLines", LuaValue.valueOf(100)).checkint();
@@ -146,4 +153,75 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 	}
 
 
+	//TESTING CODE
+//	private static void transformLocalChannelWrite(ClassNode node, boolean isObf) {
+//		if(isObf) return;
+//		//		final String INVOKE_CHAN_READ = isObf? null : "invokeChannelRead";
+//		//		final String DESC = isObf? null : "(Lio/netty/channel/AbstractChannelHandlerContext;Ljava/lang/Object;)V";
+//		final String INVOKE_CHAN_READ = isObf? null : "doWrite";
+//		final String DESC = isObf? null : "(Lio/netty/channel/ChannelOutboundBuffer;)V";
+//		for(MethodNode method : node.methods) {
+//			//System.out.println(method.name + " " + method.desc);
+//			if(method.name.equals(INVOKE_CHAN_READ) && method.desc.equals(DESC)) {
+//				//System.out.println("Located invokeChannel Read");
+//				//aload 2 for getting m
+//				System.out.println("doWrite located");
+//
+//				for(AbstractInsnNode instr : method.instructions.toArray()) {
+//					if(instr.getOpcode()==ASTORE) {
+//						VarInsnNode astore = (VarInsnNode) instr;
+//						if(astore.var==3) { //use to be 2
+//
+//							MethodInsnNode myMethod = new MethodInsnNode(
+//									INVOKESTATIC,
+//									"com/theincgi/advancedMacros/asm/ChatLinesEditThingAndOthers", //class name
+//									"getPacketHackySend",  //method name
+//									"(Ljava/lang/Object;)V",  //no args, returns int
+//									false); //not interface
+//							VarInsnNode loadM = new VarInsnNode(ALOAD, 3); //use to be 2
+//							InsnList list = new InsnList();
+//							list.add(loadM);
+//							list.add(myMethod);
+//
+//							method.instructions.insert(instr, list);
+//
+//							System.out.println("registered hook in " + INVOKE_CHAN_READ + " of " + editedClasses[1]);
+//							return;
+//						}
+//					}
+//				}
+//
+//
+//			}
+//		}
+//	}
+
+//	static Queue<Object> recent = new LinkedList<>();
+//	public static void getPacketHackySend(Object packet) {
+//		if(packet==null) return;
+//		try {
+//			String name = packet.getClass().getName();
+//			if(name.contains("Teleport") || name.contains("HeadLook") || name.contains("Velocity") ||
+//					name.contains("RelMove") || name.contains("Metadata") || name.contains("LookMove") ||
+//					name.contains("Position") || name.contains("TimeUpdate") || name.contains("EntityLook") || name.contains("SpawnObject") ||
+//					name.contains("SpawnMob") || name.contains("EntityProperties") || name.contains("DestroyEntities") || name.contains("EntityStatus") ||
+//					name.contains("KeepAlive") || name.contains("SPacketEffect") || name.contains("EntityEquipment") || name.contains("PlayerListItem") || name.contains("Rotation") || 
+//					name.contains("SPacketBlockAction") || name.contains("Sound") || name.contains("ConfirmTrans") || name.contains("WindowProp")) return;
+//			
+//			if(recent.contains(packet)) return;
+//			recent.offer(packet);
+//			if(recent.size()>30) recent.poll();
+//			switch (name) {
+//			case "net.minecraft.network.play.client.CPacketClickWindow":{
+//				CPacketClickWindow c = (CPacketClickWindow) packet;
+//				System.out.printf("ClickWindow: Act#: %d, type: %s, **id: %d**, wID: %d, button: %d\n", c.getActionNumber(), c.getClickType().name(), c.getSlotId(), c.getWindowId(), c.getUsedButton());
+//				break;
+//			}
+//			default:
+//				System.out.println(name);
+//			}
+//		}catch (Throwable e) {
+//			// TODO: handle exception
+//		}
+//	}
 }
