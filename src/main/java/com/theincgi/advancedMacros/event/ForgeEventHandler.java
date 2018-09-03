@@ -833,15 +833,16 @@ public class ForgeEventHandler {
 			LuaTable e = createEvent(EventName.Chat);
 			LuaTable e2 = createEvent(EventName.ChatFilter);
 			String unformated = event.getMessage().getUnformattedText();
-			String formated   = "&f"+event.getMessage().getFormattedText()
-					.replaceAll("&", "&&")
-					.replaceAll("\u00A7", "&")
-					.replaceAll("&k", "&O") //Obfuscated
-					.replaceAll("&l", "&B") //Bold
-					.replaceAll("&m", "&S") //Strikethru
-					.replaceAll("&o", "&I") //Italics
-					.replaceAll("&r", "&f")   //reset (to white in this case)
-					;
+			String formated   = "&f"+ Utils.fromMinecraftColorCodes(event.getMessage().getFormattedText());
+//			event.getMessage().getFormattedText()
+//					.replaceAll("&", "&&")
+//					.replaceAll("\u00A7", "&")
+//					.replaceAll("&k", "&O") //Obfuscated
+//					.replaceAll("&l", "&B") //Bold
+//					.replaceAll("&m", "&S") //Strikethru
+//					.replaceAll("&o", "&I") //Italics
+//					.replaceAll("&r", "&f")   //reset (to white in this case)
+//					;
 			formated = formated.substring(0, formated.length()-2);//gets rid of last &f that does nothing for us
 			//System.out.println(sEvent.getMessage().getSiblings());
 			//TODO simplfy formating

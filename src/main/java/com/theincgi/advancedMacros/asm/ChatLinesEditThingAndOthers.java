@@ -17,6 +17,7 @@ import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.network.play.server.SPacketSpawnObject;
 import net.minecraft.network.play.server.SPacketWindowItems;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.text.event.ClickEvent;
 import scala.collection.mutable.Stack;
 import scala.util.control.Exception.Catch;
 
@@ -33,6 +34,8 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
@@ -50,7 +53,8 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 	 * {@link GuiNewChat}
 	 * */
 	public static String[] editedClasses = {
-			"net.minecraft.client.gui.GuiNewChat"
+			"net.minecraft.client.gui.GuiNewChat",
+			"net.minecraft.client.gui.GuiScreen",
 			//,"io.netty.channel.local.LocalChannel"
 	};
 
@@ -79,6 +83,8 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 				transformGuiNewChat(node, isObf);
 				break;
 //			case 1:
+			case 1:
+				transformGuiScreenComponentClick(node, isObf);
 //				transformLocalChannelWrite(node, isObf);
 //				break;
 			default:
@@ -152,7 +158,72 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 		}
 	}
 
-
+	private static void transformGuiScreenComponentClick(ClassNode node, boolean isObf){
+		final String HANDLE_COMPONENT_CLICK = isObf? "a" : "handleComponentClick";
+		final String DESCRIPTOR = isObf? "(Lhh;)Z" : "(Lnet/minecraft/util/text/ITextComponent;)Z";
+		/*
+ 	 IF_ACMPNE L33
+   L34
+    LINENUMBER 440 L34
+    ALOAD 0: this
+    ALOAD 2: clickevent
+    INVOKEVIRTUAL ClickEvent.getValue() : String
+    ICONST_0
+    INVOKEVIRTUAL GuiScreen.sendChatMessage(String, boolean) : void
+    GOTO L24
+   L33
+    LINENUMBER 444 L33
+   FRAME SAME
+    GETSTATIC GuiScreen.LOGGER : Logger
+    LDC "Don't know how to handle {}"
+    ALOAD 2: clickevent
+    INVOKEINTERFACE Logger.error(String, Object) : void
+   L24
+    LINENUMBER 447 L24
+   FRAME SAME
+    ICONST_1
+    IRETURN
+   L9*/
+		
+		for(MethodNode method : node.methods) {
+			if(method.name.equals(HANDLE_COMPONENT_CLICK) && method.desc.equals(DESCRIPTOR)) {
+				System.out.println("Found method");
+				AbstractInsnNode target = null;
+				LabelNode l24;
+				for( AbstractInsnNode instr : method.instructions.toArray() ) {
+					if(instr.getType() == Opcodes.LDC) {
+						target = instr.getNext();
+						if(target.getType() == Opcodes.ALOAD) {
+							target = instr.getNext();
+							if(target.getType() == Opcodes.INVOKEINTERFACE) {
+								target = instr.getNext();	
+								if(target instanceof LabelNode) {
+									l24 = (LabelNode) target;
+									
+									
+								}
+							}	
+						}
+					}
+				}
+				return;
+			}
+		}
+		System.out.println(node.methods);
+		
+		/*
+		 *  else if (clickevent.getAction() == ClickEvent.Action.RUN_COMMAND) {
+         *       this.sendChatMessage(clickevent.getValue(), false);
+         *  ***************EDIT**************
+         *  }else{
+         *       LOGGER.error("Don't know how to handle {}", (Object)clickevent);
+         *  }
+		 * 
+		 * Adding case for if clickevent extends custom class then call custom action handler
+		 * Using a method here to check if it matches to minimize the added byte code
+		 * */
+	}
+	
 	//TESTING CODE
 //	private static void transformLocalChannelWrite(ClassNode node, boolean isObf) {
 //		if(isObf) return;

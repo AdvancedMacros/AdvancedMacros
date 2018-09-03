@@ -814,9 +814,15 @@ public class Utils {
 		.replaceAll("&l", "&B") //Bold
 		.replaceAll("&m", "&S") //Strikethru
 		.replaceAll("&o", "&I") //Italics
-		.replaceAll("&r", "&f")   //reset (to white in this case)
+		.replaceAll("&r", "&f")  //reset (to white in this case)
+		.replaceAll("&n", "&U")  //Underline
 		;
 	}
+	
+	public static ITextComponent toTextComponent(String codedText) {
+		ITextComponent component 
+	}
+	
 	public static void runOnMCThreadAndWait(Runnable r){
 		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {
 			r.run();

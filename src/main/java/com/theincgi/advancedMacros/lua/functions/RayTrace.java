@@ -81,6 +81,11 @@ public class RayTrace {
 			default:
 				break;
 			}
+			LuaTable vec3d = new LuaTable();
+			vec3d.set(1, rtr.hitVec.x);
+			vec3d.set(2, rtr.hitVec.y);
+			vec3d.set(3, rtr.hitVec.z);
+			result.set("vec", vec3d);
 			result.set("side", rtr.sideHit.name().toLowerCase());
 			result.set("subHit", rtr.subHit);
 			return result;
