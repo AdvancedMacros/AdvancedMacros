@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import org.apache.logging.log4j.core.appender.rolling.action.IfAccumulatedFileSize;
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaTable;
@@ -49,7 +50,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.ITextComponent.Serializer;
+import net.minecraft.util.text.Style;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class Utils {
@@ -819,10 +823,123 @@ public class Utils {
 		;
 	}
 	
-	public static ITextComponent toTextComponent(String codedText) {
-		ITextComponent component 
+	public static Pair<ITextComponent, Varargs> toTextComponent(String codedText, Varargs args, boolean allowHover) {
+		if(args == null) args = new LuaTable().unpack();
+		ITextComponent out = new TextComponentString("");
+		StringBuilder temp = new StringBuilder();
+		Boolean bold = null, italics = null, obfusc = null, strike = null, underline = null;
+		TextFormatting color = null;
+		Style pStyle = out.getStyle();
+		boolean ltcce = false;
+		int argNum = 1;
+		
+		for(int i = 0; i<codedText.length(); i++) {
+			char c = codedText.charAt(i);
+			if(c!='&')
+				temp.append(c);
+			else {
+				if(i<codedText.length()-1) {
+					char next = codedText.charAt(i+1);
+					if(isTextColorCode(next) || isTextStyleCode(next) || next == 'F' || next == '&') {
+						i++;
+						if(temp.length() > 0) {
+							ITextComponent component = ltcce? new LuaTextComponent(temp.toString(), args.arg(argNum++), allowHover) : new TextComponentString(temp.toString());
+							Style style = component.getStyle();
+							style.setBold(bold);
+							style.setItalic(italics);
+							style.setObfuscated(obfusc);
+							style.setStrikethrough(strike);
+							style.setUnderlined(underline);
+							style.setColor(color);
+							style.setParentStyle(pStyle);
+							out.appendSibling(component);
+							bold = italics = obfusc = strike = underline = null;
+							color = null;
+							ltcce = false;
+							temp = new StringBuilder();
+							pStyle = component.getStyle();
+						}
+						if (isTextColorCode(next)) {
+							color = getTextFormatingColor(next);
+							bold = italics = obfusc = strike = underline = true;
+						}else if(isTextStyleCode(next)) {
+							switch (next) {
+							case 'B':
+								bold = true;
+								break;
+							case 'I':
+								italics = true;
+								break;
+							case 'O':
+								obfusc = true;
+								break;
+							case 'S':
+								strike = true;
+								break;
+							case 'U':
+								underline = true;
+								break;
+							default:
+								break;
+							}
+						}else if(next == 'F') { //Function/table
+							ltcce = true;
+						}
+					}
+				}
+			}
+		}
+		if(temp.length() > 0) {
+			TextComponentString component = new TextComponentString(temp.toString());
+			Style style = component.getStyle();
+			style.setBold(bold);
+			style.setItalic(italics);
+			style.setObfuscated(obfusc);
+			style.setStrikethrough(strike);
+			style.setUnderlined(underline);
+			style.setColor(color);
+			out.appendSibling(component);
+		}
+		return new Pair<ITextComponent, Varargs>(out, args.subargs(argNum));
 	}
-	
+	private static TextFormatting getTextFormatingColor(char c) {
+//		 BLACK("BLACK", '0', 0),
+//		    DARK_BLUE("DARK_BLUE", '1', 1),
+//		    DARK_GREEN("DARK_GREEN", '2', 2),
+//		    DARK_AQUA("DARK_AQUA", '3', 3),
+//		    DARK_RED("DARK_RED", '4', 4),
+//		    DARK_PURPLE("DARK_PURPLE", '5', 5),
+//		    GOLD("GOLD", '6', 6),
+//		    GRAY("GRAY", '7', 7),
+//		    DARK_GRAY("DARK_GRAY", '8', 8),
+//		    BLUE("BLUE", '9', 9),
+//		    GREEN("GREEN", 'a', 10),
+//		    AQUA("AQUA", 'b', 11),
+//		    RED("RED", 'c', 12),
+//		    LIGHT_PURPLE("LIGHT_PURPLE", 'd', 13),
+//		    YELLOW("YELLOW", 'e', 14),
+//		    WHITE("WHITE", 'f', 15),
+		switch (c) {
+		case '0': return TextFormatting.BLACK;
+		case '1': return TextFormatting.DARK_BLUE;
+		case '2': return TextFormatting.DARK_GREEN;
+		case '3': return TextFormatting.DARK_AQUA;
+		case '4': return TextFormatting.DARK_RED;
+		case '5': return TextFormatting.DARK_PURPLE;
+		case '6': return TextFormatting.GOLD;
+		case '7': return TextFormatting.GRAY;
+		case '8': return TextFormatting.DARK_GRAY;
+		case '9': return TextFormatting.BLUE;
+		case 'a': return TextFormatting.GREEN;
+		case 'b': return TextFormatting.AQUA;
+		case 'c': return TextFormatting.RED;
+		case 'd': return TextFormatting.LIGHT_PURPLE;
+		case 'e': return TextFormatting.YELLOW;
+		case 'f': return TextFormatting.WHITE;
+		default:
+			return null;
+		}
+	}
 	public static void runOnMCThreadAndWait(Runnable r){
 		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {
 			r.run();

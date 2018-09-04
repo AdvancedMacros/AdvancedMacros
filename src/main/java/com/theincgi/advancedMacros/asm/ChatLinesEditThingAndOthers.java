@@ -41,6 +41,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.misc.LuaTextComponentClickEvent;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -162,7 +163,7 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 		final String HANDLE_COMPONENT_CLICK = isObf? "a" : "handleComponentClick";
 		final String DESCRIPTOR = isObf? "(Lhh;)Z" : "(Lnet/minecraft/util/text/ITextComponent;)Z";
 		/*
- 	 IF_ACMPNE L33
+ 	 IF_ACMPNE L33   -- EDIT to new Label
    L34
     LINENUMBER 440 L34
     ALOAD 0: this
@@ -171,7 +172,7 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
     ICONST_0
     INVOKEVIRTUAL GuiScreen.sendChatMessage(String, boolean) : void
     GOTO L24
-   L33
+   L33 --go here if added if is false
     LINENUMBER 444 L33
    FRAME SAME
     GETSTATIC GuiScreen.LOGGER : Logger
@@ -189,18 +190,57 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 			if(method.name.equals(HANDLE_COMPONENT_CLICK) && method.desc.equals(DESCRIPTOR)) {
 				System.out.println("Found method");
 				AbstractInsnNode target = null;
-				LabelNode l24;
+				LabelNode l24, l33;
 				for( AbstractInsnNode instr : method.instructions.toArray() ) {
-					if(instr.getType() == Opcodes.LDC) {
+					if(instr.getOpcode() == Opcodes.LDC) {
 						target = instr.getNext();
-						if(target.getType() == Opcodes.ALOAD) {
-							target = instr.getNext();
-							if(target.getType() == Opcodes.INVOKEINTERFACE) {
-								target = instr.getNext();	
+						if(target.getOpcode() == Opcodes.ALOAD) {
+							target = instr.getNext().getNext();
+							if(target.getOpcode() == Opcodes.INVOKEINTERFACE) {
+								target = target.getNext();	
 								if(target instanceof LabelNode) {
 									l24 = (LabelNode) target;
-									
-									
+									while( !(target instanceof LabelNode)) {
+										target = target.getPrevious();
+									}
+									l33 = (LabelNode) target;
+									int type = -2;
+									while(type!=Opcodes.IF_ACMPNE) {
+										target = target.getPrevious();
+										type = target.getOpcode();
+									}
+									System.out.println(target.getClass());
+									if(target instanceof JumpInsnNode) {
+										JumpInsnNode jsn = (JumpInsnNode) target;
+										
+										LabelNode newLabel = new LabelNode();
+										InsnList list = new InsnList();
+										LabelNode oldTarget = jsn.label;
+										MethodInsnNode check = new MethodInsnNode(
+												INVOKESTATIC,
+												"com/theincgi/advancedMacros/asm/ChatLinesEditThingAndOthers", //class name
+												"isLuaTextComponent",  //method name
+												"(Ljava/lang/Object;)Z",  //no args, returns int
+												false); //not interface
+										MethodInsnNode call = new MethodInsnNode(
+												INVOKESTATIC,
+												"com/theincgi/advancedMacros/asm/ChatLinesEditThingAndOthers", //class name
+												"clickLuaTextComponent",  //method name
+												"(Ljava/lang/Object;)V",  //no args, returns int
+												false); //not interface
+										//call static check for clickEvent class
+										//if ne jump to old label
+										//otherwise, call clickEvent code
+										
+										list.add(newLabel);
+										list.add(check);
+										list.add(new JumpInsnNode(Opcodes.IFNE, oldTarget));
+										list.add(new VarInsnNode(Opcodes.ALOAD, 2));
+										list.add(call);
+										list.add(new JumpInsnNode(Opcodes.GOTO, l24));
+										
+										list.insertBefore(l33, list);
+									}
 								}
 							}	
 						}
@@ -224,6 +264,12 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 		 * */
 	}
 	
+	public static boolean isLuaTextComponent(Object obj) {
+		return obj instanceof LuaTextComponentClickEvent;
+	}
+	public static void clickLuaTextComponent(Object ltc) {
+		((LuaTextComponentClickEvent) ltc).click();
+	}
 	//TESTING CODE
 //	private static void transformLocalChannelWrite(ClassNode node, boolean isObf) {
 //		if(isObf) return;

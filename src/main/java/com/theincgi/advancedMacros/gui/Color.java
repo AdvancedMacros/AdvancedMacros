@@ -211,6 +211,29 @@ public class Color {
 		return this;
 	}
 
+	public Color fromCode(char c) {
+		switch (c) {
+		case '0': return TEXT_0;
+		case '1': return TEXT_1;
+		case '2': return TEXT_2;
+		case '3': return TEXT_3;
+		case '4': return TEXT_4;
+		case '5': return TEXT_5;
+		case '6': return TEXT_6;
+		case '7': return TEXT_7;
+		case '8': return TEXT_8;
+		case '9': return TEXT_9;
+		case 'a': return TEXT_a;
+		case 'b': return TEXT_b;
+		case 'c': return TEXT_c;
+		case 'd': return TEXT_d;
+		case 'e': return TEXT_e;
+		case 'f': return TEXT_f;
+		default:
+			return null;
+		}
+	}
+	
 	public java.awt.Color toAWTColor() {
 		return new java.awt.Color(r, g, b, a);
 	}
