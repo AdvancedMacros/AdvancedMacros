@@ -20,7 +20,7 @@ public class LuaTextComponent extends TextComponentBase{
 		this.allowHover = allowHover;
 		getStyle().setClickEvent( new LuaTextComponentClickEvent(action, this));
 		if(action.istable() && allowHover) {
-			getStyle().setHoverEvent(new HoverEvent(Action.SHOW_TEXT, Utils.toTextComponent(text, null, false).a));
+			getStyle().setHoverEvent(new HoverEvent(Action.SHOW_TEXT, Utils.toTextComponent(action.tojstring(), null, false).a));
 		}
 			
 	}

@@ -822,14 +822,25 @@ public class Utils {
 		.replaceAll("&n", "&U")  //Underline
 		;
 	}
-	
+	/**
+	 * @param allowFunctions defaults true
+	 * */
 	public static Pair<ITextComponent, Varargs> toTextComponent(String codedText, Varargs args, boolean allowHover) {
+		return toTextComponent(codedText, args, allowHover, true);
+	}
+	
+	public static Pair<ITextComponent, Varargs> toTextComponent(String codedText, Varargs args, boolean allowHover, boolean allowFunctions) {
 		if(args == null) args = new LuaTable().unpack();
 		ITextComponent out = new TextComponentString("");
 		StringBuilder temp = new StringBuilder();
 		Boolean bold = null, italics = null, obfusc = null, strike = null, underline = null;
 		TextFormatting color = null;
 		Style pStyle = out.getStyle();
+		pStyle.setBold(false);
+		pStyle.setItalic(false);
+		pStyle.setObfuscated(false);
+		pStyle.setStrikethrough(false);
+		pStyle.setUnderlined(false);
 		boolean ltcce = false;
 		int argNum = 1;
 		
@@ -843,7 +854,7 @@ public class Utils {
 					if(isTextColorCode(next) || isTextStyleCode(next) || next == 'F' || next == '&') {
 						i++;
 						if(temp.length() > 0) {
-							ITextComponent component = ltcce? new LuaTextComponent(temp.toString(), args.arg(argNum++), allowHover) : new TextComponentString(temp.toString());
+							ITextComponent component = ltcce&&allowFunctions? new LuaTextComponent(temp.toString(), args.arg(argNum++), allowHover) : new TextComponentString(temp.toString());
 							Style style = component.getStyle();
 							style.setBold(bold);
 							style.setItalic(italics);
@@ -861,7 +872,7 @@ public class Utils {
 						}
 						if (isTextColorCode(next)) {
 							color = getTextFormatingColor(next);
-							bold = italics = obfusc = strike = underline = true;
+							bold = italics = obfusc = strike = underline = false;
 						}else if(isTextStyleCode(next)) {
 							switch (next) {
 							case 'B':
