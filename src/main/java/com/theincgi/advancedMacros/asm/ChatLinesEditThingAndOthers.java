@@ -211,35 +211,39 @@ public class ChatLinesEditThingAndOthers implements IClassTransformer{
 									}
 									System.out.println(target.getClass());
 									if(target instanceof JumpInsnNode) {
-										JumpInsnNode jsn = (JumpInsnNode) target;
-										
+//										JumpInsnNode jsn = (JumpInsnNode) target;
+										LabelNode l34 = (LabelNode) target.getPrevious().getPrevious().getPrevious().getPrevious().getPrevious().getPrevious();
 										LabelNode newLabel = new LabelNode();
 										InsnList list = new InsnList();
-										LabelNode oldTarget = jsn.label;
+//										LabelNode oldTarget = jsn.label;
+//										jsn.label = newLabel;
 										MethodInsnNode check = new MethodInsnNode(
 												INVOKESTATIC,
 												"com/theincgi/advancedMacros/asm/ChatLinesEditThingAndOthers", //class name
 												"isLuaTextComponent",  //method name
-												"(Ljava/lang/Object;)Z",  //no args, returns int
+												"(Ljava/lang/Object;)Z",  //obj, returns bool
 												false); //not interface
 										MethodInsnNode call = new MethodInsnNode(
 												INVOKESTATIC,
 												"com/theincgi/advancedMacros/asm/ChatLinesEditThingAndOthers", //class name
 												"clickLuaTextComponent",  //method name
-												"(Ljava/lang/Object;)V",  //no args, returns int
+												"(Ljava/lang/Object;)V",  //obj, returns void
 												false); //not interface
 										//call static check for clickEvent class
 										//if ne jump to old label
 										//otherwise, call clickEvent code
 										
-										list.add(newLabel);
+//										list.add(newLabel);
+										list.add(new VarInsnNode(Opcodes.ALOAD, 2));
 										list.add(check);
-										list.add(new JumpInsnNode(Opcodes.IFNE, oldTarget));
+										list.add(new JumpInsnNode(Opcodes.IFEQ, newLabel));
 										list.add(new VarInsnNode(Opcodes.ALOAD, 2));
 										list.add(call);
 										list.add(new JumpInsnNode(Opcodes.GOTO, l24));
+										list.add(newLabel);
 										
-										list.insertBefore(l33, list);
+										method.instructions.insert(l34, list);
+										System.out.println("GuiScreen has been modified for Lua Text components");
 									}
 								}
 							}	

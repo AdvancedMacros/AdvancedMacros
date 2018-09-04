@@ -116,9 +116,10 @@ public class LuaFunctions {
 		public synchronized ITextComponent formatString(Varargs arg0){ //TODO make it so hovering a callable table shows the tooltip
 			String toParse;
 			ITextComponent out = null;
-			for (int i = 1; i <= arg0.narg(); i++) {
-				if(i!=1)
-					out.appendText(" &f");
+			for (int i = 1;arg0.narg() > 0; i++) {
+				if(i!=1) {
+					out.appendText(" ");
+				}
 				LuaValue arg = arg0.arg1();
 				Pair<ITextComponent, Varargs> pair;
 				
@@ -133,6 +134,7 @@ public class LuaFunctions {
 					out = pair.a;
 				else
 					out.appendSibling(pair.a);
+				
 				
 			}
 			return out;
