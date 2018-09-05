@@ -20,7 +20,11 @@ public class LuaTextComponentClickEvent extends ClickEvent{
 		LuaTable args = new LuaTable();
 		args.set(1, ltc.getFormattedText());
 		args.set(2, ltc.getUnformattedText());
-		LuaThread t = new LuaThread(onClick, args.unpack(), "LuaTextComponentClick");
+		LuaThread t;
+		if(onClick.istable() && !onClick.get("click").isnil())
+			t = new LuaThread(onClick.get("click"), args.unpack(), "LuaTextComponentClick");
+		else
+			t = new LuaThread(onClick, args.unpack(), "LuaTextComponentClick");
 		t.start();
 	}
 }

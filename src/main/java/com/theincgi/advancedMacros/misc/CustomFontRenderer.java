@@ -193,7 +193,7 @@ public class CustomFontRenderer {
 		boolean bold = false, italics = false;
 		double tx = x;
 		double ty = y;
-
+		
 		float ratio = charWid/(float)charHei;
 		Matrix upVect = Matrix.vector(0, -textSize2d, 0);
 		Matrix rightVect = Matrix.vector(-textSize2d*ratio, 0 , 0);
@@ -213,7 +213,7 @@ public class CustomFontRenderer {
 				Matrix down = upVect.scalar(-lineNum);
 				dx+=down.vectorX();
 				dy+=down.vectorY();
-			}else if(c=='&' && i<text.length()-1 && (Utils.isTextColorCode(text.charAt(i+1))||Utils.isTextStyleCode(text.charAt(i+1)))) {
+			}else if(c=='&' && i<text.length()-1 && ( text.charAt(i+1)=='&' || Utils.isTextColorCode(text.charAt(i+1)) || Utils.isTextStyleCode(text.charAt(i+1)))) {
 				if(Utils.isTextColorCode(text.charAt(i+1))) //reset to normal text
 					mc.getTextureManager().bindTexture(consolas.getResourceLocation());
 				char code = text.charAt(i+1);
@@ -312,6 +312,11 @@ public class CustomFontRenderer {
 					else
 						mc.getTextureManager().bindTexture(consolas_italics.getResourceLocation());
 					italics=true;
+					break;
+				case '&':
+					drawChar2D(dx, dy, z, c, textSize2d*ratio, textSize2d);
+					dx-=rightVect.vectorX();
+					dy-=rightVect.vectorY();
 					break;
 				}
 				i++;

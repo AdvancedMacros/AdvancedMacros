@@ -259,7 +259,7 @@ public class LuaFunctions {
 				}else{
 					LuaTable vTab = v.checktable();
 					if(vTab.getmetatable()!=null && vTab.getmetatable().istable() && vTab.getmetatable().get(CallableTable.LUA_FUNCTION_KEY).optboolean(false)) {
-						s+=rep(" ",indent)+"&f[&c"+escAND(k.tojstring())+"&f] = &b"+v.tojstring();
+						s+=rep(" ",indent)+"&f[&c"+escAND(k.tojstring())+"&f] = &b"+escAND((v.tojstring()));
 						if(tableContainsKeys(vTab)){
 							s+=" &f{\n";
 							s+=formatTableForLog(vTab, antiR, indent+2);
@@ -269,7 +269,7 @@ public class LuaFunctions {
 						}
 					}else {
 						antiR.add(vTab);
-						s+=rep(" ",indent)+"&f[&c"+escAND(k.tojstring())+"&f] = &e"+v.tojstring(); //TODO remove \n if no keys of any type
+						s+=rep(" ",indent)+"&f[&c"+escAND(k.tojstring())+"&f] = &e"+escAND(v.tojstring()); //TODO remove \n if no keys of any type
 						if(tableContainsKeys(vTab)) {
 							s+=" &f{\n";
 							s+=formatTableForLog(vTab, antiR, indent+2);
@@ -284,7 +284,7 @@ public class LuaFunctions {
 			}else{
 				s+=rep(" ",indent)+"&f[&c"+escAND(k.tojstring())+"&f] = &b";
 				if(v.typename().equals("string")){
-					s+="\""+v.tojstring().replaceAll("&", "&&")+"&b\""; //added &b to fix color formating in these
+					s+="&f\"&b"+escAND(v.tojstring())+"&f\""; //added &b to fix color formating in these
 					//added .replaceAll so that way color formating doesnt trigger inside the table print
 				}else{
 					s+=v.isuserdata()?"&d"+escAND(v.tojstring()):escAND(v.tojstring());

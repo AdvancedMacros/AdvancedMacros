@@ -78,7 +78,7 @@ public class Hud2D extends LuaTable{
 				return rect.controls;
 			case newText:
 				Hud2D_Text text = new Hud2D_Text();
-				text.text = args.optjstring(1, "");
+				text.getControls().get("setText").call(args.optjstring(1, ""));
 				text.x    = (float) args.optdouble(2, 0);
 				text.y    = (float) args.optdouble(3, 0);
 				text.size = (float) args.optdouble(4, 12);

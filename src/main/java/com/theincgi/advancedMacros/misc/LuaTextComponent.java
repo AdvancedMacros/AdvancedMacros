@@ -21,7 +21,10 @@ public class LuaTextComponent extends TextComponentBase{
 		if( action.isfunction() || (action.istable() && (!action.getmetatable().isnil())) && (action.getmetatable().get("__call").isfunction()) )
 			getStyle().setClickEvent( new LuaTextComponentClickEvent(action, this));
 		if( (action.isstring() || action.istable()) && allowHover) {
-			getStyle().setHoverEvent(new HoverEvent(Action.SHOW_TEXT, Utils.toTextComponent(action.tojstring(), null, false).a));
+			if(action.istable() && !action.get("hover").isnil())
+				getStyle().setHoverEvent(new HoverEvent(Action.SHOW_TEXT, Utils.toTextComponent(action.get("hover").tojstring(), null, false).a));
+			else
+				getStyle().setHoverEvent(new HoverEvent(Action.SHOW_TEXT, Utils.toTextComponent(action.tojstring(), null, false).a));
 		}
 			
 	}

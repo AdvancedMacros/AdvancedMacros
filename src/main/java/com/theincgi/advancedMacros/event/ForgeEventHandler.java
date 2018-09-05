@@ -39,6 +39,7 @@ import com.theincgi.advancedMacros.lua.LuaDebug.LuaThread;
 import com.theincgi.advancedMacros.lua.LuaDebug.OnScriptFinish;
 import com.theincgi.advancedMacros.lua.functions.GuiControls;
 import com.theincgi.advancedMacros.lua.util.ContainerControls;
+import com.theincgi.advancedMacros.misc.Pair;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -833,27 +834,24 @@ public class ForgeEventHandler {
 			LuaTable e = createEvent(EventName.Chat);
 			LuaTable e2 = createEvent(EventName.ChatFilter);
 			String unformated = event.getMessage().getUnformattedText();
-			String formated   = "&f"+ Utils.fromMinecraftColorCodes(event.getMessage().getFormattedText());
-//			event.getMessage().getFormattedText()
-//					.replaceAll("&", "&&")
-//					.replaceAll("\u00A7", "&")
-//					.replaceAll("&k", "&O") //Obfuscated
-//					.replaceAll("&l", "&B") //Bold
-//					.replaceAll("&m", "&S") //Strikethru
-//					.replaceAll("&o", "&I") //Italics
-//					.replaceAll("&r", "&f")   //reset (to white in this case)
-//					;
-			formated = formated.substring(0, formated.length()-2);//gets rid of last &f that does nothing for us
+			Pair<String, LuaTable> pair   = Utils.codedFromTextComponent(event.getMessage());//fromMinecraftColorCodes(event.getMessage().getFormattedText());
+			String formated = pair.a;
+			
+			//formated = formated.substring(0, formated.length()-2);//gets rid of last &f that does nothing for us
 			//System.out.println(sEvent.getMessage().getSiblings());
 			//TODO simplfy formating
+			LuaTable actions = pair.b;
+			
 			e.set(3, formated);
 			e2.set(3, formated);
 			e.set(4, unformated);
 			e2.set(4,unformated);
+			e.set(5, actions);
+			e2.set(5, actions);
 
 			LinkedList<String> toRun = AdvancedMacros.macroMenuGui.getMatchingScripts(false, EventName.ChatFilter.name(), false);
 			for (String script : toRun) {
-				if(script==null) return;
+				if(script==null) continue;
 				File f = new File(AdvancedMacros.macrosFolder, script);
 				if(f.exists() && f.isFile()) {
 					try {
@@ -873,10 +871,16 @@ public class ForgeEventHandler {
 					}
 				}
 			}
-			e.set(5, e2.get(3));
-
+			if(toRun.size() > 0)
+				for(int i = 0; i<e2.length(); i++) 
+					e.set(6+i, e2.get(3+i));
+			else {
+				LuaTable toUnpack = e.get(5).checktable();
+				for(int i = 1; i<=Math.max(toUnpack.length(), 2); i++)
+					e2.set(3+i, toUnpack.get(i));
+			}
 			if(e2.get(3).toboolean())
-				AdvancedMacros.logFunc.call(e2.get(3));
+				AdvancedMacros.logFunc.invoke(e2.unpack().subargs(3));
 
 			fireEvent(EventName.Chat, e);
 		});

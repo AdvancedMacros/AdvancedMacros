@@ -17,6 +17,28 @@ local changeLog = {
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
   
+  "&f - Log now allows for & codes &b&&L&f, &b&&T&f, &b&&R&f, &b&&F&f ",
+  "&f    - &b&&L &fcreate a link",
+  "&f    - &b&&T &ftype text into the chat text field (Suggest Command)",
+  "&f    - &b&&F &fFunction - can be a table, function or string",
+  "&f            if string, used as hover text",
+  "&f            if function, used as click event",
+  "&f            if the table has hover or click values they will be used",
+  "&f            table can also use meta for __tostring and __call",
+  "&f    - &b&&R &fRun - makes the player say something on click",
+  "&f   Provide each arg for the new & codes after your formated string",
+  "&f   &a&BExamples:",
+  "&f      &blog&f('Hello &b&&b&U&&U&&Lworld&f&&f!', {click='&6http://www.google.com&f'})",  
+  "&f      &blog&f('Hello &b&&b&U&&U&&Fworld&f&&f!', {click=someFunction, hover = '&6Click me!&f'})",  
+  "&f - Tired of chatFilter making links unclickable in chat? Well no more!",
+  "&f   ChatFilter events now pass a table containing all of the actions used in the chat msg",
+  "&f   Args for the event are now: formatedText, unformatedText, actions",
+  "&f   &7&BTip: &7for the last chat filter return your formated text and unpack the actions table",
+  "&f - fixed &&&& in gui's",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 5.6.0",
   "&f - &bopenInventory() &fis now functional",
   "&f   &7Tip: Add a delay when pulling items from the crafing output",
   "&f - &asomeTable&f[123] will now highlight the table correctly when",

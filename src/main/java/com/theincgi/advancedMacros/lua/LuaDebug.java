@@ -111,7 +111,10 @@ public class LuaDebug extends DebugLib{
 			this(sFunc, new LuaTable(), label);
 		}
 		public LuaThread(LuaValue sFunc, Varargs varagrs, String label) {
-			this.sFunc = sFunc.checkfunction();
+			if(sFunc.istable() && !sFunc.getmetatable().isnil() && !sFunc.getmetatable().get("__call").isnil())
+				this.sFunc = sFunc.getmetatable().get("__call").checkfunction();
+			else
+				this.sFunc = sFunc.checkfunction();
 			this.label = label;
 			this.varagrs = varagrs;
 		}

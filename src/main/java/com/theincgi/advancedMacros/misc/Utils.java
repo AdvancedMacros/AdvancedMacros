@@ -53,6 +53,9 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.ITextComponent.Serializer;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.HoverEvent;
+import net.minecraft.util.text.event.ClickEvent.Action;
 import net.minecraft.util.text.Style;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -808,6 +811,7 @@ public class Utils {
 		.replaceAll("&O",         sel + "k")
 		.replaceAll("&S",         sel + "m")
 		.replaceAll("&I",         sel + "o")
+		.replaceAll("&&", "&")
 		;
 	}
 	public static String fromMinecraftColorCodes(String text) {
@@ -843,7 +847,8 @@ public class Utils {
 		pStyle.setUnderlined(false);
 		boolean ltcce = false;
 		int argNum = 1;
-		
+		ClickEvent clickEvent = null;
+		HoverEvent hoverEvent = null;
 		for(int i = 0; i<codedText.length(); i++) {
 			char c = codedText.charAt(i);
 			if(c!='&')
@@ -851,7 +856,10 @@ public class Utils {
 			else {
 				if(i<codedText.length()-1) {
 					char next = codedText.charAt(i+1);
-					if(isTextColorCode(next) || isTextStyleCode(next) || next == 'F' || next == '&') {
+					if(next == '&') {
+						temp.append(next);
+						i++;
+					}else if(isTextColorCode(next) || isTextStyleCode(next) || isSpecialCode(next) || next == '&') {
 						i++;
 						if(temp.length() > 0) {
 							ITextComponent component = ltcce&&allowFunctions? new LuaTextComponent(temp.toString(), args.arg(argNum++), allowHover) : new TextComponentString(temp.toString());
@@ -863,10 +871,16 @@ public class Utils {
 							style.setUnderlined(underline);
 							style.setColor(color);
 							style.setParentStyle(pStyle);
+							if(clickEvent != null)
+								style.setClickEvent(clickEvent);
 							out.appendSibling(component);
+							if (hoverEvent != null) 
+								style.setHoverEvent(hoverEvent);
 							bold = italics = obfusc = strike = underline = null;
 							color = null;
 							ltcce = false;
+							clickEvent = null;
+							hoverEvent = null;
 							temp = new StringBuilder();
 							pStyle = component.getStyle();
 						}
@@ -895,13 +909,58 @@ public class Utils {
 							}
 						}else if(next == 'F') { //Function/table
 							ltcce = true;
+						}else if(next == 'R') { //execute
+							String cText, hText;
+							if(args.arg(argNum).istable() && !args.arg(argNum).get("click").isnil())
+								cText = args.arg(argNum).get("click").tojstring();
+							else
+								cText = args.arg(argNum).tojstring();
+							
+							
+							if(args.arg(argNum).istable() && !args.arg(argNum).get("hover").isnil())
+								hText = args.arg(argNum).get("hover").tojstring();
+							else
+								hText = "Run: &b"+cText;
+							argNum++;
+							clickEvent = new ClickEvent(Action.RUN_COMMAND, cText);
+							hoverEvent = new HoverEvent(net.minecraft.util.text.event.HoverEvent.Action.SHOW_TEXT, toTextComponent(hText, null, false, false).a);
+						}else if(next == 'T') { //type (suggest)
+							String cText, hText;
+							if(args.arg(argNum).istable() && !args.arg(argNum).get("click").isnil())
+								cText = args.arg(argNum).get("click").tojstring();
+							else
+								cText = args.arg(argNum).tojstring();
+							
+							
+							if(args.arg(argNum).istable() && !args.arg(argNum).get("hover").isnil())
+								hText = args.arg(argNum).get("hover").tojstring();
+							else
+								hText = "Type: &b"+cText;
+							argNum++;
+							clickEvent = new ClickEvent(Action.SUGGEST_COMMAND, cText);
+							hoverEvent = new HoverEvent(net.minecraft.util.text.event.HoverEvent.Action.SHOW_TEXT, toTextComponent(hText, null, false, false).a);
+						}else if(next == 'L') { //Link
+							String cText, hText;
+							if(args.arg(argNum).istable() && !args.arg(argNum).get("click").isnil())
+								cText = args.arg(argNum).get("click").tojstring();
+							else
+								cText = args.arg(argNum).tojstring();
+							
+							
+							if(args.arg(argNum).istable() && !args.arg(argNum).get("hover").isnil())
+								hText = args.arg(argNum).get("hover").tojstring();
+							else
+								hText = "URL: &b&U"+cText;
+							argNum++;
+							clickEvent = new ClickEvent(Action.OPEN_URL, cText);
+							hoverEvent = new HoverEvent(net.minecraft.util.text.event.HoverEvent.Action.SHOW_TEXT, toTextComponent(hText, null, false, false).a);
 						}
 					}
 				}
 			}
 		}
 		if(temp.length() > 0) {
-			TextComponentString component = new TextComponentString(temp.toString());
+			ITextComponent component = ltcce&&allowFunctions? new LuaTextComponent(temp.toString(), args.arg(argNum++), allowHover) : new TextComponentString(temp.toString());
 			Style style = component.getStyle();
 			style.setBold(bold);
 			style.setItalic(italics);
@@ -909,9 +968,70 @@ public class Utils {
 			style.setStrikethrough(strike);
 			style.setUnderlined(underline);
 			style.setColor(color);
+			style.setParentStyle(pStyle);
+			if(clickEvent != null)
+				style.setClickEvent(clickEvent);
 			out.appendSibling(component);
+			if (hoverEvent != null) 
+				style.setHoverEvent(hoverEvent);
+			temp = new StringBuilder();
+			pStyle = component.getStyle();
 		}
 		return new Pair<ITextComponent, Varargs>(out, args.subargs(argNum));
+	}
+	
+	public static Pair<String, LuaTable> codedFromTextComponent(ITextComponent message) {
+		return codedFromTextComponent(message, true);
+	}
+	public static Pair<String, LuaTable> codedFromTextComponent(ITextComponent message, boolean includeActions) {
+		StringBuilder out = new StringBuilder();
+		String msg = message.getSiblings().size()==0?message.getUnformattedText():message.getUnformattedComponentText();
+		Style s = message.getStyle();
+		String formating = fromMinecraftColorCodes(s.getFormattingCode().toString());
+		LuaTable actions = new LuaTable();
+		
+		LuaTable action = null;
+		if(s.getClickEvent()!=null && includeActions) {
+			action = new LuaTable();
+			action.set("click", s.getClickEvent().getValue());
+			switch (s.getClickEvent().getAction()) {
+			case OPEN_URL:
+				formating +="&L";
+				break;
+			case RUN_COMMAND:
+				formating += "&R";
+				break;
+			case SUGGEST_COMMAND:
+				formating += "&T";
+				break;
+			default:
+				action = null;
+			}
+		}
+		if(s.getHoverEvent()!=null && includeActions) {
+			switch (s.getHoverEvent().getAction()) {
+			case SHOW_TEXT:
+				action = (action==null)?new LuaTable() : action;
+				action.set("hover", codedFromTextComponent(s.getHoverEvent().getValue(), false).a);
+				break;
+			default:
+			}
+		}
+		if(action!=null)
+			actions.set(1, action);
+		out.append(formating);
+		out.append(msg);
+		for(ITextComponent c : message.getSiblings()) {
+			Pair<String, LuaTable> pair = codedFromTextComponent(c);
+			out.append(pair.a);
+			for(int i = 1, j = actions.length(); i<=pair.b.length(); i++, j++) {
+				actions.set(j+1, pair.b.get(i));
+			}
+		}
+		return new Pair(out.toString(), actions);
+	}
+	private static boolean isSpecialCode(char c) {
+		return "FRTL".indexOf(c) >= 0; //Function, Execute, Type, Url
 	}
 	private static TextFormatting getTextFormatingColor(char c) {
 //		 BLACK("BLACK", '0', 0),
