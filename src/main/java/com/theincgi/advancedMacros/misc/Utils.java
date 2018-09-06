@@ -9,7 +9,6 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import org.apache.logging.log4j.core.appender.rolling.action.IfAccumulatedFileSize;
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaTable;
@@ -50,13 +49,13 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.ITextComponent.Serializer;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.ITextComponent.Serializer;
 import net.minecraft.util.text.event.ClickEvent;
-import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.util.text.event.ClickEvent.Action;
-import net.minecraft.util.text.Style;
+import net.minecraft.util.text.event.HoverEvent;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class Utils {
@@ -816,15 +815,15 @@ public class Utils {
 	}
 	public static String fromMinecraftColorCodes(String text) {
 		return text
-		.replaceAll("&", "&&")
-		.replaceAll("\u00A7", "&")
-		.replaceAll("&k", "&O") //Obfuscated
-		.replaceAll("&l", "&B") //Bold
-		.replaceAll("&m", "&S") //Strikethru
-		.replaceAll("&o", "&I") //Italics
-		.replaceAll("&r", "&f")  //reset (to white in this case)
-		.replaceAll("&n", "&U")  //Underline
-		;
+				.replaceAll("&", "&&")
+				.replaceAll("\u00A7", "&")
+				.replaceAll("&k", "&O") //Obfuscated
+				.replaceAll("&l", "&B") //Bold
+				.replaceAll("&m", "&S") //Strikethru
+				.replaceAll("&o", "&I") //Italics
+				.replaceAll("&r", "&f")  //reset (to white in this case)
+				.replaceAll("&n", "&U")  //Underline
+				;
 	}
 	/**
 	 * @param allowFunctions defaults true
@@ -832,7 +831,7 @@ public class Utils {
 	public static Pair<ITextComponent, Varargs> toTextComponent(String codedText, Varargs args, boolean allowHover) {
 		return toTextComponent(codedText, args, allowHover, true);
 	}
-	
+
 	public static Pair<ITextComponent, Varargs> toTextComponent(String codedText, Varargs args, boolean allowHover, boolean allowFunctions) {
 		if(args == null) args = new LuaTable().unpack();
 		ITextComponent out = new TextComponentString("");
@@ -915,8 +914,8 @@ public class Utils {
 								cText = args.arg(argNum).get("click").tojstring();
 							else
 								cText = args.arg(argNum).tojstring();
-							
-							
+
+
 							if(args.arg(argNum).istable() && !args.arg(argNum).get("hover").isnil())
 								hText = args.arg(argNum).get("hover").tojstring();
 							else
@@ -930,8 +929,8 @@ public class Utils {
 								cText = args.arg(argNum).get("click").tojstring();
 							else
 								cText = args.arg(argNum).tojstring();
-							
-							
+
+
 							if(args.arg(argNum).istable() && !args.arg(argNum).get("hover").isnil())
 								hText = args.arg(argNum).get("hover").tojstring();
 							else
@@ -945,14 +944,24 @@ public class Utils {
 								cText = args.arg(argNum).get("click").tojstring();
 							else
 								cText = args.arg(argNum).tojstring();
-							
-							
+
+
 							if(args.arg(argNum).istable() && !args.arg(argNum).get("hover").isnil())
 								hText = args.arg(argNum).get("hover").tojstring();
 							else
 								hText = "URL: &b&U"+cText;
 							argNum++;
 							clickEvent = new ClickEvent(Action.OPEN_URL, cText);
+							hoverEvent = new HoverEvent(net.minecraft.util.text.event.HoverEvent.Action.SHOW_TEXT, toTextComponent(hText, null, false, false).a);
+						}else if(next == 'N') {
+							String hText;
+
+							if(args.arg(argNum).istable() && !args.arg(argNum).get("hover").isnil())
+								hText = args.arg(argNum).get("hover").tojstring();
+							else
+								hText = args.arg(argNum).tojstring();
+							argNum++;
+							
 							hoverEvent = new HoverEvent(net.minecraft.util.text.event.HoverEvent.Action.SHOW_TEXT, toTextComponent(hText, null, false, false).a);
 						}
 					}
@@ -979,77 +988,85 @@ public class Utils {
 		}
 		return new Pair<ITextComponent, Varargs>(out, args.subargs(argNum));
 	}
-	
+
 	public static Pair<String, LuaTable> codedFromTextComponent(ITextComponent message) {
 		return codedFromTextComponent(message, true);
 	}
 	public static Pair<String, LuaTable> codedFromTextComponent(ITextComponent message, boolean includeActions) {
 		StringBuilder out = new StringBuilder();
-		String msg = message.getSiblings().size()==0?message.getUnformattedText():message.getUnformattedComponentText();
-		Style s = message.getStyle();
-		String formating = fromMinecraftColorCodes(s.getFormattingCode().toString());
+		//		if(message instanceof TextComponentTranslation) {
+		//			TextComponentTranslation tct = (TextComponentTranslation) message;
+		//			System.out.println(tct.getUnformattedComponentText());
+		//			System.out.println(Arrays.toString(tct.getFormatArgs()));
+		//			tct.getFormattedText();
+		//		}
+
+		//msg = message.getSiblings().size()==0?message.getUnformattedText():message.getUnformattedComponentText();
+		//if(message.getSiblings().size()==0)
+		//			System.out.println(message.getClass()); //FIXME remove when done debugging
+
 		LuaTable actions = new LuaTable();
-		
-		LuaTable action = null;
-		if(s.getClickEvent()!=null && includeActions) {
-			action = new LuaTable();
-			action.set("click", s.getClickEvent().getValue());
-			switch (s.getClickEvent().getAction()) {
-			case OPEN_URL:
-				formating +="&L";
-				break;
-			case RUN_COMMAND:
-				formating += "&R";
-				break;
-			case SUGGEST_COMMAND:
-				formating += "&T";
-				break;
-			default:
-				action = null;
+		int actionNum = 1;
+		for(ITextComponent com : message ) {
+			if(com.getUnformattedComponentText().isEmpty()) continue;
+			Style s = com.getStyle();
+			LuaTable action = null;
+			String formating = "&f"+fromMinecraftColorCodes(s.getFormattingCode().toString());
+			if(s.getClickEvent()!=null && includeActions) {
+				action = new LuaTable();
+				action.set("click", s.getClickEvent().getValue());
+				switch (s.getClickEvent().getAction()) {
+				case OPEN_URL:
+					formating +="&L";
+					break;
+				case RUN_COMMAND:
+					formating += "&R";
+					break;
+				case SUGGEST_COMMAND:
+					formating += "&T";
+					break;
+				default:
+					action = null;
+				}
 			}
-		}
-		if(s.getHoverEvent()!=null && includeActions) {
-			switch (s.getHoverEvent().getAction()) {
-			case SHOW_TEXT:
-				action = (action==null)?new LuaTable() : action;
-				action.set("hover", codedFromTextComponent(s.getHoverEvent().getValue(), false).a);
-				break;
-			default:
+			if(s.getHoverEvent()!=null && includeActions) {
+				switch (s.getHoverEvent().getAction()) {
+				case SHOW_TEXT:
+					if(action==null)
+						formating+="&N";
+					action = (action==null)?new LuaTable() : action;
+					action.set("hover", codedFromTextComponent(s.getHoverEvent().getValue(), false).a);
+					break;
+				default:
+				}
 			}
+			if(action!=null)
+				actions.set(actionNum++, action);
+			out.append(formating);
+			out.append(com.getUnformattedComponentText());
 		}
-		if(action!=null)
-			actions.set(1, action);
-		out.append(formating);
-		out.append(msg);
-		for(ITextComponent c : message.getSiblings()) {
-			Pair<String, LuaTable> pair = codedFromTextComponent(c);
-			out.append(pair.a);
-			for(int i = 1, j = actions.length(); i<=pair.b.length(); i++, j++) {
-				actions.set(j+1, pair.b.get(i));
-			}
-		}
-		return new Pair(out.toString(), actions);
+		return new Pair<String, LuaTable>(out.toString(), actions);
 	}
 	private static boolean isSpecialCode(char c) {
-		return "FRTL".indexOf(c) >= 0; //Function, Execute, Type, Url
+		return "FRTLN".indexOf(c) >= 0; //Function, Execute, Type, Url
 	}
 	private static TextFormatting getTextFormatingColor(char c) {
-//		 BLACK("BLACK", '0', 0),
-//		    DARK_BLUE("DARK_BLUE", '1', 1),
-//		    DARK_GREEN("DARK_GREEN", '2', 2),
-//		    DARK_AQUA("DARK_AQUA", '3', 3),
-//		    DARK_RED("DARK_RED", '4', 4),
-//		    DARK_PURPLE("DARK_PURPLE", '5', 5),
-//		    GOLD("GOLD", '6', 6),
-//		    GRAY("GRAY", '7', 7),
-//		    DARK_GRAY("DARK_GRAY", '8', 8),
-//		    BLUE("BLUE", '9', 9),
-//		    GREEN("GREEN", 'a', 10),
-//		    AQUA("AQUA", 'b', 11),
-//		    RED("RED", 'c', 12),
-//		    LIGHT_PURPLE("LIGHT_PURPLE", 'd', 13),
-//		    YELLOW("YELLOW", 'e', 14),
-//		    WHITE("WHITE", 'f', 15),
+		//		 BLACK("BLACK", '0', 0),
+		//		    DARK_BLUE("DARK_BLUE", '1', 1),
+		//		    DARK_GREEN("DARK_GREEN", '2', 2),
+		//		    DARK_AQUA("DARK_AQUA", '3', 3),
+		//		    DARK_RED("DARK_RED", '4', 4),
+		//		    DARK_PURPLE("DARK_PURPLE", '5', 5),
+		//		    GOLD("GOLD", '6', 6),
+		//		    GRAY("GRAY", '7', 7),
+		//		    DARK_GRAY("DARK_GRAY", '8', 8),
+		//		    BLUE("BLUE", '9', 9),
+		//		    GREEN("GREEN", 'a', 10),
+		//		    AQUA("AQUA", 'b', 11),
+		//		    RED("RED", 'c', 12),
+		//		    LIGHT_PURPLE("LIGHT_PURPLE", 'd', 13),
+		//		    YELLOW("YELLOW", 'e', 14),
+		//		    WHITE("WHITE", 'f', 15),
 		switch (c) {
 		case '0': return TextFormatting.BLACK;
 		case '1': return TextFormatting.DARK_BLUE;
@@ -1106,8 +1123,8 @@ public class Utils {
 			Vec3d v = new Vec3d(args.checkdouble(1), args.checkdouble(2), args.checkdouble(3));
 			return new Pair<Vec3d, Varargs>(v, args.subargs(4));
 		}else if(args.isnumber(1) && args.isnumber(2) && isAngular) {
-						float yaw = (float) args.checkdouble(1), pitch = (float) args.checkdouble(2);
-						//yaw = Math.toRadians(yaw);
+			float yaw = (float) args.checkdouble(1), pitch = (float) args.checkdouble(2);
+			//yaw = Math.toRadians(yaw);
 			//			pitch = Math.toRadians(pitch);
 			////			double x = Math.cos(yaw), z = Math.sin(yaw);
 			////			double y = -Math.sin(pitch);

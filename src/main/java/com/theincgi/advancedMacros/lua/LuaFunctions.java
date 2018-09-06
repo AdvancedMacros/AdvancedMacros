@@ -117,9 +117,9 @@ public class LuaFunctions {
 			String toParse;
 			ITextComponent out = null;
 			for (int i = 1;arg0.narg() > 0; i++) {
-				if(i!=1) {
-					out.appendText(" ");
-				}
+//				if(i!=1) {
+//					out.appendText(" ");
+//				}
 				LuaValue arg = arg0.arg1();
 				Pair<ITextComponent, Varargs> pair;
 				

@@ -17,6 +17,13 @@ local changeLog = {
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
   
+  "&f - Fixed some formating issues with player names or other",
+  "&f   &bTranslatableTextComponent&fs",
+  "&f - &b&&N&f was added for text with no click action (hover only)",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 5.8.0",
   "&f - Log now allows for & codes &b&&L&f, &b&&T&f, &b&&R&f, &b&&F&f ",
   "&f    - &b&&L &fcreate a link",
   "&f    - &b&&T &ftype text into the chat text field (Suggest Command)",
@@ -38,7 +45,7 @@ local changeLog = {
   
   "&7"..DIVIDER,
   
-  "&b&BChange Log: &7version 5.6.0",
+  "&b&BChange Log: &7version 5.7.0",
   "&f - &bopenInventory() &fis now functional",
   "&f   &7Tip: Add a delay when pulling items from the crafing output",
   "&f - &asomeTable&f[123] will now highlight the table correctly when",
