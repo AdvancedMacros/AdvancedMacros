@@ -79,6 +79,7 @@ import com.theincgi.advancedMacros.lua.functions.entity.GetEntityData;
 import com.theincgi.advancedMacros.lua.functions.entity.GetEntityList;
 import com.theincgi.advancedMacros.lua.functions.entity.HighlightEntity;
 import com.theincgi.advancedMacros.lua.functions.midi.MidiLib2;
+import com.theincgi.advancedMacros.lua.modControl.EditorControls;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.CustomFontRenderer;
@@ -114,6 +115,7 @@ public class AdvancedMacros {
 	public static KeyBinding modKeybind;
 	public static IBindingsGui macroMenuGui;
 	public static EditorGUI editorGUI;
+	public static final LuaTable advancedMacrosTable = new LuaTable();
 	public static ScriptBrowser2 scriptBrowser2;
 	public static RunningScriptsGui runningScriptsGui;
 	public static Gui lastGui;
@@ -197,6 +199,10 @@ public class AdvancedMacros {
 		globals.load(debug);
 		globals.set("_MOD_VERSION", VERSION);
 		
+		globals.set("advancedMacros", advancedMacrosTable);
+		LuaTable editor = new LuaTable();
+		advancedMacrosTable.set("editor", editor);
+		editor.set("jumpToLine", new EditorControls.JumpToLine());
 		
 		globals.set("run", new Call());
 		globals.set("pRun", new PCall());

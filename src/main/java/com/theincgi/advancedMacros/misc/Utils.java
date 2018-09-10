@@ -210,6 +210,9 @@ public class Utils {
 	}
 	public static void logError(Throwable le){
 		if(le instanceof LuaError) {
+			for(StackTraceElement ste : le.getStackTrace()) {
+				System.out.println(ste);
+			}
 			AdvancedMacros.logFunc.call("&c"+le.toString());			
 		}else {
 			StringWriter sw = new StringWriter();
@@ -1043,7 +1046,7 @@ public class Utils {
 			if(action!=null)
 				actions.set(actionNum++, action);
 			out.append(formating);
-			out.append(com.getUnformattedComponentText());
+			out.append(com.getUnformattedComponentText().replace("&", "&&"));
 		}
 		return new Pair<String, LuaTable>(out.toString(), actions);
 	}

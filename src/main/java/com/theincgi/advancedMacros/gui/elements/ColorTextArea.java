@@ -1517,4 +1517,9 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		return isEditable;
 	}
 	
+	public void jumpToLine( int x, int y ) {
+		cursor.setY( Math.max(0, Math.min(lines.size(), y)));
+		cursor.setX( Math.max(0, Math.min(cursor.getY(), lines.get(cursor.getY()).length() )));
+	}
+	
 }
