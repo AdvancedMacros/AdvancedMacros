@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
@@ -14,6 +16,8 @@ import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
+import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
+import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.theincgi.advancedMacros.AdvancedMacros;
@@ -208,12 +212,50 @@ public class Utils {
 		}
 		return null;
 	}
-	public static void logError(Throwable le){
-		if(le instanceof LuaError) {
-			for(StackTraceElement ste : le.getStackTrace()) {
-				System.out.println(ste);
+	private static LuaValue createJumpToAction(String file, int lineNum) {
+		LuaTable table = new LuaTable();
+		table.set("hover", "&b&BClick&f to jump to\nline in editor");
+		table.set("click", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				//TODO check for unsaved changes first or use tab'd editor instead
+				AdvancedMacros.editorGUI.openScript(file);
+				AdvancedMacros.editorGUI.getCta().jumpToLine(0, lineNum);
+				return null;
 			}
+		});
+		return table;
+	}
+	public static void logError(Throwable le){
+		final String pattern = "([a-zA-Z_0-9]+[./\\\\]?)+:(\\d+)";
+		if(le instanceof LuaError) {
+			String errText = le.getLocalizedMessage();
+			Pattern pat = Pattern.compile(pattern);
+			Matcher m = pat.matcher( errText );
+			StringBuilder output = new StringBuilder("&c");
+			int i = 0;
+			LuaTable actions = new LuaTable();
+			int actNum = 2; //1 reserved for output string
+			while(m.find()) {
+				int s = m.start(), e = m.end();
+				String fileName = m.group(1);
+				int lineNum = Integer.parseInt(m.group(2));
+				actions.set(actNum++, createJumpToAction(fileName, lineNum));
+				if(i<s){
+					output.append("&c");
+					output.append(errText.substring(i, s));
+				}
+				output.append("&U&F");
+				output.append(fileName)
+				.append("&c:")
+				.append(lineNum);
+				i = e;
+			}
+			if(i < errText.length())
+				output.append("&c").append(errText.substring(i));
+			actions.set(1, output.toString());
 			AdvancedMacros.logFunc.call("&c"+le.toString());			
+			AdvancedMacros.logFunc.invoke(actions.unpack());			
 		}else {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
@@ -964,7 +1006,7 @@ public class Utils {
 							else
 								hText = args.arg(argNum).tojstring();
 							argNum++;
-							
+
 							hoverEvent = new HoverEvent(net.minecraft.util.text.event.HoverEvent.Action.SHOW_TEXT, toTextComponent(hText, null, false, false).a);
 						}
 					}
