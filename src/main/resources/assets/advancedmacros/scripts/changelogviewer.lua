@@ -16,14 +16,21 @@ local changeLog = {
   "&fA clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
-  "&f - ",
-  "&f - ",
-  "&f - ",
-  "&f - ",
-  "&f - ",
+  
+  "&f - Files across all functions are now accessed the same way",
+  "&f   Files starting with ~ are in the macros root folder",
+  "&f   Files starting with / start at the hard drive letter given",
+  "&f   Files with no prefix will access files in their own folder",
+  "&f   &7Tip: \\ also works instead of /",
+  "&f - You can now click on your errors to go to them in the editor",
+  "&f - Fixed a bug where regular chat messages were getting",
+  "&f   & formated",
+  "&f   &7Note: when clicking the error, it will open the gui",
+  "&f   &7  **Unsaved changes will not be saved currently**",
   
   "&7"..DIVIDER,
   
+  "&b&BChange Log: &7version 5.8.1",
   "&f - Fixed some formating issues with player names or other",
   "&f   &bTranslatableTextComponent&fs",
   "&f - &b&&N&f was added for text with no click action (hover only)",
