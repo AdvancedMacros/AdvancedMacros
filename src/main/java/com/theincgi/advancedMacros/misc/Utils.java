@@ -1,5 +1,6 @@
 package com.theincgi.advancedMacros.misc;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.event.ForgeEventHandler;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
@@ -220,7 +222,8 @@ public class Utils {
 			public LuaValue call() {
 				//TODO check for unsaved changes first or use tab'd editor instead
 				AdvancedMacros.editorGUI.openScript(file);
-				AdvancedMacros.editorGUI.getCta().jumpToLine(0, lineNum);
+				AdvancedMacros.editorGUI.getCta().jumpToLine(0, lineNum-1);
+				ForgeEventHandler.showMenu(AdvancedMacros.editorGUI, AdvancedMacros.macroMenuGui.getGui());
 				return null;
 			}
 		});
@@ -806,6 +809,30 @@ public class Utils {
 		System.out.println( LuaTableToString(t) );
 	}
 
+	
+	public static File parseFileLocation(LuaValue arg0) {
+		return parseFileLocation(arg0.isnil()?"":arg0.tojstring());
+	}
+	public static File parseFileLocation(String arg) {
+		if(arg==null)
+			arg = "";
+
+		File file = null;
+		if(arg.startsWith("/") || arg.startsWith("\\"))
+			file = new File(arg.substring(1));
+		else if(arg.startsWith("~"))
+			file = new File(AdvancedMacros.macrosRootFolder, arg.substring(1));
+		else {
+			LuaValue v = Utils.getDebugStacktrace();
+			if(v.isnil())
+				throw new LuaError("Unable to get local path of file");
+			String m = v.get("short_src").tojstring();
+			m = m.substring(0, Math.max(0, Math.max(m.lastIndexOf("\\"),m.lastIndexOf("/"))));
+			File path = new File(AdvancedMacros.macrosFolder, m);
+			file = new File(path, arg);
+		}
+		return file;
+	}
 
 	public static LuaValTexture parseTexture(LuaValue v) {
 		return parseTexture(v, Utils.checkTexture(Settings.getTextureID("resource:holoblock.png")));
@@ -1187,5 +1214,9 @@ public class Utils {
 		if(!optional)
 			throw new LuaError(isAngular?"Invalid direction, must be {yaw, pitch} or yaw, pitch":"Invalid vector, must be {x,y,z} or x,y,z");
 		return new Pair<Vec3d, Varargs>(null, args);
+	}
+	public static LuaValue getDebugStacktrace() {
+		//LuaValue v = AdvancedMacros.globals.debuglib.get("getinfo").call(valueOf(1), valueOf("Sl"));
+		return AdvancedMacros.debugTable.get("getinfo").call(LuaValue.valueOf(1), LuaValue.valueOf("Sl"));
 	}
 }

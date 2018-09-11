@@ -8,7 +8,7 @@ import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
-import com.theincgi.advancedMacros.lua.functions.ScriptGui.OpCodes;
+import com.theincgi.advancedMacros.lua.scriptGui.ScriptGui.OpCodes;
 import com.theincgi.advancedMacros.misc.CallableTable;
 
 import net.minecraft.client.Minecraft;

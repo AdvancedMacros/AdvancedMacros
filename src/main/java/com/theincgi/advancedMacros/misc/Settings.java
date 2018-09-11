@@ -197,7 +197,7 @@ public class Settings {
 					return null;
 				}
 			}
-			DynamicTexture dTex = new DynamicTexture(ImageIO.read(new File(file)));
+			DynamicTexture dTex = new DynamicTexture(ImageIO.read(Utils.parseFileLocation(file)/*new File(file)*/));
 			return new LuaValTexture(file, dTex);
 		} catch (IOException e) {
 			return LuaValue.NIL;

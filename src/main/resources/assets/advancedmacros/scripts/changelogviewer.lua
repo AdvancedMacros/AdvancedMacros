@@ -16,6 +16,13 @@ local changeLog = {
   "&fA clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  "&f - ",
+  "&f - ",
+  "&f - ",
+  "&f - ",
+  "&f - ",
+  
+  "&7"..DIVIDER,
   
   "&f - Fixed some formating issues with player names or other",
   "&f   &bTranslatableTextComponent&fs",

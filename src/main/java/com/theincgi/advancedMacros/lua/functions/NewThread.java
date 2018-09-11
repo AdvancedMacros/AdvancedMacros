@@ -13,6 +13,7 @@ import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.lua.LuaDebug;
 import com.theincgi.advancedMacros.lua.LuaDebug.LuaThread;
 import com.theincgi.advancedMacros.lua.LuaDebug.ThreadControls;
+import com.theincgi.advancedMacros.misc.Utils;
 
 public class NewThread extends VarArgFunction{
 	@Override
@@ -20,7 +21,7 @@ public class NewThread extends VarArgFunction{
 		try {
 			LuaValue function = null;
 			if(args.arg1().isstring()) {
-				File f = new File(AdvancedMacros.macrosFolder, args.arg1().tojstring());
+				File f = Utils.parseFileLocation(args.arg1());//new File(AdvancedMacros.macrosFolder, args.arg1().tojstring());
 
 				FileReader fr = new FileReader(f);
 				function = AdvancedMacros.globals.load(fr, args.arg1().tojstring());

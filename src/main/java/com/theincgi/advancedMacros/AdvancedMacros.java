@@ -69,7 +69,6 @@ import com.theincgi.advancedMacros.lua.functions.PCall;
 import com.theincgi.advancedMacros.lua.functions.PlaySound;
 import com.theincgi.advancedMacros.lua.functions.RayTrace;
 import com.theincgi.advancedMacros.lua.functions.RunThread;
-import com.theincgi.advancedMacros.lua.functions.ScriptGui;
 import com.theincgi.advancedMacros.lua.functions.SetProfile;
 import com.theincgi.advancedMacros.lua.functions.SkinCustomizer;
 import com.theincgi.advancedMacros.lua.functions.StopAllScripts;
@@ -80,6 +79,7 @@ import com.theincgi.advancedMacros.lua.functions.entity.GetEntityList;
 import com.theincgi.advancedMacros.lua.functions.entity.HighlightEntity;
 import com.theincgi.advancedMacros.lua.functions.midi.MidiLib2;
 import com.theincgi.advancedMacros.lua.modControl.EditorControls;
+import com.theincgi.advancedMacros.lua.scriptGui.ScriptGui;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.CustomFontRenderer;
@@ -107,7 +107,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "5.8.1"; //${version} ??
+	public static final String VERSION = "6.0.0"; //${version} ??
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -192,11 +192,13 @@ public class AdvancedMacros {
 	public static LuaFunctions.Say sayFunc;
 	public static LuaFunctions.Sleep sleepFunc;
 	public static LuaFunctions.Debug debugFunc;
+	public static LuaTable debugTable;
 	public static OpenInventory openInventory;
 
 
 	private void loadFunctions() {
 		globals.load(debug);
+		debugTable = globals.get("debug").checktable();
 		globals.set("_MOD_VERSION", VERSION);
 		
 		globals.set("advancedMacros", advancedMacrosTable);

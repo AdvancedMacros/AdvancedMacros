@@ -1,4 +1,4 @@
-package com.theincgi.advancedMacros.lua.functions;
+package com.theincgi.advancedMacros.lua.scriptGui;
 
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
@@ -14,15 +14,6 @@ import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
 import com.theincgi.advancedMacros.gui.elements.GuiScrollBar;
 import com.theincgi.advancedMacros.gui.elements.GuiScrollBar.Orientation;
-import com.theincgi.advancedMacros.lua.scriptGui.Group;
-import com.theincgi.advancedMacros.lua.scriptGui.GuiBox;
-import com.theincgi.advancedMacros.lua.scriptGui.GuiCTA;
-import com.theincgi.advancedMacros.lua.scriptGui.GuiImage;
-import com.theincgi.advancedMacros.lua.scriptGui.GuiItemIcon;
-import com.theincgi.advancedMacros.lua.scriptGui.GuiRectangle;
-import com.theincgi.advancedMacros.lua.scriptGui.MCTextBar;
-import com.theincgi.advancedMacros.lua.scriptGui.ScriptGuiScrollBar;
-import com.theincgi.advancedMacros.lua.scriptGui.ScriptGuiText;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Utils;
 

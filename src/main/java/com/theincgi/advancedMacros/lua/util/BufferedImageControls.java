@@ -41,7 +41,7 @@ public class BufferedImageControls extends LuaTable{
 	public static class LoadImg extends OneArgFunction {
 		@Override
 		public LuaValue call(LuaValue arg) {
-			File f = new File(AdvancedMacros.macrosRootFolder, arg.checkjstring());
+			File f = Utils.parseFileLocation(arg);//new File(AdvancedMacros.macrosRootFolder, arg.checkjstring());
 			try {
 				return new BufferedImageControls(ImageIO.read(f));
 			} catch (IOException e) {
@@ -90,7 +90,7 @@ public class BufferedImageControls extends LuaTable{
 			@Override
 			public LuaValue call(LuaValue arg, LuaValue optFormat) {
 					try {
-						File f = FileSystem.parseFileLocation(arg);
+						File f = Utils.parseFileLocation(arg);//FileSystem.parseFileLocation(arg);
 						ImageIO.write(img, optFormat.optjstring("png"), f);
 					} catch (IOException e) {
 						throw new LuaError("IOException occurred, "+e.getMessage());

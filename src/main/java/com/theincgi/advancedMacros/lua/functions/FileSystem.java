@@ -21,6 +21,7 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.lua.LuaDebug;
 import com.theincgi.advancedMacros.lua.LuaFunctions.Log;
+import com.theincgi.advancedMacros.misc.Utils;
 
 public class FileSystem extends LuaTable{
 	public FileSystem() {
@@ -47,7 +48,7 @@ public class FileSystem extends LuaTable{
 			String mode = arg1.checkjstring();
 			//assertAddress(arg0);
 
-			File file = parseFileLocation(arg0);
+			File file = Utils.parseFileLocation(arg0);
 
 			if(!mode.equals("r")) {
 				file.getParentFile().mkdirs();
@@ -96,14 +97,15 @@ public class FileSystem extends LuaTable{
 	//TODO move syncLock to the open class so we dont keep so many unnecessary copies
 
 
-	private static class ClosingLuaTable extends LuaTable{
+	public static class ClosingLuaTable extends LuaTable{
 		String traceback;
 		String objName;
 		public ClosingLuaTable(String objectName) {
 			super();
 			try {
 			objName = objectName;
-			LuaValue v = AdvancedMacros.globals.debuglib.get("getinfo").call(valueOf(1), valueOf("Sl"));
+//			LuaValue v = AdvancedMacros.globals.debuglib.get("getinfo").call(valueOf(1), valueOf("Sl")); 
+			LuaValue v = Utils.getDebugStacktrace();
 			int line = -1;
 			String name = "?";
 			if(!v.isnil()) {
@@ -363,15 +365,15 @@ public class FileSystem extends LuaTable{
 	private static class Exists extends OneArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg0) {
-			File f = parseFileLocation(arg0);
+			File f = Utils.parseFileLocation(arg0);
 			return LuaValue.valueOf( f.exists() );
 		}
 	}
 	private static class Copy extends TwoArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg0, LuaValue arg1) {
-			File from = parseFileLocation(arg0);
-			File to   = parseFileLocation(arg1);
+			File from = Utils.parseFileLocation(arg0);
+			File to   = Utils.parseFileLocation(arg1);
 
 			try {
 				if(Files.isSameFile(from.toPath(), to.toPath())){
@@ -388,36 +390,36 @@ public class FileSystem extends LuaTable{
 	private static class Delete extends OneArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg0) {
-			File file = parseFileLocation(arg0);
+			File file = Utils.parseFileLocation(arg0);
 			return LuaValue.valueOf( file.delete() );
 		}
 	}
 	private static class Rename extends TwoArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg0, LuaValue arg1) {
-			File from = parseFileLocation(arg0);
-			File to   = parseFileLocation(arg1);
+			File from = Utils.parseFileLocation(arg0);
+			File to   = Utils.parseFileLocation(arg1);
 			return LuaValue.valueOf(from.renameTo(to));
 		}
 	}
 	private static class MkDir extends OneArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg0) {
-			File f = parseFileLocation(arg0);
+			File f = Utils.parseFileLocation(arg0);
 			return LuaValue.valueOf(f.mkdir());
 		}
 	}
 	private static class MkDirs extends OneArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg0) {
-			File f = parseFileLocation(arg0);
+			File f = Utils.parseFileLocation(arg0);
 			return LuaValue.valueOf(f.mkdirs());
 		}
 	}
 	private static class IsDir extends OneArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg0) {
-			File f = parseFileLocation(arg0);
+			File f = Utils.parseFileLocation(arg0);
 			return LuaValue.valueOf(f.isDirectory());
 		}
 	}//TODO Check list("") or list()
@@ -428,7 +430,7 @@ public class FileSystem extends LuaTable{
 				arg0 = LuaValue.valueOf("");
 			}
 			LuaTable t = new LuaTable();
-			File f = parseFileLocation(arg0);
+			File f = Utils.parseFileLocation(arg0);
 			if(!f.isDirectory()){
 				return LuaValue.FALSE;
 			}
@@ -440,17 +442,7 @@ public class FileSystem extends LuaTable{
 		}
 	}
 
-	public static File parseFileLocation(LuaValue arg0) {
-		if(arg0.isnil())
-			arg0 =  LuaValue.valueOf("");
-
-		File file = null;
-		if(arg0.tojstring().startsWith("/") || arg0.tojstring().startsWith("\\"))
-			file = new File(arg0.checkjstring().substring(1));
-		else
-			file = new File(AdvancedMacros.macrosRootFolder, arg0.checkjstring());
-		return file;
-	}
+	
 	//	private static void assertAddress(LuaValue arg) {
 	//		if(!isValidAddress(arg.checkjstring())){
 	//			throw new LuaError("File may not be accessed, move/copy into the advanced macros folder to use this file.");
