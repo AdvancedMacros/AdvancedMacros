@@ -4,23 +4,32 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentBase;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.util.text.event.HoverEvent.Action;
 
-public class LuaTextComponent extends TextComponentBase{
+public class LuaTextComponent extends TextComponentString{
 	private String text;
 	private LuaValue action;
 	private boolean allowHover;
 	
 	public LuaTextComponent(String text, LuaValue action, boolean allowHover) {
-		super();
+		super(text);
 		this.text = text;
 		this.action = action;
 		this.allowHover = allowHover;
-		if( action.isfunction() || (action.istable() && (!action.getmetatable().isnil())) && (action.getmetatable().get("__call").isfunction()) )
+		if( action.isfunction() || (
+					action.istable() &&
+					((action.getmetatable()!=null) && !action.getmetatable().isnil())
+				) && (
+					action.getmetatable().get("__call").isfunction()
+				) 
+			)
 			getStyle().setClickEvent( new LuaTextComponentClickEvent(action, this));
 		if( (action.isstring() || action.istable()) && allowHover) {
+			if(action.istable() && !action.get("click").isnil())
+				getStyle().setClickEvent(new LuaTextComponentClickEvent(action.get("click"), this));
 			if(action.istable() && !action.get("hover").isnil())
 				getStyle().setHoverEvent(new HoverEvent(Action.SHOW_TEXT, Utils.toTextComponent(action.get("hover").tojstring(), null, false).a));
 			else
@@ -30,14 +39,14 @@ public class LuaTextComponent extends TextComponentBase{
 	}
 
 	
-	@Override
-	public String getUnformattedComponentText() {
-		return text;
-	}
+//	@Override
+//	public String getUnformattedComponentText() {
+//		return text;
+//	}
 
-	@Override
-	public ITextComponent createCopy() {
-		return new LuaTextComponent(this.text, action, allowHover);
-	}
+//	@Override
+//	public ITextComponent createCopy() {
+//		return new LuaTextComponent(this.text, action, allowHover);
+//	}
 
 }

@@ -227,7 +227,7 @@ public class Utils {
 		return table;
 	}
 	public static void logError(Throwable le){
-		final String pattern = "([a-zA-Z_0-9]+[./\\\\]?)+:(\\d+)";
+		final String pattern = "((?:[a-zA-Z_0-9]+[./\\\\]?)+):(\\d+)";
 		if(le instanceof LuaError) {
 			String errText = le.getLocalizedMessage();
 			Pattern pat = Pattern.compile(pattern);
@@ -247,14 +247,14 @@ public class Utils {
 				}
 				output.append("&U&F");
 				output.append(fileName)
-				.append("&c:")
+				.append(":")
 				.append(lineNum);
 				i = e;
 			}
 			if(i < errText.length())
 				output.append("&c").append(errText.substring(i));
-			actions.set(1, output.toString());
-			AdvancedMacros.logFunc.call("&c"+le.toString());			
+			actions.set(1, output.toString().replaceAll("\t", "  "));
+//			AdvancedMacros.logFunc.call("&c"+le.toString());			
 			AdvancedMacros.logFunc.invoke(actions.unpack());			
 		}else {
 			StringWriter sw = new StringWriter();
@@ -921,7 +921,7 @@ public class Utils {
 							if (hoverEvent != null) 
 								style.setHoverEvent(hoverEvent);
 							bold = italics = obfusc = strike = underline = null;
-							color = null;
+							//color = null;
 							ltcce = false;
 							clickEvent = null;
 							hoverEvent = null;
