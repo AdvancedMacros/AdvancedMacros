@@ -257,7 +257,7 @@ public class Utils {
 			if(i < errText.length())
 				output.append("&c").append(errText.substring(i));
 			actions.set(1, output.toString().replaceAll("\t", "  "));
-//			AdvancedMacros.logFunc.call("&c"+le.toString());			
+			//			AdvancedMacros.logFunc.call("&c"+le.toString());			
 			AdvancedMacros.logFunc.invoke(actions.unpack());			
 		}else {
 			StringWriter sw = new StringWriter();
@@ -809,11 +809,14 @@ public class Utils {
 		System.out.println( LuaTableToString(t) );
 	}
 
-	
+
 	public static File parseFileLocation(LuaValue arg0) {
-		return parseFileLocation(arg0.isnil()?"":arg0.tojstring());
+		return parseFileLocation(arg0.isnil()?"":arg0.tojstring(), 1);
 	}
-	public static File parseFileLocation(String arg) {
+	public static File parseFileLocation(LuaValue arg0, LuaValue level) {
+		return parseFileLocation(arg0.isnil()?"":arg0.tojstring(), level.optint(1));
+	}
+	public static File parseFileLocation(String arg, int level) {
 		if(arg==null)
 			arg = "";
 
@@ -823,7 +826,7 @@ public class Utils {
 		else if(arg.startsWith("~"))
 			file = new File(AdvancedMacros.macrosRootFolder, arg.substring(1));
 		else {
-			LuaValue v = Utils.getDebugStacktrace();
+			LuaValue v = Utils.getDebugStacktrace(level);
 			if(v.isnil())
 				throw new LuaError("Unable to get local path of file");
 			String m = v.get("short_src").tojstring();
@@ -1216,7 +1219,10 @@ public class Utils {
 		return new Pair<Vec3d, Varargs>(null, args);
 	}
 	public static LuaValue getDebugStacktrace() {
+		return getDebugStacktrace(1);
+	}
+	public static LuaValue getDebugStacktrace(int level) {
 		//LuaValue v = AdvancedMacros.globals.debuglib.get("getinfo").call(valueOf(1), valueOf("Sl"));
-		return AdvancedMacros.debugTable.get("getinfo").call(LuaValue.valueOf(1), LuaValue.valueOf("Sl"));
+		return AdvancedMacros.debugTable.get("getinfo").call(LuaValue.valueOf(level), LuaValue.valueOf("Sl"));
 	}
 }

@@ -10,6 +10,18 @@ if(#package.path <= #("?.lua"))then
   end
 end
 
+function loader(name)
+  --log(name)
+  --log( filesystem.resolve(name, 2))
+  local name = filesystem.resolve(name, 2)
+  if filesystem.exists( name ) then
+    return function() run( name ) end
+  end
+  --log( filesystem.resolve(name, 3))
+  return nil
+end
+package.searchers[#package.searchers+1] = loader
+
 --if not package.cpath then
 --  package.cpath = 
 --    ".\?.dll;"..

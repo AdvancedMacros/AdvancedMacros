@@ -36,6 +36,8 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.IoLib;
 import org.luaj.vm2_v3_0_1.lib.LibFunction;
 
+import com.theincgi.advancedMacros.misc.Utils;
+
 /** 
  * Subclass of {@link IoLib} and therefore {@link LibFunction} which implements the lua standard {@code io} 
  * library for the JSE platform. 
@@ -84,6 +86,9 @@ public class JseIoLib extends IoLib {
 	}
 	
 	protected File openFile( String filename, boolean readMode, boolean appendMode, boolean updateMode, boolean binaryMode ) throws IOException {
+		//TheIncgi's Edit
+		filename = Utils.parseFileLocation(filename, 1).toString();
+		//End of edit
 		RandomAccessFile f = new RandomAccessFile(filename,readMode? "r": "rw");
 		if ( appendMode ) {
 			f.seek(f.length());

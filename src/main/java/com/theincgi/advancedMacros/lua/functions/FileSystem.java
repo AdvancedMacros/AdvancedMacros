@@ -39,6 +39,12 @@ public class FileSystem extends LuaTable{
 				return LuaValue.valueOf(AdvancedMacros.macrosFolder.toString());
 			}
 		});
+		set("resolve", new TwoArgFunction() {
+			@Override
+			public LuaValue call(LuaValue name, LuaValue level) {
+				return valueOf(Utils.parseFileLocation(name, level).toString());
+			}
+		});
 	}
 
 	private static class Open extends TwoArgFunction{
