@@ -1224,12 +1224,12 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	private void updateScrollbarContent(boolean typed) {
 		vBar.setItemCount(getLineCount());
 		hBar.setItemCount(getWidestLine());
-		vBar.setVisibleItems(Math.max(1,visChars.length-4));
-		hBar.setVisibleItems(Math.max(1,visChars[0].length-12));
+		vBar.setVisibleItems(Math.max(1,visChars==null?0:visChars.length-4));
+		hBar.setVisibleItems(Math.max(1,visChars==null?0:visChars[0].length-12));
 		if (typed) {
-			if(cursor.getX()<viewX+3 || cursor.getX()>viewX+visChars[0].length-4)
+			if(cursor.getX()<viewX+3 || cursor.getX()>viewX+(visChars==null?0:visChars[0].length-4))
 				hBar.focusToItem(cursor.getX());
-			if(cursor.getY()<viewY || cursor.getY()>viewY+visChars.length)
+			if(cursor.getY()<viewY || cursor.getY()>viewY+(visChars==null?0:visChars.length))
 				vBar.focusToItem(cursor.getY());
 
 		}

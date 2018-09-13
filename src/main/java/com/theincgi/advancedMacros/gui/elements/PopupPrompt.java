@@ -1,6 +1,7 @@
 package com.theincgi.advancedMacros.gui.elements;
 
 import org.luaj.vm2_v3_0_1.LuaValue;
+import org.lwjgl.input.Keyboard;
 
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
@@ -203,6 +204,8 @@ public class PopupPrompt implements InputSubscriber, Drawable{
 	public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
 		if(inputBox.getVisible())
 			inputBox.textboxKeyTyped(typedChar, keyCode);
+		if(keyCode == Keyboard.KEY_RETURN)
+			ok.onClick.onClick(-1, ok);
 		return isVisible;
 	}
 	@Override

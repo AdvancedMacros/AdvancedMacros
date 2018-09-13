@@ -508,6 +508,17 @@ public class IoLib extends TwoArgFunction {
 						case 'l': vi = freadline(f); break item;
 						case 'a': vi = freadall(f); break item;
 						}
+					}else {
+						switch (fmt.tojstring()) {
+						case "*line":
+							vi = freadline(f); break item;
+						case "*all":
+							vi = freadall(f); break item;
+						case "*number":
+							vi = freadnumber(f); break item;
+						default:
+							return argerror( i+1, "(invalid format)" ); 
+						}
 					}
 				default: 
 					return argerror( i+1, "(invalid format)" ); 

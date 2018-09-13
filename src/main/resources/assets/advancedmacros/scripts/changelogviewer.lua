@@ -17,6 +17,12 @@ local changeLog = {
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
   
+  "&f - Bug fix where client would crash if exiting script gui run",
+  "&f   from the editor's '&6Run&f' button",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 6.0.0",
   "&f - Files across all functions are now accessed the same way",
   "&f   Files starting with ~ are in the macros root folder",
   "&f   Files starting with / start at the hard drive letter given",
@@ -27,6 +33,14 @@ local changeLog = {
   "&f   & formated",
   "&f   &7Note: when clicking the error, it will open the gui",
   "&f   &7  **Unsaved changes will not be saved currently**",
+  "&f - &aFile IO&f tweaks:",
+  "&f    - &6*all&f, &6*number &fand &6*line&f all work like &6*a&f, &6*n&f and &6*l&f &7(previously",
+  "&f      &7wasn't available as valid format)",
+  "&f    - Files will be localized to the folder the calling script is in",
+  "&f      &7(Same rules as all file access ~ and / prefixes are also applied)",
+  "&f - Added a function &bresolve&f(&7name&8<, &7level&8>&f) which can be used to",
+  "&f   find the path a script is located in relative to its stacktrace level",
+  "&f - You can now press &aENTER&f on popup prompts to press &bOK",
   
   "&7"..DIVIDER,
   

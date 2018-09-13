@@ -3,6 +3,7 @@ package com.theincgi.advancedMacros.gui2;
 import java.io.IOException;
 
 import org.luaj.vm2_v3_0_1.LuaValue;
+import org.lwjgl.input.Keyboard;
 
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
@@ -223,6 +224,8 @@ public class PopupPrompt2 extends Gui{
 		super.keyTyped(typedChar, keyCode);
 		if(textField.isFocused())
 			textField.textboxKeyTyped(typedChar, keyCode);
+		if(keyCode == Keyboard.KEY_RETURN)
+			ok.getOnClickHandler().onClick(-1, ok);
 	}
 	@Override
 	public void keyRepeated(char typedChar, int keyCode, int mod) {
