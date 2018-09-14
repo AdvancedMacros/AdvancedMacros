@@ -63,6 +63,7 @@ public class GuiImage extends ScriptGuiElement{
 		if(!visible) return;
 		
 		GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+		GlStateManager.pushAttrib();
 		float dx = x, dy = y, dw = wid, dh = hei;
 		
 		
@@ -95,6 +96,7 @@ public class GuiImage extends ScriptGuiElement{
 		buffer.pos(dx+dw	, dy     , z).tex(uMax, vMin).endVertex();
 		Tessellator.getInstance().draw();
 		//GlStateManager.disableBlend();
+		GlStateManager.popAttrib();
 		GL11.glPopAttrib();
 		
 		if(getHoverTint()!=null && GuiRect.isInBounds(mouseX, mouseY, (int)x, (int)y, (int)wid, (int)hei)) {

@@ -146,6 +146,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 		this.set("setHoverTint", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs args) {
+				//FIXME needs syncronization
 				hoverTint = Utils.parseColor(args, AdvancedMacros.COLOR_SPACE_IS_255);
 				colorTintInt = hoverTint.toInt();
 				return LuaValue.NONE;
