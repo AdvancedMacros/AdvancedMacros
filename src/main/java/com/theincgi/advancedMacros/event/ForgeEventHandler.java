@@ -805,7 +805,7 @@ public class ForgeEventHandler {
 	public void onSound(PlaySoundEvent pse) {
 		LuaTable event = createEvent(EventName.Sound);
 		event.set(3, pse.getName());
-
+		//TODO location ptich and volume pse.getSound().
 		fireEvent(EventName.Sound, event);
 		LuaTable controls = new LuaTable();
 		controls.set("isPlaying", new ZeroArgFunction() {
