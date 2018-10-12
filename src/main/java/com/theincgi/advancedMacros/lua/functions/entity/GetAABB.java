@@ -1,32 +1,51 @@
 package com.theincgi.advancedMacros.lua.functions.entity;
 
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.theincgi.advancedMacros.misc.CallableTable;
+import com.theincgi.advancedMacros.misc.Pair;
+import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import scala.annotation.varargs;
 
 public class GetAABB {
+	@SuppressWarnings("unchecked")
+	private static final Predicate<Entity> ARROW_TARGETS = Predicates.and(EntitySelectors.NOT_SPECTATING, EntitySelectors.IS_ALIVE, new Predicate<Entity>()
+	{
+		public boolean apply(@Nullable Entity p_apply_1_)
+		{
+			return p_apply_1_.canBeCollidedWith();
+		}
+	});
 	private CallableTable func;
 	private static final String[] LOCATION = {"entity","getAABB"};
 	public GetAABB() {
 		func = new CallableTable(LOCATION, new Get());
 	}
-	
+
 	public CallableTable getFunc() {
 		return func;
 	}
-	
+
 	private class Get extends VarArgFunction {
 		Minecraft mc = Minecraft.getMinecraft();
 		World world = mc.world;
@@ -41,7 +60,7 @@ public class GetAABB {
 			if(args.narg()==3 || args.arg1().istable()) {
 				BlockPos pos;
 				if(args.arg1().istable()) { LuaValue t = args.arg1();
-					pos = new BlockPos(t.get(1).checkdouble(), t.get(2).checkdouble(), t.get(3).checkdouble());
+				pos = new BlockPos(t.get(1).checkdouble(), t.get(2).checkdouble(), t.get(3).checkdouble());
 				}else {
 					pos = new BlockPos(args.arg(1).checkdouble(), args.arg(2).checkdouble(), args.arg(3).checkdouble());
 				}
@@ -56,15 +75,17 @@ public class GetAABB {
 				Entity e = world.getEntityByID(args.arg1().checkint());
 				AxisAlignedBB bb = e.getEntityBoundingBox();
 				if(bb==null) return FALSE;
-				return new AABB(bb);
+				return new AABB(bb, e);
 			}else {
 				throw new LuaError("Invalid arguments");
 			}
 		}
 	}
-	
+
 	private static class AABB extends LuaTable {
 		AxisAlignedBB aabb;
+		Entity entity;
+		public AABB(AxisAlignedBB aabb, Entity e) {this(aabb); entity = e;}
 		public AABB(AxisAlignedBB aabb) {
 			super();
 			this.aabb = aabb;
@@ -73,7 +94,7 @@ public class GetAABB {
 			}
 			this.set("__class", "AxisAlignedBoudingBox");
 		}
-		
+
 		private class DoOp extends VarArgFunction {
 			OpCode code;
 
@@ -81,7 +102,7 @@ public class GetAABB {
 				super();
 				this.code = code;
 			}
-			
+
 			@Override
 			public Varargs invoke(Varargs args) {
 				switch (code) {
@@ -136,12 +157,49 @@ public class GetAABB {
 						return new AABB(aabb.union(a.aabb));
 					}
 					throw new LuaError("Not an Axis Aligned Bounding Box");
+				case calculateIntercept:{
+					Pair<Vec3d, Varargs> v1 = Utils.consumeVector(args, false, false);
+					Pair<Vec3d, Varargs> v2 = Utils.consumeVector(v1.b, false, false);
+					return Utils.rayTraceResultToLuaValue(aabb.calculateIntercept(v1.a, v2.a));
+				}
+				case findEntityOnPath: {
+					World world = Minecraft.getMinecraft().world;
+					Pair<Vec3d, Varargs> v1 = Utils.consumeVector(args, false, false);
+					Entity entity = null;
+					Vec3d start = aabb.getCenter();
+					Vec3d end   = start.add(v1.a);
+					List<Entity> list = world.getEntitiesInAABBexcluding(entity, aabb.expand(v1.a.x, v1.a.y, v1.a.z).grow(1.0D), ARROW_TARGETS);
+					double d0 = 0.0D;
+
+					for (int i = 0; i < list.size(); ++i) {
+						Entity entity1 = list.get(i);
+
+						//				            if (entity1 != this.shootingEntity || this.ticksInAir >= 5)
+						//				            {
+						AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().grow(0.30000001192092896D);
+						RayTraceResult raytraceresult = axisalignedbb.calculateIntercept(start, end);
+
+						if (raytraceresult != null)
+						{
+							double d1 = start.squareDistanceTo(raytraceresult.hitVec);
+
+							if (d1 < d0 || d0 == 0.0D)
+							{
+								entity = entity1;
+								d0 = d1;
+							}
+						}
+						//				            }
+				}
+
+					return Utils.entityToTable(entity);
+				}
 				default:
 					throw new LuaError("Undefined operation: "+code.name());
 				}
 			}
 		}
-		
+
 		static enum OpCode {
 			getPoints,
 			contains,
@@ -154,6 +212,8 @@ public class GetAABB {
 			intersects,
 			offset,
 			union,
+			calculateIntercept, 
+			findEntityOnPath;
 		}
 	}
 }

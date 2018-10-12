@@ -45,6 +45,7 @@ import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.block.BlockAnvil.Anvil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.ISound;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiCommandBlock;
 import net.minecraft.client.gui.GuiEnchantment;
@@ -806,6 +807,26 @@ public class ForgeEventHandler {
 		LuaTable event = createEvent(EventName.Sound);
 		event.set(3, pse.getName());
 		//TODO location ptich and volume pse.getSound().
+		LuaTable details = new LuaTable();
+		ISound sound = pse.getSound();
+		try {
+			details.set("pitch", sound.getPitch());
+		}catch (NullPointerException e) {
+			details.set("pitch", 1);
+		}
+		try{
+			details.set("volume", sound.getVolume());
+		}catch (NullPointerException e) {
+			details.set("volume", 1);
+		}
+		try{details.set("pos", Utils.posToTable(sound.getXPosF(), sound.getYPosF(), sound.getZPosF()));}catch(NullPointerException e) {
+			
+		}
+		try{details.set("category", sound.getCategory().getName().toLowerCase());}catch(NullPointerException e) {
+			
+		}
+		event.set(4, details);
+		
 		fireEvent(EventName.Sound, event);
 		LuaTable controls = new LuaTable();
 		controls.set("isPlaying", new ZeroArgFunction() {

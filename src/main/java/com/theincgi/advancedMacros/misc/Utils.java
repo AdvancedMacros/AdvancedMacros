@@ -1225,4 +1225,32 @@ public class Utils {
 		//LuaValue v = AdvancedMacros.globals.debuglib.get("getinfo").call(valueOf(1), valueOf("Sl"));
 		return AdvancedMacros.debugTable.get("getinfo").call(LuaValue.valueOf(level), LuaValue.valueOf("Sl"));
 	}
+	public static LuaValue rayTraceResultToLuaValue(RayTraceResult rtr) {
+		Minecraft mc = Minecraft.getMinecraft();
+		if(rtr==null) return LuaValue.FALSE;
+		LuaTable result = new LuaTable();
+
+		switch (rtr.typeOfHit) {
+		case MISS:
+			return LuaValue.FALSE;
+		case ENTITY:
+			result.set("entity", Utils.entityToTable(rtr.entityHit));
+		case BLOCK:
+			BlockPos pos = rtr.getBlockPos();
+			result.set("pos", Utils.blockPosToTable(pos));
+			IBlockState ibs = mc.world.getBlockState(pos);
+			TileEntity te = mc.world.getTileEntity(pos);
+			result.set("block", Utils.blockToTable(ibs, te));
+		default:
+			break;
+		}
+		LuaTable vec3d = new LuaTable();
+		vec3d.set(1, rtr.hitVec.x);
+		vec3d.set(2, rtr.hitVec.y);
+		vec3d.set(3, rtr.hitVec.z);
+		result.set("vec", vec3d);
+		result.set("side", rtr.sideHit.name().toLowerCase());
+		result.set("subHit", rtr.subHit);
+		return result;
+	}
 }

@@ -1,6 +1,7 @@
 package com.theincgi.advancedMacros.lua.functions;
 
 import org.luaj.vm2_v3_0_1.LuaTable;
+import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
@@ -64,30 +65,7 @@ public class RayTrace {
 
 			Vec3d end = optVec.a.add( vec.a.scale( distance ) );
 			RayTraceResult rtr = Minecraft.getMinecraft().world.rayTraceBlocks( optVec.a, end, stopOnLiquid, false, true);
-			if(rtr==null) return FALSE;
-			LuaTable result = new LuaTable();
-
-			switch (rtr.typeOfHit) {
-			case MISS:
-				return FALSE;
-			case ENTITY:
-				result.set("entity", Utils.entityToTable(rtr.entityHit));
-			case BLOCK:
-				BlockPos pos = rtr.getBlockPos();
-				result.set("pos", Utils.blockPosToTable(pos));
-				IBlockState ibs = mc.world.getBlockState(pos);
-				TileEntity te = mc.world.getTileEntity(pos);
-				result.set("block", Utils.blockToTable(ibs, te));
-			default:
-				break;
-			}
-			LuaTable vec3d = new LuaTable();
-			vec3d.set(1, rtr.hitVec.x);
-			vec3d.set(2, rtr.hitVec.y);
-			vec3d.set(3, rtr.hitVec.z);
-			result.set("vec", vec3d);
-			result.set("side", rtr.sideHit.name().toLowerCase());
-			result.set("subHit", rtr.subHit);
+			LuaValue result = Utils.rayTraceResultToLuaValue(rtr);
 			return result;
 		}
 	}
