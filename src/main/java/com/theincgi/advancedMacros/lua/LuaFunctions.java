@@ -56,6 +56,7 @@ public class LuaFunctions {
 		@Override
 		public LuaValue call(LuaValue arg) {
 			Minecraft.getMinecraft().player.sendChatMessage(arg.tojstring());
+			Minecraft.getMinecraft().ingameGUI.getChatGUI().addToSentMessages(arg.tojstring());
 			return LuaValue.NONE;
 		}
 	}

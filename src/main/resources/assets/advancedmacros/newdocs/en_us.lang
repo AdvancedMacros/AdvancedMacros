@@ -534,7 +534,12 @@
         "Default texture is the Hud Block texture"
       ],
       "types": [
-        []
+        [
+          "opt_number",
+          "opt_number",
+          "opt_number",
+          "opt_table"
+        ]
       ]
     },
     "newBlock()": {
@@ -676,6 +681,24 @@
           ]
         ]
       }
+    },
+    "newPane": {
+      "definition": "newPane( [face, x, y, z, texture] )",
+      "tooltip": [
+        "Make a new 2D rectangle",
+        "Sides can be xy, xz, or yz",
+        "adding + or - to the end will set the face cull",
+        "side"
+      ],
+      "types": [
+        [
+          "string",
+          "opt_number",
+          "opt_number",
+          "opt_number",
+          "opt_table"
+        ]
+      ]
     }
   },
   "rayTrace": {

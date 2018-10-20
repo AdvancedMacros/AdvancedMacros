@@ -31,13 +31,13 @@ public class HoloBlock extends WorldHudItem{
 	LuaValTexture textureEast;
 	LuaValTexture textureSouth;
 	LuaValTexture textureWest;
-	
+
 	Color colorUp,   colorDown, colorNorth,
-	      colorWest, colorEast, colorSouth;
-	
+	colorWest, colorEast, colorSouth;
+
 	float uMin, uMax, vMin,vMax, width;
-	
-	
+
+
 	private double scale;
 	public HoloBlock(){
 		this("resource:holoblock.png");
@@ -57,7 +57,7 @@ public class HoloBlock extends WorldHudItem{
 		width = 1;
 
 	}
-	
+
 
 	/**flip'd with 1-# for the way I like it, 0,0 in top left*/
 	public void setUV(float uMin,float vMin, float uMax, float vMax){
@@ -75,33 +75,41 @@ public class HoloBlock extends WorldHudItem{
 			//GlStateManager.pushAttrib();
 			//GlStateManager.pushMatrix(); //TODO include obj rotation in another push pop matrix about here
 			
+			
+			
 			color.apply();
-			
-			bindOrBind(textureNorth, texture);
-			drawSideFace(playerX,   playerY, playerZ  ,  width, width,  0); //draw front
-			
-			
-			bindOrBind(textureEast, texture);
-			drawSideFace(playerX-width, playerY, playerZ  ,  0, width,  width); //draw front
-			
-			bindOrBind(textureSouth, texture);
-			drawSideFace(playerX-width, playerY, playerZ-width, -width, width,  0);
-			
-			bindOrBind(textureWest, texture);
-			drawSideFace(playerX  , playerY, playerZ-width,  0, width, -width);
-			
-			bindOrBind(textureUp, texture);
-			drawTopFace(playerX, playerY-width, playerZ, width, width);
-			
-			bindOrBind(textureDown, texture);
-			drawBottomFace(playerX, playerY, playerZ, width, width);
+
+			if(texture!=null || textureNorth!=null) {
+				bindOrBind(textureNorth, texture);
+				drawSideFace(playerX,   playerY, playerZ  ,  width, width,  0); //draw front
+			}
+			if(texture!=null || textureEast!=null) {
+				bindOrBind(textureEast, texture);
+				drawSideFace(playerX-width, playerY, playerZ  ,  0, width,  width); //draw front
+			}
+			if(texture!=null || textureSouth!=null) {
+				bindOrBind(textureSouth, texture);
+				drawSideFace(playerX-width, playerY, playerZ-width, -width, width,  0);
+			}
+			if(texture!=null || textureWest!=null) {
+				bindOrBind(textureWest, texture);
+				drawSideFace(playerX  , playerY, playerZ-width,  0, width, -width);
+			}
+			if(texture!=null || textureUp!=null) {
+				bindOrBind(textureUp, texture);
+				drawTopFace(playerX, playerY-width, playerZ, width, width);
+			}
+			if(texture!=null || textureDown!=null) {
+				bindOrBind(textureDown, texture);
+				drawBottomFace(playerX, playerY, playerZ, width, width);
+			}
 
 
 			//GlStateManager.popMatrix();//protection for not messing up matrix
 			//GlStateManager.popAttrib();
 		}
 	}
-	
+
 	private void bindOrBind(LuaValTexture pref, LuaValTexture def) {
 		if(pref!=null) {
 			pref.bindTexture();
@@ -110,7 +118,7 @@ public class HoloBlock extends WorldHudItem{
 		if(def!=null)
 			def.bindTexture();
 	}
-	
+
 	//north face
 	private void drawSideFace(double px, double py, double pz, double xWid, double yHei, double zWid){
 		double x = this.x - px;
@@ -172,7 +180,7 @@ public class HoloBlock extends WorldHudItem{
 	public void setTexture(LuaValTexture v){
 		texture = v;
 	}
-	
+
 
 	/**Doesnt do much unless you are set to custom scale mode*/
 	public void setScale(double scale) {
@@ -208,38 +216,38 @@ public class HoloBlock extends WorldHudItem{
 		t.set("setColor",      new CallableTable(new String[]{"hud3D","newBlock()","setColor"}     , new SetColorSide() ));
 		t.set("getColor",      new CallableTable(new String[]{"hud3D","newBlock()","getColor"}     , new GetColorSide() ));
 	}
-	
-	
+
+
 
 	private class SetColorSide extends TwoArgFunction {
 		@Override
 		public LuaValue call(LuaValue color, LuaValue optSide) {
 			Color c = Utils.parseColor(color, AdvancedMacros.COLOR_SPACE_IS_255);
 			if(optSide.isstring())
-			switch (optSide.checkjstring().toLowerCase()) {
-			case "up":
-			case "top":
-				colorUp = c;
-				return NONE;
-			case "north":
-				colorNorth = c;
-				return NONE;
-			case "west":
-				colorWest = c;
-				return NONE;
-			case "east":
-				colorEast = c;
-				return NONE;
-			case "south":
-				colorSouth = c;
-				return NONE;
-			case "down":
-			case "bottom":
-				colorDown = c;
-				return NONE;
-			default:
-				throw new LuaError("Undefined side '"+optSide.tojstring()+"'");
-			}
+				switch (optSide.checkjstring().toLowerCase()) {
+				case "up":
+				case "top":
+					colorUp = c;
+					return NONE;
+				case "north":
+					colorNorth = c;
+					return NONE;
+				case "west":
+					colorWest = c;
+					return NONE;
+				case "east":
+					colorEast = c;
+					return NONE;
+				case "south":
+					colorSouth = c;
+					return NONE;
+				case "down":
+				case "bottom":
+					colorDown = c;
+					return NONE;
+				default:
+					throw new LuaError("Undefined side '"+optSide.tojstring()+"'");
+				}
 			HoloBlock.this.color = c;
 			return NONE;
 		}
@@ -267,7 +275,7 @@ public class HoloBlock extends WorldHudItem{
 				default:
 					throw new LuaError("Undefined side '"+optside.tojstring()+"'");
 				}
-				return color.toLuaValue(use);
+			return color.toLuaValue(use);
 		}
 	}
 	private class SetWidth extends OneArgFunction{
@@ -310,11 +318,11 @@ public class HoloBlock extends WorldHudItem{
 					throw new LuaError("Unknown side '"+optSide.tojstring()+"'");
 				}
 			}
-//			setTexture(tex);
-//			if(arg instanceof LuaValTexture)
-//				setTexture(tex = Utils.checkTexture(arg));
-//			else
-//				setTexture(tex = Utils.checkTexture(Settings.getTextureID(arg.checkjstring())));
+			//			setTexture(tex);
+			//			if(arg instanceof LuaValTexture)
+			//				setTexture(tex = Utils.checkTexture(arg));
+			//			else
+			//				setTexture(tex = Utils.checkTexture(Settings.getTextureID(arg.checkjstring())));
 			if(texture!=null)
 				setUV(texture.uMin(), texture.vMin(), texture.uMax(), texture.vMax());
 			return LuaValue.NONE;
