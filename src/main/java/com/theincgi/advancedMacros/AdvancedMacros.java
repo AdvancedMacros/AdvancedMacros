@@ -56,6 +56,7 @@ import com.theincgi.advancedMacros.lua.functions.GetPlayerBlockPos;
 import com.theincgi.advancedMacros.lua.functions.GetPlayerList;
 import com.theincgi.advancedMacros.lua.functions.GetPlayerPos;
 import com.theincgi.advancedMacros.lua.functions.GetProfile;
+import com.theincgi.advancedMacros.lua.functions.GetRecipe;
 import com.theincgi.advancedMacros.lua.functions.GetScreen;
 import com.theincgi.advancedMacros.lua.functions.GetTextureList;
 import com.theincgi.advancedMacros.lua.functions.GetWorld;
@@ -78,6 +79,7 @@ import com.theincgi.advancedMacros.lua.functions.entity.GetEntityData;
 import com.theincgi.advancedMacros.lua.functions.entity.GetEntityList;
 import com.theincgi.advancedMacros.lua.functions.entity.HighlightEntity;
 import com.theincgi.advancedMacros.lua.functions.midi.MidiLib2;
+import com.theincgi.advancedMacros.lua.functions.minecraft.MinecraftFunctions;
 import com.theincgi.advancedMacros.lua.modControl.EditorControls;
 import com.theincgi.advancedMacros.lua.scriptGui.ScriptGui;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
@@ -91,6 +93,7 @@ import com.theincgi.advancedMacros.publicInterfaces.LuaPlugin;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -107,7 +110,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
-	public static final String VERSION = "6.0.1"; //${version} ??
+	public static final String VERSION = "6.1.0"; //${version} ??
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -262,6 +265,8 @@ public class AdvancedMacros {
 		globals.set("getPlayerPos", new GetPlayerPos());
 		globals.set("getPlayerBlockPos", new GetPlayerBlockPos());
 
+		//globals.set("minecraft", new MinecraftFunctions());
+		globals.set("getRecipes", new GetRecipe());
 		
 		globals.set("getEntityList", new GetEntityList());
 		globals.set("getEntity", new GetEntityData());
@@ -395,7 +400,7 @@ public class AdvancedMacros {
 		args.set(1, "manual");
 		try {
 			FileReader fr = new FileReader(f);
-			LuaValue function = AdvancedMacros.globals.load(fr, scriptName);
+			LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
 			LuaDebug.LuaThread t = new LuaDebug.LuaThread(function, args.unpack(), scriptName);
 			t.start();
 		} catch (FileNotFoundException e) {

@@ -26,6 +26,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import com.ibm.icu.impl.ICUService.Key;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.MacroMenuGui;
@@ -133,7 +134,7 @@ public class ForgeEventHandler {
 	/**Keeping this syncronized!*/
 	private LinkedList<WorldHudItem> worldHudItems = new LinkedList<>();
 	private LinkedList<Hud2DItem> hud2DItems = new LinkedList<>();
-	int sTick = 0;
+	private int sTick = 0; private Object sTickSync = new Object();
 	private ConcurrentHashMap<String, Boolean> lastPlayerList;
 	private ConcurrentHashMap<String, Boolean> nowPlayerList = new ConcurrentHashMap<>();
 	public WeakHashMap<Entity, RenderFlags> entityRenderFlags = new WeakHashMap<>();
@@ -279,7 +280,9 @@ public class ForgeEventHandler {
 				heldMouseButtons.set(i, b);
 			}
 		}
-		sTick++;
+		synchronized (sTickSync) {
+			sTick++;
+		}
 		if(look!=null){
 			look.look();
 		}
@@ -564,7 +567,7 @@ public class ForgeEventHandler {
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onCraft(PlayerEvent.ItemCraftedEvent event) { //CONFIRMED MP
 		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
-		System.out.println(event.getPhase());
+		//System.out.println(event.getPhase());
 		LuaTable e = createEvent(EventName.ItemCrafted);
 		e.set(3, Utils.itemStackToLuatable(event.crafting));
 		LuaTable matrix = new LuaTable();
@@ -878,7 +881,7 @@ public class ForgeEventHandler {
 					try {
 						FileReader fr = new FileReader(f);
 						Thread.currentThread().setName("ChatFilter - " + script);
-						LuaValue function = AdvancedMacros.globals.load(fr, script);
+						LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
 						Varargs ret = function.invoke(e2.unpack());
 						if(!ret.toboolean(1)) 
 							return;
@@ -938,7 +941,7 @@ public class ForgeEventHandler {
 					try {
 						FileReader fr = new FileReader(f);
 						Thread.currentThread().setName("ChatSendFilter - " + script);
-						LuaValue function = AdvancedMacros.globals.load(fr, script);
+						LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
 						Varargs ret = function.invoke(e.unpack());
 						if(!ret.toboolean(1)) 
 							return;
@@ -1247,7 +1250,9 @@ public class ForgeEventHandler {
 	}
 
 	public int getSTick() {
-		return sTick;
+		synchronized (sTickSync) {
+			return sTick;
+		}
 	}
 
 	private Look look;
@@ -1360,10 +1365,12 @@ public class ForgeEventHandler {
 		public LuaValue call() {
 			LuaTable t = new LuaTable();
 			int j = 1;
-			for(int i : heldKeys.keySet()) {
-				t.set(j++, Keyboard.getKeyName(i));
+			for(int i = 0; i<Keyboard.KEYBOARD_SIZE; i++) {
+				if(Keyboard.isKeyDown(i))
+					t.set(j++, Keyboard.getKeyName(i));
 			}
-			for(int i = 0; i < heldMouseButtons.size(); i++) {
+			for(int i = 0; i < Mouse.getButtonCount(); i++) {
+				if(!Mouse.isButtonDown(i)) continue;
 				String s;
 				switch (i) {
 				case 0:
@@ -1379,8 +1386,7 @@ public class ForgeEventHandler {
 					s = "MOUSE:"+i;
 					break;
 				}
-				if(heldMouseButtons.get(i))
-					t.set(j++, s);
+				t.set(j++, s);
 			}
 			return t;
 		}

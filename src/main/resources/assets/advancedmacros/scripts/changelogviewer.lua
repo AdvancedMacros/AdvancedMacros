@@ -17,6 +17,18 @@ local changeLog = {
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
   
+  "&f - &eOnCraft&f event doesn't output to the console debug info anymore",
+  "&f - &bgetRecipes&f(name,[dmg]) added",
+  "&f - Inventory actions are now more reliable &7(syncronized with mc thread)",
+  "&f - &bwaitTick&f() has been sycronized for better accuracy",
+  "&f - Internal change: Changed script chunk names",
+  "&f   to use full path name instead of script name.",
+  "&f - Fixed &bgetHeldKeys&f()",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 6.0.0",
+  
   "&f - Bug fix where client would crash if exiting script gui run",
   "&f   from the editor's '&6Run&f' button",
   

@@ -18,7 +18,7 @@ public class Call extends VarArgFunction{
 			File f = Utils.parseFileLocation(arg0.arg1());
 //			File f = new File(AdvancedMacros.macrosFolder, arg0.arg1().tojstring());
 			FileReader fr = new FileReader(f);
-			LuaValue function = AdvancedMacros.globals.load(fr, arg0.arg1().tojstring());
+			LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
 			Varargs args = function.invoke(arg0.subargs(2));
 			return args;
 		} catch (Exception e) {

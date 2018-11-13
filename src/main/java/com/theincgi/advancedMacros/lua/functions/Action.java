@@ -14,6 +14,7 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import org.lwjgl.input.Keyboard;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -243,12 +244,7 @@ public class Action {
 	class WaitTick extends ZeroArgFunction{
 		@Override
 		public LuaValue call() {
-			int t = AdvancedMacros.forgeEventHandler.getSTick();
-			while(t==AdvancedMacros.forgeEventHandler.getSTick()){
-				try {
-					Thread.sleep(5); //tick should be 20, lil bit faster this way
-				} catch (InterruptedException e) {} 
-			}
+			Utils.waitTick();
 			return LuaValue.NONE;
 		}
 	}

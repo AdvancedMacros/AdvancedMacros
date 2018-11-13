@@ -283,7 +283,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 							if(f.exists() && f.isFile()) {
 								try {
 									FileReader fr = new FileReader(f);
-									LuaValue function = AdvancedMacros.globals.load(fr, b.getScriptName());
+									LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
 									LuaDebug.LuaThread t = new LuaDebug.LuaThread(function, args, b.getScriptName());
 									t.start(onScriptFinish);
 								} catch (FileNotFoundException e) {

@@ -24,7 +24,7 @@ public class NewThread extends VarArgFunction{
 				File f = Utils.parseFileLocation(args.arg1());//new File(AdvancedMacros.macrosFolder, args.arg1().tojstring());
 
 				FileReader fr = new FileReader(f);
-				function = AdvancedMacros.globals.load(fr, args.arg1().tojstring());
+				function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
 			}else if(args.arg1().isfunction()) {
 				function = args.arg1();
 			}else {

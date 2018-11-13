@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,6 +36,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
@@ -1252,5 +1255,36 @@ public class Utils {
 		result.set("side", rtr.sideHit.name().toLowerCase());
 		result.set("subHit", rtr.subHit);
 		return result;
+	}
+	public static Object runOnMCAndWait(Runnable r) {
+		ListenableFuture<Object> a = Minecraft.getMinecraft().addScheduledTask(r);
+		while(!a.isDone())
+			try {Thread.sleep(1);}catch (Exception e) {break;}
+		try {
+			return a.get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public static <T> T  runOnMCAndWait(Callable<T> c) {
+		ListenableFuture<T> a = Minecraft.getMinecraft().addScheduledTask(c);
+		while(!a.isDone())
+			try {Thread.sleep(1);}catch (Exception e) {break;}
+		try {
+			return (T) a.get();
+		} catch (InterruptedException | ExecutionException | ClassCastException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public static void waitTick() {
+		int t = AdvancedMacros.forgeEventHandler.getSTick();
+		while(t==AdvancedMacros.forgeEventHandler.getSTick()){
+			try {
+				Thread.sleep(5); //tick should be 20, lil bit faster this way
+			} catch (InterruptedException e) {} 
+		}
 	}
 }
