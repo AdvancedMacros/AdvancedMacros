@@ -11,7 +11,11 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 //apply plugin: 'com.theincgi.advancedMacros.asm'
 
+<<<<<<< HEAD
 version = "6.1.0"
+=======
+version = "6.0.5"
+>>>>>>> 6ccef05268ffd8dab4e184a98932450d7615781b
 group = "com.theincgi.advancedMacros" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "advancedmacros"
 

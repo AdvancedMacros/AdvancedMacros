@@ -25,10 +25,40 @@ local changeLog = {
   "&f   to use full path name instead of script name.",
   "&f - Fixed &bgetHeldKeys&f()",
   
+  
   "&7"..DIVIDER,
   
-  "&b&BChange Log: &7version 6.0.0",
+  "&b&BChange Log: &7version 6.0.5",
   
+  "&f - Filtered chat message exist in the sent history now so you can use arrow keys",
+  "&f   to see them",
+  "&f - player yaw and pitch in getPlayer will now match the F3 menu values",
+  
+  "&b&BChange Log: &7version 6.0.4",
+  
+  "&f - typo fix setSide -> setSize in hud3dPane",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 6.0.2, 6.0.3",
+  
+  "&f - Whoops, fixed an optimization for hud blocks that broke them",
+  "&f   &bTip: &7Scroll past this version like it never happened....",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 6.0.2",
+  
+  "&f - Added details to the sound event, pitch, volume, location",
+  "&f - Added Pane to hud3D",
+  "&f   allows for width and length controls so you can make all",
+  "&f   of your favorite rectangular prisms",
+  "&f   valid sides are xy, xz, yz, xy+, xy-, xz+, xz-, yz+, yz-",
+  "&f - Added details to the AABB (axis aligned bounding box)",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 6.0.1",
   "&f - Bug fix where client would crash if exiting script gui run",
   "&f   from the editor's '&6Run&f' button",
   
