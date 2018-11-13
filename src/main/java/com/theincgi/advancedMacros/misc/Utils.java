@@ -233,9 +233,10 @@ public class Utils {
 		return table;
 	}
 	public static void logError(Throwable le){
-		final String pattern = "((?:[a-zA-Z_0-9]+[./\\\\]?)+):(\\d+)";
+		final String pattern = "((?:[a-zA-Z_0-9./\\\\]+)+):(\\d+)";
 		if(le instanceof LuaError) {
 			String errText = le.getLocalizedMessage();
+			
 			Pattern pat = Pattern.compile(pattern);
 			Matcher m = pat.matcher( errText );
 			StringBuilder output = new StringBuilder("&c");
@@ -269,6 +270,27 @@ public class Utils {
 			AdvancedMacros.logFunc.call("&c"+sw.toString());
 		}
 	}
+	
+	public static void logError2(Throwable le) {
+		if(le instanceof LuaError) {
+			String errText = le.getLocalizedMessage();
+			StringBuilder output = new StringBuilder("&c");
+			int start = 0, end = 0;
+			LuaTable actions = new LuaTable();
+			int actNum = 2; //1 reserved for output string
+			boolean valid = true;
+			while(end < errText.length()) {
+				//TODO rewrite error code here so it doesn't use regex
+			}
+			
+		}else{
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			le.printStackTrace(pw);
+			AdvancedMacros.logFunc.call("&c"+sw.toString());
+		}
+	}
+	
 	public static String normalizeText(String keyName) {
 		return keyName.charAt(0)+(keyName.substring(1).toLowerCase());
 	}

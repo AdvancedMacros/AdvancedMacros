@@ -21,6 +21,7 @@
 ******************************************************************************/
 package org.luaj.vm2_v3_0_1.compiler;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Hashtable;
@@ -34,6 +35,10 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Prototype;
 import org.luaj.vm2_v3_0_1.compiler.FuncState.BlockCnt;
 import org.luaj.vm2_v3_0_1.lib.MathLib;
+
+import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.lua.functions.FileSystem;
+import com.theincgi.advancedMacros.misc.Utils;
 
 
 public class LexState extends Constants {
@@ -263,6 +268,10 @@ public class LexState extends Constants {
 		L.pushfstring( cid+":"+linenumber+": "+msg );
 		if ( token != 0 )
 			L.pushfstring( "syntax error: "+msg+" near "+txtToken(token) );
+		//theincgi's edit
+		if(new File(source.tojstring()).exists()) {
+			throw new LuaError(source+":"+linenumber+": "+msg);
+		}
 		throw new LuaError(cid+":"+linenumber+": "+msg);
 	}
 
