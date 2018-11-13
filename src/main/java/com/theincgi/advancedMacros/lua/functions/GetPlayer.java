@@ -65,8 +65,8 @@ public class GetPlayer extends OneArgFunction {
 			t.set("invSlot", ((EntityPlayerSP)player).inventory.currentItem+1);
 		
 		t.set("dimension", LuaValue.valueOf(player.dimension));
-		t.set("pitch", player.rotationPitch);
-		t.set("yaw", player.rotationYawHead);
+		t.set("pitch", MathHelper.wrapDegrees(player.rotationPitch));//player.rotationPitch);
+		t.set("yaw", MathHelper.wrapDegrees(player.rotationYaw));//player.rotationYawHead);
 		t.set("exp", player.experience);
 		t.set("expLevel", player.experienceLevel);
 		t.set("expTotal", player.experienceTotal);

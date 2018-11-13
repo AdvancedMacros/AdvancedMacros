@@ -56,6 +56,15 @@ public class Hud3D extends LuaTable{
 						  args.optint(4, (int) Math.floor(p.posZ)));
 				return text.getControls();
 			}
+			case newPane:{
+				Hud3DPane pane = new Hud3DPane(args.arg(1).checkjstring());
+				pane.setPos(args.optint(2, (int) Math.floor(p.posX)),
+						    args.optint(3, (int) Math.floor(p.posY)),
+						    args.optint(4, (int) Math.floor(p.posZ)));
+				if(!args.arg(5).isnil())
+					pane.changeTexture(args.arg(5));
+				return pane.getControls();
+			}
 			default:
 				throw new LuaError("Unimplemented function "+op);
 			}
@@ -65,6 +74,7 @@ public class Hud3D extends LuaTable{
 	private static enum Hud3DOpCode {
 		newBlock,
 		newText,
+		newPane,
 		clearAll;
 		
 		public String[] getDocLocation(){
@@ -74,6 +84,7 @@ public class Hud3D extends LuaTable{
 			case clearAll:
 			case newBlock:
 			case newText:
+			case newPane:
 				loc[1] = this.toString();
 				return loc;
 			default:

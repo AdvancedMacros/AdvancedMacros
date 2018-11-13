@@ -959,6 +959,7 @@ public class ForgeEventHandler {
 		});
 		thread.start();
 		event.setCanceled( true );
+		Minecraft.getMinecraft().ingameGUI.getChatGUI().addToSentMessages(event.getOriginalMessage());
 	}
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)
