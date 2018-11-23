@@ -24,6 +24,10 @@ local changeLog = {
   "&f - Internal change: Changed script chunk names",
   "&f   to use full path name instead of script name.",
   "&f - Fixed &bgetHeldKeys&f()",
+  "&f - Error logs have been reformated sligtly",
+  "&f   Clicking errors will now scroll the text editor to that line",
+  "&f   &7(not just the cursor anymore)",
+  "&f - Added &bmath.sign()",
   
   
   "&7"..DIVIDER,

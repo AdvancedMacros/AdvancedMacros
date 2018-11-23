@@ -275,51 +275,62 @@ public class Utils {
 
 	public static void logError(Throwable le) {  //FIXME launch matrex vector test from tools
 		if(le instanceof LuaError) {
-			String errText = le.getLocalizedMessage();
+			String errText = le.getLocalizedMessage().replace("\t","  ").replace("\n\n", "\n");
 			StringBuilder output = new StringBuilder();
 			int start = 0, end = 0;
 			LuaTable actions = new LuaTable();
 			int actNum = 2; //1 reserved for output string
+			int amRootLength = AdvancedMacros.macrosFolder.getAbsolutePath().length()+1;
 			boolean valid = true;
 			while(end < errText.length()) {
-				//TODO rewrite error code here so it doesn't use regex
-				if(errText.charAt(end)==':' && end+1<errText.length() && Character.isDigit(errText.charAt(end+1))) {
-					String file = errText.substring(start, end);
-					boolean localFile = false;
-					{
-						File tmp = new File(file);
-						if(tmp.exists() && tmp.getAbsolutePath().startsWith(AdvancedMacros.macrosFolder.getAbsolutePath())) {
-							file = file.substring(AdvancedMacros.macrosFolder.getAbsolutePath().length()+1);
-							localFile = true;
+				//matches _: where _ is a letter
+				if((start+1 < errText.length()) && Character.isLetter(errText.charAt(start)) && errText.charAt(start+1)==':') {
+					end = start+2;
+					while(end+1<errText.length() && errText.charAt(end)!='\n' && !(errText.charAt(end)==':' && Character.isDigit(errText.charAt(end+1))))
+						end++;
+					String fileName = errText.substring(start, end);
+					if(errText.charAt(end)=='\n') {
+						output.append(errText.substring(start, end+1));
+						start = end++;
+					}else {
+						start = ++end;
+						while(end<errText.length() && Character.isDigit(errText.charAt(end)))
+							end++;
+						if(start==end) {
+							output.append(fileName);
+						}else {
+							int line = Integer.parseInt(errText.substring(start,end));
+							start = end;
+							File tmp = new File(fileName);
+							if(tmp.exists() && tmp.getAbsolutePath().contains(AdvancedMacros.macrosFolder.getAbsolutePath())) {
+								fileName = fileName.substring(amRootLength);
+								output.append("&4&F")
+								.append(fileName)
+								.append(':')
+								.append(line)
+								.append("&c");
+								actions.set(actNum++, createJumpToAction(fileName, line));
+							}else {
+								output.append("&4")
+								.append(fileName)
+								.append(':')
+								.append(line)
+								.append("&c");
+							}
+							
+							
 						}
 					}
-					start = end = end+1;
-					while(end < errText.length() && Character.isDigit(errText.charAt(end))) {
-						end++;
-					}
-					if(end-start <= 0) continue;
-					int num = Integer.parseInt(errText.substring(start, end));
-					end = start = end+1;
-					output.append(localFile?"&c&F" : "&c") .append(file) .append(localFile? "&7&F:&c&F" : "&7:&c") .append(num).append(" ");
-					LuaValue act = createJumpToAction(file, num);
-					if(localFile) {
-						actions.set(actNum++, act);//file text
-						actions.set(actNum++, act);//:
-						actions.set(actNum++, act);//num
-					}
-				}else if(errText.charAt(end)=='\n') {
-					output.append("&4") .append(errText.substring(start, end));
-					output.append('\n');
-					start = end = end+2;
-				}else if( end+1<errText.length() && Character.isLetter(errText.charAt(end)) && errText.charAt(end+1)==':' && end+2<errText.length() && !Character.isDigit(errText.charAt(end+2))&& !Character.isWhitespace(errText.charAt(end+2))) {
-					output.append("&4") .append(errText.substring(start, end));
-					start = end = end+1;
 				}else {
+					//if(errText.charAt(start)!='\n')
+						output.append(errText.charAt(start));
+					start++;
 					end++;
 				}
 			}
 			if(start!=end) {
-				output.append(errText.substring(start,end));
+				output.append("&b")
+				.append(errText.substring(start,end));
 			}
 			actions.set(1, output.toString());
 			AdvancedMacros.logFunc.invoke(actions.unpack());
