@@ -1521,7 +1521,11 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		cursor.setY( Math.max(0, Math.min(lines.size(), y)));
 		cursor.setX( Math.max(0, Math.min(x, lines.get(cursor.getY()).length() )));
 		viewX = 0;
-		viewY = Math.max(0, cursor.getY()-visChars[0].length);
+		hBar.focusToItem(0);
+		vBar.focusToItem(Math.max(0, cursor.getY()));
+		
+		textChanged = true;
+		resetBlinkOffset();
 	}
 	
 }

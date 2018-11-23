@@ -379,6 +379,13 @@ public class AdvancedMacros {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
+		try {
+			InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/morefunc.lua")).getInputStream();
+			globals.load(in, "moreFunctions", "t", globals).call();
+			in.close();
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static File[] getScriptList(){

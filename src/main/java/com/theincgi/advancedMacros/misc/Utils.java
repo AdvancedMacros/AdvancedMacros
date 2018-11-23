@@ -219,7 +219,7 @@ public class Utils {
 	}
 	private static LuaValue createJumpToAction(String file, int lineNum) {
 		LuaTable table = new LuaTable();
-		table.set("hover", "&b&BClick&f to jump to\nline in editor");
+		table.set("hover", "&b&BClick&f to jump to\nline &a&B"+lineNum+"&f in editor");
 		table.set("click", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
@@ -232,11 +232,13 @@ public class Utils {
 		});
 		return table;
 	}
-	public static void logError(Throwable le){
+
+	@Deprecated
+	public static void logError2(Throwable le){
 		final String pattern = "((?:[a-zA-Z_0-9./\\\\]+)+):(\\d+)";
 		if(le instanceof LuaError) {
 			String errText = le.getLocalizedMessage();
-			
+
 			Pattern pat = Pattern.compile(pattern);
 			Matcher m = pat.matcher( errText );
 			StringBuilder output = new StringBuilder("&c");
@@ -270,19 +272,57 @@ public class Utils {
 			AdvancedMacros.logFunc.call("&c"+sw.toString());
 		}
 	}
-	
-	public static void logError2(Throwable le) {
+
+	public static void logError(Throwable le) {  //FIXME launch matrex vector test from tools
 		if(le instanceof LuaError) {
 			String errText = le.getLocalizedMessage();
-			StringBuilder output = new StringBuilder("&c");
+			StringBuilder output = new StringBuilder();
 			int start = 0, end = 0;
 			LuaTable actions = new LuaTable();
 			int actNum = 2; //1 reserved for output string
 			boolean valid = true;
 			while(end < errText.length()) {
 				//TODO rewrite error code here so it doesn't use regex
+				if(errText.charAt(end)==':' && end+1<errText.length() && Character.isDigit(errText.charAt(end+1))) {
+					String file = errText.substring(start, end);
+					boolean localFile = false;
+					{
+						File tmp = new File(file);
+						if(tmp.exists() && tmp.getAbsolutePath().startsWith(AdvancedMacros.macrosFolder.getAbsolutePath())) {
+							file = file.substring(AdvancedMacros.macrosFolder.getAbsolutePath().length()+1);
+							localFile = true;
+						}
+					}
+					start = end = end+1;
+					while(end < errText.length() && Character.isDigit(errText.charAt(end))) {
+						end++;
+					}
+					if(end-start <= 0) continue;
+					int num = Integer.parseInt(errText.substring(start, end));
+					end = start = end+1;
+					output.append(localFile?"&c&F" : "&c") .append(file) .append(localFile? "&7&F:&c&F" : "&7:&c") .append(num).append(" ");
+					LuaValue act = createJumpToAction(file, num);
+					if(localFile) {
+						actions.set(actNum++, act);//file text
+						actions.set(actNum++, act);//:
+						actions.set(actNum++, act);//num
+					}
+				}else if(errText.charAt(end)=='\n') {
+					output.append("&4") .append(errText.substring(start, end));
+					output.append('\n');
+					start = end = end+2;
+				}else if( end+1<errText.length() && Character.isLetter(errText.charAt(end)) && errText.charAt(end+1)==':' && end+2<errText.length() && !Character.isDigit(errText.charAt(end+2))&& !Character.isWhitespace(errText.charAt(end+2))) {
+					output.append("&4") .append(errText.substring(start, end));
+					start = end = end+1;
+				}else {
+					end++;
+				}
 			}
-			
+			if(start!=end) {
+				output.append(errText.substring(start,end));
+			}
+			actions.set(1, output.toString());
+			AdvancedMacros.logFunc.invoke(actions.unpack());
 		}else{
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
@@ -290,7 +330,7 @@ public class Utils {
 			AdvancedMacros.logFunc.call("&c"+sw.toString());
 		}
 	}
-	
+
 	public static String normalizeText(String keyName) {
 		return keyName.charAt(0)+(keyName.substring(1).toLowerCase());
 	}
@@ -856,7 +896,7 @@ public class Utils {
 				throw new LuaError("Unable to get local path of file");
 			String m = v.get("short_src").tojstring();
 			m = m.substring(0, Math.max(0, Math.max(m.lastIndexOf("\\"),m.lastIndexOf("/"))));
-			File path = new File(AdvancedMacros.macrosFolder, m);
+			File path = new File(m);
 			file = new File(path, arg);
 		}
 		return file;
@@ -1289,7 +1329,7 @@ public class Utils {
 			return null;
 		}
 	}
-	
+
 	public static <T> T  runOnMCAndWait(Callable<T> c) {
 		ListenableFuture<T> a = Minecraft.getMinecraft().addScheduledTask(c);
 		while(!a.isDone())
