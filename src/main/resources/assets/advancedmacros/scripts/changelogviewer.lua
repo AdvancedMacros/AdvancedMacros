@@ -17,6 +17,12 @@ local changeLog = {
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
   
+  "&f - Added Mutex"
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 6.0.5",
+  
   "&f - &eOnCraft&f event doesn't output to the console debug info anymore",
   "&f - &bgetRecipes&f(name,[dmg]) added",
   "&f - Inventory actions are now more reliable &7(syncronized with mc thread)",

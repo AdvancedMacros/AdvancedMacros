@@ -75,6 +75,7 @@ import com.theincgi.advancedMacros.lua.functions.midi.MidiLib2;
 import com.theincgi.advancedMacros.lua.modControl.EditorControls;
 import com.theincgi.advancedMacros.lua.scriptGui.ScriptGui;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
+import com.theincgi.advancedMacros.lua.util.LuaMutex;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.CustomFontRenderer;
 import com.theincgi.advancedMacros.misc.FontRendererOverride;
@@ -227,7 +228,8 @@ public class AdvancedMacros {
 		globals.set("sleep", sleepFunc = new LuaFunctions.Sleep());
 		globals.set("print", new LuaFunctions.Debug());
 		globals.set("getSettings", new Settings.GetSettings());
-
+		globals.set("newMutex", new LuaMutex());
+		
 		globals.get("os").set("millis", new GetOSMilliseconds());
 		globals.get("os").set("exit", LuaValue.NIL);
 		

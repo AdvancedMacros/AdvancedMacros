@@ -14,6 +14,7 @@ import org.luaj.vm2_v3_0_1.lib.DebugLib;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.gui.Color;
+import com.theincgi.advancedMacros.lua.util.LuaMutex;
 import com.theincgi.advancedMacros.misc.Utils;
 
 public class LuaDebug extends DebugLib{
@@ -150,6 +151,7 @@ public class LuaDebug extends DebugLib{
 							e.printStackTrace();
 							Utils.logError(e);
 						}
+						LuaMutex.cleanup();
 					}
 				});
 				thread.setName(sFunc.tojstring());
