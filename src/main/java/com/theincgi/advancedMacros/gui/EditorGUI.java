@@ -9,10 +9,8 @@ import com.theincgi.advancedMacros.event.ForgeEventHandler;
 import com.theincgi.advancedMacros.gui.elements.ColorTextArea;
 import com.theincgi.advancedMacros.gui.elements.GuiButton;
 import com.theincgi.advancedMacros.gui.elements.OnClickHandler;
-import com.theincgi.advancedMacros.gui.elements.WidgetID;
 import com.theincgi.advancedMacros.gui2.ScriptBrowser2;
 import com.theincgi.advancedMacros.misc.PropertyPalette;
-import com.theincgi.advancedMacros.misc.Settings;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;

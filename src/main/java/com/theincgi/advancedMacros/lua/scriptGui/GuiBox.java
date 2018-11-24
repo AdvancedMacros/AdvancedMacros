@@ -5,7 +5,6 @@ import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.gui.Gui;
-import com.theincgi.advancedMacros.hud.hud2D.Hud2D_Rectangle;
 
 public class GuiBox extends ScriptGuiElement{
 	public float thickness=1;

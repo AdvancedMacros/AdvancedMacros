@@ -1,7 +1,6 @@
 package com.theincgi.advancedMacros.misc;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.WeakHashMap;
@@ -17,13 +16,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonReader;
 import com.theincgi.advancedMacros.AdvancedMacros;
-import com.theincgi.advancedMacros.lua.DocumentationManager;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.Language;
-import net.minecraft.client.resources.LanguageManager;
 import net.minecraft.util.ResourceLocation;
 
 public class CallableTable extends LuaTable{

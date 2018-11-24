@@ -7,10 +7,7 @@ import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
 import com.theincgi.advancedMacros.gui.elements.GuiScrollBar.Orientation;
-import com.theincgi.advancedMacros.misc.Property;
 import com.theincgi.advancedMacros.misc.PropertyPalette;
-import com.theincgi.advancedMacros.misc.Settings;
-import com.theincgi.advancedMacros.misc.Utils;
 
 public class ListManager implements InputSubscriber, Drawable, Moveable{
 	private LinkedList<Moveable> items= new LinkedList<>();

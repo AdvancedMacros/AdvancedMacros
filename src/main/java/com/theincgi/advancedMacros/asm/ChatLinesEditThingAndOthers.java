@@ -1,37 +1,18 @@
 package com.theincgi.advancedMacros.asm;
 
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiNewChat;
-import net.minecraft.item.ItemStack;
-import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraft.network.play.client.CPacketClickWindow;
-import net.minecraft.network.play.server.SPacketCollectItem;
-import net.minecraft.network.play.server.SPacketConfirmTransaction;
-import net.minecraft.network.play.server.SPacketMultiBlockChange;
-import net.minecraft.network.play.server.SPacketOpenWindow;
-import net.minecraft.network.play.server.SPacketParticles;
-import net.minecraft.network.play.server.SPacketPlayerListItem;
-import net.minecraft.network.play.server.SPacketRespawn;
-import net.minecraft.network.play.server.SPacketSetSlot;
-import net.minecraft.network.play.server.SPacketSpawnObject;
-import net.minecraft.network.play.server.SPacketWindowItems;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.text.event.ClickEvent;
-import scala.collection.mutable.Stack;
-import scala.util.control.Exception.Catch;
+import static org.objectweb.asm.Opcodes.BIPUSH;
+import static org.objectweb.asm.Opcodes.IF_ICMPLE;
+import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
 
 import org.luaj.vm2_v3_0_1.LuaValue;
-import org.objectweb.asm.*;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
@@ -40,14 +21,12 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.LuaTextComponentClickEvent;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
-import io.netty.util.IllegalReferenceCountException;
-
-import static org.objectweb.asm.Opcodes.*;
+import net.minecraft.client.gui.GuiNewChat;
+import net.minecraft.launchwrapper.IClassTransformer;
 
 public class ChatLinesEditThingAndOthers implements IClassTransformer{
 	/**

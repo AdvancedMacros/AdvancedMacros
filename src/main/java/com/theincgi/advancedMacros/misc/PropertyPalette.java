@@ -1,6 +1,5 @@
 package com.theincgi.advancedMacros.misc;
 
-import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 

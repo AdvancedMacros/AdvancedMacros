@@ -6,11 +6,7 @@ import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.Focusable;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
-import com.theincgi.advancedMacros.gui.elements.GuiScrollBar.Orientation;
-import com.theincgi.advancedMacros.misc.Property;
 import com.theincgi.advancedMacros.misc.PropertyPalette;
-import com.theincgi.advancedMacros.misc.Settings;
-import com.theincgi.advancedMacros.misc.Utils;
 
 public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Moveable{
 	//boolean prop keep scroll, for exit and return to menu

@@ -16,7 +16,6 @@ import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.ITextComponent.Serializer;
 
 public class LuaFunctions {
 	public static Dictionary<Character, String> chatColors = new Hashtable<>();

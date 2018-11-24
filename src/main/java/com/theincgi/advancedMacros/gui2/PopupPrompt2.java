@@ -10,10 +10,7 @@ import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.elements.GuiButton;
 import com.theincgi.advancedMacros.gui.elements.GuiDropDown;
 import com.theincgi.advancedMacros.gui.elements.GuiRect;
-import com.theincgi.advancedMacros.gui.elements.WidgetID;
-import com.theincgi.advancedMacros.misc.Property;
 import com.theincgi.advancedMacros.misc.PropertyPalette;
-import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;

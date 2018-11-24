@@ -11,7 +11,6 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import org.lwjgl.opengl.GL11;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
-import com.theincgi.advancedMacros.misc.CustomFontRenderer;
 import com.theincgi.advancedMacros.misc.FontRendererOverride;
 import com.theincgi.advancedMacros.misc.Utils;
 

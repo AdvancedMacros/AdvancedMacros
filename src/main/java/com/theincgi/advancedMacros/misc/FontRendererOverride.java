@@ -16,7 +16,6 @@ import com.ibm.icu.text.Bidi;
 import com.theincgi.advancedMacros.gui.Color;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;

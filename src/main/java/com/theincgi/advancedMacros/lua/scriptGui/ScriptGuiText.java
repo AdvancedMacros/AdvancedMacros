@@ -14,8 +14,6 @@ import com.theincgi.advancedMacros.hud.hud2D.Hud2D_Rectangle;
 import com.theincgi.advancedMacros.misc.FontRendererOverride;
 import com.theincgi.advancedMacros.misc.Utils;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 
 public class ScriptGuiText extends ScriptGuiElement{

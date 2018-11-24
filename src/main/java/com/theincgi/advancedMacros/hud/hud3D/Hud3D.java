@@ -7,12 +7,7 @@ import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
-import com.theincgi.advancedMacros.lua.LuaValTexture;
-import com.theincgi.advancedMacros.lua.functions.AddHoloBlock;
-import com.theincgi.advancedMacros.lua.functions.AddHoloText;
-import com.theincgi.advancedMacros.lua.functions.ClearWorldHud;
 import com.theincgi.advancedMacros.misc.CallableTable;
-import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;

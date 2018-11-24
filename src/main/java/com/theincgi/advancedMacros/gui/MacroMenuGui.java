@@ -10,12 +10,10 @@ import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
-import org.lwjgl.opengl.GL11;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.event.ForgeEventHandler;
 import com.theincgi.advancedMacros.event.ForgeEventHandler.EventName;
-import com.theincgi.advancedMacros.gui.IBindingsGui.IBinding;
 import com.theincgi.advancedMacros.gui.elements.Drawable;
 import com.theincgi.advancedMacros.gui.elements.GuiBinding;
 import com.theincgi.advancedMacros.gui.elements.GuiBinding.EventMode;
@@ -36,7 +34,6 @@ import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
 
 public class MacroMenuGui extends Gui implements IBindingsGui{
 	//BufferedImage img = null;

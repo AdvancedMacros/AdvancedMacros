@@ -5,7 +5,6 @@ import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ThreeArgFunction;
-import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 
 import com.theincgi.advancedMacros.misc.Utils;
 

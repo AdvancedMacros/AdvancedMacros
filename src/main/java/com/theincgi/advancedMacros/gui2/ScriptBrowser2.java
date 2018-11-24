@@ -20,13 +20,10 @@ import com.theincgi.advancedMacros.gui.elements.GuiRect;
 import com.theincgi.advancedMacros.gui.elements.ListManager;
 import com.theincgi.advancedMacros.gui.elements.Moveable;
 import com.theincgi.advancedMacros.gui.elements.OnClickHandler;
-import com.theincgi.advancedMacros.gui.elements.WidgetID;
 import com.theincgi.advancedMacros.gui2.PopupPrompt2.Result;
 import com.theincgi.advancedMacros.gui2.PopupPrompt2.ResultHandler;
-import com.theincgi.advancedMacros.misc.Property;
 import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Settings;
-import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
 

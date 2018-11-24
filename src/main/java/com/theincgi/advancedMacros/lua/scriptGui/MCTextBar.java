@@ -1,20 +1,16 @@
 package com.theincgi.advancedMacros.lua.scriptGui;
 
 import org.luaj.vm2_v3_0_1.LuaError;
-import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
-import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Gui;
-import com.theincgi.advancedMacros.lua.functions.PCall;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraftforge.common.MinecraftForge;
 
 public class MCTextBar extends ScriptGuiElement{
 	GuiTextField textField;

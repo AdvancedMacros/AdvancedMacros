@@ -12,7 +12,6 @@ import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.lua.LuaDebug;
 import com.theincgi.advancedMacros.lua.LuaDebug.LuaThread;
-import com.theincgi.advancedMacros.lua.LuaDebug.ThreadControls;
 import com.theincgi.advancedMacros.misc.Utils;
 
 public class RunThread extends VarArgFunction{

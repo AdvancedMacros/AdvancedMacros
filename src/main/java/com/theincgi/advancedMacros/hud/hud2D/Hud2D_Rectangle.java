@@ -3,7 +3,6 @@ package com.theincgi.advancedMacros.hud.hud2D;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
-import org.lwjgl.opengl.GL11;
 
 import com.theincgi.advancedMacros.gui.Color;
 

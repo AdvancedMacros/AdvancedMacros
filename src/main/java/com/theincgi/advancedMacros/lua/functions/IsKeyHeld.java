@@ -1,7 +1,6 @@
 package com.theincgi.advancedMacros.lua.functions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.luaj.vm2_v3_0_1.LuaError;

@@ -25,7 +25,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import scala.annotation.varargs;
 
 public class GetAABB {
 	@SuppressWarnings("unchecked")

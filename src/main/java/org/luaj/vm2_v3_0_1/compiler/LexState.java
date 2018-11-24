@@ -36,10 +36,6 @@ import org.luaj.vm2_v3_0_1.Prototype;
 import org.luaj.vm2_v3_0_1.compiler.FuncState.BlockCnt;
 import org.luaj.vm2_v3_0_1.lib.MathLib;
 
-import com.theincgi.advancedMacros.AdvancedMacros;
-import com.theincgi.advancedMacros.lua.functions.FileSystem;
-import com.theincgi.advancedMacros.misc.Utils;
-
 
 public class LexState extends Constants {
 	

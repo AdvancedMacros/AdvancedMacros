@@ -7,9 +7,6 @@ import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import com.theincgi.advancedMacros.lua.functions.GetRecipe;
 import com.theincgi.advancedMacros.misc.CallableTable;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-
 public class MinecraftFunctions extends LuaTable{
 	
 	public MinecraftFunctions() {

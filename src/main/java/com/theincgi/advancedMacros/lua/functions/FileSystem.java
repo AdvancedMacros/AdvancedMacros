@@ -19,8 +19,6 @@ import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
-import com.theincgi.advancedMacros.lua.LuaDebug;
-import com.theincgi.advancedMacros.lua.LuaFunctions.Log;
 import com.theincgi.advancedMacros.misc.Utils;
 
 public class FileSystem extends LuaTable{

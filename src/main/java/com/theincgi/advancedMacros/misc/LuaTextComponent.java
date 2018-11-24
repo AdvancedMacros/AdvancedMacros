@@ -2,10 +2,7 @@ package com.theincgi.advancedMacros.misc;
 
 import org.luaj.vm2_v3_0_1.LuaValue;
 
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentBase;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.util.text.event.HoverEvent.Action;
 

@@ -1,6 +1,5 @@
 package com.theincgi.advancedMacros.lua.scriptGui;
 
-import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
@@ -10,8 +9,6 @@ import com.theincgi.advancedMacros.gui.elements.GuiScrollBar;
 import com.theincgi.advancedMacros.gui.elements.GuiScrollBar.Orientation;
 import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Utils;
-
-import net.minecraftforge.fml.client.GuiScrollingList;
 
 public class ScriptGuiScrollBar extends ScriptGuiElement{
 	GuiScrollBar bar;

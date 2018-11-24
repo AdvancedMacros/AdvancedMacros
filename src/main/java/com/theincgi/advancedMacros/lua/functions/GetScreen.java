@@ -1,7 +1,6 @@
 package com.theincgi.advancedMacros.lua.functions;
 
 import java.awt.image.BufferedImage;
-import java.lang.reflect.Field;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
@@ -13,7 +12,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.util.ScreenShotHelper;
 
 public class GetScreen extends ZeroArgFunction{
