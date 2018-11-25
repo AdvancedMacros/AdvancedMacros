@@ -1261,5 +1261,64 @@
         ]
       ]
     }
+  },
+  "newMutex": {
+    "definition": "newMutex( String:key )",
+    "tooltip": [
+      "Creates a new mutex.",
+      "Mutexes are used in multithreading",
+      "to prevent 2 or more threads from running",
+      "sections of code at the same time."
+    ],
+    "types": [
+      [
+        "string"
+      ]
+    ]
+  },
+  "newMutex()": {
+    "lock": {
+      "definition": "lock(<timeout>)",
+      "tooltip": [
+        "Locks this mutex",
+        "If it's already locked by another thread it will wait"
+      ],
+      "types": [
+        [
+          "opt_number"
+        ]
+      ]
+    },
+    "tryLock": {
+      "definition": "tryLock",
+      "tooltip": [
+        "Attempt to lock the mutex",
+        "returns false if it is already locked by another thread",
+        "returns true if locked succesfuly"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "unlock": {
+      "definition": "unlock()",
+      "tooltip": [
+        "unlocks the mutex",
+        "This will throw an error if you attempt to unlock",
+        "a mutex locked by another thread"
+      ],
+      "types": [
+        []
+      ]
+    },
+    "getKey": {
+      "definition": "getKey()",
+      "tooltip": [
+        "Returns the key used to make this mutex"
+      ],
+      "types": [
+        []
+      ]
+    }
   }
 }

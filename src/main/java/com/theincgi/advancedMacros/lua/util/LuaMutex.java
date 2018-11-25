@@ -17,7 +17,7 @@ import com.theincgi.advancedMacros.misc.CallableTable;
 public class LuaMutex extends CallableTable{
 	private static WeakHashMap<String, Long> mutex = new WeakHashMap<>();
 	private static WeakHashMap<Long, LinkedList<String>> reverse = new WeakHashMap<>();
-	private static String[] DOC_LOCATION = new String[] {"createMutex"};
+	private static String[] DOC_LOCATION = new String[] {"newMutex"};
 	public LuaMutex() {
 		super(DOC_LOCATION, new OneArgFunction() {
 
@@ -64,6 +64,8 @@ public class LuaMutex extends CallableTable{
 				if(!mutex.containsKey(key)) {
 					register(key);
 					return true;
+				}else if(mutex.get(key) == Thread.currentThread().getId()){
+					return true; //already locked
 				}
 			}
 			sleep();
@@ -74,7 +76,7 @@ public class LuaMutex extends CallableTable{
 	public static boolean tryLock(String key) {
 		synchronized (mutex) {
 			if(mutex.containsKey(key)) {
-				return false;
+				return mutex.get(key)==Thread.currentThread().getId();
 			}
 			register(key);
 		}
@@ -136,7 +138,7 @@ public class LuaMutex extends CallableTable{
 			getKey;
 
 			String[] docLocation() {
-				return new String[] {"mutex", this.name()};
+				return new String[] {"newMutex()", this.name()};
 			}
 		}
 	}

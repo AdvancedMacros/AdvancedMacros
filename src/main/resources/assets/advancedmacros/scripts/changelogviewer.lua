@@ -17,7 +17,13 @@ local changeLog = {
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
   
-  "&f - Added Mutex"
+  "&f - Added mutexes for thread safety",
+  "&f   &bnewMutex( String:key )",
+  "&f   &b.lock(<timeout>)&f - waits for the mutex to become unlocked, optional timeout",
+  "&f   &b.tryLock()&f - returns false if the mutex is locked, locks otherwise",
+  "&f   &b.unlock()&f - unlocks the mutex",
+  "&f   Additionaly, mutex will automaticly unlock if the thread that locked it dies",
+  "&f   (including if errors stop the script)",
   
   "&7"..DIVIDER,
   
