@@ -287,8 +287,12 @@ public class ScriptBrowser2 extends Gui{
 	
 	private String splice(String name, int i) {
 		int m = name.lastIndexOf('.');
-		String a = name.substring(0, m);
-		String b = name.substring(m);
+		String a = name;
+		String b = "";
+		if(m>=0) {
+			a = name.substring(0, m);
+			b = name.substring(m);
+		}
 		return a+" ("+i+")"+b;
 	}
 	@Override

@@ -37,6 +37,8 @@ import com.theincgi.advancedMacros.lua.LuaFunctions;
 import com.theincgi.advancedMacros.lua.functions.Action;
 import com.theincgi.advancedMacros.lua.functions.AdvLog;
 import com.theincgi.advancedMacros.lua.functions.Call;
+import com.theincgi.advancedMacros.lua.functions.DirectConnect;
+import com.theincgi.advancedMacros.lua.functions.Disconnect;
 import com.theincgi.advancedMacros.lua.functions.FileSystem;
 import com.theincgi.advancedMacros.lua.functions.GetBiome;
 import com.theincgi.advancedMacros.lua.functions.GetBlock;
@@ -251,6 +253,8 @@ public class AdvancedMacros {
 		//			string.set("unpack", new StringSerialization.StringUnpack());
 		//		}
 
+		globals.set("directConnect", new DirectConnect());
+		globals.set("disconnect", new Disconnect());
 		globals.set("httpRequest", new HTTP());
 		globals.set("getWorld", new GetWorld());
 		globals.set("getBlock", new GetBlock());

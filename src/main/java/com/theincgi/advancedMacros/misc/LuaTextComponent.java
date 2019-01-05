@@ -11,6 +11,10 @@ public class LuaTextComponent extends TextComponentString{
 	private LuaValue action;
 	private boolean allowHover;
 	
+	public LuaTextComponent(String text) {
+		super(text);
+	
+	}
 	public LuaTextComponent(String text, LuaValue action, boolean allowHover) {
 		super(text);
 		this.text = text;

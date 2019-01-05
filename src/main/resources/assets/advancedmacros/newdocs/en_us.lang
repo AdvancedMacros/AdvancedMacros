@@ -1320,5 +1320,25 @@
         []
       ]
     }
+  },
+  "disconnect": {
+    "definition": "disconnect()",
+    "tooltip": [
+      "Disconnects from the world"
+    ],
+    "types": [
+      []
+    ]
+  },
+  "directConnect": {
+    "definition": "directConnect( ip/hostName )",
+    "tooltip": [
+      "Connect to an ip or domain name"
+    ],
+    "types": [
+      [
+        "string"
+      ]
+    ]
   }
 }

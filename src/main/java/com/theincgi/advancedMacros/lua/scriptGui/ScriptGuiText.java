@@ -65,6 +65,7 @@ public class ScriptGuiText extends ScriptGuiElement{
 		if(!visible) return;
 		
 		GlStateManager.bindTexture(0);
+		GlStateManager.color(1, 1, 1);
 		//FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
 		//FontRenderer fr;
 		if(monospaced) {
