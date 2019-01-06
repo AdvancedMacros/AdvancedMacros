@@ -12,10 +12,10 @@ import net.minecraft.client.gui.GuiScreenServerList;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.resources.I18n;
 
-public class DirectConnect extends CallableTable{
+public class Connect extends CallableTable{
 
-	public DirectConnect() {
-		super(new String[] {"directConnect"}, new Op());
+	public Connect() {
+		super(new String[] {"connect"}, new Op());
 	}
 
 	private static class Op extends OneArgFunction {

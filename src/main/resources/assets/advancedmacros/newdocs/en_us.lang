@@ -1330,10 +1330,11 @@
       []
     ]
   },
-  "directConnect": {
-    "definition": "directConnect( ip/hostName )",
+  "connect": {
+    "definition": "connect( ip/hostName )",
     "tooltip": [
-      "Connect to an ip or domain name"
+      "Connect to an ip or domain name",
+      "Will disconnect you from your current game"
     ],
     "types": [
       [

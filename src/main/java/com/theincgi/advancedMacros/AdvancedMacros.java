@@ -37,7 +37,7 @@ import com.theincgi.advancedMacros.lua.LuaFunctions;
 import com.theincgi.advancedMacros.lua.functions.Action;
 import com.theincgi.advancedMacros.lua.functions.AdvLog;
 import com.theincgi.advancedMacros.lua.functions.Call;
-import com.theincgi.advancedMacros.lua.functions.DirectConnect;
+import com.theincgi.advancedMacros.lua.functions.Connect;
 import com.theincgi.advancedMacros.lua.functions.Disconnect;
 import com.theincgi.advancedMacros.lua.functions.FileSystem;
 import com.theincgi.advancedMacros.lua.functions.GetBiome;
@@ -74,6 +74,7 @@ import com.theincgi.advancedMacros.lua.functions.entity.GetEntityData;
 import com.theincgi.advancedMacros.lua.functions.entity.GetEntityList;
 import com.theincgi.advancedMacros.lua.functions.entity.HighlightEntity;
 import com.theincgi.advancedMacros.lua.functions.midi.MidiLib2;
+import com.theincgi.advancedMacros.lua.functions.minecraft.GetFPS;
 import com.theincgi.advancedMacros.lua.modControl.EditorControls;
 import com.theincgi.advancedMacros.lua.scriptGui.ScriptGui;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
@@ -105,7 +106,7 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "6.2.0"; //${version} ??
+	public static final String VERSION = "6.3.0"; //${version} ??
 
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
@@ -253,7 +254,7 @@ public class AdvancedMacros {
 		//			string.set("unpack", new StringSerialization.StringUnpack());
 		//		}
 
-		globals.set("directConnect", new DirectConnect());
+		globals.set("connect", new Connect());
 		globals.set("disconnect", new Disconnect());
 		globals.set("httpRequest", new HTTP());
 		globals.set("getWorld", new GetWorld());
@@ -266,6 +267,7 @@ public class AdvancedMacros {
 
 		//globals.set("minecraft", new MinecraftFunctions());
 		globals.set("getRecipes", new GetRecipe());
+		globals.set("getFps", new GetFPS());
 		
 		globals.set("getEntityList", new GetEntityList());
 		globals.set("getEntity", new GetEntityData());

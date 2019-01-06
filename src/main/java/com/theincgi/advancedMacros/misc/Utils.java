@@ -1382,4 +1382,10 @@ public class Utils {
 			} catch (InterruptedException e) {} 
 		}
 	}
+	public static double clamp(double min, double value, double max) {
+		return Math.max(min, Math.min(max, value));
+	}
+	public static int clamp(int min, int value, int max) {
+		return Math.max(min, Math.min(max, value));
+	}
 }
