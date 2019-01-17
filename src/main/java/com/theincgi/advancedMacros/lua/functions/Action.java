@@ -14,6 +14,7 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import org.lwjgl.input.Keyboard;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.event.ForgeEventHandler;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
@@ -82,9 +83,7 @@ public class Action {
 			if(arg.isnil() || (arg.islong()&&arg.checklong()==0)){
 				Class c = minecraft.getClass();
 				m.setAccessible(true);
-				minecraft.addScheduledTask(new Runnable() {
-					@Override
-					public void run() {
+				Utils.runOnMCAndWait(()-> {
 						try {
 							m.invoke(minecraft);
 						} catch (IllegalAccessException e) {
@@ -94,9 +93,7 @@ public class Action {
 						} catch (InvocationTargetException e) {
 							e.printStackTrace();
 						}
-					}
 				});
-
 			}else{
 				holdKeybind(sets.keyBindAttack, arg.checklong());
 			}
@@ -119,24 +116,17 @@ public class Action {
 
 				//Method m = c.getDeclaredMethod("rightClickMouse");
 				m.setAccessible(true);
-				minecraft.addScheduledTask(new Runnable() {
-					@Override
-					public void run() {
+				Utils.runOnMCAndWait(()->{
 						try {
 							m.invoke(minecraft);
 						} catch (IllegalAccessException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						} catch (IllegalArgumentException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						} catch (InvocationTargetException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-					}
 				});
-				
 			}else{
 				holdKeybind(sets.keyBindUseItem, arg.optlong(0));
 			}
@@ -160,6 +150,7 @@ public class Action {
 							BlockPos.ORIGIN, 
 							EnumFacing.DOWN));
 			//tapKeybind(sets.keyBindSwapHands);
+			
 			return LuaValue.NONE;
 		}
 	}
@@ -168,20 +159,6 @@ public class Action {
 		@Override
 		public LuaValue call() {
 			net.minecraftforge.common.ForgeHooks.onPickBlock(mc.objectMouseOver, mc.player, mc.world);
-			//			Class c = minecraft.getClass();
-			//			try {
-			//				
-			//				m.setAccessible(true);
-			//				m.invoke(minecraft);
-			//			} catch (SecurityException e) {
-			//				e.printStackTrace();
-			//			} catch (IllegalAccessException e) {
-			//				e.printStackTrace();
-			//			} catch (IllegalArgumentException e) {
-			//				e.printStackTrace();
-			//			} catch (InvocationTargetException e) {
-			//				e.printStackTrace();
-			//			}
 			return LuaValue.NONE;
 		}
 	}

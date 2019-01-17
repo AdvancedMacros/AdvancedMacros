@@ -27,6 +27,7 @@ import java.io.InputStream;
 import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.Lua;
 import org.luaj.vm2_v3_0_1.LuaError;
+import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaString;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaThread;
@@ -399,7 +400,11 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 			this.next = next;
 		}
 		public Varargs invoke(Varargs args) {
-				return varargsOf( next, args.checktable(1), NIL );
+			LuaValue meta = args.checktable(1).getmetatable();
+			LuaValue __pairs;
+			if(meta!=null && (__pairs = meta.get("__pairs")).isfunction())
+				return __pairs.invoke(args);
+			return varargsOf( next, args.checktable(1), NIL );
 		}
 	}
 	
@@ -407,6 +412,10 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 	static final class ipairs extends VarArgFunction {
 		inext inext = new inext();
 		public Varargs invoke(Varargs args) {
+			LuaValue meta = args.checktable(1).getmetatable();
+			LuaValue __ipairs;
+			if(meta!=null && (__ipairs = meta.get("__ipairs")).isfunction())
+				return __ipairs.invoke(args);
 			return varargsOf( inext, args.checktable(1), ZERO );
 		}
 	}

@@ -1,3 +1,4 @@
+local args = {...}
 --check if the gui should show and set the default value if missing
 local settings = getSettings()
 settings.changeLog = settings.changeLog or {}
@@ -5,7 +6,7 @@ local cl = settings.changeLog
 cl.showOnStartup = cl.showOnStartup==nil or cl.showOnStartup
 if not cl.showOnStartup then return end
 cl.shownVersions = cl.shownVersions or {}
-if cl.shownVersions[_MOD_VERSION] then return end
+if cl.shownVersions[_MOD_VERSION] and args[1]~="force" then return end
 
 local DIVIDER =
 "--------------------------------------------------------------------------------"
@@ -16,6 +17,29 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  " - Fixed &blog&f not showing quotes around string keys in tables",
+  " - Fixed &blog&f showing &crecursive&f tables exactly one extra time",
+  " - Added &bgetLabel&f() to threads so you can see how its name would look in ",
+  "   the running scripts gui (CTRL + A.M. Keybind)",
+  " - Added &bgetUptime&f() to threads so you can see how long it has been running",
+  " - Added &bthread.listRunning&f() to list all the scripts that are either",
+  "   Paused or Running",
+  " - Added &badvancedMacros.openChangeLog&f() so you can open this change log again",
+  " - implemented the &d__pairs&f and &d__ipairs&f meta events",
+  " - Fine-tuned actions (&bforward&f, &bback&f, etc)",
+  " - Gui groups can now return a list of their child elements",
+  " - Fixed a missing &c,&f in the change log for version &76.4.0&f that broke the change log",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 6.4.0",
+  
+  " - added &bgetChunkUpdateCount&f() &7(info from the debug screen)",
+    
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 6.3.0",
+  
   " - Added &bconnect&f and &bdisconnect&f for quickly quickly switching and leaving",
   "   a server",
   " - Fixed a bug where copying and pasting a file with no extension caused the game",
@@ -412,8 +436,10 @@ g.setOnClose( function(...)
 end)
 g.setOnResize( resize )
 resize( g.getSize() )
-while( getPlayer() == nil)do 
-  sleep(1000) 
+if(getPlayer() == nil)then
+  while( getPlayer() == nil)do 
+   sleep(1000) 
+  end
+  sleep(2000)
 end
-sleep(2000)
 g.open()
