@@ -60,7 +60,7 @@ public class LuaFunctions {
 		}
 	}
 	
-	public static class Log extends VarArgFunction{ // ... this should really be a ONE arg function... but it will work this way too
+	public static class Log extends VarArgFunction{
 		
 		final char 	OBFUSCATE 	= 'O',   //&_ escape char definitions
 					ITALICS 	= 'I',
