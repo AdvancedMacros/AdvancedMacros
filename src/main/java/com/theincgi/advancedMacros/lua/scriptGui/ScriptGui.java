@@ -83,7 +83,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 			case getName:
 				return LuaValue.valueOf(guiName);
 			case getParentGui:
-				return parentGui;
+				return parentGui == null? NIL : parentGui;
 			case getSize:{
 				LuaTable temp = new LuaTable();
 				Minecraft mc = Minecraft.getMinecraft();

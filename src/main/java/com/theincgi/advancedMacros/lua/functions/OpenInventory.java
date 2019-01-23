@@ -185,7 +185,9 @@ public class OpenInventory extends ZeroArgFunction{
 				if(container instanceof GuiShulkerBox)
 					return valueOf("shulker box");
 				return valueOf(container.getClass().toString());
-
+			case getTotalSlots: { //as suggested by swadicalrag
+				return valueOf(container.inventorySlots.inventorySlots.size());
+			}
 			default:
 				break;
 			}
@@ -204,6 +206,7 @@ public class OpenInventory extends ZeroArgFunction{
 		quick,
 		grabAll,
 		getType,
+		getTotalSlots,
 		click;
 
 		public String[] getDocLocation() {

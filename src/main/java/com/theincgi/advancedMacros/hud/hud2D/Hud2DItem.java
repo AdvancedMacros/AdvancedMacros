@@ -10,9 +10,10 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
+import com.theincgi.advancedMacros.hud.Destroyable;
 import com.theincgi.advancedMacros.misc.Utils;
 
-public abstract class Hud2DItem {
+public abstract class Hud2DItem implements Destroyable{
 	
 	float x, y, z;
 	float lastX, lastY;

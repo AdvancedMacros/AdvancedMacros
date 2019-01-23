@@ -128,7 +128,7 @@ public class BufferedImageControls extends LuaTable{
 			@Override
 			public LuaValue call() {
 				if (dynamicTexture != null) { 
-					Utils.runOnMCThreadAndWait(()->{
+					Utils.runOnMCAndWait(()->{
 						img.getRGB(0, 0, img.getWidth(), img.getHeight(), dynamicTexture.getTextureData(), 0, img.getWidth());
 						dynamicTexture.updateDynamicTexture();
 					});
@@ -146,7 +146,7 @@ public class BufferedImageControls extends LuaTable{
 		return img;
 	}
 	private void createTexture() {
-		Utils.runOnMCThreadAndWait(()->{
+		Utils.runOnMCAndWait(()->{
 			dynamicTexture = new DynamicTexture(img);
 			tex = new LuaValTexture(dynamicTexture);
 		});

@@ -104,7 +104,10 @@ public class Utils {
 		out+="}\n";
 		return out;
 	}
-
+	
+	public static Color parseColor(LuaValue v) {
+		return parseColor(LuaValue.varargsOf(new LuaValue[] {v}));
+	} 
 	public static Color parseColor(Varargs v, boolean use255Space) {
 		if(use255Space)
 			return parseColor(v);
@@ -1035,7 +1038,10 @@ public class Utils {
 						if (isTextColorCode(next)) {
 							color = getTextFormatingColor(next);
 							bold = italics = obfusc = strike = underline = false;
-						}else if(isTextStyleCode(next)) {
+						}/*else if(next == 'x') { //custom color
+							color = parseColor(args.arg(argNum++));
+							bold = italics = obfusc = strike = underline = false;
+						}*/else if(isTextStyleCode(next)) {
 							switch (next) {
 							case 'B':
 								bold = true;
@@ -1237,14 +1243,17 @@ public class Utils {
 			return null;
 		}
 	}
-	public static void runOnMCThreadAndWait(Runnable r){
-		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {
-			r.run();
-			return;
-		}
-		ListenableFuture<Object> f = Minecraft.getMinecraft().addScheduledTask(r);
-		while(!f.isDone()) try{Thread.sleep(5);}catch (InterruptedException ie) {return;}
-	}
+	
+//	//why is there also runOnMCAndWait...
+//	@Deprecated
+//	public static void runOnMCThreadAndWait(Runnable r){
+//		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {
+//			r.run();
+//			return;
+//		}
+//		ListenableFuture<Object> f = Minecraft.getMinecraft().addScheduledTask(r);
+//		while(!f.isDone()) try{Thread.sleep(5);}catch (InterruptedException ie) {return;}
+//	}
 	public static LuaValue toTable(Container container) {
 		return toTable(container, false);
 	}
@@ -1327,7 +1336,12 @@ public class Utils {
 		result.set("subHit", rtr.subHit);
 		return result;
 	}
+	/**Returns null when done if already on MC thread*/
 	public static Object runOnMCAndWait(Runnable r) {
+		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {
+			r.run();
+			return null;
+		}
 		ListenableFuture<Object> a = Minecraft.getMinecraft().addScheduledTask(r);
 		while(!a.isDone())
 			try {Thread.sleep(1);}catch (Exception e) {break;}
@@ -1340,6 +1354,16 @@ public class Utils {
 	}
 
 	public static <T> T  runOnMCAndWait(Callable<T> c) {
+		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {
+			try {
+				return c.call();
+			} catch (InterruptedException | ExecutionException | ClassCastException e) {
+				e.printStackTrace();
+				return null;
+			} catch (Exception e) {
+				Utils.logError(e);
+			}
+		}
 		ListenableFuture<T> a = Minecraft.getMinecraft().addScheduledTask(c);
 		while(!a.isDone())
 			try {Thread.sleep(1);}catch (Exception e) {break;}
@@ -1357,5 +1381,11 @@ public class Utils {
 				Thread.sleep(5); //tick should be 20, lil bit faster this way
 			} catch (InterruptedException e) {} 
 		}
+	}
+	public static double clamp(double min, double value, double max) {
+		return Math.max(min, Math.min(max, value));
+	}
+	public static int clamp(int min, int value, int max) {
+		return Math.max(min, Math.min(max, value));
 	}
 }

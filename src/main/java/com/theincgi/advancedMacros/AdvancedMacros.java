@@ -34,9 +34,12 @@ import com.theincgi.advancedMacros.hud.hud3D.Hud3D;
 import com.theincgi.advancedMacros.lua.DocumentationManager;
 import com.theincgi.advancedMacros.lua.LuaDebug;
 import com.theincgi.advancedMacros.lua.LuaFunctions;
+import com.theincgi.advancedMacros.lua.OpenChangeLog;
 import com.theincgi.advancedMacros.lua.functions.Action;
 import com.theincgi.advancedMacros.lua.functions.AdvLog;
 import com.theincgi.advancedMacros.lua.functions.Call;
+import com.theincgi.advancedMacros.lua.functions.Connect;
+import com.theincgi.advancedMacros.lua.functions.Disconnect;
 import com.theincgi.advancedMacros.lua.functions.FileSystem;
 import com.theincgi.advancedMacros.lua.functions.GetBiome;
 import com.theincgi.advancedMacros.lua.functions.GetBlock;
@@ -72,6 +75,8 @@ import com.theincgi.advancedMacros.lua.functions.entity.GetEntityData;
 import com.theincgi.advancedMacros.lua.functions.entity.GetEntityList;
 import com.theincgi.advancedMacros.lua.functions.entity.HighlightEntity;
 import com.theincgi.advancedMacros.lua.functions.midi.MidiLib2;
+import com.theincgi.advancedMacros.lua.functions.minecraft.GetChunkUpdates;
+import com.theincgi.advancedMacros.lua.functions.minecraft.GetFPS;
 import com.theincgi.advancedMacros.lua.modControl.EditorControls;
 import com.theincgi.advancedMacros.lua.scriptGui.ScriptGui;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
@@ -103,7 +108,7 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "6.2.0"; //${version} ??
+	public static final String VERSION = "6.5.0"; //${version} ??
 
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
@@ -201,6 +206,7 @@ public class AdvancedMacros {
 		globals.set("advancedMacros", advancedMacrosTable);
 		LuaTable editor = new LuaTable();
 		advancedMacrosTable.set("editor", editor);
+		advancedMacrosTable.set("openChangeLog", new OpenChangeLog());
 		editor.set("jumpToLine", new EditorControls.JumpToLine());
 		
 		globals.set("run", new Call());
@@ -209,11 +215,13 @@ public class AdvancedMacros {
 		LuaTable thread = new LuaTable();
 			thread.set("new", new NewThread());
 			thread.set("current", new LuaDebug.GetCurrent());
+			thread.set("listRunning", new LuaDebug.GetRunningScripts());
 		globals.set("thread", thread);
 		
 		globals.set("getProfile", new GetProfile());
 		globals.set("setProfile", new SetProfile());
 		globals.set("stopAllScripts", new StopAllScripts());
+		
 
 		try {
 			globals.set("listTextures", new GetTextureList());
@@ -251,6 +259,8 @@ public class AdvancedMacros {
 		//			string.set("unpack", new StringSerialization.StringUnpack());
 		//		}
 
+		globals.set("connect", new Connect());
+		globals.set("disconnect", new Disconnect());
 		globals.set("httpRequest", new HTTP());
 		globals.set("getWorld", new GetWorld());
 		globals.set("getBlock", new GetBlock());
@@ -262,6 +272,8 @@ public class AdvancedMacros {
 
 		//globals.set("minecraft", new MinecraftFunctions());
 		globals.set("getRecipes", new GetRecipe());
+		globals.set("getFps", new GetFPS());
+		globals.set("getChunkUpdateCount", new GetChunkUpdates());
 		
 		globals.set("getEntityList", new GetEntityList());
 		globals.set("getEntity", new GetEntityData());

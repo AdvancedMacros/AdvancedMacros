@@ -36,7 +36,7 @@ public class MinecraftFunctions extends LuaTable{
 	}
 	
 	private static enum OpCodes{
-		
+		//getBlockList
 		//getBlockDrops,
 		//getMobDrops
 		;

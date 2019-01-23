@@ -3,6 +3,7 @@ package com.theincgi.advancedMacros.lua;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
 import org.luaj.vm2_v3_0_1.LuaError;
@@ -268,6 +269,8 @@ public class LuaDebug extends DebugLib{
 			set("pause", new Pause());
 			set("unpause", new Unpause());
 			set("getID", new GetID());
+			set("getLabel", new GetLabel());
+			set("getUptime", new GetUptime());
 			controlLookup.put(t.thread, this);
 		}
 		class Start extends ZeroArgFunction{
@@ -317,6 +320,18 @@ public class LuaDebug extends DebugLib{
 				throw new LuaError("Attempt to unpause a thread in state '"+t.status+"'");
 			}
 		}
+		class GetUptime extends ZeroArgFunction {
+			@Override
+			public LuaValue call() {
+				return valueOf(getUptime(t.thread));
+			}
+		}
+		class GetLabel extends ZeroArgFunction{
+			@Override
+			public LuaValue call() {
+				return valueOf(t.label);
+			}
+		}
 		
 	}
 	
@@ -325,6 +340,18 @@ public class LuaDebug extends DebugLib{
 	public void stopAll() {
 		for (LuaThread t : threads.values()) {
 			t.stop();
+		}
+	}
+	
+	public static class GetRunningScripts extends ZeroArgFunction {
+		@Override
+		public LuaValue call() {
+			LuaTable scripts = new LuaTable();
+			for (Entry<Thread, LuaThread> e : threads.entrySet()) {
+				if(e.getValue().status == Status.RUNNING || e.getValue().status==Status.PAUSED)
+					scripts.set(valueOf(e.getKey().getId()), ThreadControls.getControls(e.getValue()));
+			}
+			return scripts;
 		}
 	}
 	

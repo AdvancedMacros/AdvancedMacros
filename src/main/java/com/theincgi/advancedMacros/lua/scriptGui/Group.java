@@ -88,6 +88,17 @@ public class Group extends LuaTable implements Moveable, InputSubscriber, Drawab
 			}
 		});
 		
+		this.set("getChildren", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				LuaTable result = new LuaTable();
+				for (Object o : children) {
+					if(o instanceof LuaTable)
+						result.set(result.length()+1, (LuaValue) o);
+				}
+				return result;
+			}
+		});
 		
 		
 		//		controls.set("setWidthCalculate", new OneArgFunction() {
@@ -286,7 +297,7 @@ public class Group extends LuaTable implements Moveable, InputSubscriber, Drawab
 //		element.set("getParent", controls);
 //	}
 	public void setParentControls(LuaTable element) {
-		element.set("getParent", this);
+		element.set("getParent", this); //TODO inspect
 	}
 
 	@Override

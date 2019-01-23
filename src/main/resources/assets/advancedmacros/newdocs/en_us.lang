@@ -1320,5 +1320,26 @@
         []
       ]
     }
+  },
+  "disconnect": {
+    "definition": "disconnect()",
+    "tooltip": [
+      "Disconnects from the world"
+    ],
+    "types": [
+      []
+    ]
+  },
+  "connect": {
+    "definition": "connect( ip/hostName )",
+    "tooltip": [
+      "Connect to an ip or domain name",
+      "Will disconnect you from your current game"
+    ],
+    "types": [
+      [
+        "string"
+      ]
+    ]
   }
 }

@@ -60,7 +60,7 @@ public class LuaFunctions {
 		}
 	}
 	
-	public static class Log extends VarArgFunction{ // ... this should really be a ONE arg function... but it will work this way too
+	public static class Log extends VarArgFunction{
 		
 		final char 	OBFUSCATE 	= 'O',   //&_ escape char definitions
 					ITALICS 	= 'I',
@@ -138,99 +138,7 @@ public class LuaFunctions {
 				
 			}
 			return out;
-//			
-//			if(arg0.arg(1).istable()){
-//				toParse = formatTableForLog(arg0.arg(1).checktable());
-//				toParse = "&f"+toParse.replace("\"", "\\\"");
-//			}else{
-//				toParse = arg0.tojstring().replace("\\", "\\\\");
-//				toParse = "&f"+toParse.replace("\"", "\\\"");
-//			}
-//			toParse+="&f";
-//			fragment = "";
-//			parsed = "[\"\"";  
-//			/*json formating example
-//			 * /tellraw @p 
-//			 * ["",
-//			 * {"text":"Text 1"},
-//			 * {"text":"Text 2","color":"blue"},
-//			 * {"text":"Text 3","color":"red","bold":true},
-//			 * {"text":"this you can hover on","hoverEvent":{
-//			 * 		"action":"show_text","value":{
-//			 * 			"text":"","extra":[
-//			 * 				{"text":"Hover text in color","color":"white"},
-//			 * 				{"text":"With a second line in blue","color":"blue"}
-//			 * 			]
-//			 * 		}
-//			 * },
-//			 * "color":"none","bold":false}
-//			 * ]
-//			 */
-//			//System.out.println("PARSING DEBUG: "+chatColors.size());
-//			
-//			//example &O WOW &a&U WOW &I WOW
-//			
-//			for(int i = 0; i<toParse.length(); i++){ 						//char by char
-//				if(toParse.charAt(i)=='&'){									//color format escape char
-//					if(i!=toParse.length()-1){								//not a & at the end of a string
-//						char next = toParse.charAt(i+1);
-//						if(('0'<=next && next <= '9') || ('a'<=next && next <= 'f') ){
-//							if(fragment.length()>0){						//if fragment contains text, add to parsed
-//								appendSegment();
-//								resetFormat();
-//							}
-//							activeColor = chatColors.get(toParse.charAt(i+1));
-//							//System.out.println("PARSE: ACTIVE COLOR IS "+toParse.charAt(i+1) +" which is " +activeColor);
-//						}else if(next=='&'){
-//							fragment+="&";
-//						}else if(next==OBFUSCATE){
-//							if(fragment.length()>0){						//if fragment contains text, add to parsed
-//								appendSegment();
-//							}
-//							obfuscate = true;
-//						}else if(next==BOLD){
-//							if(fragment.length()>0){						//if fragment contains text, add to parsed
-//								appendSegment();
-//							}
-//							bold = true;
-//						}else if(next==ITALICS){
-//							if(fragment.length()>0){						//if fragment contains text, add to parsed
-//								appendSegment();
-//							}
-//							italics = true;
-//						}else if(next==STRIKETHRU){
-//							if(fragment.length()>0){						//if fragment contains text, add to parsed
-//								appendSegment();
-//							}
-//							strikethru = true;
-//						}else if(next==UNDERLINE){
-//							if(fragment.length()>0){						//if fragment contains text, add to parsed
-//								appendSegment();
-//							}
-//							underline = true;
-//						}else{ //invalid formating, we'll just print it out as is
-//							fragment+="&"+toParse.charAt(i+1);
-//						}
-//						i++; continue; //skip next char after the &, it was already handled
-//					}
-//				}//no else, lets the at end fall in as well
-//				fragment+=toParse.charAt(i);
-//			}
-//			//this code was coppied from the loop
-//			if(fragment.length()>0){						//if fragment contains text, add to parsed
-//				parsed += ","+textHeader+fragment+singalQuote;       //text
-//				if(bold			){ parsed += BOLD_SEGMENT; 		 }   //bold
-//				if(italics		){ parsed += ITALIC_SEGMENT; 	 }   //italics
-//				if(underline	){ parsed += UNDERLINE_SEGMENT;  }   //underline
-//				if(strikethru	){ parsed += STRIKETHRU_SEGMENT; }   //strikethru
-//				if(obfuscate	){ parsed += OBFUSCATE_SEGMENT;  }   //obfuscate
-//				parsed += colorHeader+activeColor+singalQuote+"}";   //color
-//				//dont even bother reseting values here, no need
-//			}
-//			parsed +="]"; //close it all up
-//			new ITextComponent.Serializer();
-//			//System.out.println("DEBUG PARSED JSON VALUE:\n\t"+parsed);
-//			return Serializer.jsonToComponent(parsed);
+
 		}
 	}
 	
@@ -250,16 +158,20 @@ public class LuaFunctions {
 	
 	private static String formatTableForLog(LuaTable t, LinkedList<LuaTable> antiR, int indent){ //TODO optamize with StringBuilder
 		String s = "";
+		antiR.add(t);
 		for(LuaValue k : t.keys()){
 			LuaValue v = t.get(k);
+			String keyText = escAND(k.tojstring());
+			if(k.type() == LuaValue.TSTRING) 
+				keyText = "\""+keyText+"\"";
 			if(v.istable()){
 				if(antiR.indexOf(v)>=0){
 					//repeat subTable
-					s+=rep(" ",indent)+"&f[&c"+escAND(k.tojstring())+"&f] = <&4RECURSIVE&f> &e"+escAND(v.tojstring())+"&f{&4...&f}\n";
+					s+=rep(" ",indent)+"&f[&c"+keyText+"&f] = <&4RECURSIVE&f> &e"+escAND(v.tojstring())+"&f{&4...&f}\n";
 				}else{
 					LuaTable vTab = v.checktable();
 					if(vTab.getmetatable()!=null && vTab.getmetatable().istable() && vTab.getmetatable().get(CallableTable.LUA_FUNCTION_KEY).optboolean(false)) {
-						s+=rep(" ",indent)+"&f[&c"+escAND(k.tojstring())+"&f] = &b"+escAND((v.tojstring()));
+						s+=rep(" ",indent)+"&f[&c"+keyText+"&f] = &b"+escAND((v.tojstring()));
 						if(tableContainsKeys(vTab)){
 							s+=" &f{\n";
 							s+=formatTableForLog(vTab, antiR, indent+2);
@@ -268,8 +180,8 @@ public class LuaFunctions {
 							s+="&f\n";
 						}
 					}else {
-						antiR.add(vTab);
-						s+=rep(" ",indent)+"&f[&c"+escAND(k.tojstring())+"&f] = &e"+escAND(v.tojstring()); //TODO remove \n if no keys of any type
+						//antiR.add(t);
+						s+=rep(" ",indent)+"&f[&c"+keyText+"&f] = &e"+escAND(v.tojstring()); //TODO remove \n if no keys of any type
 						if(tableContainsKeys(vTab)) {
 							s+=" &f{\n";
 							s+=formatTableForLog(vTab, antiR, indent+2);
@@ -282,7 +194,7 @@ public class LuaFunctions {
 					
 				}
 			}else{
-				s+=rep(" ",indent)+"&f[&c"+escAND(k.tojstring())+"&f] = &b";
+				s+=rep(" ",indent)+"&f[&c"+keyText+"&f] = &b";
 				if(v.typename().equals("string")){
 					s+="&f\"&b"+escAND(v.tojstring())+"&f\""; //added &b to fix color formating in these
 					//added .replaceAll so that way color formating doesnt trigger inside the table print
