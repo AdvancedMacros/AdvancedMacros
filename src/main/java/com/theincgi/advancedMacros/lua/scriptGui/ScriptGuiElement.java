@@ -39,6 +39,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 	private boolean mouseWasOver = false;
 	boolean visible = true;
 	private Group parent;
+	Object hoverTintLock = new Object(); 
 	
 	public ScriptGuiElement(Gui gui, Group parent) {this(gui, parent, true);}
 	public ScriptGuiElement(Gui gui, Group parent, boolean addEventControls) {
@@ -146,16 +147,20 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 		this.set("setHoverTint", new VarArgFunction() {
 			@Override
 			public Varargs invoke(Varargs args) {
-				//FIXME needs syncronization 
-				hoverTint = Utils.parseColor(args, AdvancedMacros.COLOR_SPACE_IS_255);
-				colorTintInt = hoverTint.toInt();
+				//TODO check for additional synchronization 
+				synchronized (hoverTintLock) {
+					hoverTint = Utils.parseColor(args, AdvancedMacros.COLOR_SPACE_IS_255);
+					colorTintInt = hoverTint.toInt();
+				}
 				return LuaValue.NONE;
 			}
 		});
 		this.set("getHoverTint", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return hoverTint.toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255);
+				synchronized (hoverTintLock) {
+					return hoverTint.toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255);
+				}
 			}
 		});
 
