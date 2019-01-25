@@ -337,7 +337,7 @@ public class LuaDebug extends DebugLib{
 	
 	
 	
-	public void stopAll() {
+	public void stopAll() { //FIXME concurrent mod
 		for (LuaThread t : threads.values()) {
 			t.stop();
 		}

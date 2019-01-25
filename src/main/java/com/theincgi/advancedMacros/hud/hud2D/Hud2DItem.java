@@ -165,15 +165,6 @@ public abstract class Hud2DItem implements Destroyable{
 	
 	public void destroy() {
 		disableDraw();
-		LuaTable t = getControls();
-		LuaValue k = LuaValue.NIL;
-		do{
-			k = t.next(k).arg1();
-			if(k.isnil()){break;}
-			//System.out.println(k);
-			t.set(k, LuaValue.NIL);
-		}while(!k.isnil());
-		controls = LuaValue.FALSE;
 	}
 	
 	public synchronized void disableDraw() {
@@ -181,6 +172,7 @@ public abstract class Hud2DItem implements Destroyable{
 		AdvancedMacros.forgeEventHandler.removeHud2DItem(this);
 		isDrawing = false;
 	}
+	
 	public synchronized void enableDraw() {
 		if(isDrawing) return;
 		isDrawing = true;

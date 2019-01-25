@@ -57,6 +57,7 @@ public class GraphicsContextControls extends LuaTable{
 				LuaValue v = args.arg1();
 				if(v instanceof BufferedImageControls) {
 					BufferedImageControls bic = (BufferedImageControls) v;
+					BufferedImage img = bic.getImg();
 					args = args.subargs(2);
 					switch (args.narg()) {
 					case 2:
@@ -66,17 +67,17 @@ public class GraphicsContextControls extends LuaTable{
 					case 4:
 					case 6:
 					case 8:
-						int destX = args.checkint(1)-1;
-						int destY = args.checkint(2)-1;
-						int destW = args.checkint(3)-destX;
-						int destH = args.checkint(4)-destY;
+						int destX = args.optint(1, 1)-1;
+						int destY = args.optint(2, 1)-1;
+						int destW = args.optint(3, img.getWidth())+destX;
+						int destH = args.optint(4, img.getHeight())+destY;
 
 						int srcX = args.optint(5, 1) - 1;
 						int srcY = args.optint(6, 1) - 1;
 						int maxW = bic.getImg().getWidth() - srcX + 1;
 						int maxH = bic.getImg().getHeight() - srcY + 1;
-						int srcW = args.optint(7, maxW) - srcX;
-						int srcH = args.optint(8, maxH) - srcY;
+						int srcW = args.optint(7, maxW) + srcX;
+						int srcH = args.optint(8, maxH) + srcY;
 						
 						g.drawImage(bic.getImg(), destX, destY,
 												  destW, destH,

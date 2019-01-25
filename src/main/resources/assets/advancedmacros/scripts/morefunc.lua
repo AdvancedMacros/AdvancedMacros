@@ -9,3 +9,10 @@ function math.sign(num)
     return -1
   end
 end
+
+
+--map(x, iMin, iMax, oMin, oMax)
+--maps x from input range to output range
+function math.map(x, iMin, iMax, oMin, oMax)
+  return (x - iMin) * (oMax - oMin) / (iMax - iMin) + oMin
+end

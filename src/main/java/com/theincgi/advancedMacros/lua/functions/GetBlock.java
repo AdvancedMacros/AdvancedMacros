@@ -1,10 +1,12 @@
 package com.theincgi.advancedMacros.lua.functions;
 
+import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.ThreeArgFunction;
 
 import com.theincgi.advancedMacros.misc.Utils;
 
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.tileentity.TileEntity;
@@ -22,6 +24,8 @@ public class GetBlock extends ThreeArgFunction{
 			return LuaValue.FALSE;
 		}
 		IBlockState block = chunk.getBlockState(x,y,z);
-		return Utils.blockToTable(block, te);
+		LuaTable result = Utils.blockToTable(block, te);
+		result.set("mapColor", Utils.parseColor(block.getMapColor(Minecraft.getMinecraft().player.world, pos)));
+		return result;
 	}
 }

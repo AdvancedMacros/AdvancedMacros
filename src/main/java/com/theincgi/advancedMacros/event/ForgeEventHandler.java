@@ -1193,7 +1193,7 @@ public class ForgeEventHandler {
 	public void clearWorldHud(){
 		synchronized (worldHudItems) {
 			while(!worldHudItems.isEmpty()){
-				worldHudItems.getFirst().destroy(); //removed when disable draw is called
+				worldHudItems.getFirst().disableDraw(); //removed when disable draw is called
 			}
 			worldHudItems.clear();
 		}
@@ -1212,7 +1212,7 @@ public class ForgeEventHandler {
 	public void clear2DHud() {
 		synchronized (hud2DItems) {
 			while(!hud2DItems.isEmpty()) {
-				hud2DItems.getLast().destroy();
+				hud2DItems.getLast().disableDraw();
 			}
 			hud2DItems.clear();
 		}

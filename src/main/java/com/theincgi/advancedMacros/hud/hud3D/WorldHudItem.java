@@ -29,15 +29,6 @@ public abstract class WorldHudItem implements Destroyable {
 	/**should call to {@link #disableDraw()} and to make all functions un-usable as it is no longer in use*/
 	public void destroy() {
 			disableDraw();
-			LuaTable t = controls.checktable();
-			LuaValue k = LuaValue.NIL;
-			do{
-				k = t.next(k).arg1();
-				if(k.isnil()){break;}
-				//System.out.println(k);
-				t.set(k, LuaValue.NIL);
-			}while(!k.isnil());
-			controls = LuaValue.FALSE;
 	}
 	/**Add this to the forgeEventHandler draw list if it isnt already<br>
 	 * @see<br>

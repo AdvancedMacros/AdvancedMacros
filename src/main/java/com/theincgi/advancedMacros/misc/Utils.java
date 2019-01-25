@@ -30,6 +30,7 @@ import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
 import com.theincgi.advancedMacros.lua.util.ContainerControls;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -395,6 +396,7 @@ public class Utils {
 		table.set("amount", stack.getCount());
 		table.set("repairCost", stack.getRepairCost());
 		table.set("enchants", NBTUtils.fromTagList(stack.getEnchantmentTagList()));
+		table.set("nbt", NBTUtils.fromCompound(stack.serializeNBT()));
 		return table;
 	}
 	public static LuaTable blockToTable(IBlockState blockState, @Nullable TileEntity te) {
@@ -996,6 +998,7 @@ public class Utils {
 		pStyle.setObfuscated(false);
 		pStyle.setStrikethrough(false);
 		pStyle.setUnderlined(false);
+		//lua text component ce?
 		boolean ltcce = false;
 		int argNum = 1;
 		ClickEvent clickEvent = null;
@@ -1387,5 +1390,8 @@ public class Utils {
 	}
 	public static int clamp(int min, int value, int max) {
 		return Math.max(min, Math.min(max, value));
+	}
+	public static LuaValue parseColor(MapColor mapColor) {
+		return new Color(mapColor.colorValue | 0xFF000000).toLuaValue(false);
 	}
 }
