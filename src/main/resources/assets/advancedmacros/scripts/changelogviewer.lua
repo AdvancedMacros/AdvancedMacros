@@ -17,6 +17,29 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  " &cMajor:",
+  " - the return value of &bgetBlockList&f() has been changed",
+  "   to a string key, each value has a table with a key of the dmg and",
+  "   value of item details",
+  " &aMinor:",
+  " - Depreciating &bdestroy&f() from &ahud&f items",
+  "   &7disableDraw will safely remove your hud elements and is ",
+  "   &7less likely to cause issues if it is accidently removed via",
+  "   &7a clearAll. Destroy's functionality is now that of disableDraw",
+  "   &7(removes itself from list of elements to be drawn)",
+  " - &bgetBlock&f() now returns &amapColor&f with the block details",
+  " - Item stack info now shows NBT tag data",
+  " - Added &bmath.map&f() &7used to map a value from one range to another",
+  "   &7math.map(x, inMin, inMax, outMin, outMax)",
+  " &aFixes:",
+  " - Fixed an issue with the drawImage (from image.graphics)",
+  "   drawing incorrectly when given a set width and height for the destination",
+  
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 6.5.0",
+  
   " - Fixed &blog&f not showing quotes around string keys in tables",
   " - Fixed &blog&f showing &crecursive&f tables exactly one extra time",
   " - Added &bgetLabel&f() to threads so you can see how its name would look in ",
