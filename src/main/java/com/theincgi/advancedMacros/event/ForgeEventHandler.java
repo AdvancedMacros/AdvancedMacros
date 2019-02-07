@@ -15,6 +15,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.luaj.vm2_v3_0_1.LuaError;
+import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
@@ -30,6 +31,7 @@ import com.theincgi.advancedMacros.gui.elements.ColorTextArea;
 import com.theincgi.advancedMacros.hud.hud2D.Hud2DItem;
 import com.theincgi.advancedMacros.hud.hud3D.WorldHudItem;
 import com.theincgi.advancedMacros.lua.LuaDebug.JavaThread;
+import com.theincgi.advancedMacros.lua.LuaDebug.LuaThread;
 import com.theincgi.advancedMacros.lua.LuaDebug.OnScriptFinish;
 import com.theincgi.advancedMacros.lua.functions.GuiControls;
 import com.theincgi.advancedMacros.misc.Pair;
@@ -572,14 +574,20 @@ public class ForgeEventHandler {
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onJoinedWorld(FMLNetworkEvent.ClientConnectedToServerEvent event){
 		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
-		Thread t = new Thread(()->{
-			try {
-				InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/changelogviewer.lua")).getInputStream();
-				AdvancedMacros.globals.load(in, "changeLog", "t", AdvancedMacros.globals).call();
-				in.close();
-			} catch (IOException e) {e.printStackTrace();}
-		});
-		t.start();
+		try {
+			InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/changelogviewer.lua")).getInputStream();
+			LuaValue sFunc = AdvancedMacros.globals.load(in, "changeLog", "t", AdvancedMacros.globals);
+			LuaThread thread = new LuaThread(sFunc, "changelog");
+			thread.start();
+		} catch (IOException e) {e.printStackTrace();}
+//		Thread t = new Thread(()->{
+//			try {
+//				InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/changelogviewer.lua")).getInputStream();
+//				AdvancedMacros.globals.load(in, "changeLog", "t", AdvancedMacros.globals).call();
+//				in.close();
+//			} catch (IOException e) {e.printStackTrace();}
+//		});
+//		t.start();
 
 		LuaTable e = createEvent(EventName.JoinWorld);
 		e.set(3, event.getConnectionType()); //yeilded modded

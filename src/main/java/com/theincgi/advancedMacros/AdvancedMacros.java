@@ -16,6 +16,7 @@ import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaTable;
+import org.luaj.vm2_v3_0_1.LuaThread;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import org.luaj.vm2_v3_0_1.lib.jse.JsePlatform;
@@ -141,6 +142,7 @@ public class AdvancedMacros {
 		try {
 			if(event.getSide().isServer()){return;}
 			minecraftThread = Thread.currentThread();
+			globals.setLuaThread(minecraftThread, new LuaThread(globals));
 			macrosRootFolder.mkdirs();
 			macrosFolder.mkdirs();
 			macroSoundsFolder.mkdirs();

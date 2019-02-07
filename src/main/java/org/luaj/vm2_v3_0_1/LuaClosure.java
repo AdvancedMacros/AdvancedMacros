@@ -520,7 +520,7 @@ public class LuaClosure extends LuaFunction {
 	 * */
 	String errorHook(String msg, int level) {
 		if (globals == null ) return msg;
-		final LuaThread r = globals.running;
+		final LuaThread r = globals.getCurrentLuaThread();
 		if (r.errorfunc == null)
 			return globals.debuglib != null?
 					msg + "\n" + globals.debuglib.traceback(level):

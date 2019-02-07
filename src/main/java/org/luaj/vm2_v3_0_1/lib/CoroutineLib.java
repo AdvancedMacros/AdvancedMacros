@@ -101,7 +101,7 @@ public class CoroutineLib extends TwoArgFunction {
 
 	final class running extends VarArgFunction {
 		public Varargs invoke(Varargs args) {
-			final LuaThread r = globals.running;
+			final LuaThread r = globals.getCurrentLuaThread();
 			return varargsOf(r, valueOf(r.isMainThread()));
 		}
 	}

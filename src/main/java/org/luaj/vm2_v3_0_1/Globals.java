@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.util.WeakHashMap;
 
 import org.luaj.vm2_v3_0_1.lib.BaseLib;
 import org.luaj.vm2_v3_0_1.lib.DebugLib;
@@ -126,9 +127,11 @@ public class Globals extends LuaTable {
 	/** The installed ResourceFinder for looking files by name. */
 	public ResourceFinder finder;
 	
-	/** The currently running thread.  Should not be changed by non-library code. */
-	public LuaThread running = new LuaThread(this);
-
+	///** The currently running thread.  Should not be changed by non-library code. */
+	private LuaThread defaultLuaThread = null;//new LuaThread(this);
+	private static final WeakHashMap<Thread, LuaThread> luaThreads = new WeakHashMap<>();
+	
+	
 	/** The BaseLib instance loaded into this Globals */
 	public BaseLib baselib;
 	
@@ -309,6 +312,7 @@ public class Globals extends LuaTable {
 	 * @return Values supplied as arguments to the resume() call that reactivates this thread.
 	 */
 	public Varargs yield(Varargs args) {
+		LuaThread running = getCurrentLuaThread(); //TheINCGI
 		if (running == null || running.isMainThread())
 			throw new LuaError("cannot yield main thread");
 		final LuaThread.State s = running.state;
@@ -453,6 +457,25 @@ public class Globals extends LuaTable {
 		}
 		public synchronized void reset() throws IOException {
 			i = 0;
+		}
+	}
+	
+	/**
+	 * @author TheINCGI
+	 * */
+	public LuaThread getCurrentLuaThread() {
+		synchronized (luaThreads) {
+			return luaThreads.getOrDefault(Thread.currentThread(), defaultLuaThread);
+		}
+	}
+	public void setCurrentLuaThread(LuaThread thread) {
+		synchronized (luaThreads) {
+			luaThreads.put(Thread.currentThread(), thread);
+		}
+	}
+	public void setLuaThread(Thread t, LuaThread thread) {
+		synchronized (luaThreads) {
+			luaThreads.put(t, thread);
 		}
 	}
 }

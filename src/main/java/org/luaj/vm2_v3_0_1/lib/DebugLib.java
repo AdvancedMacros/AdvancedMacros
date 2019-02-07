@@ -149,7 +149,7 @@ public class DebugLib extends TwoArgFunction {
 	// debug.gethook ([thread])
 	final class gethook extends VarArgFunction { 
 		public Varargs invoke(Varargs args) {
-			LuaThread t = args.narg() > 0 ? args.checkthread(1): globals.running;
+			LuaThread t = args.narg() > 0 ? args.checkthread(1): globals.getCurrentLuaThread();
 			LuaThread.State s = t.state;
 			return varargsOf(
 					s.hookfunc != null? s.hookfunc: NIL,
@@ -162,7 +162,7 @@ public class DebugLib extends TwoArgFunction {
 	final class getinfo extends VarArgFunction { 
 		public Varargs invoke(Varargs args) {
 			int a=1;
-			LuaThread thread = args.isthread(a)? args.checkthread(a++): globals.running; 
+			LuaThread thread = args.isthread(a)? args.checkthread(a++): globals.getCurrentLuaThread(); 
 			LuaValue func = args.arg(a++);
 			String what = args.optjstring(a++, "flnStu");
 			DebugLib.CallStack callstack = callstack(thread);
@@ -225,7 +225,7 @@ public class DebugLib extends TwoArgFunction {
 	final class getlocal extends VarArgFunction { 
 		public Varargs invoke(Varargs args) {
 			int a=1;
-			LuaThread thread = args.isthread(a)? args.checkthread(a++): globals.running; 
+			LuaThread thread = args.isthread(a)? args.checkthread(a++): globals.getCurrentLuaThread(); 
 			int level = args.checkint(a++);
 			int local = args.checkint(a++);
 			CallFrame f = callstack(thread).getCallFrame(level);
@@ -276,7 +276,7 @@ public class DebugLib extends TwoArgFunction {
 	final class sethook extends VarArgFunction { 
 		public Varargs invoke(Varargs args) {
 			int a=1;
-			LuaThread t = args.isthread(a)? args.checkthread(a++): globals.running; 
+			LuaThread t = args.isthread(a)? args.checkthread(a++): globals.getCurrentLuaThread(); 
 			LuaValue func    = args.optfunction(a++, null);
 			String str       = args.optjstring(a++,"");
 			int count        = args.optint(a++,0);
@@ -301,7 +301,7 @@ public class DebugLib extends TwoArgFunction {
 	final class setlocal extends VarArgFunction { 
 		public Varargs invoke(Varargs args) {
 			int a=1;
-			LuaThread thread = args.isthread(a)? args.checkthread(a++): globals.running; 
+			LuaThread thread = args.isthread(a)? args.checkthread(a++): globals.getCurrentLuaThread(); 
 			int level = args.checkint(a++);
 			int local = args.checkint(a++);
 			LuaValue value = args.arg(a++);
@@ -361,7 +361,7 @@ public class DebugLib extends TwoArgFunction {
 	final class traceback extends VarArgFunction { 
 		public Varargs invoke(Varargs args) {
 			int a=1;
-			LuaThread thread = args.isthread(a)? args.checkthread(a++): globals.running; 
+			LuaThread thread = args.isthread(a)? args.checkthread(a++): globals.getCurrentLuaThread(); 
 			String message = args.optjstring(a++, null);
 			int level = args.optint(a++,1);
 			String tb = callstack(thread).traceback(level);
@@ -401,21 +401,21 @@ public class DebugLib extends TwoArgFunction {
 	}
 
 	public void onCall(LuaFunction f) {
-		LuaThread.State s = globals.running.state;
+		LuaThread.State s = globals.getCurrentLuaThread().state;
 		if (s.inhook) return;
 		callstack().onCall(f);
 		if (s.hookcall) callHook(s, CALL, NIL);
 	}
 
 	public void onCall(LuaClosure c, Varargs varargs, LuaValue[] stack) {
-		LuaThread.State s = globals.running.state;
+		LuaThread.State s = globals.getCurrentLuaThread().state;
 		if (s.inhook) return;
 		callstack().onCall(c, varargs, stack);
 		if (s.hookcall) callHook(s, CALL, NIL);
 	}
 
 	public void onInstruction(int pc, Varargs v, int top) {
-		LuaThread.State s = globals.running.state;
+		LuaThread.State s = globals.getCurrentLuaThread().state;
 		if (s.inhook) return;
 		callstack().onInstruction(pc, v, top);
 		if (s.hookfunc == null) return;
@@ -432,7 +432,7 @@ public class DebugLib extends TwoArgFunction {
 	}
 
 	public void onReturn() {
-		LuaThread.State s = globals.running.state;
+		LuaThread.State s = globals.getCurrentLuaThread().state;
 		if (s.inhook) return;
 		callstack().onReturn();
 		if (s.hookrtrn) callHook(s, RETURN, NIL);
@@ -448,6 +448,7 @@ public class DebugLib extends TwoArgFunction {
 		try {
 			s.hookfunc.call(type, arg);
 		} catch (LuaError e) {
+			s.hookfunc = null; //incase of error removes hook, otherwise you can't run code anymore
 			throw e;
 		} catch (RuntimeException e) {
 			throw new LuaError(e);
@@ -457,7 +458,7 @@ public class DebugLib extends TwoArgFunction {
 	}
 	
 	CallStack callstack() {
-		return callstack(globals.running);
+		return callstack(globals.getCurrentLuaThread());
 	}
 
 	CallStack callstack(LuaThread t) {

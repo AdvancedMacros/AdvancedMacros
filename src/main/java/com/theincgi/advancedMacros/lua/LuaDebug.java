@@ -14,6 +14,7 @@ import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.DebugLib;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.lua.util.LuaMutex;
 import com.theincgi.advancedMacros.misc.Utils;
@@ -142,7 +143,11 @@ public class LuaDebug extends DebugLib{
 							status = Status.RUNNING;
 							notifyStatusListeners(thread, Status.RUNNING);
 							launchTime = System.currentTimeMillis();
-							Varargs retValues = sFunc.invoke(varagrs);
+							org.luaj.vm2_v3_0_1.LuaThread luaThread = new org.luaj.vm2_v3_0_1.LuaThread(AdvancedMacros.globals, sFunc);
+							AdvancedMacros.globals.setCurrentLuaThread(luaThread);
+							//luaThread.state.args = varagrs;
+							//luaThread.state.run()
+							Varargs retValues = sFunc.invoke(varagrs);//luaThread.resume(varagrs);//sFunc.invoke(varagrs);
 							if(onScriptFinish!=null){onScriptFinish.onFinish(retValues);}
 							status = Status.DONE;
 							notifyStatusListeners(thread, Status.DONE);
@@ -193,7 +198,7 @@ public class LuaDebug extends DebugLib{
 							status = Status.RUNNING;
 							notifyStatusListeners(thread, Status.RUNNING);
 							launchTime = System.currentTimeMillis();
-							
+							AdvancedMacros.globals.setCurrentLuaThread(new org.luaj.vm2_v3_0_1.LuaThread(AdvancedMacros.globals));
 							r.run();
 							
 							status = Status.DONE;

@@ -369,7 +369,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 	// "xpcall", // (f, err) -> result1, ...				
 	final class xpcall extends VarArgFunction {
 		public Varargs invoke(Varargs args) {
-			final LuaThread t = globals.running;
+			final LuaThread t = globals.getCurrentLuaThread();
 			final LuaValue preverror = t.errorfunc;
 			t.errorfunc = args.checkvalue(2);
 			try {
