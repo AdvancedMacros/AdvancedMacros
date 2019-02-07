@@ -93,6 +93,7 @@ public class GuiImage extends ScriptGuiElement{
 		buffer.pos(dx+dw	, dy     , z).tex(uMax, vMin).endVertex();
 		Tessellator.getInstance().draw();
 		//GlStateManager.disableBlend();
+		GlStateManager.resetColor();
 		GlStateManager.popAttrib();
 		GL11.glPopAttrib();
 		

@@ -21,7 +21,7 @@ import com.theincgi.advancedMacros.misc.Utils;
 
 public class LuaDebug extends DebugLib{
 	private static HashMap<Thread, LuaThread> threads = new HashMap<>();
-	
+
 	private static LinkedList<StatusListener> statusListeners = new LinkedList<>();
 	public abstract static class StatusListener{
 		public abstract void onStatus(final Thread sThread, Status status);
@@ -63,12 +63,12 @@ public class LuaDebug extends DebugLib{
 			}
 		}
 	}
-	
-	
-	
-//	public Set<Thread> getThreads(){
-//		return threads.keySet();
-//	}
+
+
+
+	//	public Set<Thread> getThreads(){
+	//		return threads.keySet();
+	//	}
 	public static double getUptime(Thread thread){
 		LuaThread lt = threads.get(thread);
 		if(lt==null){return Double.NaN;}
@@ -94,7 +94,7 @@ public class LuaDebug extends DebugLib{
 		if(lt==null){return;}
 		lt.stop();
 	}
-	
+
 	public abstract static class OnScriptFinish{
 		abstract public void onFinish(Varargs v);
 	}
@@ -105,9 +105,9 @@ public class LuaDebug extends DebugLib{
 		protected Status status = Status.NEW;
 		private String label;
 		protected Thread thread;
-		
+
 		private LuaThread() {}
-		
+
 		public LuaThread(LuaValue sFunc, String label) {
 			this(sFunc, new LuaTable(), label);
 		}
@@ -119,12 +119,12 @@ public class LuaDebug extends DebugLib{
 			this.label = label;
 			this.varagrs = varagrs;
 		}
-		
+
 		public static LuaThread getCurrent() {
 			return threads.get(Thread.currentThread());
 		}
-		
-		
+
+
 		protected void register(Thread t){
 			threads.put(t, this);
 		}
@@ -134,38 +134,40 @@ public class LuaDebug extends DebugLib{
 		}
 		/**returns a LuaTable for controlling this thread*/
 		public LuaTable start(final OnScriptFinish onScriptFinish){ //TODO needs lua func to make new thread
-			if(status.equals(Status.NEW)){
-				thread = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						try{
-							register(thread);
-							status = Status.RUNNING;
-							notifyStatusListeners(thread, Status.RUNNING);
-							launchTime = System.currentTimeMillis();
-							org.luaj.vm2_v3_0_1.LuaThread luaThread = new org.luaj.vm2_v3_0_1.LuaThread(AdvancedMacros.globals, sFunc);
-							AdvancedMacros.globals.setCurrentLuaThread(luaThread);
-							//luaThread.state.args = varagrs;
-							//luaThread.state.run()
-							Varargs retValues = sFunc.invoke(varagrs);//luaThread.resume(varagrs);//sFunc.invoke(varagrs);
-							if(onScriptFinish!=null){onScriptFinish.onFinish(retValues);}
-							status = Status.DONE;
-							notifyStatusListeners(thread, Status.DONE);
-						}catch (Throwable e) {
-							status = Status.CRASH;
-							notifyStatusListeners(thread, Status.CRASH);
-							e.printStackTrace();
-							Utils.logError(e);
+			synchronized (this) {
+				if(status.equals(Status.NEW)){
+					thread = new Thread(new Runnable() {
+						@Override
+						public void run() {
+							try{
+								register(thread);
+								status = Status.RUNNING;
+								notifyStatusListeners(thread, Status.RUNNING);
+								launchTime = System.currentTimeMillis();
+								org.luaj.vm2_v3_0_1.LuaThread luaThread = new org.luaj.vm2_v3_0_1.LuaThread(AdvancedMacros.globals, sFunc);
+								AdvancedMacros.globals.setCurrentLuaThread(luaThread);
+								//luaThread.state.args = varagrs;
+								//luaThread.state.run()
+								Varargs retValues = sFunc.invoke(varagrs);//luaThread.resume(varagrs);//sFunc.invoke(varagrs);
+								if(onScriptFinish!=null){onScriptFinish.onFinish(retValues);}
+								status = Status.DONE;
+								notifyStatusListeners(thread, Status.DONE);
+							}catch (Throwable e) {
+								status = Status.CRASH;
+								notifyStatusListeners(thread, Status.CRASH);
+								e.printStackTrace();
+								Utils.logError(e);
+							}
+							LuaMutex.cleanup();
 						}
-						LuaMutex.cleanup();
-					}
-				});
-				thread.setName(sFunc.tojstring());
-				thread.start();
+					});
+					thread.setName(sFunc.tojstring());
+					thread.start();
 
-				return ThreadControls.getControls(this);
-			}else{
-				throw new LuaError("Attempt to start a thread in state '"+status+"'");
+					return ThreadControls.getControls(this);
+				}else{
+					throw new LuaError("Attempt to start a thread in state '"+status+"'");
+				}
 			}
 		}
 		public void stop(){
@@ -176,8 +178,8 @@ public class LuaDebug extends DebugLib{
 		public double getUpTime(){
 			return ((int)(System.currentTimeMillis()-launchTime)/10f)/100f;
 		}
-		
-		
+
+
 	}
 	/**Added for the ChatSendFilter which will go through multiple filters, this occurs in a runnable<br>
 	 * This will allow it to show up inside the running scripts list and be cancel-able*/
@@ -186,7 +188,7 @@ public class LuaDebug extends DebugLib{
 		public JavaThread(Runnable r) {
 			this.r = r;
 		}
-		
+
 		@Override
 		public LuaTable start(OnScriptFinish unused) {
 			if(status.equals(Status.NEW)){
@@ -200,7 +202,7 @@ public class LuaDebug extends DebugLib{
 							launchTime = System.currentTimeMillis();
 							AdvancedMacros.globals.setCurrentLuaThread(new org.luaj.vm2_v3_0_1.LuaThread(AdvancedMacros.globals));
 							r.run();
-							
+
 							status = Status.DONE;
 							notifyStatusListeners(thread, Status.DONE);
 						}catch (Throwable e) {
@@ -211,7 +213,7 @@ public class LuaDebug extends DebugLib{
 						}
 					}
 				});
-				
+
 				thread.start();
 
 				return ThreadControls.getControls(this);
@@ -219,7 +221,7 @@ public class LuaDebug extends DebugLib{
 				throw new LuaError("Attempt to start a thread in state '"+status+"'");
 			}
 		}
-		
+
 		public void setName(String s) {
 			thread.setName(s);
 		}
@@ -254,17 +256,18 @@ public class LuaDebug extends DebugLib{
 			}
 		}
 	}
-	
+
 	public static class ThreadControls extends LuaTable{
-		static final WeakHashMap<Thread, ThreadControls> controlLookup = new WeakHashMap<>();
+		static final WeakHashMap<LuaThread, ThreadControls> controlLookup = new WeakHashMap<>();
 		LuaThread t;
-		
+
 		public static ThreadControls getControls(LuaThread t) {
-			return controlLookup.computeIfAbsent(t.thread, (key)->{
+			if(t==null) throw new NullPointerException("LuaThread is null");
+			return controlLookup.computeIfAbsent(t, (key)->{
 				return new ThreadControls(t);
 			});
 		}
-		
+
 		private ThreadControls(LuaThread t) {
 			super();
 			this.t = t;
@@ -276,7 +279,7 @@ public class LuaDebug extends DebugLib{
 			set("getID", new GetID());
 			set("getLabel", new GetLabel());
 			set("getUptime", new GetUptime());
-			controlLookup.put(t.thread, this);
+			controlLookup.put(t, this);
 		}
 		class Start extends ZeroArgFunction{
 			@Override
@@ -337,17 +340,17 @@ public class LuaDebug extends DebugLib{
 				return valueOf(t.label);
 			}
 		}
-		
+
 	}
-	
-	
-	
+
+
+
 	public void stopAll() { //FIXME concurrent mod
 		for (LuaThread t : threads.values()) {
 			t.stop();
 		}
 	}
-	
+
 	public static class GetRunningScripts extends ZeroArgFunction {
 		@Override
 		public LuaValue call() {
@@ -359,5 +362,5 @@ public class LuaDebug extends DebugLib{
 			return scripts;
 		}
 	}
-	
+
 }

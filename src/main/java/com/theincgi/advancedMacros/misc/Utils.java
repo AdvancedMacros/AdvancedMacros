@@ -896,6 +896,9 @@ public class Utils {
 		return parseFileLocation(arg0.isnil()?"":arg0.tojstring(), level.optint(1));
 	}
 	public static File parseFileLocation(String arg, int level) {
+		return parseFileLocation(Thread.currentThread(), arg, level);
+	}
+	public static File parseFileLocation(Thread caller, String arg, int level) {
 		if(arg==null)
 			arg = "";
 
@@ -905,7 +908,7 @@ public class Utils {
 		else if(arg.startsWith("~"))
 			file = new File(AdvancedMacros.macrosRootFolder, arg.substring(1));
 		else {
-			LuaValue v = Utils.getDebugStacktrace(level);
+			LuaValue v = Utils.getDebugStacktrace(caller, level);
 			if(v.isnil())
 				throw new LuaError("Unable to get local path of file");
 			String m = v.get("short_src").tojstring();
@@ -1308,8 +1311,13 @@ public class Utils {
 		return getDebugStacktrace(1);
 	}
 	public static LuaValue getDebugStacktrace(int level) {
+		return getDebugStacktrace(Thread.currentThread(), level);
+	}
+	public static LuaValue getDebugStacktrace(Thread caller, int level) {
 		//LuaValue v = AdvancedMacros.globals.debuglib.get("getinfo").call(valueOf(1), valueOf("Sl"));
-		return AdvancedMacros.debugTable.get("getinfo").call(LuaValue.valueOf(level), LuaValue.valueOf("Sl"));
+		return AdvancedMacros.debugTable.get("getinfo")
+				.call(AdvancedMacros.globals.getLuaThread(caller),LuaValue.valueOf(level),
+						LuaValue.valueOf("Sl"));
 	}
 	public static LuaValue rayTraceResultToLuaValue(RayTraceResult rtr) {
 		Minecraft mc = Minecraft.getMinecraft();

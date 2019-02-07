@@ -28,6 +28,7 @@ import com.theincgi.advancedMacros.gui.elements.PopupPrompt.Answer;
 import com.theincgi.advancedMacros.gui.elements.PopupPrompt.Choice;
 import com.theincgi.advancedMacros.gui.elements.WidgetID;
 import com.theincgi.advancedMacros.lua.LuaDebug;
+import com.theincgi.advancedMacros.lua.OpenChangeLog;
 import com.theincgi.advancedMacros.lua.LuaDebug.OnScriptFinish;
 import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Settings;
@@ -51,6 +52,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 	GuiButton addBinding       = new GuiButton(5, 17, 36, 12, Settings.getTextureID("resource:whitenewbinding.png"), LuaValue.NIL, "bindingsMenu", "addBindingButton");
 	GuiButton showScriptManager=new GuiButton(41, 17, 36, 12, Settings.getTextureID("resource:whitescripts.png"), LuaValue.NIL, "bindingsMenu", "scriptManagerButton");
 	//whitescripts
+	GuiButton openChangeLog = new GuiButton(width-36-6, 17, 37, 12, Settings.getTextureID("resource:whiteopenchangelog.png"), LuaValue.NIL, "bindingsMenu", "openChangeLog");
 	//GuiButton showScriptManager=new GuiButton(new WidgetID(5), 41, 17, 36, 12, Settings.getTextureID("resource:whitescripts.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE); //file browser thing, no folders tho, all macros are in /macros, this will be sepereate gui housing the script manager
 	//GuiButton gotoSettings	  = new GuiButton(new WidgetID(6), width-5-36, 17, 36, 12, Settings.getTextureID("resource:whitesettings.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.BLACK);
 	Prompting prompting;
@@ -175,6 +177,13 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 				prompt.promptConfirm("Delete this profile?");
 			}
 		});
+		
+		openChangeLog.setOnClick(new OnClickHandler() {
+			@Override
+			public void onClick(int button, GuiButton sButton) {
+				OpenChangeLog.openChangeLog();
+			}
+		});
 
 		inputSubscribers.add(bindingsList);
 		inputSubscribers.add(profileSelect);
@@ -183,6 +192,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 		inputSubscribers.add(showScriptManager);
 		//inputSubscribers.add(gotoSettings);
 		inputSubscribers.add(addBinding);
+		inputSubscribers.add(openChangeLog);
 
 		addDrawable(bindingsList);
 		addDrawable(profileSelect);
@@ -191,6 +201,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 		addDrawable(showScriptManager);
 		//drawables.add(gotoSettings);
 		addDrawable(addBinding);
+		addDrawable(openChangeLog);
 
 		//updateProfileList();
 //		profileSelect.select("DEFAULT"); done in INIT
@@ -370,6 +381,9 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 		//gotoSettings.setPos(12*6+5, 17);
 		profileSelect.setPos(5, 5);
 		profileSelect.setWidth(w-35);
+		openChangeLog.setPos(width -36-6, 17);
+		openChangeLog.setWidth(37);
+		
 		bindingsList.setWidth(width-10);
 		bindingsList.setHeight(h-15-24);
 		prompt.setPos(width/3, height/3);

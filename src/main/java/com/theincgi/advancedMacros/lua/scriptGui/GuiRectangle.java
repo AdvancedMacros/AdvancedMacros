@@ -27,6 +27,7 @@ public class GuiRectangle extends ScriptGuiElement{
 		if(getHoverTint()!=null && GuiRect.isInBounds(mouseX, mouseY, (int)x, (int)y, (int)wid, (int)hei)) {
 			drawRectangle(x, y, wid, hei, getHoverTint(), z);
 		}
+		GlStateManager.resetColor();
 	}
 
 	@Override

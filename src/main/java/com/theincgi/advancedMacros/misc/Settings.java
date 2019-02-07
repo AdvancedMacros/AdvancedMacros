@@ -172,14 +172,18 @@ public class Settings {
 	//			b.
 	//		}
 	//	}
-	private static LuaValue loadTex(String file){
+	private static LuaValue loadTex(String file) {
+		return loadTex(file, null);
+	}
+	private static LuaValue loadTex(String file, Thread caller) {
 		try {
 			if(Thread.currentThread() != AdvancedMacros.getMinecraftThread()) {
 				final String sFile = file;
+				final Thread callingThread = Thread.currentThread();
 				ListenableFuture<LuaValue> future = Minecraft.getMinecraft().addScheduledTask(new Callable<LuaValue>() {
 					@Override
 					public LuaValue call() throws Exception {
-						return loadTex(sFile);
+						return loadTex(sFile, callingThread);
 					}
 				});
 				try {
@@ -187,17 +191,21 @@ public class Settings {
 						Thread.sleep(1);
 					}
 					if(future.isCancelled())
-						return null;
+						return LuaValue.NIL;
 					return future.get();
 				} catch (InterruptedException e) {
 					System.err.println("Interrupted durring texture grab");
-					return null;
+					return LuaValue.NIL;
 				} catch (ExecutionException e) {
 					e.printStackTrace();
-					return null;
+					return LuaValue.NIL;
 				}
 			}
-			DynamicTexture dTex = new DynamicTexture(ImageIO.read(Utils.parseFileLocation(file, 1)/*new File(file)*/));
+			DynamicTexture dTex;
+			if(caller!=null)
+				dTex = new DynamicTexture(ImageIO.read(Utils.parseFileLocation(caller, file, 1)/*new File(file)*/));
+			else 
+				dTex = new DynamicTexture(ImageIO.read(Utils.parseFileLocation(file, 1)/*new File(file)*/));
 			return new LuaValTexture(file, dTex);
 		} catch (IOException e) {
 			return LuaValue.NIL;

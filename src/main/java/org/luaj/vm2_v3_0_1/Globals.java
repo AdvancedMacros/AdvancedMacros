@@ -468,6 +468,11 @@ public class Globals extends LuaTable {
 			return luaThreads.getOrDefault(Thread.currentThread(), defaultLuaThread);
 		}
 	}
+	public LuaThread getLuaThread(Thread thread) {
+		synchronized (luaThreads) {
+			return luaThreads.getOrDefault(thread, defaultLuaThread);
+		}
+	}
 	public void setCurrentLuaThread(LuaThread thread) {
 		synchronized (luaThreads) {
 			luaThreads.put(Thread.currentThread(), thread);
