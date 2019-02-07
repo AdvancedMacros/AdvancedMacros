@@ -38,6 +38,8 @@ import org.luaj.vm2_v3_0_1.Print;
 import org.luaj.vm2_v3_0_1.Prototype;
 import org.luaj.vm2_v3_0_1.Varargs;
 
+import com.theincgi.advancedMacros.lua.LuaDebug;
+
 /** 
  * Subclass of {@link LibFunction} which implements the lua standard {@code debug} 
  * library. 
@@ -149,7 +151,15 @@ public class DebugLib extends TwoArgFunction {
 	// debug.gethook ([thread])
 	final class gethook extends VarArgFunction { 
 		public Varargs invoke(Varargs args) {
-			LuaThread t = args.narg() > 0 ? args.checkthread(1): globals.getCurrentLuaThread();
+			LuaThread t;
+			if(args.isthread(1))
+				t = args.checkthread(1);
+			else if (args.arg1() instanceof LuaDebug.ThreadControls) {
+				LuaDebug.ThreadControls ctrls = (LuaDebug.ThreadControls) args.arg1();
+				t = globals.getLuaThread(ctrls.getThread().getThread()); //theincgi.luaThread -> Java Thread -> LuaJ.luathread
+			}else {
+				t = globals.getCurrentLuaThread();
+			}
 			LuaThread.State s = t.state;
 			return varargsOf(
 					s.hookfunc != null? s.hookfunc: NIL,
@@ -162,7 +172,17 @@ public class DebugLib extends TwoArgFunction {
 	final class getinfo extends VarArgFunction { 
 		public Varargs invoke(Varargs args) {
 			int a=1;
-			LuaThread thread = args.isthread(a)? args.checkthread(a++): globals.getCurrentLuaThread(); 
+			
+			LuaThread thread;
+			if(args.isthread(a))
+				thread = args.checkthread(a++);
+			else if (args.arg1() instanceof LuaDebug.ThreadControls) {
+				LuaDebug.ThreadControls ctrls = (LuaDebug.ThreadControls) args.arg1();
+				thread = globals.getLuaThread(ctrls.getThread().getThread()); //theincgi.luaThread -> Java Thread -> LuaJ.luathread
+			}else {
+				thread = globals.getCurrentLuaThread();
+			}
+							
 			LuaValue func = args.arg(a++);
 			String what = args.optjstring(a++, "flnStu");
 			DebugLib.CallStack callstack = callstack(thread);
@@ -225,7 +245,15 @@ public class DebugLib extends TwoArgFunction {
 	final class getlocal extends VarArgFunction { 
 		public Varargs invoke(Varargs args) {
 			int a=1;
-			LuaThread thread = args.isthread(a)? args.checkthread(a++): globals.getCurrentLuaThread(); 
+			LuaThread thread;
+			if(args.isthread(a))
+				thread = args.checkthread(a++);
+			else if (args.arg1() instanceof LuaDebug.ThreadControls) {
+				LuaDebug.ThreadControls ctrls = (LuaDebug.ThreadControls) args.arg1();
+				thread = globals.getLuaThread(ctrls.getThread().getThread()); //theincgi.luaThread -> Java Thread -> LuaJ.luathread
+			}else {
+				thread = globals.getCurrentLuaThread();
+			}
 			int level = args.checkint(a++);
 			int local = args.checkint(a++);
 			CallFrame f = callstack(thread).getCallFrame(level);
@@ -276,7 +304,15 @@ public class DebugLib extends TwoArgFunction {
 	final class sethook extends VarArgFunction { 
 		public Varargs invoke(Varargs args) {
 			int a=1;
-			LuaThread t = args.isthread(a)? args.checkthread(a++): globals.getCurrentLuaThread(); 
+			LuaThread t;
+			if(args.isthread(a))
+				t = args.checkthread(a++);
+			else if (args.arg1() instanceof LuaDebug.ThreadControls) {
+				LuaDebug.ThreadControls ctrls = (LuaDebug.ThreadControls) args.arg1();
+				t = globals.getLuaThread(ctrls.getThread().getThread()); //theincgi.luaThread -> Java Thread -> LuaJ.luathread
+			}else {
+				t = globals.getCurrentLuaThread();
+			}
 			LuaValue func    = args.optfunction(a++, null);
 			String str       = args.optjstring(a++,"");
 			int count        = args.optint(a++,0);
@@ -301,7 +337,15 @@ public class DebugLib extends TwoArgFunction {
 	final class setlocal extends VarArgFunction { 
 		public Varargs invoke(Varargs args) {
 			int a=1;
-			LuaThread thread = args.isthread(a)? args.checkthread(a++): globals.getCurrentLuaThread(); 
+			LuaThread thread;
+			if(args.isthread(a))
+				thread = args.checkthread(a++);
+			else if (args.arg1() instanceof LuaDebug.ThreadControls) {
+				LuaDebug.ThreadControls ctrls = (LuaDebug.ThreadControls) args.arg1();
+				thread = globals.getLuaThread(ctrls.getThread().getThread()); //theincgi.luaThread -> Java Thread -> LuaJ.luathread
+			}else {
+				thread = globals.getCurrentLuaThread();
+			}
 			int level = args.checkint(a++);
 			int local = args.checkint(a++);
 			LuaValue value = args.arg(a++);
@@ -361,7 +405,15 @@ public class DebugLib extends TwoArgFunction {
 	final class traceback extends VarArgFunction { 
 		public Varargs invoke(Varargs args) {
 			int a=1;
-			LuaThread thread = args.isthread(a)? args.checkthread(a++): globals.getCurrentLuaThread(); 
+			LuaThread thread;
+			if(args.isthread(a))
+				thread = args.checkthread(a++);
+			else if (args.arg1() instanceof LuaDebug.ThreadControls) {
+				LuaDebug.ThreadControls ctrls = (LuaDebug.ThreadControls) args.arg1();
+				thread = globals.getLuaThread(ctrls.getThread().getThread()); //theincgi.luaThread -> Java Thread -> LuaJ.luathread
+			}else {
+				thread = globals.getCurrentLuaThread();
+			}
 			String message = args.optjstring(a++, null);
 			int level = args.optint(a++,1);
 			String tb = callstack(thread).traceback(level);

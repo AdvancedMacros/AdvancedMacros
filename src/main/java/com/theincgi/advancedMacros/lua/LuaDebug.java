@@ -124,7 +124,10 @@ public class LuaDebug extends DebugLib{
 			return threads.get(Thread.currentThread());
 		}
 
-
+		public Thread getThread() {
+			return thread;
+		}
+		
 		protected void register(Thread t){
 			threads.put(t, this);
 		}
@@ -340,7 +343,10 @@ public class LuaDebug extends DebugLib{
 				return valueOf(t.label);
 			}
 		}
-
+		
+		public LuaThread getThread() {
+			return t;
+		}
 	}
 
 
