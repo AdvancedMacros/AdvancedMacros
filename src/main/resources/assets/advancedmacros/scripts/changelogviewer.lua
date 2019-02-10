@@ -17,11 +17,24 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
-  " - ",
-  " - ",
-  " - ",
-  " - ",
-
+  " - The &adebug&f library has been repaired so that:",
+  "   - &bgetinfo&f doesn't give you the stack trace of another script that's",
+  "     also running at the same time",
+  "   - Debug hooks are now per thread",
+  "   - &bgetinfo&f now also allows you to pass in the &athread&f from &bthread.new&f (or",
+  "     &brunThread&f) as an optional first arg.",
+  "     &7*it is recommended that you pause the script first*",
+  " - The &eCHANGELOG&f can now be viewed from the bindings menu",
+  " - Fixed an issue where &bthread.new&f would only let you start",
+  "   one thread before telling you all your new threads are already done",
+  " - Fixed an issue where GuiImage and GuiRectangle were causing some render issues",
+  "   with elements drawn after them",
+  " - You can now get and set clipboard contents with:",
+  "   - &bos.getClipboard&f() and",
+  "   - &bos.setClipboard&f(&7 string &f)",
+  " - Fixed &bisKeyDown&f() so it should provide correct results even after a gui",
+  "   has been opened",
+  " - NBT tag data is now available on entities",
 
   "&7"..DIVIDER,
   
@@ -411,7 +424,108 @@ local changeLog = {
   " - Added &bthread.new() &fand &bthread.current()",
   "   &bthread.new() &fwill allow you to create a thread without starting it",
   "   &bthread.current() &fwill return controls for the current thread",
-  "   thread controls now contains &bgetID() &ffor comparison"
+  "   thread controls now contains &bgetID() &ffor comparison",
+  
+  -------------------------------------------------------------------
+  ----retro active change log
+   
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.2.5", 
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.2.5", 
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.2.5", 
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.8.0",
+  " - &cUpdated for use on Minecraft 1.12.2",
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.7.1",
+  " - Removed a line of code from testing that spams your console", 
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.7.0",
+  " - Now easier to set textures for holoblocks using vanilla textures.",
+  " - New function listTextures will return a list of textures register to the TextureMap.",
+  ' - Using .changeTexture on a holoblock with "block:" and one of the items from the ',
+  "   listTextures table will set the UV to that blocks spot on the blocks texture.", 
+  '   &7ex: hb.changeTexture("block:minecraft:blocks/redstone_block")',
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.6.0",
+  " - New function runThread(function/file, args...)", 
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.5.2", 
+  " - Fixed a bug that showed up all over the place (related to converting NBT data to tables) [Caused game crash]",
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.5.1",
+  " - Fixed a bug that made it impossible to join a multiplayer world.", 
+  " - implemented PlayerJoin event",
+  " - Implemented PlayerLeave event",
+  " - getBlock now gives NBT data as available.",
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.4.0", 
+  " - getEntityData now yields false if there is not entity with a matching id",
+  " - getEntityList no longer has duplicates",
+  " - playSound has volume control now closes",
+  " - call has been changed to run",
+  " - pcall has been changed to pRun",
+  "   &7native pcall should now be accessible",
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.3.2",
+  " - New event type ChatFilter works as Chat used to. The Chat event will not block messages, ChatFilter will.",
+  "- Fixed: Unable to get player velocity when riding something like a minecart", 
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.3.1",
+  " - Added velocity to getEntity", 
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.3.0",
+  ' - Edited Tool tip for look and look at to include "Number:" for time',
+  ' - Function "stopAllScripts" added to kill all the scripts instantly (tooltip included)',
+  ' - Actions like forward, back, left, use.. etc when passing a time of 0 will now instantly stop the action',
+  
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.2.5",
+  " - Fixed a bug related to getPlayerList",
+  "   &7(Removed &f from start of every name from getPlayerList())",
+  
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.2.4",
+  " - getPlayerList now returns names with their color codes in & format",
+  "   &7Tip: string.gsub can be used to filter them out",
+  
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.2.3",
+  "Fixed getPlayerList() returning an empty table",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.2.2",
+  " - Fixed:",
+  "   - New profiles could not be created",
+  '   - Script list would not update (now updates when "Scripts" is clicked from the main menu)',
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.2.1",
+  
+  "Initial release. Welcome!"
 }
 
 ---------------------------------------------------------------------------------

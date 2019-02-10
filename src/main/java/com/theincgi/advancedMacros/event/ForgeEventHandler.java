@@ -579,7 +579,7 @@ public class ForgeEventHandler {
 			LuaValue sFunc = AdvancedMacros.globals.load(in, "changeLog", "t", AdvancedMacros.globals);
 			LuaThread thread = new LuaThread(sFunc, "changelog");
 			thread.start();
-		} catch (IOException e) {e.printStackTrace();}
+		} catch (Throwable e) {e.printStackTrace();}
 //		Thread t = new Thread(()->{
 //			try {
 //				InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/changelogviewer.lua")).getInputStream();
