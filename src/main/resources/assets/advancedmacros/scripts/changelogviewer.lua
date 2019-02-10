@@ -429,15 +429,67 @@ local changeLog = {
   -------------------------------------------------------------------
   ----retro active change log
    
+  
   "&7"..DIVIDER,
   
-  "&b&BChange Log: &7version 3.2.5", 
+  "&b&BChange Log: &7version 3.", 
+  " - ",
+  
   "&7"..DIVIDER,
   
-  "&b&BChange Log: &7version 3.2.5", 
+  "&b&BChange Log: &7version 3.", 
+  " - ",
+  
   "&7"..DIVIDER,
   
-  "&b&BChange Log: &7version 3.2.5", 
+  "&b&BChange Log: &7version 3.10.0", 
+  " - &aFixed:",
+  "   - ",
+  "   - ",
+  " - &bAdded:",
+  "   - ",
+  "   - ",
+  "   - ",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.9.3", 
+  " - Added advancement toast messages.",
+  "   &7(bread not included)",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.9.2",
+  " - Fixed errors from scripts not showing in chat",
+  "  &7(seems the \ from the folder was messing with json formating)", 
+  
+   
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.9.1", 
+  " - This update may fix issues where color settings with overlapping names caused issues",
+  " - Some property names have been changed",
+   
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.9.0", 
+  " - Tab size property for text editor",
+  " - Dont need to press CTRL for deleting scripts",
+  " - Added text color controls GuiButton",
+  " - Added Choice Prompt",
+  " - getPlayer has mainHand, offHand and invSlot now",
+  " - Script browser and selection now uses a folder system.",
+  " - added new bugs",
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.8.2",
+  " - Fixed a compatibility issue with computerCraft.",
+  "   As a side effect you no longer need to download the luaj-jse jar as it is included in the mod files.", 
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 3.8.1",
+  " - Fixed a compatibility issue with InventoryTweaks.", 
+  "   &7ComputerCraft still has compatibility issues",
   "&7"..DIVIDER,
   
   "&b&BChange Log: &7version 3.8.0",
