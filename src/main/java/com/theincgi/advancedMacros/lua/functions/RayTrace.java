@@ -60,6 +60,7 @@ public class RayTrace {
 
 			Vec3d end = optVec.a.add( vec.a.scale( distance ) );
 			RayTraceResult rtr = Minecraft.getMinecraft().world.rayTraceBlocks( optVec.a, end, stopOnLiquid, false, true);
+			//Minecraft.getMinecraft().objectMouseOver
 			LuaValue result = Utils.rayTraceResultToLuaValue(rtr);
 			return result;
 		}

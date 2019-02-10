@@ -28,6 +28,8 @@ import com.theincgi.advancedMacros.misc.Utils;
 import net.minecraft.client.gui.GuiNewChat;
 import net.minecraft.launchwrapper.IClassTransformer;
 
+//-Dfml.coreMods.load=com.theincgi.advancedMacros.asm.AdvancedMacrosCorePlugin
+//as a VM argument for the launch config if you want this to apply when working in a dev env.
 public class ChatLinesEditThingAndOthers implements IClassTransformer{
 	/**
 	 * {@link GuiNewChat}

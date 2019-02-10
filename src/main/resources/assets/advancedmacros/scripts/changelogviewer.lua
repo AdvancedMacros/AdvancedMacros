@@ -17,6 +17,16 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  " - ",
+  " - ",
+  " - ",
+  " - ",
+
+
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 7.0.0",
+  
   " &cMajor:",
   " - the return value of &bgetBlockList&f() has been changed",
   "   to a string key, each value has a table with a key of the dmg and",

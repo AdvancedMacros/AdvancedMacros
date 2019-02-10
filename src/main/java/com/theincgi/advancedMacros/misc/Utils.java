@@ -530,6 +530,7 @@ public class Utils {
 		t.set("isSprinting", LuaValue.valueOf(entity.isSprinting()));
 		t.set("entityRiding", Utils.entityToTable(entity.getRidingEntity()));
 		t.set("isInvisible", LuaValue.valueOf(entity.isInvisible()));
+		t.set("nbt", NBTUtils.fromCompound(entity.serializeNBT()));
 		t.set("uuid", LuaValue.valueOf(entity.getUniqueID().toString()));
 		{
 			RayTraceResult rtr = entity.rayTrace(8, 0);
