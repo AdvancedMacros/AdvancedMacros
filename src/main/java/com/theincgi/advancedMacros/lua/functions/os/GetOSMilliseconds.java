@@ -1,4 +1,4 @@
-package com.theincgi.advancedMacros.lua.functions;
+package com.theincgi.advancedMacros.lua.functions.os;
 
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;

@@ -47,7 +47,6 @@ import com.theincgi.advancedMacros.lua.functions.GetBlock;
 import com.theincgi.advancedMacros.lua.functions.GetBlockList;
 import com.theincgi.advancedMacros.lua.functions.GetInventory;
 import com.theincgi.advancedMacros.lua.functions.GetLoadedPlayers;
-import com.theincgi.advancedMacros.lua.functions.GetOSMilliseconds;
 import com.theincgi.advancedMacros.lua.functions.GetPlayer;
 import com.theincgi.advancedMacros.lua.functions.GetPlayerBlockPos;
 import com.theincgi.advancedMacros.lua.functions.GetPlayerList;
@@ -70,6 +69,7 @@ import com.theincgi.advancedMacros.lua.functions.RunThread;
 import com.theincgi.advancedMacros.lua.functions.SetProfile;
 import com.theincgi.advancedMacros.lua.functions.SkinCustomizer;
 import com.theincgi.advancedMacros.lua.functions.StopAllScripts;
+import com.theincgi.advancedMacros.lua.functions.StringTrim;
 import com.theincgi.advancedMacros.lua.functions.Toast;
 import com.theincgi.advancedMacros.lua.functions.entity.GetAABB;
 import com.theincgi.advancedMacros.lua.functions.entity.GetEntityData;
@@ -78,6 +78,8 @@ import com.theincgi.advancedMacros.lua.functions.entity.HighlightEntity;
 import com.theincgi.advancedMacros.lua.functions.midi.MidiLib2;
 import com.theincgi.advancedMacros.lua.functions.minecraft.GetChunkUpdates;
 import com.theincgi.advancedMacros.lua.functions.minecraft.GetFPS;
+import com.theincgi.advancedMacros.lua.functions.os.ClipBoard;
+import com.theincgi.advancedMacros.lua.functions.os.GetOSMilliseconds;
 import com.theincgi.advancedMacros.lua.modControl.EditorControls;
 import com.theincgi.advancedMacros.lua.scriptGui.ScriptGui;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
@@ -242,6 +244,9 @@ public class AdvancedMacros {
 		
 		globals.get("os").set("millis", new GetOSMilliseconds());
 		globals.get("os").set("exit", LuaValue.NIL);
+		globals.get("os").set("getClipboard", new ClipBoard.GetClipboard());
+		globals.get("os").set("setClipboard", new ClipBoard.SetClipboard());
+		globals.get("string").set("trim", new StringTrim());
 		
 		LuaTable imgTools = new LuaTable();
 		imgTools.set("new", new BufferedImageControls.CreateImg());

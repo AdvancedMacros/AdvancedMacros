@@ -199,7 +199,7 @@ public class ForgeEventHandler {
 			boolean oldState = heldKeys.getOrDefault(eventKey, false);
 			if(oldState && Keyboard.isKeyDown(eventKey)){
 				//was in, is in now
-				return;
+				return;  //blocks keyRepeats
 			}
 			if(Keyboard.isKeyDown(eventKey))
 				heldKeys.put(eventKey, true);
