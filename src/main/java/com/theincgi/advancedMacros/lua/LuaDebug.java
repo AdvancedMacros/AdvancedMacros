@@ -20,22 +20,28 @@ import com.theincgi.advancedMacros.lua.util.LuaMutex;
 import com.theincgi.advancedMacros.misc.Utils;
 
 public class LuaDebug extends DebugLib{
-	private static HashMap<Thread, LuaThread> threads = new HashMap<>();
+	private static final HashMap<Thread, LuaThread> threads = new HashMap<>();
 
 	private static LinkedList<StatusListener> statusListeners = new LinkedList<>();
 	public abstract static class StatusListener{
 		public abstract void onStatus(final Thread sThread, Status status);
 	}
 	public void addStatusListener(StatusListener sl){
-		statusListeners.add(sl);
+		synchronized (statusListeners) {
+			statusListeners.add(sl);
+		}
 	}
 	public void removeStatusListener(StatusListener sl){
-		statusListeners.remove(sl);
+		synchronized (statusListeners) {
+			statusListeners.remove(sl);
+		}
 	}
 	private static void notifyStatusListeners(Thread sThread, Status status){
-		Iterator<StatusListener> listeners = statusListeners.iterator();
-		while(listeners.hasNext()){
-			listeners.next().onStatus(sThread, status);
+		synchronized (statusListeners) {
+			Iterator<StatusListener> listeners = statusListeners.iterator();
+			while(listeners.hasNext()){
+				listeners.next().onStatus(sThread, status);
+			}
 		}
 	}
 	@Override
@@ -56,7 +62,9 @@ public class LuaDebug extends DebugLib{
 				return;
 			}
 			case STOPPED:
-				threads.remove(Thread.currentThread());
+				synchronized (threads) {
+					threads.remove(Thread.currentThread());
+				}
 				throw new LuaError("Script was stopped");
 			default:
 				break;
@@ -127,9 +135,11 @@ public class LuaDebug extends DebugLib{
 		public Thread getThread() {
 			return thread;
 		}
-		
+
 		protected void register(Thread t){
-			threads.put(t, this);
+			synchronized (threads) {
+				threads.put(t, this);
+			}
 		}
 		/**returns a LuaTable for controlling this thread*/
 		public LuaTable start(){
@@ -343,7 +353,7 @@ public class LuaDebug extends DebugLib{
 				return valueOf(t.label);
 			}
 		}
-		
+
 		public LuaThread getThread() {
 			return t;
 		}
@@ -352,8 +362,10 @@ public class LuaDebug extends DebugLib{
 
 
 	public void stopAll() { //FIXME concurrent mod
-		for (LuaThread t : threads.values()) {
-			t.stop();
+		synchronized (threads) {
+			for (LuaThread t : threads.values()) {
+				t.stop();
+			}
 		}
 	}
 
@@ -361,9 +373,11 @@ public class LuaDebug extends DebugLib{
 		@Override
 		public LuaValue call() {
 			LuaTable scripts = new LuaTable();
-			for (Entry<Thread, LuaThread> e : threads.entrySet()) {
-				if(e.getValue().status == Status.RUNNING || e.getValue().status==Status.PAUSED)
-					scripts.set(valueOf(e.getKey().getId()), ThreadControls.getControls(e.getValue()));
+			synchronized (threads) {
+				for (Entry<Thread, LuaThread> e : threads.entrySet()) {
+					if(e.getValue().status == Status.RUNNING || e.getValue().status==Status.PAUSED)
+						scripts.set(valueOf(e.getKey().getId()), ThreadControls.getControls(e.getValue()));
+				}
 			}
 			return scripts;
 		}

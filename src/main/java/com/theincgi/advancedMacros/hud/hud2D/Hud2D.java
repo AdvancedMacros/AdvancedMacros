@@ -42,6 +42,8 @@ public class Hud2D extends LuaTable{
 				ScaledResolution scaled = new ScaledResolution(mc);
 				temp.set(1, LuaValue.valueOf(scaled.getScaledWidth()));
 				temp.set(2, LuaValue.valueOf(scaled.getScaledHeight()));
+				temp.set(3, valueOf(mc.displayWidth));
+				temp.set(4, valueOf(mc.displayHeight));
 				return temp.unpack();
 			case newBox:
 				Hud2D_Box box = new Hud2D_Box();

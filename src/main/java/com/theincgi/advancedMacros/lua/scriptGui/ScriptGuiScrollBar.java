@@ -171,4 +171,8 @@ public class ScriptGuiScrollBar extends ScriptGuiElement{
 	public void setHeight(int i) {
 		bar.setHeight(i);
 	}
+	@Override
+	public void setPos(int x, int y) {
+		bar.setPos(x, y);
+	}
 }

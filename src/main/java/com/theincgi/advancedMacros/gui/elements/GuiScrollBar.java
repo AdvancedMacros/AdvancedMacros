@@ -147,10 +147,10 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 		    buttonShade =propertyPalette.getColor("colors", "buttonShade").toInt();
 		
 		if(orientation.isUPDOWN()){
-			gui.drawBoxedRectangle(x, y, wid, len, barFrame, barBG);
+			gui.drawBoxedRectangle(x, y, wid, len, barFrame, barBG); //track
 			int buttonLen = getButtonLen()-1;
 			int buttonY =   getButtonY()+1;
-			gui.drawBoxedRectangle(x+1, buttonY, wid-2, buttonLen, buttonFrame, buttonFill);
+			gui.drawBoxedRectangle(x+1, buttonY-1, wid-2, buttonLen+1, buttonFrame, buttonFill);
 			gui.drawHorizontalLine(x+4, x+wid-4, buttonY+buttonLen/2, buttonDetail);
 			gui.drawHorizontalLine(x+4, x+wid-4, buttonY+buttonLen/2-2, buttonDetail);
 			gui.drawHorizontalLine(x+4, x+wid-4, buttonY+buttonLen/2+2, buttonDetail);
@@ -160,7 +160,7 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 				net.minecraft.client.gui.Gui.drawRect(x+1, buttonY, wid+x, buttonLen+buttonY+1, buttonShade);
 			}
 		}else if(orientation.isLEFTRIGHT()){
-			gui.drawBoxedRectangle(x, y, len, wid, barFrame, barBG);
+			gui.drawBoxedRectangle(x, y, len, wid, barFrame, barBG); //track
 			
 			gui.drawBoxedRectangle(getButtonX(), y+1, getButtonLen()-1, wid-2, buttonFrame, buttonFill);
 			

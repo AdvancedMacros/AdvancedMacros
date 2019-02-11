@@ -1,6 +1,7 @@
 package com.theincgi.advancedMacros.gui;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.luaj.vm2_v3_0_1.LuaValue;
 
@@ -21,7 +22,7 @@ import net.minecraft.client.Minecraft;
 public class RunningScriptsGui extends Gui{
 	ListManager listManager;
 	private LuaDebug luaDebug;
-	HashMap<Thread, Script> scripts = new HashMap<>(10);
+	ConcurrentHashMap<Thread, Script> scripts = new ConcurrentHashMap<>(10);
 	public RunningScriptsGui(LuaDebug luaDebug) {
 		this.luaDebug = luaDebug;
 		listManager = new ListManager(5, 17, width-10, height-22, /*new WidgetID(700), "colors.runningScripts"*/ new PropertyPalette());

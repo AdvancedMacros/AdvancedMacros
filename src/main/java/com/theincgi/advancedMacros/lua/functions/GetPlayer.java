@@ -143,6 +143,9 @@ public class GetPlayer extends OneArgFunction {
 		t.set("entityID", valueOf(player.getEntityId()));
 		t.set("gamemode", player.isSpectator()?"spectator":player.isCreative()?"creative":"survival");
 		
+		if(player.equals(Minecraft.getMinecraft().player)) {
+			t.set("target", Utils.rayTraceResultToLuaValue(Minecraft.getMinecraft().objectMouseOver));
+		}
 		
 		return t;
 		}catch (Exception e) {

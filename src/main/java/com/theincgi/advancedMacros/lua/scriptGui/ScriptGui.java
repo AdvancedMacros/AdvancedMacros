@@ -90,6 +90,8 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				ScaledResolution scaled = new ScaledResolution(mc);
 				temp.set(1, LuaValue.valueOf(scaled.getScaledWidth()));
 				temp.set(2, LuaValue.valueOf(scaled.getScaledHeight()));
+				temp.set(3, valueOf(mc.displayWidth));
+				temp.set(4, valueOf(mc.displayHeight));
 				return temp.unpack();
 			}
 			case newBox:
@@ -160,8 +162,8 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				cta.getCTA().setText( args.optstring(5, valueOf("")).tojstring() );
 				return cta;
 			case open:
-				Minecraft.getMinecraft().displayGuiScreen(gui);
 				Minecraft.getMinecraft().addScheduledTask(()->{
+					Minecraft.getMinecraft().displayGuiScreen(gui);
 					Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
 				});
 				if(onGuiOpen!=null)

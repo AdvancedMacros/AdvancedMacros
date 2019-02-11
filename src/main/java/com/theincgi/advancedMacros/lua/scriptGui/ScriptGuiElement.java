@@ -243,6 +243,15 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 				return LuaValue.NONE;
 			}
 		});
+		set("setSize", new TwoArgFunction() {
+			@Override public LuaValue call(LuaValue arg1, LuaValue arg2) {
+				int w = arg1.checkint();
+				int h = arg2.checkint();
+				setWidth(w);
+				setHeight(h);
+				return null;
+			}
+		});
 	}
 	private void addInputControls(LuaTable s) {
 		s.set("setOnScroll", new OneArgFunction() {
@@ -321,8 +330,8 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 
 	@Override
 	public void setPos(int x, int y) {
-		this.x = x;
-		this.y = y;
+		setX(x);
+		setY(y);
 	}
 	
 	@Override

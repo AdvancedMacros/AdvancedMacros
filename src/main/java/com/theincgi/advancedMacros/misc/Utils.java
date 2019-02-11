@@ -1330,6 +1330,7 @@ public class Utils {
 			return LuaValue.FALSE;
 		case ENTITY:
 			result.set("entity", Utils.entityToTable(rtr.entityHit));
+			break;
 		case BLOCK:
 			BlockPos pos = rtr.getBlockPos();
 			result.set("pos", Utils.blockPosToTable(pos));
@@ -1344,7 +1345,8 @@ public class Utils {
 		vec3d.set(2, rtr.hitVec.y);
 		vec3d.set(3, rtr.hitVec.z);
 		result.set("vec", vec3d);
-		result.set("side", rtr.sideHit.name().toLowerCase());
+		if( rtr.sideHit != null)
+			result.set("side", rtr.sideHit.name().toLowerCase());
 		result.set("subHit", rtr.subHit);
 		return result;
 	}
