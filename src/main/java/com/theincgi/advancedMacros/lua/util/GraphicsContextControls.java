@@ -1,7 +1,9 @@
 package com.theincgi.advancedMacros.lua.util;
 
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Polygon;
 import java.awt.Rectangle;
@@ -21,11 +23,11 @@ import com.theincgi.advancedMacros.misc.Utils;
 public class GraphicsContextControls extends LuaTable{
 	BufferedImage img;
 	BufferedImageControls bic;
-	Graphics g;
+	Graphics2D g;
 	public GraphicsContextControls(BufferedImageControls bi) {
 		bic = bi;
 		img = bi.img;
-		g = img.getGraphics();
+		g = img.createGraphics();
 
 		loadFuncs();
 
@@ -131,30 +133,7 @@ public class GraphicsContextControls extends LuaTable{
 			}
 			case setFont:{
 				//TODO table arg and vararg name, <size>, <bold>, <italic>
-				Font f = null;
-				switch(args.narg()) {
-				case 1:
-					if(args.istable(1)) {
-						LuaTable t = args.arg1().checktable();
-						int flag = t.get("bold").optboolean(false)? Font.BOLD : Font.PLAIN;
-						flag = t.get("italic").optboolean(false)? flag | Font.ITALIC : flag;
-						f = new Font(t.get("name").checkjstring(), flag, t.get("size").optint(12)); //default size 12
-						throw new LuaError("Unimplemented"); //TODO
-					}else{
-						f = Font.getFont(args.checkjstring(1));
-					}
-					break;
-				case 2:
-					f = new Font(args.checkjstring(1), Font.PLAIN, args.checkint(2)); //name, size
-					break;
-				case 3:
-				case 4:
-					int flag = args.optboolean(3, false)? Font.BOLD : Font.PLAIN;
-					flag = args.optboolean(4, false)? flag | Font.ITALIC : flag;
-					f = new Font(args.checkjstring(1), flag, args.checkint(2)); //name, size
-				default:
-					throw new LuaError("Unexpected number of arguments");
-				}
+				Font f = parseFont(args);
 				g.setFont(f);
 				return NONE;
 			}
@@ -315,11 +294,66 @@ public class GraphicsContextControls extends LuaTable{
 				//			  throw new LuaError("Unimplemented");
 				//			case hashCode:
 				//				return LuaValue.valueOf(img.hashCode());
+			case rotate:{
+				double cx = img.getWidth()/2f, cy = img.getHeight()/2f;
+				g.rotate(args.checkdouble(1), args.optdouble(2, cx), args.optdouble(3, cy));
+				return NONE;
+			}
+			case scale:{
+				g.scale(args.checkdouble(1), args.checkdouble(2));
+				return NONE;
+			}
+			case measureString:{
+				String s = args.tojstring(1);
+				
+				Font font = args.arg(2).isnil()? g.getFont() : parseFont(args.arg(2));
+				LuaTable out = new LuaTable();
+				FontMetrics fm = g.getFontMetrics( font );
+				out.set(1, fm.stringWidth(s));
+				out.set(2, fm.getHeight());
+				
+				LuaTable extra = new LuaTable();
+				out.set(3, extra);
+				extra.set("ascent", fm.getAscent());
+				extra.set("descent", fm.getDescent());
+				extra.set("leading", fm.getLeading());
+				return out.unpack();
+			}
 			default:
 				throw new LuaError("Undefined action for opperation '"+op.name()+"'");
 			}
 		}
+		
 	}
+	
+	public static Font parseFont(Varargs args) {
+		Font f = null;
+		switch(args.narg()) {
+		case 1:
+			if(args.istable(1)) {
+				LuaTable t = args.arg1().checktable();
+				int flag = t.get("bold").optboolean(false)? Font.BOLD : Font.PLAIN;
+				flag = t.get("italic").optboolean(false)? flag | Font.ITALIC : flag;
+				f = new Font(t.get("name").checkjstring(), flag, t.get("size").optint(12)); //default size 12
+				throw new LuaError("Unimplemented"); //TODO
+			}else{
+				f = Font.getFont(args.checkjstring(1));
+			}
+			break;
+		case 2:
+			f = new Font(args.checkjstring(1), Font.PLAIN, args.checkint(2)); //name, size
+			break;
+		case 3:
+		case 4:
+			int flag = args.optboolean(3, false)? Font.BOLD : Font.PLAIN;
+			flag = args.optboolean(4, false)? flag | Font.ITALIC : flag;
+			f = new Font(args.checkjstring(1), flag, args.checkint(2)); //name, size
+		default:
+			throw new LuaError("Unexpected number of arguments");
+		}
+		return f;
+	}
+	
 	public static enum Draw {
 		//getFontMetrics, 
 		drawImage, 
@@ -356,9 +390,13 @@ public class GraphicsContextControls extends LuaTable{
 		getClip, 
 		fillRect, 
 		drawRect, 
-		drawRoundRect
+		drawRoundRect,
 		//equals, 
-		, getFonts;
+		getFonts,
+		rotate,
+		scale, 
+		measureString
+		;
 
 		public String[] getDocLocation() {
 			//image.new.___

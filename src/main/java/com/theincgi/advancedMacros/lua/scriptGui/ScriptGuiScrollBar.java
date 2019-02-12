@@ -3,6 +3,7 @@ package com.theincgi.advancedMacros.lua.scriptGui;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
+import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.elements.GuiScrollBar;
@@ -31,11 +32,23 @@ public class ScriptGuiScrollBar extends ScriptGuiElement{
 				return NONE;
 			}
 		});
+		this.set("getMaxItems", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return valueOf(bar.getItems());
+			}
+		});
 		this.set("setVisibleItems", new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg) {
 				bar.setVisibleItems(arg.checkint());
 				return NONE;
+			}
+		});
+		this.set("getVisibleItems", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return valueOf(bar.getVisibleItems());
 			}
 		});
 		this.set("setScrollPos", new OneArgFunction() {
@@ -134,7 +147,8 @@ public class ScriptGuiScrollBar extends ScriptGuiElement{
 	@Override
 	public boolean onScroll(Gui gui, int i) {
 		if(bar.onScroll(gui, i)) {
-			Utils.pcall(onScroll, LuaValue.valueOf(i));
+			if(onScroll!=null)
+				Utils.pcall(onScroll, LuaValue.valueOf(i));
 			return true;
 		}
 		return false;

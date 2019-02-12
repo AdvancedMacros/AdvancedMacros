@@ -88,7 +88,7 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 		setPos(getOffset());
 	}
 	/**This is the scrollbar position*/
-	public double getOffset(){
+	public double getOffset(){ //FIXME gui scrollbar to start at 1?
 		return pos;
 	}
 

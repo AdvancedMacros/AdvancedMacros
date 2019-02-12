@@ -62,7 +62,7 @@ public class BufferedImageControls extends LuaTable{
 			return out;
 		}
 	}
-
+	
 
 	public BufferedImageControls(BufferedImage img) {
 		this.img = img;
