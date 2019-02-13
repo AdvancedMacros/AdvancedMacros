@@ -886,12 +886,16 @@ tmp = g.newBox(93, 9, 14, 14, 1)
 tmp.setColor( 0xFFAAAAAA )
 tmp.setParent( group )
 --scrollbar setup
-function onScroll(...)
+
+s.setOnMouseDrag( function(...)
   local pos = s.getScrollPos()
   group.setPos(0, pos*-12)
-end
-s.setOnMouseDrag( onScroll )
-s.setOnScroll( onScroll )
+end )
+s.setOnScroll( function (amount)
+  s.scroll(amount )
+  local pos = s.getScrollPos()
+  group.setPos(0, pos*-12)
+end )
 
 --generate text elements
 for i, text in pairs(changeLog) do

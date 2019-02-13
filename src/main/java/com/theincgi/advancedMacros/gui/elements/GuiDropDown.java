@@ -348,7 +348,7 @@ public class GuiDropDown implements Drawable, InputSubscriber, Moveable{
 
 
 	public void setScrollSpeed(int i) {
-		listManager.scrollBar.setScrollMagnifier(i);
+		listManager.scrollBar.setScrollPos(i);
 	}
 
 	

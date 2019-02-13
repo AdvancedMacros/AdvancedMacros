@@ -18,7 +18,7 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	private Orientation orientation;
 	private WidgetID wID;
 	private int x,y,wid,len;
-	public boolean needsFocus = false;
+	//public boolean needsFocus = false;
 	private boolean isVisible=true;
 	private double scrollSpeed = 1;
 	
@@ -136,7 +136,7 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	}
 	
 	@Override
-	public void onDraw(Gui gui, int mouseX, int mouseY, float partialTicks) {
+	public void onDraw(Gui gui, int mouseX, int mouseY, float partialTicks) { //FIXME not OCD friendly
 		if(!isVisible()){return;}
 		
 		int barFrame =   propertyPalette.getColor("colors", "bgFrame").toInt(),
@@ -203,16 +203,13 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	}
 
 	
-	double scrollMagnifier = 1;
-	public void setScrollMagnifier(double scrollMagnifier) {
-		this.scrollMagnifier = scrollMagnifier;
-	}
+
 	@Override
 	public boolean onScroll(Gui gui, int sign) {
 		double lastPos = getOffset();
 		double i = sign*scrollSpeed;
 		if(visible<items){
-			setPos(pos - i*scrollMagnifier);
+			setPos(pos - i);
 			return lastPos!=getOffset();
 		}
 		return false;
@@ -286,8 +283,11 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 		this.pos = Math.min(items-visible, Math.max(0, pos));
 	}
 	/**This should totes work*/
-	public void focusToItem(int i){
+	public void focusToItem(double i){
 		setPos(i-visible/2);
+	}
+	public void setScrollPos(double i) {
+		setPos(i);
 	}
 
 	@Override
@@ -408,6 +408,9 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	
 	public void setScrollSpeed(double speed) {
 		scrollSpeed = speed;
+	}
+	public double getScrollSpeed() {
+		return scrollSpeed;
 	}
 	
 	/**Always focused*/

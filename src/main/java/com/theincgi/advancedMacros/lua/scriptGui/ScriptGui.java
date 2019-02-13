@@ -9,6 +9,8 @@ import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.event.ForgeEventHandler;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
 import com.theincgi.advancedMacros.gui.elements.GuiScrollBar.Orientation;
@@ -16,6 +18,7 @@ import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 
 public class ScriptGui extends LuaTable implements InputSubscriber{
@@ -33,8 +36,9 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 			public void onGuiClosed() {
 				super.onGuiClosed();
 				if(onGuiClose!=null) {
-					onGuiClose.call();
+					Utils.pcall(onGuiClose);
 				}
+				GuiScreen tmp = Minecraft.getMinecraft().currentScreen;
 			}
 			@Override
 			public void drawScreen(int mouseX, int mouseY, float partialTicks) {
@@ -50,7 +54,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 			public void onResize(Minecraft mcIn, int w, int h) {
 				super.onResize(mcIn, w, h);
 				if(onResize!=null)
-					onResize.call(valueOf(w), valueOf(h));
+					Utils.pcall(onResize, valueOf(w), valueOf(h));
 			}
 			@Override
 			public String toString() {
@@ -162,7 +166,10 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				cta.getCTA().setText( args.optstring(5, valueOf("")).tojstring() );
 				return cta;
 			case open:
+				AdvancedMacros.forgeEventHandler.releaseAllKeys();
 				Minecraft.getMinecraft().addScheduledTask(()->{
+					System.out.println("DEBUG: was: "+ Minecraft.getMinecraft().currentScreen + 
+							" and is going to be: "+gui);
 					Minecraft.getMinecraft().displayGuiScreen(gui);
 					Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
 				});

@@ -191,9 +191,13 @@ public class GraphicsContextControls extends LuaTable{
 						args.checkint(3), args.checkint(4)); //width, height
 				return NONE;
 
-			case clearRect:
+			case clearRect:{
+				java.awt.Color old = g.getBackground();
+				g.setBackground(Color.CLEAR.toAWTColor());
 				g.clearRect(args.checkint(1)-1, args.checkint(2)-1,  //x, y
 						args.checkint(3), args.checkint(4)); //width, height
+				g.setBackground(old);
+				}
 				return NONE;
 
 			case drawRoundRect:

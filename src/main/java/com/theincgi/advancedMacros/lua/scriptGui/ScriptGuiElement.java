@@ -143,6 +143,14 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 				return LuaValue.valueOf(getItemHeight());
 			}
 		});
+		this.set("getSize", new VarArgFunction() {
+			@Override public Varargs invoke(Varargs args) {
+				LuaTable out=new LuaTable();
+				out.set(1, getItemWidth());
+				out.set(2, getItemHeight());
+				return out.unpack();
+			}
+		});
 
 		this.set("setHoverTint", new VarArgFunction() {
 			@Override
@@ -369,7 +377,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 	@Override
 	public boolean onScroll(Gui gui, int i) {
 		if(onScroll != null) {
-			return Utils.pcall(onScroll, LuaValue.valueOf(i)).optboolean(false);
+			return Utils.pcall(onScroll, LuaValue.valueOf(i)).toboolean();
 		}
 		return false;
 	}
@@ -377,14 +385,14 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 	@Override
 	public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
 		if(onMouseClick != null && GuiButton.isInBounds(x, y, (int)this.x, (int)this.y, (int)wid, (int)hei))
-			return Utils.pcall(onMouseClick, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(buttonNum)).optboolean(false);
+			return Utils.pcall(onMouseClick, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(buttonNum)).toboolean();
 		return false;
 	}
 
 	@Override
 	public boolean onMouseRelease(Gui gui, int x, int y, int state) {
 		if(onMouseRelease!=null && GuiButton.isInBounds(x, y, (int)this.x, (int)this.y, (int)wid, (int)hei))
-			return Utils.pcall(onMouseRelease, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(state)).optboolean(false);
+			return Utils.pcall(onMouseRelease, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(state)).toboolean();
 		return false;
 	}
 
@@ -396,7 +404,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 			args.set(2, LuaValue.valueOf(y));
 			args.set(3, LuaValue.valueOf(buttonNum));
 			args.set(4, LuaValue.valueOf(timeSinceClick));
-			return Utils.pcall(onMouseDrag,args.unpack()).optboolean(false);
+			return Utils.pcall(onMouseDrag,args.unpack()).toboolean();
 		}
 		return false;
 	}
@@ -404,21 +412,21 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 	@Override
 	public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
 		if(onKeyPressed!=null)
-			return Utils.pcall(onKeyPressed, LuaValue.valueOf(typedChar), LuaValue.valueOf(keyCode)).optboolean(false);
+			return Utils.pcall(onKeyPressed, LuaValue.valueOf(typedChar), LuaValue.valueOf(keyCode)).toboolean();
 		return false;
 	}
 
 	@Override
 	public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
 		if(onKeyRepeated!=null)
-			return Utils.pcall(onKeyRepeated, LuaValue.valueOf(typedChar), LuaValue.valueOf(keyCode), LuaValue.valueOf(repeatMod)).optboolean(false);
+			return Utils.pcall(onKeyRepeated, LuaValue.valueOf(typedChar), LuaValue.valueOf(keyCode), LuaValue.valueOf(repeatMod)).toboolean();
 		return false;
 	}
 
 	@Override
 	public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
 		if(onKeyReleased!=null)
-			return Utils.pcall(onKeyReleased, LuaValue.valueOf(typedChar), LuaValue.valueOf(keyCode)).optboolean(false);
+			return Utils.pcall(onKeyReleased, LuaValue.valueOf(typedChar), LuaValue.valueOf(keyCode)).toboolean();
 		return false;
 	}
 	public int getColorInt() {

@@ -54,7 +54,14 @@ public class ScriptGuiScrollBar extends ScriptGuiElement{
 		this.set("setScrollPos", new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg) {
-				bar.focusToItem(arg.checkint());
+				bar.setScrollPos(arg.checkdouble());
+				return NONE;
+			}
+		});
+		this.set("focusTo", new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg) {
+				bar.focusToItem(arg.checkdouble());
 				return NONE;
 			}
 		});
@@ -62,6 +69,24 @@ public class ScriptGuiScrollBar extends ScriptGuiElement{
 			@Override
 			public LuaValue call(LuaValue arg) {
 				return valueOf(bar.getOffset());
+			}
+		});
+		this.set("setScrollSpeed", new OneArgFunction() {
+			@Override public LuaValue call(LuaValue arg) {
+				bar.setScrollSpeed(arg.checkdouble());
+				return null;
+			}
+		});
+		this.set("getScrollSpeed", new ZeroArgFunction() {
+			@Override public LuaValue call() {
+				return valueOf(bar.getScrollSpeed());
+			}
+		});
+		this.set("scroll", new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue sign) {
+				bar.onScroll(gui, sign.checkint());
+				return NONE;
 			}
 		});
 		//		this.set("setWidth", new OneArgFunction() {
@@ -144,15 +169,12 @@ public class ScriptGuiScrollBar extends ScriptGuiElement{
 		}
 		return false;
 	}
-	@Override
-	public boolean onScroll(Gui gui, int i) {
-		if(bar.onScroll(gui, i)) {
-			if(onScroll!=null)
-				Utils.pcall(onScroll, LuaValue.valueOf(i));
-			return true;
-		}
-		return false;
-	}
+//	@Override
+//	public boolean onScroll(Gui gui, int i) {
+//			if(onScroll!=null)
+//				return Utils.pcall(onScroll, LuaValue.valueOf(i)).toboolean();
+//			return false;
+//	}
 	@Override
 	public void setX(int x) {
 		bar.setX(x);
