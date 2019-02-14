@@ -100,7 +100,7 @@ public class Group extends LuaTable implements Moveable, InputSubscriber, Drawab
 			}
 		});
 		
-		
+		this.set("__class", "advancedMacros.GuiGroup");
 		//		controls.set("setWidthCalculate", new OneArgFunction() {
 		//			@Override
 		//			public LuaValue call(LuaValue arg) {

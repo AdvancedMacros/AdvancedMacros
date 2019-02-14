@@ -56,7 +56,7 @@ public class ScriptGuiText extends ScriptGuiElement{
 				return NONE;
 			}
 		});
-		
+		set("__class", "advancedMacros.GuiText");
 	}
 	
 	@Override

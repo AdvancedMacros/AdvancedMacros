@@ -30,6 +30,9 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 	onGuiOpen, onResize;
 	Group guiGroup = new Group();
 	ScriptGui parentGui = null;
+	private boolean isOpen = false;
+	private boolean pausesGame = true;
+	private double lastMouseX, lastMouseY;
 	public ScriptGui() { 
 		gui = new Gui() {
 			@Override
@@ -38,10 +41,13 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				if(onGuiClose!=null) {
 					Utils.pcall(onGuiClose);
 				}
-				GuiScreen tmp = Minecraft.getMinecraft().currentScreen;
+				isOpen = false;
+				//GuiScreen tmp = Minecraft.getMinecraft().currentScreen;
 			}
 			@Override
 			public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+				lastMouseX = mouseX;
+				lastMouseY = mouseY;
 				if(parentGui!=null) {
 					parentGui.gui.drawScreen(mouseX, mouseY, partialTicks);
 					setDrawDefaultBackground(false);
@@ -57,6 +63,10 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 					Utils.pcall(onResize, valueOf(w), valueOf(h));
 			}
 			@Override
+			public boolean doesGuiPauseGame() {
+				return pausesGame;
+			}
+			@Override
 			public String toString() {
 				return "ScriptGui:"+guiName;
 			}
@@ -66,7 +76,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 		for(OpCodes op : OpCodes.values()) {
 			set(op.name(), new CallableTable( op.getDocLocation() , new DoOperation( op ) ));
 		}
-		
+		set("__class", "advancedMacros.ScriptGui");
 		addInputControls(this);
 	}
 	
@@ -168,14 +178,15 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 			case open:
 				AdvancedMacros.forgeEventHandler.releaseAllKeys();
 				Minecraft.getMinecraft().addScheduledTask(()->{
-					System.out.println("DEBUG: was: "+ Minecraft.getMinecraft().currentScreen + 
-							" and is going to be: "+gui);
 					Minecraft.getMinecraft().displayGuiScreen(gui);
 					Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
 				});
 				if(onGuiOpen!=null)
 					onGuiOpen.call();
+				isOpen = true;
 				return LuaValue.NONE;
+			case isOpen:
+				return valueOf(isOpen);
 			case setName:
 				guiName = args.arg1().checkjstring();
 				return NONE;
@@ -190,6 +201,29 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				}
 				return NONE;
 			}
+			case isDefaultBackground:
+				return valueOf(gui.getDrawDefaultBackground());
+			case setDefaultBackground:
+				gui.setDrawDefaultBackground(args.checkboolean(1));
+				return NONE;
+			case getMousePos:{
+				return Utils.varargs(valueOf(lastMouseX), valueOf(lastMouseY));
+			}
+			case grabMouse:
+				Minecraft.getMinecraft().addScheduledTask(()->{
+					Minecraft.getMinecraft().mouseHelper.grabMouseCursor();
+				});
+				return NONE;
+			case ungrabMouse:
+				Minecraft.getMinecraft().addScheduledTask(()->{
+					Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
+				});
+				return NONE;
+			case setPausesGame:
+				pausesGame = args.checkboolean(1);
+				return NONE;
+			case isPausesGame:
+				return valueOf(pausesGame);
 			default:
 				throw new LuaError("This function hasn't been implemented D:");
 			}
@@ -212,7 +246,12 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 		getParentGui,
 		getSize,
 		setName,
-		getName;
+		getName,
+		setDefaultBackground,
+		isDefaultBackground, 
+		isOpen,
+		getMousePos, 
+		grabMouse, ungrabMouse, isPausesGame, setPausesGame;
 		
 		public String[] getDocLocation() {
 			String[] out = new String[3];

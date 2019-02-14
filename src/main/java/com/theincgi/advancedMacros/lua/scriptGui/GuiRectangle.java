@@ -14,6 +14,7 @@ public class GuiRectangle extends ScriptGuiElement{
 		super(gui, parent);
 		enableColorControl();
 		enableSizeControl();
+		set("__class", "advancedMacros.GuiRectangle");
 	}
 	
 	@Override

@@ -43,6 +43,7 @@ public class MCTextBar extends ScriptGuiElement{
 		this.set("setSelectionSize", new TextFieldOp(Op.setSelection));
 		this.set("setText", new TextFieldOp(Op.setText));
 		this.set("setTextColor", new TextFieldOp(Op.setTextColor));
+		set("__class", "advancedMacros.GuiMinecraftTextField");
 	}
 	
 	@Override

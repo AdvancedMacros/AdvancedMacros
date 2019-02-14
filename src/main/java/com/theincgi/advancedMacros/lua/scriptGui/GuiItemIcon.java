@@ -45,6 +45,7 @@ public class GuiItemIcon extends ScriptGuiElement{
 				return NONE;
 			}
 		});
+		set("__class", "advancedMacros.GuiItem");
 		wid = hei = 16;
 	}
 

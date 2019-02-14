@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
+import org.luaj.vm2_v3_0_1.LuaNumber;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
@@ -1404,5 +1405,8 @@ public class Utils {
 	}
 	public static LuaValue parseColor(MapColor mapColor) {
 		return new Color(mapColor.colorValue | 0xFF000000).toLuaValue(false);
+	}
+	public static Varargs varargs(LuaValue...args) {
+		return LuaValue.varargsOf(args);
 	}
 }

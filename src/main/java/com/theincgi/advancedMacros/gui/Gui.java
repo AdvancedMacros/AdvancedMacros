@@ -285,7 +285,7 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	public void onOpen(){
 
 	}
-
+	
 	public Object getFocusItem() {
 		//System.out.println("Foooocas "+focusItem);
 		return focusItem;

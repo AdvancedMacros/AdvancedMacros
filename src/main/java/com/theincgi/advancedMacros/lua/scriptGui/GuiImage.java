@@ -51,7 +51,7 @@ public class GuiImage extends ScriptGuiElement{
 				return LuaValue.NONE;
 			}
 		});
-		
+		set("__class", "advancedMacros.GuiImage");
 	}
 	
 	@Override

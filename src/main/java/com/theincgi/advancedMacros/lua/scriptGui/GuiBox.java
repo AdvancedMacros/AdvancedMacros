@@ -25,6 +25,7 @@ public class GuiBox extends ScriptGuiElement{
 				return LuaValue.valueOf(thickness);
 			}
 		});
+		set("__class", "advancedMacros.GuiBox");
 	}
 	
 	@Override

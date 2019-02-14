@@ -127,10 +127,11 @@ public class ScriptGuiScrollBar extends ScriptGuiElement{
 				return NONE;
 			}
 		});
+		set("__class", "advancedMacros.GuiScrollBar");
 		enableSizeControl();
 
 	}
-
+	
 	@Override
 	public void onDraw(Gui g, int mouseX, int mouseY, float partialTicks) {
 		super.onDraw(g, mouseX, mouseY, partialTicks);

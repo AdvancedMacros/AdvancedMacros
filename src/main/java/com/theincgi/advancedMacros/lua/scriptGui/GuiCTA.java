@@ -189,6 +189,7 @@ public class GuiCTA extends ScriptGuiElement{
 				}
 			}
 		});
+		set("__class", "advancedMacros.GuiTextArea");
 	}
 	
 	@Override
