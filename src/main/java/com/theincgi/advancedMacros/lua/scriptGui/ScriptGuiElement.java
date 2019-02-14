@@ -257,7 +257,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 				int h = arg2.checkint();
 				setWidth(w);
 				setHeight(h);
-				return null;
+				return NONE;
 			}
 		});
 	}
