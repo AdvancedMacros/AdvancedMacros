@@ -3,6 +3,7 @@ package com.theincgi.advancedMacros.lua.functions;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -25,7 +26,7 @@ public class Disconnect extends CallableTable {
 	
 	
 	public static void disconnect() {
-		Minecraft mc = Minecraft.getMinecraft();
+		Minecraft mc = AdvancedMacros.getMinecraft();
 		Utils.runOnMCAndWait(()->{
 			if(mc.world != null && !mc.world.isRemote)
 				mc.world.sendQuittingDisconnectingPacket();

@@ -23,6 +23,7 @@ import com.theincgi.advancedMacros.misc.Utils;
 public class GraphicsContextControls extends LuaTable{
 	BufferedImage img;
 	BufferedImageControls bic;
+	Color clearColor = Color.CLEAR;
 	Graphics2D g;
 	public GraphicsContextControls(BufferedImageControls bi) {
 		bic = bi;
@@ -102,6 +103,9 @@ public class GraphicsContextControls extends LuaTable{
 			case setColor: {
 				g.setColor(Utils.parseColor(args, AdvancedMacros.COLOR_SPACE_IS_255).toAWTColor());
 				return NONE;
+			}
+			case setClearColor:{
+				clearColor = Utils.parseColor(args, AdvancedMacros.COLOR_SPACE_IS_255);
 			}
 			case translate:
 				g.translate(args.checkint(1), args.checkint(2));//TODO 1 index?
@@ -193,7 +197,7 @@ public class GraphicsContextControls extends LuaTable{
 
 			case clearRect:{
 				java.awt.Color old = g.getBackground();
-				g.setBackground(Color.CLEAR.toAWTColor());
+				g.setBackground(clearColor.toAWTColor());
 				g.clearRect(args.checkint(1)-1, args.checkint(2)-1,  //x, y
 						args.checkint(3), args.checkint(4)); //width, height
 				g.setBackground(old);
@@ -372,7 +376,8 @@ public class GraphicsContextControls extends LuaTable{
 		drawPolygon, 
 		drawPolyline, 
 		fillArc, 
-		setColor, 
+		setColor,
+		setClearColor,
 		translate, 
 		clipRect, 
 		getColor, 

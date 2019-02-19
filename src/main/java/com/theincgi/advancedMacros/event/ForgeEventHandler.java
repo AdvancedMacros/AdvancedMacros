@@ -183,7 +183,7 @@ public class ForgeEventHandler {
 				if(ColorTextArea.isShiftDown()) {
 					AdvancedMacros.stopAll();
 				}else {
-					Minecraft.getMinecraft().displayGuiScreen(AdvancedMacros.runningScriptsGui);
+					AdvancedMacros.getMinecraft().displayGuiScreen(AdvancedMacros.runningScriptsGui);
 				}
 			}else if(ColorTextArea.isShiftDown()){
 				showMenu(AdvancedMacros.scriptBrowser2, AdvancedMacros.macroMenuGui.getGui());
@@ -269,7 +269,7 @@ public class ForgeEventHandler {
 			keyBindReleaseMap.remove(toRemove.pop());
 		}
 
-		EntityPlayerSP player = Minecraft.getMinecraft().player;
+		EntityPlayerSP player = AdvancedMacros.getMinecraft().player;
 		if(player==null){playerWasNull = true; return;}
 		if(playerWasNull){
 			resetLastStats();
@@ -403,8 +403,8 @@ public class ForgeEventHandler {
 			fireEvent(EventName.AttackReady, createEvent(EventName.AttackReady));
 		}
 		lastSwingProgress = player.swingProgress;
-		boolean rain = Minecraft.getMinecraft().world.isRaining();
-		boolean thunder = Minecraft.getMinecraft().world.isThundering();
+		boolean rain = AdvancedMacros.getMinecraft().world.isRaining();
+		boolean thunder = AdvancedMacros.getMinecraft().world.isThundering();
 		if(rain!=wasRaining || wasThundering!=thunder){
 			wasRaining = rain;
 			wasThundering = thunder;
@@ -575,14 +575,14 @@ public class ForgeEventHandler {
 	public void onJoinedWorld(FMLNetworkEvent.ClientConnectedToServerEvent event){
 		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		try {
-			InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/changelogviewer.lua")).getInputStream();
+			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/changelogviewer.lua")).getInputStream();
 			LuaValue sFunc = AdvancedMacros.globals.load(in, "changeLog", "t", AdvancedMacros.globals);
 			LuaThread thread = new LuaThread(sFunc, "changelog");
 			thread.start();
 		} catch (Throwable e) {e.printStackTrace();}
 //		Thread t = new Thread(()->{
 //			try {
-//				InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/changelogviewer.lua")).getInputStream();
+//				InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/changelogviewer.lua")).getInputStream();
 //				AdvancedMacros.globals.load(in, "changeLog", "t", AdvancedMacros.globals).call();
 //				in.close();
 //			} catch (IOException e) {e.printStackTrace();}
@@ -592,8 +592,8 @@ public class ForgeEventHandler {
 		LuaTable e = createEvent(EventName.JoinWorld);
 		e.set(3, event.getConnectionType()); //yeilded modded
 		e.set(4, LuaValue.valueOf(event.isLocal()?"SP":"MP")); //yeilded false on localhost multiplayer true on single player
-		if(Minecraft.getMinecraft().getCurrentServerData()!=null){
-			ServerData sd = Minecraft.getMinecraft().getCurrentServerData();
+		if(AdvancedMacros.getMinecraft().getCurrentServerData()!=null){
+			ServerData sd = AdvancedMacros.getMinecraft().getCurrentServerData();
 			if(sd!=null) {
 				e.set(5, sd.serverName==null? LuaValue.FALSE    : LuaValue.valueOf(sd.serverName));
 				e.set(6, sd.serverMOTD==null? LuaValue.FALSE    : LuaValue.valueOf(sd.serverMOTD));
@@ -623,7 +623,7 @@ public class ForgeEventHandler {
 	public void onGuiStartup(GuiScreenEvent.InitGuiEvent.Post sEvent) {
 		if(sEvent.getGui().getClass().equals(GuiMainMenu.class)) {
 			if(startupHasFired) return;
-			Minecraft.getMinecraft().addScheduledTask(()->{
+			AdvancedMacros.getMinecraft().addScheduledTask(()->{
 				fireEvent(EventName.Startup,ForgeEventHandler.createEvent(EventName.Startup));
 			});
 			startupHasFired = true;
@@ -741,7 +741,7 @@ public class ForgeEventHandler {
 					//						e.set(3, LuaValue.FALSE);
 					//					}
 					//					
-					//System.out.println(Minecraft.getMinecraft().ingameGUI.getClass());
+					//System.out.println(AdvancedMacros.getMinecraft().ingameGUI.getClass());
 					
 					fireEvent(EventName.ContainerOpen, e);
 
@@ -765,7 +765,7 @@ public class ForgeEventHandler {
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onUseItem( LivingEntityUseItemEvent event) {//CONFIRMED MP
 		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
-		if(!event.getEntity().equals(Minecraft.getMinecraft().player)) return;
+		if(!event.getEntity().equals(AdvancedMacros.getMinecraft().player)) return;
 		int useItemFrequency = 1;
 		try{
 			useItemFrequency = Utils.tableFromProp(Settings.settings, "events.useItemFrequency", LuaValue.valueOf(20)).checkint();
@@ -935,7 +935,7 @@ public class ForgeEventHandler {
 		});
 		thread.start();
 		event.setCanceled( true );
-		Minecraft.getMinecraft().ingameGUI.getChatGUI().addToSentMessages(event.getOriginalMessage());
+		AdvancedMacros.getMinecraft().ingameGUI.getChatGUI().addToSentMessages(event.getOriginalMessage());
 	}
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)
@@ -987,7 +987,7 @@ public class ForgeEventHandler {
 	}
 
 	private void forceSendMsg(String msg, boolean addToChat) {
-		Minecraft mc = Minecraft.getMinecraft();
+		Minecraft mc = AdvancedMacros.getMinecraft();
 		if (msg.isEmpty()) return;
 		if (addToChat)
 		{
@@ -1014,11 +1014,11 @@ public class ForgeEventHandler {
 	//not including this world render, but its not for the trigger list
 
 	private void resetItemDurablitity(){
-		ItemStack i = Minecraft.getMinecraft().player.getHeldItemMainhand();
+		ItemStack i = AdvancedMacros.getMinecraft().player.getHeldItemMainhand();
 		lastItemDurablity = i.getMaxDamage()-i.getItemDamage();
 	}
 	private void resetLastStats(){
-		EntityPlayerSP player = Minecraft.getMinecraft().player;
+		EntityPlayerSP player = AdvancedMacros.getMinecraft().player;
 		if(player==null){return;}
 		lastAir = player.getAir()/3;
 		lastHealth = (int) player.getHealth();
@@ -1049,8 +1049,8 @@ public class ForgeEventHandler {
 
 
 		//double x,y,z,uMin,vMin,uMax,vMax, wid, hei;
-		float p = Minecraft.getMinecraft().getRenderPartialTicks();
-		Entity player = Minecraft.getMinecraft().player;
+		float p = AdvancedMacros.getMinecraft().getRenderPartialTicks();
+		Entity player = AdvancedMacros.getMinecraft().player;
 
 		GlStateManager.pushAttrib();
 		GlStateManager.enableCull();
@@ -1083,8 +1083,8 @@ public class ForgeEventHandler {
 	@SubscribeEvent
 	public void afterOverlay(RenderGameOverlayEvent.Post event) {
 
-		float p = Minecraft.getMinecraft().getRenderPartialTicks();
-		//Entity player = Minecraft.getMinecraft().player;
+		float p = AdvancedMacros.getMinecraft().getRenderPartialTicks();
+		//Entity player = AdvancedMacros.getMinecraft().player;
 
 		GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 
@@ -1164,19 +1164,19 @@ public class ForgeEventHandler {
 		showMenu(AdvancedMacros.macroMenuGui.getGui());
 	}
 	public static void closeMenu() {
-		Minecraft.getMinecraft().displayGuiScreen(null);
+		AdvancedMacros.getMinecraft().displayGuiScreen(null);
 	}
 	public static void showMenu(Gui gui){
 		if(gui==null){
 			showMenu();
 		}
 		AdvancedMacros.lastGui = gui;//the one to return to on open, not prev gui
-		Minecraft.getMinecraft().displayGuiScreen(gui);
+		AdvancedMacros.getMinecraft().displayGuiScreen(gui);
 		gui.onOpen();
 
 	}
 	public static void showMenu(Gui gui, Gui prevGui){
-		Minecraft.getMinecraft().displayGuiScreen(gui);
+		AdvancedMacros.getMinecraft().displayGuiScreen(gui);
 		AdvancedMacros.prevGui = prevGui;
 		AdvancedMacros.lastGui = gui;
 		gui.onOpen();
@@ -1234,7 +1234,7 @@ public class ForgeEventHandler {
 
 	private Look look;
 	public void lookTo(float sYaw, float sPitch, long time) {
-		EntityPlayerSP player = Minecraft.getMinecraft().player;
+		EntityPlayerSP player = AdvancedMacros.getMinecraft().player;
 		look = new Look(player.rotationYawHead, player.rotationPitch,sYaw, sPitch, time);
 
 	}
@@ -1252,7 +1252,7 @@ public class ForgeEventHandler {
 			this.toYaw = toYaw;
 			this.toPitch = toPitch;
 
-			EntityPlayerSP player = Minecraft.getMinecraft().player;
+			EntityPlayerSP player = AdvancedMacros.getMinecraft().player;
 			player.rotationYaw = fixYaw( player.rotationYaw );
 			player.prevRotationYaw = fixYaw( player.prevRotationYaw );
 
@@ -1278,7 +1278,7 @@ public class ForgeEventHandler {
 		}
 		public void look(){
 			if(System.currentTimeMillis()<=time+start){
-				EntityPlayerSP player = Minecraft.getMinecraft().player;
+				EntityPlayerSP player = AdvancedMacros.getMinecraft().player;
 
 
 				player.rotationYaw = interpolate(fromYaw, toYaw);
@@ -1311,7 +1311,7 @@ public class ForgeEventHandler {
 	}
 
 	private void populatePlayerList(ConcurrentHashMap<String, Boolean> map) {
-		Minecraft mc = Minecraft.getMinecraft();
+		Minecraft mc = AdvancedMacros.getMinecraft();
 		Iterator<NetworkPlayerInfo> iter = mc.getConnection().getPlayerInfoMap().iterator();
 		while(iter.hasNext()) {
 			NetworkPlayerInfo playerInfo = iter.next();

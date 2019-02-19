@@ -12,6 +12,7 @@ import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Pair;
 import com.theincgi.advancedMacros.misc.Utils;
@@ -46,7 +47,7 @@ public class GetAABB {
 	}
 
 	private class Get extends VarArgFunction {
-		Minecraft mc = Minecraft.getMinecraft();
+		Minecraft mc = AdvancedMacros.getMinecraft();
 		World world = mc.world;
 		/**
 		 * Given 1 table:
@@ -162,7 +163,7 @@ public class GetAABB {
 					return Utils.rayTraceResultToLuaValue(aabb.calculateIntercept(v1.a, v2.a));
 				}
 				case findEntityOnPath: {
-					World world = Minecraft.getMinecraft().world;
+					World world = AdvancedMacros.getMinecraft().world;
 					Pair<Vec3d, Varargs> v1 = Utils.consumeVector(args, false, false);
 					Entity entity = null;
 					Vec3d start = aabb.getCenter();

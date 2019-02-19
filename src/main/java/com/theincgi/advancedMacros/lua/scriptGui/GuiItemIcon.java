@@ -5,6 +5,7 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.elements.GuiRect;
 
@@ -17,8 +18,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public class GuiItemIcon extends ScriptGuiElement{
-	static RenderItem itemRender = Minecraft.getMinecraft().getRenderItem();
-	static FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
+	static RenderItem itemRender = AdvancedMacros.getMinecraft().getRenderItem();
+	static FontRenderer fontRenderer = AdvancedMacros.getMinecraft().fontRenderer;
 
 	ItemStack itemStack;
 

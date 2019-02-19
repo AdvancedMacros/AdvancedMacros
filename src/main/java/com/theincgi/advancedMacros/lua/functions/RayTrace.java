@@ -4,6 +4,7 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Pair;
 import com.theincgi.advancedMacros.misc.Utils;
@@ -35,7 +36,7 @@ public class RayTrace {
 		public Varargs invoke(Varargs args) {
 			//args: {vector}, <{from}>, <maxDist/REACH_LIMIT>, stopOnLiquid
 			//args: {vector}, <maxDist/REACH_LIMIT>, stopOnLiquid
-			Minecraft mc = Minecraft.getMinecraft();
+			Minecraft mc = AdvancedMacros.getMinecraft();
 			EntityPlayer p = mc.player;
 
 
@@ -59,8 +60,8 @@ public class RayTrace {
 
 
 			Vec3d end = optVec.a.add( vec.a.scale( distance ) );
-			RayTraceResult rtr = Minecraft.getMinecraft().world.rayTraceBlocks( optVec.a, end, stopOnLiquid, false, true);
-			//Minecraft.getMinecraft().objectMouseOver
+			RayTraceResult rtr = AdvancedMacros.getMinecraft().world.rayTraceBlocks( optVec.a, end, stopOnLiquid, false, true);
+			//AdvancedMacros.getMinecraft().objectMouseOver
 			LuaValue result = Utils.rayTraceResultToLuaValue(rtr);
 			return result;
 		}

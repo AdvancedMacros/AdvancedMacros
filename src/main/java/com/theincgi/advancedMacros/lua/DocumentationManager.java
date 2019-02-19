@@ -78,7 +78,7 @@ public class DocumentationManager {
 		}
 		if(in==null) {
 			try {
-				in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "docs/"+fName+".txt")).getInputStream();
+				in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "docs/"+fName+".txt")).getInputStream();
 			} catch (IOException e) {
 				//return lastResponseL1 = null; set in the last one
 			}

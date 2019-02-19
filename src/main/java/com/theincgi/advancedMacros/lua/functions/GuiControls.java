@@ -11,6 +11,7 @@ import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -82,13 +83,13 @@ public class GuiControls {
 		controls.set("isOpen", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return valueOf(whenOpened==Minecraft.getMinecraft().currentScreen);
+				return valueOf(whenOpened==AdvancedMacros.getMinecraft().currentScreen);
 			}
 		});
 		controls.set("close", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				Minecraft.getMinecraft().displayGuiScreen(null);
+				AdvancedMacros.getMinecraft().displayGuiScreen(null);
 				return NONE;
 			}
 		});
@@ -158,7 +159,7 @@ public class GuiControls {
 			switch (op) {
 			case getTrades:{
 				LuaTable trades = new LuaTable();
-				MerchantRecipeList mrl = gm.getMerchant().getRecipes(Minecraft.getMinecraft().player);
+				MerchantRecipeList mrl = gm.getMerchant().getRecipes(AdvancedMacros.getMinecraft().player);
 				for(int i = 0; i<mrl.size(); i++) {
 					MerchantRecipe mr = mrl.get(i);
 					LuaTable t = new LuaTable();
@@ -208,7 +209,7 @@ public class GuiControls {
 					return out;
 				}
 				case pickOption:
-					Minecraft mc = Minecraft.getMinecraft();
+					Minecraft mc = AdvancedMacros.getMinecraft();
 					int arg = args.checkint(1);
 					if(arg < 1 || arg > 3) throw new LuaError("argument out of range 1-3 ("+arg+")");
 					if(ce.enchantItem(mc.player, arg-1))
@@ -252,9 +253,9 @@ public class GuiControls {
 				//					return lines;
 				//				}
 				case done:
-					if(es.mc==null) es.mc = Minecraft.getMinecraft();
+					if(es.mc==null) es.mc = AdvancedMacros.getMinecraft();
 					ts.markDirty();
-					Minecraft.getMinecraft().displayGuiScreen(null);
+					AdvancedMacros.getMinecraft().displayGuiScreen(null);
 					return NONE;
 				case setLine:
 					ts.signText[args.checkint(1)] = new TextComponentString(args.optjstring(2, ""));
@@ -348,7 +349,7 @@ public class GuiControls {
 					bookTitle.set(book, newTitle);
 					markDirty();
 					sendBook.invoke(book, true);
-					Minecraft.getMinecraft().displayGuiScreen(null);
+					AdvancedMacros.getMinecraft().displayGuiScreen(null);
 					break;
 				case save:
 					sendBook.invoke(book, false);
@@ -585,7 +586,7 @@ public class GuiControls {
 		}
 		private void done() throws IllegalArgumentException, IllegalAccessException {
 			TileEntityCommandBlock block = (TileEntityCommandBlock) tecb.get(cb);
-			Minecraft mc = Minecraft.getMinecraft();
+			Minecraft mc = AdvancedMacros.getMinecraft();
 			
 			PacketBuffer packetbuffer = new PacketBuffer(Unpooled.buffer());
 			CommandBlockBaseLogic commandblockbaselogic = block.getCommandBlockLogic();

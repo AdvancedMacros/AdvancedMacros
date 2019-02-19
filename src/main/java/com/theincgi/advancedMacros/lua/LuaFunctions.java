@@ -10,6 +10,7 @@ import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Pair;
 import com.theincgi.advancedMacros.misc.Utils;
@@ -54,8 +55,8 @@ public class LuaFunctions {
 	public static class Say extends OneArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg) {
-			Minecraft.getMinecraft().player.sendChatMessage(arg.tojstring());
-			Minecraft.getMinecraft().ingameGUI.getChatGUI().addToSentMessages(arg.tojstring());
+			AdvancedMacros.getMinecraft().player.sendChatMessage(arg.tojstring());
+			AdvancedMacros.getMinecraft().ingameGUI.getChatGUI().addToSentMessages(arg.tojstring());
 			return LuaValue.NONE;
 		}
 	}
@@ -106,7 +107,7 @@ public class LuaFunctions {
 		@Override
 		public Varargs invoke(Varargs arg0) {
 			try {
-				Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(formatString(arg0));
+				AdvancedMacros.getMinecraft().ingameGUI.getChatGUI().printChatMessage(formatString(arg0));
 			}catch (Throwable e) {
 				//prob tried to log without chat
 				e.printStackTrace();

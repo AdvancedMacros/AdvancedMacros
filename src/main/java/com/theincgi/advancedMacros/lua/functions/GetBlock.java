@@ -4,6 +4,7 @@ import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.ThreeArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.block.material.MapColor;
@@ -18,14 +19,14 @@ public class GetBlock extends ThreeArgFunction{
 	public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
 		int x = (arg1.checkint()), y = arg2.checkint(), z = (arg3.checkint());
 		BlockPos pos = new BlockPos(x,y,z);
-		Chunk chunk = Minecraft.getMinecraft().world.getChunk(pos);
-		TileEntity te = Minecraft.getMinecraft().world.getTileEntity(pos);
+		Chunk chunk = AdvancedMacros.getMinecraft().world.getChunk(pos);
+		TileEntity te = AdvancedMacros.getMinecraft().world.getTileEntity(pos);
 		if(!chunk.isLoaded()){
 			return LuaValue.FALSE;
 		}
 		IBlockState block = chunk.getBlockState(x,y,z);
 		LuaTable result = Utils.blockToTable(block, te);
-		result.set("mapColor", Utils.parseColor(block.getMapColor(Minecraft.getMinecraft().player.world, pos)));
+		result.set("mapColor", Utils.parseColor(block.getMapColor(AdvancedMacros.getMinecraft().player.world, pos)));
 		return result;
 	}
 }

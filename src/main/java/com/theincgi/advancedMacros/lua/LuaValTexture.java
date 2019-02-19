@@ -2,6 +2,7 @@ package com.theincgi.advancedMacros.lua;
 
 import org.luaj.vm2_v3_0_1.LuaValue;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.Settings;
 
 import net.minecraft.client.Minecraft;
@@ -63,7 +64,7 @@ public class LuaValTexture extends LuaValue{
 	}
 	public void bindTexture() {
 		if(r!=null)
-			Minecraft.getMinecraft().getTextureManager().bindTexture(r);
+			AdvancedMacros.getMinecraft().getTextureManager().bindTexture(r);
 		else
 			GlStateManager.bindTexture(dTex.getGlTextureId());
 	}

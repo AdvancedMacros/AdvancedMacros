@@ -1,5 +1,6 @@
 package com.theincgi.advancedMacros.misc;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
 import com.theincgi.advancedMacros.misc.Matrix.Axis;
@@ -15,7 +16,7 @@ public class CustomFontRenderer {
 	static LuaValTexture consolas_bold = Utils.checkTexture(Settings.getTextureID("resource:consolas_bold.png"));
 	static LuaValTexture consolas_italics = Utils.checkTexture(Settings.getTextureID("resource:consolas_italic.png"));
 	static LuaValTexture consolas_bold_italics = Utils.checkTexture(Settings.getTextureID("resource:consolas_bold_italic.png"));
-	Minecraft mc = Minecraft.getMinecraft();
+	Minecraft mc = AdvancedMacros.getMinecraft();
 	private UVPair uvPair = new UVPair();
 	//private ResourceLocation ascii = new ResourceLocation("textures/font/ascii.png");
 	static final int charWid = 13,charHei = 29, vGap=1, imgWid=256, imgHei=256;

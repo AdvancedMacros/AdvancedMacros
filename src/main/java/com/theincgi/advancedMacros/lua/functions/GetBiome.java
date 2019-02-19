@@ -6,6 +6,8 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -17,13 +19,13 @@ public class GetBiome extends VarArgFunction{
 		BlockPos pos = null;
 		
 		if(args.narg()==0) {
-			pos = Minecraft.getMinecraft().player.getPosition();
+			pos = AdvancedMacros.getMinecraft().player.getPosition();
 		}else if(args.narg()==2){
 			pos = new BlockPos(args.arg(1).checkint(),64, args.arg(2).checkint());
 		}else {
 			throw new LuaError("Invalid args: NONE or X, Z");
 		}
-		World w = Minecraft.getMinecraft().player.getEntityWorld();
+		World w = AdvancedMacros.getMinecraft().player.getEntityWorld();
 		LuaTable out = new LuaTable();
 		Biome b = w.getBiomeForCoordsBody(pos);
 		out.set(1, b.getBiomeName());

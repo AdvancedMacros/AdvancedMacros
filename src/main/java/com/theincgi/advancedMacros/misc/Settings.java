@@ -54,8 +54,10 @@ public class Settings {
 		settings.set("save", new Save());
 		settings.set("load", new Load());
 		settings.set("minecraft", new MinecraftSettings());
-		if(settings.get("chatMaxLines").isnil())
-			settings.set("chatMaxLines", LuaValue.valueOf(100));
+		if(settings.get("chat").isnil()) 
+			settings.set("chat", new LuaTable());
+		if(settings.get("chat").get("maxLines").isnil())
+			settings.set("maxLines", 100);
 	}
 	//	private static void loadDefaults(boolean force) {
 	//		
@@ -100,7 +102,7 @@ public class Settings {
 
 		//		if(Thread.currentThread()!=minecraftThread) {
 		//			final String file2 = file;
-		//			ListenableFuture<LuaValue> future = Minecraft.getMinecraft().addScheduledTask(new Callable<LuaValue>() {
+		//			ListenableFuture<LuaValue> future = AdvancedMacros.getMinecraft().addScheduledTask(new Callable<LuaValue>() {
 		//				
 		//				@Override
 		//				public LuaValue call() throws Exception {
@@ -140,14 +142,14 @@ public class Settings {
 			val = new LuaValTexture("resource:"+file, r);
 		}else if(file.equals("minecraft:blocks")){
 			file = file.substring("minecraft:".length());
-			//Minecraft.getMinecraft().getTextureMapBlocks();
+			//AdvancedMacros.getMinecraft().getTextureMapBlocks();
 			ResourceLocation r = TextureMap.LOCATION_BLOCKS_TEXTURE;//new ResourceLocation(file);
 			//ResourceLocation r = new ResourceLocation(file);
 			val = new LuaValTexture("game:"+file, r);
 		}else if(file.startsWith("block:")){
 			file = file.substring("block:".length());
 
-			TextureMap tm = Minecraft.getMinecraft().getTextureMapBlocks();
+			TextureMap tm = AdvancedMacros.getMinecraft().getTextureMapBlocks();
 			TextureAtlasSprite sprite = tm.getTextureExtry(file);
 			ResourceLocation r = TextureMap.LOCATION_BLOCKS_TEXTURE;
 			LuaValTexture tex;
@@ -180,7 +182,7 @@ public class Settings {
 			if(Thread.currentThread() != AdvancedMacros.getMinecraftThread()) {
 				final String sFile = file;
 				final Thread callingThread = Thread.currentThread();
-				ListenableFuture<LuaValue> future = Minecraft.getMinecraft().addScheduledTask(new Callable<LuaValue>() {
+				ListenableFuture<LuaValue> future = AdvancedMacros.getMinecraft().addScheduledTask(new Callable<LuaValue>() {
 					@Override
 					public LuaValue call() throws Exception {
 						return loadTex(sFile, callingThread);
@@ -213,7 +215,7 @@ public class Settings {
 	}
 
 	public static ResourceLocation fromDynamic(String name, DynamicTexture t){
-		return Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation(name, t);
+		return AdvancedMacros.getMinecraft().getTextureManager().getDynamicTextureLocation(name, t);
 	}
 
 	public static class GetSettings extends ZeroArgFunction{

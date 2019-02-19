@@ -132,9 +132,10 @@ public class BufferedImageControls extends LuaTable{
 						img.getRGB(0, 0, img.getWidth(), img.getHeight(), dynamicTexture.getTextureData(), 0, img.getWidth());
 						dynamicTexture.updateDynamicTexture();
 					});
-					return NONE;
+					
 				}
-				throw new LuaError("Dynamic texture not created yet");
+				return NONE;
+				//throw new LuaError("Dynamic texture not created yet");
 			}
 		});
 		

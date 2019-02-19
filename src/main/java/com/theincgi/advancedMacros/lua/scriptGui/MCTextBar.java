@@ -17,7 +17,7 @@ public class MCTextBar extends ScriptGuiElement{
 	public MCTextBar(Gui gui, Group parent) {
 		super(gui, parent, true);
 		enableSizeControl();
-		textField = new GuiTextField(0, Minecraft.getMinecraft().fontRenderer, 0, 0, 20, 20) {
+		textField = new GuiTextField(0, AdvancedMacros.getMinecraft().fontRenderer, 0, 0, 20, 20) {
 			@Override
 			public boolean isFocused() {
 				return gui.getFocusItem()==this; //not .equals, must be this object exactly

@@ -38,7 +38,7 @@ public class Hud2D extends LuaTable{
 				return LuaValue.NONE;
 			case getSize:
 				LuaTable temp = new LuaTable();
-				Minecraft mc = Minecraft.getMinecraft();
+				Minecraft mc = AdvancedMacros.getMinecraft();
 				ScaledResolution scaled = new ScaledResolution(mc);
 				temp.set(1, LuaValue.valueOf(scaled.getScaledWidth()));
 				temp.set(2, LuaValue.valueOf(scaled.getScaledHeight()));

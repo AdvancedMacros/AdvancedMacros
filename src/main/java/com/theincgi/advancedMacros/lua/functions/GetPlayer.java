@@ -6,6 +6,7 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ThreeArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
@@ -21,10 +22,10 @@ public class GetPlayer extends OneArgFunction {
 	@Override
 	public LuaValue call(LuaValue playerName) {
 		if(playerName.isnil()) {
-			return entityPlayerToTable(Minecraft.getMinecraft().player);
+			return entityPlayerToTable(AdvancedMacros.getMinecraft().player);
 		}else{
 			try {
-			return entityPlayerToTable(Minecraft.getMinecraft().world.getPlayerEntityByName(playerName.checkjstring()));
+			return entityPlayerToTable(AdvancedMacros.getMinecraft().world.getPlayerEntityByName(playerName.checkjstring()));
 			}catch(NullPointerException npe) {
 				return LuaValue.FALSE;
 			}
@@ -143,8 +144,8 @@ public class GetPlayer extends OneArgFunction {
 		t.set("entityID", valueOf(player.getEntityId()));
 		t.set("gamemode", player.isSpectator()?"spectator":player.isCreative()?"creative":"survival");
 		
-		if(player.equals(Minecraft.getMinecraft().player)) {
-			t.set("target", Utils.rayTraceResultToLuaValue(Minecraft.getMinecraft().objectMouseOver));
+		if(player.equals(AdvancedMacros.getMinecraft().player)) {
+			t.set("target", Utils.rayTraceResultToLuaValue(AdvancedMacros.getMinecraft().objectMouseOver));
 		}
 		
 		return t;

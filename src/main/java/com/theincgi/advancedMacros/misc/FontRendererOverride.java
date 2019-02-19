@@ -13,6 +13,7 @@ import org.apache.commons.io.IOUtils;
 import com.ibm.icu.text.ArabicShaping;
 import com.ibm.icu.text.ArabicShapingException;
 import com.ibm.icu.text.Bidi;
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 
 import net.minecraft.client.Minecraft;
@@ -28,7 +29,7 @@ import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.ResourceLocation;
 
 public class FontRendererOverride{
-	static Minecraft mc = Minecraft.getMinecraft();
+	static Minecraft mc = AdvancedMacros.getMinecraft();
 	
 	
 	/**<s>steals</s> <i>borrows</i> from Minecraft default renderer*/
@@ -1018,7 +1019,7 @@ public class FontRendererOverride{
 
     protected IResource getResource(ResourceLocation location) throws IOException
     {
-        return Minecraft.getMinecraft().getResourceManager().getResource(location);
+        return AdvancedMacros.getMinecraft().getResourceManager().getResource(location);
     }
 
     public int getColorCode(char character)

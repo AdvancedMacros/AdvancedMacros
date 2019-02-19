@@ -1172,7 +1172,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		resize(x, i);
 	}
 	public void resize(int newWid, int newHei){
-		if(newWid==0 || newHei==0 || g.width==0 || g.height==0 || Minecraft.getMinecraft().displayWidth==0 || Minecraft.getMinecraft().displayHeight==0)return;
+		if(newWid==0 || newHei==0 || g.width==0 || g.height==0 || AdvancedMacros.getMinecraft().displayWidth==0 || AdvancedMacros.getMinecraft().displayHeight==0)return;
 		if(wid!=newWid || hei!=newHei){ //something changed
 			////			if(texture!=null){
 			////				texture.deleteGlTexture();
@@ -1180,8 +1180,8 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 			wid = newWid;
 			hei = newHei;
 			//			//System.out.println(g);
-			//			bufferedImage = new BufferedImage((int) (Minecraft.getMinecraft().displayWidth  * (newWid/(float)g.width)), 
-			//					(int) (Minecraft.getMinecraft().displayHeight * (newHei/(float)g.height)), 
+			//			bufferedImage = new BufferedImage((int) (AdvancedMacros.getMinecraft().displayWidth  * (newWid/(float)g.width)), 
+			//					(int) (AdvancedMacros.getMinecraft().displayHeight * (newHei/(float)g.height)), 
 			//					BufferedImage.TYPE_INT_ARGB);
 			//			bufferedImage.getGraphics().setColor(java.awt.Color.red);
 			//			bufferedImage.getGraphics().drawLine(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());

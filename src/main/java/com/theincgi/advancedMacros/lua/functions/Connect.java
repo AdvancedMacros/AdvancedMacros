@@ -3,6 +3,7 @@ package com.theincgi.advancedMacros.lua.functions;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -24,7 +25,7 @@ public class Connect extends CallableTable{
 
 			Utils.runOnMCAndWait( () -> {
 				try {
-				Minecraft mc = Minecraft.getMinecraft();
+				Minecraft mc = AdvancedMacros.getMinecraft();
 				if(mc.world != null)
 					Disconnect.disconnect();
 				ServerData sDat = new ServerData(I18n.format("selectServer.defaultName"), "", false);

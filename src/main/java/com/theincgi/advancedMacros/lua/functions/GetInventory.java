@@ -4,6 +4,7 @@ import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
@@ -16,9 +17,9 @@ public class GetInventory extends OneArgFunction{
 		IInventory inventory;
 		LuaTable output = new LuaTable();
 		if(arg.isnil()){
-			inventory = Minecraft.getMinecraft().player.inventory;
+			inventory = AdvancedMacros.getMinecraft().player.inventory;
 		}else{
-			EntityPlayer player = Minecraft.getMinecraft().world.getPlayerEntityByName(arg.checkjstring());
+			EntityPlayer player = AdvancedMacros.getMinecraft().world.getPlayerEntityByName(arg.checkjstring());
 			if(player==null){return LuaValue.FALSE;}
 			inventory = player.inventory;
 		}

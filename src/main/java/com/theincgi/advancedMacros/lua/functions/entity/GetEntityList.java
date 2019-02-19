@@ -9,6 +9,7 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.theincgi.advancedMacros.AdvancedMacros;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -19,12 +20,12 @@ public class GetEntityList extends ZeroArgFunction {
 	public LuaValue call() {
 		synchronized (syncLock) {
 			final LuaTable table = new LuaTable();
-			ListenableFuture<Object> f = Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+			ListenableFuture<Object> f = AdvancedMacros.getMinecraft().addScheduledTask(new Runnable() {
 				@Override
 				public void run() {
 					HashMap<Integer, Boolean> map=new HashMap<>();
 					int i = 1;
-					List<Entity> entities = Minecraft.getMinecraft().world.loadedEntityList;
+					List<Entity> entities = AdvancedMacros.getMinecraft().world.loadedEntityList;
 					for(int j = 0; j<entities.size(); j++) {
 						Entity e = entities.get(j);
 						if(map.containsKey(e.getEntityId())) {continue;}

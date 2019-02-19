@@ -7,6 +7,7 @@ import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
@@ -35,7 +36,7 @@ public class MinecraftSettings extends LuaTable {
 		}
 		@Override
 		public Varargs invoke(Varargs args) {
-			Minecraft mc = Minecraft.getMinecraft();
+			Minecraft mc = AdvancedMacros.getMinecraft();
 			switch (code) {
 			case getFov:
 				return valueOf(mc.gameSettings.fovSetting);

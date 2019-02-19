@@ -134,7 +134,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 				ForgeEventHandler.showMenu(AdvancedMacros.scriptBrowser2);
 				//else
 				//	ForgeEventHandler.showMenu(AdvancedMacros.scriptBrowser);
-				//Minecraft.getMinecraft().displayGuiScreen(AdvancedMacros.scriptBrowser);
+				//AdvancedMacros.getMinecraft().displayGuiScreen(AdvancedMacros.scriptBrowser);
 			}
 		});
 		addProfile.setOnClick(new OnClickHandler() {
@@ -205,7 +205,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 
 		//updateProfileList();
 //		profileSelect.select("DEFAULT"); done in INIT
-		onResize(Minecraft.getMinecraft(), width, height);
+		onResize(AdvancedMacros.getMinecraft(), width, height);
 
 	}
 	
@@ -444,7 +444,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 
 			}
 		}
-		onResize(Minecraft.getMinecraft(), width, height);
+		onResize(AdvancedMacros.getMinecraft(), width, height);
 		//gb.setWidth(width-10);
 		super.drawScreen(mouseX, mouseY, partialTicks);
 	}
@@ -471,7 +471,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 	}
 
 	public static void showMenu(){
-		Minecraft.getMinecraft().displayGuiScreen(AdvancedMacros.macroMenuGui.getGui());
+		AdvancedMacros.getMinecraft().displayGuiScreen(AdvancedMacros.macroMenuGui.getGui());
 		AdvancedMacros.macroMenuGui.onGuiOpened();
 	}
 	private enum Prompting{

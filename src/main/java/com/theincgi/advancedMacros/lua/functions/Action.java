@@ -27,7 +27,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 public class Action {
-	Minecraft minecraft = Minecraft.getMinecraft();
+	Minecraft minecraft = AdvancedMacros.getMinecraft();
 	GameSettings sets = minecraft.gameSettings;
 	class Forward extends OneArgFunction{
 		@Override
@@ -62,8 +62,8 @@ public class Action {
 		@Override
 		public LuaValue call(LuaValue arg) {
 			//do not document forced jumps unless they are discovered...maybe
-			if(minecraft.getMinecraft().player.onGround || arg.isstring()&&arg.tojstring().equals("forced")) {
-				Minecraft.getMinecraft().player.jump();
+			if(AdvancedMacros.getMinecraft().player.onGround || arg.isstring()&&arg.tojstring().equals("forced")) {
+				AdvancedMacros.getMinecraft().player.jump();
 			}
 			//holdKeybind(sets.keyBindJump, arg.optlong(0));
 			return LuaValue.NONE;
@@ -103,7 +103,7 @@ public class Action {
 	class GetHotbar extends ZeroArgFunction{
 		@Override
 		public LuaValue call() {
-			return LuaValue.valueOf(Minecraft.getMinecraft().player.inventory.currentItem+1);
+			return LuaValue.valueOf(AdvancedMacros.getMinecraft().player.inventory.currentItem+1);
 		}
 	}
 	class Use extends OneArgFunction{
@@ -136,7 +136,7 @@ public class Action {
 	class Drop extends OneArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg) {
-			Minecraft.getMinecraft().player.dropItem(arg.optboolean(false));
+			AdvancedMacros.getMinecraft().player.dropItem(arg.optboolean(false));
 			//tapKeybind(sets.keyBindDrop);
 			return LuaValue.NONE;
 		}
@@ -144,7 +144,7 @@ public class Action {
 	class SwapHand extends ZeroArgFunction{
 		@Override
 		public LuaValue call() {
-			Minecraft.getMinecraft().getConnection().sendPacket(
+			AdvancedMacros.getMinecraft().getConnection().sendPacket(
 					new CPacketPlayerDigging(
 							net.minecraft.network.play.client.CPacketPlayerDigging.Action.SWAP_HELD_ITEMS, 
 							BlockPos.ORIGIN, 
@@ -155,7 +155,7 @@ public class Action {
 		}
 	}
 	class PickBlock extends ZeroArgFunction{
-		Minecraft mc = Minecraft.getMinecraft();
+		Minecraft mc = AdvancedMacros.getMinecraft();
 		@Override
 		public LuaValue call() {
 			net.minecraftforge.common.ForgeHooks.onPickBlock(mc.objectMouseOver, mc.player, mc.world);
@@ -165,7 +165,7 @@ public class Action {
 	class Sprint extends OneArgFunction{
 		@Override
 		public LuaValue call(LuaValue v) {
-			Minecraft.getMinecraft().player.setSprinting(v.optboolean(true));
+			AdvancedMacros.getMinecraft().player.setSprinting(v.optboolean(true));
 			return LuaValue.NONE;
 		}
 	}
@@ -234,7 +234,7 @@ public class Action {
 				if(time>0){
 					AdvancedMacros.forgeEventHandler.lookTo((float)args.arg(1).todouble(), (float)args.arg(2).todouble(), time);
 				}else{
-					EntityPlayerSP player = Minecraft.getMinecraft().player;
+					EntityPlayerSP player = AdvancedMacros.getMinecraft().player;
 					player.rotationPitch = (float) args.arg(2).todouble();
 					player.rotationYaw = (float) args.arg(1).todouble();
 					System.out.println(player.rotationYaw);
@@ -273,7 +273,7 @@ public class Action {
 		tapKeybind(kb.getKeyCode());
 	}
 	private void tapKeybind(int keyCode){
-		Minecraft minecraft = Minecraft.getMinecraft();
+		Minecraft minecraft = AdvancedMacros.getMinecraft();
 		GameSettings sets = minecraft.gameSettings;
 		KeyBinding.setKeyBindState(keyCode, true);
 		int t = AdvancedMacros.forgeEventHandler.getSTick()+1;

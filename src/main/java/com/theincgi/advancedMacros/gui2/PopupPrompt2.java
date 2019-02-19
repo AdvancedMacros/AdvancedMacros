@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.lwjgl.input.Keyboard;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.elements.GuiButton;
@@ -93,7 +94,7 @@ public class PopupPrompt2 extends Gui{
 	}
 	
 	private void returnToOwner() {
-		Minecraft.getMinecraft().displayGuiScreen(owner);
+		AdvancedMacros.getMinecraft().displayGuiScreen(owner);
 	}
 
 	public void setResultHandler(ResultHandler rh) {
@@ -107,7 +108,7 @@ public class PopupPrompt2 extends Gui{
 
 	/**Msg + OK*/
 	public synchronized void showNotification(String msg) {
-		setWorldAndResolution(Minecraft.getMinecraft(), width, height);
+		setWorldAndResolution(AdvancedMacros.getMinecraft(), width, height);
 		this.msg = msg;
 		
 		cancel.setVisible(false);
@@ -117,12 +118,12 @@ public class PopupPrompt2 extends Gui{
 		textField.setFocused(false);
 		
 		type = Type.Notification;
-		Minecraft.getMinecraft().displayGuiScreen(this);
+		AdvancedMacros.getMinecraft().displayGuiScreen(this);
 	}
 
 	/**Msg + OK/Cancel*/
 	public synchronized void showConfirmation(String msg) {
-		setWorldAndResolution(Minecraft.getMinecraft(), width, height);
+		setWorldAndResolution(AdvancedMacros.getMinecraft(), width, height);
 		owner.setDrawDefaultBackground(false);
 		this.msg = msg;
 		
@@ -133,12 +134,12 @@ public class PopupPrompt2 extends Gui{
 		textField.setFocused(false);
 		
 		type = Type.Confirmation;
-		Minecraft.getMinecraft().displayGuiScreen(this);
+		AdvancedMacros.getMinecraft().displayGuiScreen(this);
 	}
 
 	/**Msg + Text Input + OK/Cancel*/
 	public synchronized void prompt(String prompt) {
-		setWorldAndResolution(Minecraft.getMinecraft(), width, height);
+		setWorldAndResolution(AdvancedMacros.getMinecraft(), width, height);
 		owner.setDrawDefaultBackground(false);
 		this.msg = prompt;
 		
@@ -151,12 +152,12 @@ public class PopupPrompt2 extends Gui{
 	//	System.out.println(background.getFrame());
 		
 		type = Type.Prompt;
-		Minecraft.getMinecraft().displayGuiScreen(this);
+		AdvancedMacros.getMinecraft().displayGuiScreen(this);
 	}
 
 	/**Msg + ChoiceBox + OK/Cancel*/
 	public synchronized void promptChoice(String prompt, String...options) {
-		setWorldAndResolution(Minecraft.getMinecraft(), width, height);
+		setWorldAndResolution(AdvancedMacros.getMinecraft(), width, height);
 		owner.setDrawDefaultBackground(false);
 		this.msg = prompt;
 		
@@ -173,7 +174,7 @@ public class PopupPrompt2 extends Gui{
 		choiceBox.select(options[0]);
 		
 		type = Type.Choice;
-		Minecraft.getMinecraft().displayGuiScreen(this);
+		AdvancedMacros.getMinecraft().displayGuiScreen(this);
 	}
 	
 	@Override
@@ -225,10 +226,11 @@ public class PopupPrompt2 extends Gui{
 			ok.getOnClickHandler().onClick(-1, ok);
 	}
 	@Override
-	public void keyRepeated(char typedChar, int keyCode, int mod) {
+	public boolean keyRepeated(char typedChar, int keyCode, int mod) {
 		super.keyRepeated(typedChar, keyCode, mod);
 		if(mod%5==0 && textField.isFocused())
 			textField.textboxKeyTyped(typedChar, keyCode);
+		return textField.isFocused();
 	}
 
 	public static class Result{

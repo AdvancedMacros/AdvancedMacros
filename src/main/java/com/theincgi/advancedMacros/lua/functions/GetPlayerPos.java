@@ -7,6 +7,7 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.event.ForgeEventHandler;
 
 import net.minecraft.client.Minecraft;
@@ -18,10 +19,10 @@ public class GetPlayerPos extends VarArgFunction{
 	public Varargs invoke(Varargs args) {
 		
 		if(args.narg()==0){
-			BlockPos pos = Minecraft.getMinecraft().player.getPosition();
-			EntityPlayer player = Minecraft.getMinecraft().player;
+			BlockPos pos = AdvancedMacros.getMinecraft().player.getPosition();
+			EntityPlayer player = AdvancedMacros.getMinecraft().player;
 			LuaTable t = new LuaTable();
-			float pt = Minecraft.getMinecraft().getRenderPartialTicks();
+			float pt = AdvancedMacros.getMinecraft().getRenderPartialTicks();
 			t.set(1, LuaValue.valueOf(ForgeEventHandler.accuPlayerX(pt, player)));
 			t.set(2, LuaValue.valueOf(ForgeEventHandler.accuPlayerY(pt, player)));
 			t.set(3, LuaValue.valueOf(ForgeEventHandler.accuPlayerZ(pt, player)));
@@ -30,15 +31,15 @@ public class GetPlayerPos extends VarArgFunction{
 			final String sPlayer = args.checkjstring(1);
 			final LuaTable t = new LuaTable();
 			t.set(1, FALSE);
-			//ListenableFuture<Object> f = Minecraft.getMinecraft().addScheduledTask(new Runnable() { //scheduledTask is too slow
+			//ListenableFuture<Object> f = AdvancedMacros.getMinecraft().addScheduledTask(new Runnable() { //scheduledTask is too slow
 			//	@Override
 			//	public void run() {
-				List<EntityPlayer> players = Minecraft.getMinecraft().world.playerEntities;
+				List<EntityPlayer> players = AdvancedMacros.getMinecraft().world.playerEntities;
 					for(int i = 0; i<players.size(); i++) {
 						EntityPlayer player = players.get(i);
-					//for(EntityPlayer player : Minecraft.getMinecraft().world.playerEntities){
+					//for(EntityPlayer player : AdvancedMacros.getMinecraft().world.playerEntities){
 						if(player!=null && player.getName().equals(sPlayer)){
-							float pt = Minecraft.getMinecraft().getRenderPartialTicks();
+							float pt = AdvancedMacros.getMinecraft().getRenderPartialTicks();
 							t.set(1, LuaValue.valueOf(ForgeEventHandler.accuPlayerX(pt, player)));
 							t.set(2, LuaValue.valueOf(ForgeEventHandler.accuPlayerY(pt, player)));
 							t.set(3, LuaValue.valueOf(ForgeEventHandler.accuPlayerZ(pt, player)));

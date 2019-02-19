@@ -1259,7 +1259,7 @@ public class Utils {
 //			r.run();
 //			return;
 //		}
-//		ListenableFuture<Object> f = Minecraft.getMinecraft().addScheduledTask(r);
+//		ListenableFuture<Object> f = AdvancedMacros.getMinecraft().addScheduledTask(r);
 //		while(!f.isDone()) try{Thread.sleep(5);}catch (InterruptedException ie) {return;}
 //	}
 	public static LuaValue toTable(Container container) {
@@ -1322,7 +1322,7 @@ public class Utils {
 						LuaValue.valueOf("Sl"));
 	}
 	public static LuaValue rayTraceResultToLuaValue(RayTraceResult rtr) {
-		Minecraft mc = Minecraft.getMinecraft();
+		Minecraft mc = AdvancedMacros.getMinecraft();
 		if(rtr==null) return LuaValue.FALSE;
 		LuaTable result = new LuaTable();
 
@@ -1357,7 +1357,7 @@ public class Utils {
 			r.run();
 			return null;
 		}
-		ListenableFuture<Object> a = Minecraft.getMinecraft().addScheduledTask(r);
+		ListenableFuture<Object> a = AdvancedMacros.getMinecraft().addScheduledTask(r);
 		while(!a.isDone())
 			try {Thread.sleep(1);}catch (Exception e) {break;}
 		try {
@@ -1379,7 +1379,7 @@ public class Utils {
 				Utils.logError(e);
 			}
 		}
-		ListenableFuture<T> a = Minecraft.getMinecraft().addScheduledTask(c);
+		ListenableFuture<T> a = AdvancedMacros.getMinecraft().addScheduledTask(c);
 		while(!a.isDone())
 			try {Thread.sleep(1);}catch (Exception e) {break;}
 		try {

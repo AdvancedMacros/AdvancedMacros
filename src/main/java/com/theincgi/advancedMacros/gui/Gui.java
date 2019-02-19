@@ -8,6 +8,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.elements.Drawable;
 
 import net.minecraft.client.Minecraft;
@@ -19,7 +20,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 
 public class Gui extends net.minecraft.client.gui.GuiScreen{
-	FontRenderer fontRend = Minecraft.getMinecraft().fontRenderer;
+	FontRenderer fontRend = AdvancedMacros.getMinecraft().fontRenderer;
 	private LinkedList<KeyTime> heldKeys = new LinkedList<>();
 	public LinkedList<InputSubscriber> inputSubscribers = new LinkedList<>();
 	/**The next key or mouse event will be sent to this before anything else*/
@@ -34,7 +35,7 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	private boolean drawDefaultBackground = true;
 
 	public Gui() {
-		super.mc = Minecraft.getMinecraft();
+		super.mc = AdvancedMacros.getMinecraft();
 	}
 
 	@Override
@@ -74,24 +75,37 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 
 	@Override
 	protected void keyTyped(char typedChar, int keyCode) throws IOException {
-		if(nextKeyListen!=null && nextKeyListen.onKeyPressed(this, typedChar, keyCode)){nextKeyListen = null; return;}
-		if(firstSubsciber!=null && firstSubsciber.onKeyPressed(this, typedChar, keyCode)){return;}
-		super.keyTyped(typedChar, keyCode);
+		onKeyTyped(typedChar, keyCode);
+	}
+	public boolean onKeyTyped(char typedChar, int keyCode) {
+		if(nextKeyListen!=null && nextKeyListen.onKeyPressed(this, typedChar, keyCode)){nextKeyListen = null; return true;}
+		if(firstSubsciber!=null && firstSubsciber.onKeyPressed(this, typedChar, keyCode)){return true;}
+		try {
+			super.keyTyped(typedChar, keyCode);
+		} catch (IOException e) {}
 		heldKeys.add(new KeyTime(keyCode, typedChar));
 		for (InputSubscriber inputSubscriber : inputSubscribers) {
-			if(inputSubscriber.onKeyPressed(this, typedChar, keyCode)) break;
+			if(inputSubscriber.onKeyPressed(this, typedChar, keyCode)) return true;
 		}
+		return false;
 	}
 	/**fires after key has been held in for a time
 	 * mod will always be positive
 	 * <br><b>Tip</b>: Use mod to reduce key repeat speed.
 	 * <blockquote><br> if(mod%5==0){...} </code></blockquote>>*/
-	public void keyRepeated(char typedChar, int keyCode, int mod){
-		if(firstSubsciber!=null && firstSubsciber.onKeyRepeat(this, typedChar, keyCode, mod)){return;}
+	public boolean keyRepeated(char typedChar, int keyCode, int mod){
+		if(firstSubsciber!=null && firstSubsciber.onKeyRepeat(this, typedChar, keyCode, mod)){return true;}
 		for (InputSubscriber inputSubscriber : inputSubscribers) {
-			if(inputSubscriber.onKeyRepeat(this, typedChar, keyCode, mod)) break;
+			if(inputSubscriber.onKeyRepeat(this, typedChar, keyCode, mod)) return true;
 		}
+		return false;
 	}
+	
+	/**very overridable, this is called after input subscribers have not claimed this event*/
+	public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
+		return false;
+	}
+	
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		if(drawDefaultBackground)
@@ -107,9 +121,15 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 			}
 		}
 		for (KeyTime keyTime : killList) {
+			boolean flag = false;
 			for (InputSubscriber inputSubscriber : inputSubscribers) {
-				if(inputSubscriber.onKeyRelease(this, keyTime.key, keyTime.keyCode)) break;
+				if(inputSubscriber.onKeyRelease(this, keyTime.key, keyTime.keyCode)) {
+					flag = true;
+					break;
+				}
 			}
+			if(!flag)
+				onKeyRelease(this, keyTime.key, keyTime.keyCode);
 			heldKeys.remove(keyTime);
 		}
 
@@ -142,7 +162,7 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 		//GlStateManager.pushMatrix();
 		//GlStateManager.pushAttrib();
 
-		Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
+		AdvancedMacros.getMinecraft().getTextureManager().bindTexture(texture);
 		
 		//GlStateManager.enableBlend();
 		//GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -159,7 +179,7 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 		
 		GL11.glPopAttrib();
 		
-		//Minecraft.getMinecraft().getTextureManager().
+		//AdvancedMacros.getMinecraft().getTextureManager().
 		//GlStateManager.popMatrix();
 		//GlStateManager.popAttrib();
 	}
@@ -174,15 +194,16 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	}
 
 	//Called by drawScreen, gets overridden by gui
-	public void mouseScroll(int i){
-		if(firstSubsciber!=null && firstSubsciber.onScroll(this, i)) return;
+	public boolean mouseScroll(int i){
+		if(firstSubsciber!=null && firstSubsciber.onScroll(this, i)) return true;
 		synchronized (drawables) {
 
 			for (InputSubscriber inputSubscriber : inputSubscribers) {
-				if(inputSubscriber.onScroll(this, i)) break;
+				if(inputSubscriber.onScroll(this, i)) return true;
 			}
 
 		}
+		return false;
 	}
 
 	private class KeyTime{
@@ -224,36 +245,50 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 		fontRendererIn.drawString(text, x-wid/2, y-fontRend.FONT_HEIGHT/2, color, false);
 	}
 
-
+	
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-		if(nextKeyListen!=null && nextKeyListen.onMouseClick(this, mouseX, mouseY, mouseButton)){nextKeyListen = null; return;}
-		if(firstSubsciber!=null && firstSubsciber.onMouseClick(this, mouseX, mouseY, mouseButton)){return;}
-		super.mouseClicked(mouseX, mouseY, mouseButton);
+		onMouseClicked(mouseX, mouseY, mouseButton);
+	}
+	public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton) {
+		if(nextKeyListen!=null && nextKeyListen.onMouseClick(this, mouseX, mouseY, mouseButton)){nextKeyListen = null; return true;}
+		if(firstSubsciber!=null && firstSubsciber.onMouseClick(this, mouseX, mouseY, mouseButton)){return true;}
+		try {
+			super.mouseClicked(mouseX, mouseY, mouseButton);
+		} catch (IOException e) {}
 		//System.out.println("CLICK 1");
 		for (InputSubscriber inputSubscriber : inputSubscribers) {
 			if(inputSubscriber.onMouseClick(this, mouseX, mouseY, mouseButton))
-				break;
+				return true;;
 		}
+		return false;
 	}
 
 	@Override
 	protected void mouseReleased(int mouseX, int mouseY, int state) {
+		onMouseReleased(mouseX, mouseY, state);
+	}
+	public boolean onMouseReleased(int mouseX, int mouseY, int state) {
 		super.mouseReleased(mouseX, mouseY, state);
-		if(firstSubsciber!=null && firstSubsciber.onMouseRelease(this, mouseX, mouseY, state)){return;}
+		if(firstSubsciber!=null && firstSubsciber.onMouseRelease(this, mouseX, mouseY, state)){return true;}
 		for (InputSubscriber inputSubscriber : inputSubscribers) {
 			if(inputSubscriber.onMouseRelease(this, mouseX, mouseY, state))
-				break;
+				return true;
 		}
+		return false;
 	}
 	@Override
 	protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+		onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+	}
+	public boolean onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
 		super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
-		if(firstSubsciber!=null && firstSubsciber.onMouseClickMove(this, mouseX, mouseY, clickedMouseButton, timeSinceLastClick)) {return;}
+		if(firstSubsciber!=null && firstSubsciber.onMouseClickMove(this, mouseX, mouseY, clickedMouseButton, timeSinceLastClick)) {return true;}
 		for (InputSubscriber inputSubscriber : inputSubscribers) {
 			if(inputSubscriber.onMouseClickMove(this, mouseX, mouseY, clickedMouseButton, timeSinceLastClick))
-				break;
+				return true;
 		}
+		return false;
 	}
 
 	public static interface Focusable{
@@ -279,7 +314,7 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 
 	public void showGui(){
 		//AdvancedMacros.lastGui = this;
-		Minecraft.getMinecraft().displayGuiScreen(this);
+		AdvancedMacros.getMinecraft().displayGuiScreen(this);
 	}
 	//something to call each time you switch back
 	public void onOpen(){
@@ -295,10 +330,10 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 		//System.out.println("FOCUS: >> "+focusItem);
 	}
 	public int getUnscaledWindowWidth(){
-		return Minecraft.getMinecraft().displayWidth;
+		return AdvancedMacros.getMinecraft().displayWidth;
 	}
 	public int getUnscaledWindowHeight(){
-		return Minecraft.getMinecraft().displayHeight;
+		return AdvancedMacros.getMinecraft().displayHeight;
 	}
 
 	public void setDrawDefaultBackground(boolean drawDefaultBackground) {

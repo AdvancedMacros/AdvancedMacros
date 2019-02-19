@@ -4,6 +4,8 @@ import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -14,7 +16,7 @@ public class GetWorld extends ZeroArgFunction {
 	@Override
 	public LuaValue call() {
 		try {
-			World world = Minecraft.getMinecraft().player.getEntityWorld();
+			World world = AdvancedMacros.getMinecraft().player.getEntityWorld();
 			return worldToTable(world);
 		}catch(NullPointerException npe) {
 			return LuaValue.FALSE;

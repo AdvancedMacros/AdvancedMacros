@@ -8,6 +8,7 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.theincgi.advancedMacros.AdvancedMacros;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetworkPlayerInfo;
@@ -16,18 +17,18 @@ public class GetPlayerList extends ZeroArgFunction {
 	@Override
 	public LuaValue call() {
 		final LuaTable table=new LuaTable();
-		ListenableFuture<Object> f = Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+		ListenableFuture<Object> f = AdvancedMacros.getMinecraft().addScheduledTask(new Runnable() {
 			@Override
 			public void run() {
 				int i = 1;
-//				NetworkPlayerInfo[] list = (NetworkPlayerInfo[]) Minecraft.getMinecraft().player.connection.getPlayerInfoMap().toArray();
+//				NetworkPlayerInfo[] list = (NetworkPlayerInfo[]) AdvancedMacros.getMinecraft().player.connection.getPlayerInfoMap().toArray();
 //				
 //				for(int j = 0; j<list.length; j++) {
 //					NetworkPlayerInfo player = list[j];
 //					table.set(i++, player.getGameProfile().getName());
 //				}
 				
-				Minecraft mc = Minecraft.getMinecraft();
+				Minecraft mc = AdvancedMacros.getMinecraft();
 				Iterator<NetworkPlayerInfo> iter = mc.getConnection().getPlayerInfoMap().iterator();
 				while(iter.hasNext()) {
 					NetworkPlayerInfo playerInfo = iter.next();

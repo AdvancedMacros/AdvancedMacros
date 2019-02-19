@@ -7,6 +7,8 @@ import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -16,7 +18,7 @@ public class GetTextureList extends ZeroArgFunction{
 	private final Map<String, TextureAtlasSprite> mapRegisteredSprites;
 	
 	public GetTextureList() throws NoSuchFieldException, RuntimeException, IllegalAccessException {
-		TextureMap map = Minecraft.getMinecraft().getTextureMapBlocks();
+		TextureMap map = AdvancedMacros.getMinecraft().getTextureMapBlocks();
 		Field f = ReflectionHelper.findField(TextureMap.class, "mapRegisteredSprites", "field_110574_e", "j");
 		//Field f = TextureMap.class.getDeclaredField(isObf?"j":"mapRegisteredSprites");
 		f.setAccessible(true);

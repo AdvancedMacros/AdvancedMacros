@@ -29,7 +29,7 @@ public class Hud3D extends LuaTable{
 		}
 		@Override
 		public Varargs invoke(Varargs args) {
-			EntityPlayerSP p = Minecraft.getMinecraft().player;
+			EntityPlayerSP p = AdvancedMacros.getMinecraft().player;
 			switch (op) {
 			case clearAll:{
 				AdvancedMacros.forgeEventHandler.clearWorldHud();

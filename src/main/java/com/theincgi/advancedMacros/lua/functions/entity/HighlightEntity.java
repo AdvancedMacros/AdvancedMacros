@@ -13,7 +13,7 @@ import net.minecraft.entity.Entity;
 public class HighlightEntity extends ThreeArgFunction{
 	@Override
 	public LuaValue call(LuaValue arg, LuaValue action, LuaValue active) {
-		Entity e = Minecraft.getMinecraft().world.getEntityByID(arg.checkint());
+		Entity e = AdvancedMacros.getMinecraft().world.getEntityByID(arg.checkint());
 		boolean flag = active.optboolean(true);
 		switch ( action.checkjstring() ) {
 		case "glow":{

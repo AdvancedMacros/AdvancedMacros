@@ -9,6 +9,7 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
 
 import net.minecraft.client.Minecraft;
@@ -19,7 +20,7 @@ public class GetScreen extends ZeroArgFunction{
 	
 	@Override
 	public LuaValue call() {
-		Minecraft mc = Minecraft.getMinecraft();	
+		Minecraft mc = AdvancedMacros.getMinecraft();	
 		
 		ListenableFuture<BufferedImage> futureImage = mc.addScheduledTask(new Callable<BufferedImage>() {
 			@Override

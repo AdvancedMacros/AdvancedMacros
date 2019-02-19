@@ -115,7 +115,7 @@ public class ScriptBrowser2 extends Gui{
 		
 		listManager.setModeFullBox(true);
 		
-		setWorldAndResolution(Minecraft.getMinecraft(), width, height);
+		setWorldAndResolution(AdvancedMacros.getMinecraft(), width, height);
 		
 		returnButton.setOnClick((int mouseButton, GuiButton b)->{
 			ForgeEventHandler.showPrevMenu();
@@ -554,9 +554,9 @@ public class ScriptBrowser2 extends Gui{
 							if(isSelectionMode()) {
 								selectionMode = false;
 								if(requester==null) {//FIXME
-									Minecraft.getMinecraft().displayGuiScreen(AdvancedMacros.macroMenuGui.getGui());
+									AdvancedMacros.getMinecraft().displayGuiScreen(AdvancedMacros.macroMenuGui.getGui());
 								}else {
-									Minecraft.getMinecraft().displayGuiScreen(requester);
+									AdvancedMacros.getMinecraft().displayGuiScreen(requester);
 								}
 								Result r = new PopupPrompt2.Result();
 								r.canceled = false;
@@ -673,7 +673,7 @@ public class ScriptBrowser2 extends Gui{
 	public void getSelection(Gui gui, ResultHandler rh) {
 		setSelectionMode(requester, true);
 		this.rh = rh;
-		Minecraft.getMinecraft().displayGuiScreen(this);
+		AdvancedMacros.getMinecraft().displayGuiScreen(this);
 	}
 
 	public void setSelectedFile(String script) {

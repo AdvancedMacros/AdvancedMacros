@@ -4,6 +4,8 @@ import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EnumPlayerModelParts;
@@ -11,7 +13,7 @@ import net.minecraft.entity.player.EnumPlayerModelParts;
 public class SkinCustomizer extends TwoArgFunction{
 	@Override
 	public LuaValue call(LuaValue arg0, LuaValue arg1) {
-		GameSettings set = Minecraft.getMinecraft().gameSettings;
+		GameSettings set = AdvancedMacros.getMinecraft().gameSettings;
 		switch (arg0.checkjstring()) {
 		case "hat":
 		case "helmet":

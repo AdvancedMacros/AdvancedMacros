@@ -19,13 +19,13 @@ public class Toast extends TwoArgFunction{
 	}
 	
 	public void toast(LuaValue arg1, LuaValue arg2) {
-		//Minecraft.getMinecraft().ingameGUI.setOverlayMessage(message, animateColor);
-		//Minecraft.getMinecraft().ingameGUI.setRecordPlayingMessage(recordName);
-		//Minecraft.getMinecraft().ingameGUI.displayTitle(title, subTitle, timeFadeIn, displayTime, timeFadeOut);
+		//AdvancedMacros.getMinecraft().ingameGUI.setOverlayMessage(message, animateColor);
+		//AdvancedMacros.getMinecraft().ingameGUI.setRecordPlayingMessage(recordName);
+		//AdvancedMacros.getMinecraft().ingameGUI.displayTitle(title, subTitle, timeFadeIn, displayTime, timeFadeOut);
 		ITextComponent comp1, comp2;
 		comp1 = AdvancedMacros.logFunc.formatString(arg1);
 		comp2 = AdvancedMacros.logFunc.formatString(arg2);
-		Minecraft.getMinecraft().getToastGui().add(
+		AdvancedMacros.getMinecraft().getToastGui().add(
 				//new AdvancementToast(Advancement.Builder.)
 				//new RecipeToast(ItemStack)
 				new SystemToast(Type.TUTORIAL_HINT, comp1, comp2)

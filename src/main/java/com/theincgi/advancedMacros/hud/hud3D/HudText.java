@@ -10,7 +10,7 @@ import com.theincgi.advancedMacros.misc.CallableTable;
 import net.minecraft.client.Minecraft;
 
 public class HudText extends WorldHudItem{
-	Minecraft mc = Minecraft.getMinecraft();
+	Minecraft mc = AdvancedMacros.getMinecraft();
 	String text="";
 	//private boolean is3D;
 	//Color color;

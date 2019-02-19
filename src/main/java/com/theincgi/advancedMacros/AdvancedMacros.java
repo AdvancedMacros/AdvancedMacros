@@ -134,6 +134,7 @@ public class AdvancedMacros {
 	private static final DocumentationManager documentationManager = new DocumentationManager();
 	private JarLibSearcher jarLibSearcher;
 	private static Thread minecraftThread;
+	private static Minecraft mc;
 	
 	public static final boolean COLOR_SPACE_IS_255 = false;
 
@@ -378,21 +379,21 @@ public class AdvancedMacros {
 	
 	private void loadScripts() {
 		try {
-			InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/searcher.lua")).getInputStream();
+			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/searcher.lua")).getInputStream();
 			globals.load(in, "searcher", "t", globals).call();
 			in.close();
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 		try {
-			InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/settings_fix.lua")).getInputStream();
+			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/settings_fix.lua")).getInputStream();
 			globals.load(in, "settingsFix", "t", globals).call();
 			in.close();
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 		try {
-			InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/morefunc.lua")).getInputStream();
+			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/morefunc.lua")).getInputStream();
 			globals.load(in, "moreFunctions", "t", globals).call();
 			in.close();
 		} catch (Throwable e) {
@@ -435,8 +436,8 @@ public class AdvancedMacros {
 		}
 	}
 	private static File getRootFolder() {
-		File defaultRoot = new File(Minecraft.getMinecraft().gameDir,"mods/advancedMacros");
-		File f = new File(Minecraft.getMinecraft().gameDir,"config/advancedMacros.cfg");
+		File defaultRoot = new File(AdvancedMacros.getMinecraft().gameDir,"mods/advancedMacros");
+		File f = new File(AdvancedMacros.getMinecraft().gameDir,"config/advancedMacros.cfg");
 		if(!f.exists()) {
 			try (PrintWriter pw = new PrintWriter(f)){
 				pw.write("advancedMacrosRootFolder=" +defaultRoot.toString()+"\n");
@@ -462,5 +463,9 @@ public class AdvancedMacros {
 
 	public static boolean isServerSide() {
 		return (FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER); //lik srsly;
+	}
+	public static Minecraft getMinecraft() {
+		if (mc == null) mc = Minecraft.getMinecraft();
+		return mc;
 	}
 }

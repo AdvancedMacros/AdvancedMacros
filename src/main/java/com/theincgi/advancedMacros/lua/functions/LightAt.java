@@ -6,6 +6,8 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
@@ -20,11 +22,11 @@ public class LightAt{
 			if(args.narg()==3) {
 				pos = new BlockPos(args.arg1().checkint(), args.arg(2).checkint(), args.arg(3).checkint());
 			}else if(args.narg()==0) {
-				pos = Minecraft.getMinecraft().player.getPosition();
+				pos = AdvancedMacros.getMinecraft().player.getPosition();
 			}else {
 				throw new LuaError("Invalid args: NONE or X,Y,Z");
 			}
-			Chunk c = Minecraft.getMinecraft().player.getEntityWorld().getChunk(pos);
+			Chunk c = AdvancedMacros.getMinecraft().player.getEntityWorld().getChunk(pos);
 			int overall = c.getLightSubtracted(pos, 0);
 			int block = LightAt.getBlockLight(c, pos);
 			int sky = LightAt.getSkyLight(c, pos);
@@ -42,11 +44,11 @@ public class LightAt{
 			if(args.narg()==3) {
 				pos = new BlockPos(args.arg1().checkint(), args.arg(2).checkint(), args.arg(3).checkint());
 			}else if(args.narg()==0) {
-				pos = Minecraft.getMinecraft().player.getPosition();
+				pos = AdvancedMacros.getMinecraft().player.getPosition();
 			}else {
 				throw new LuaError("Invalid args: NONE or X,Y,Z");
 			}
-			Chunk c = Minecraft.getMinecraft().player.getEntityWorld().getChunk(pos);
+			Chunk c = AdvancedMacros.getMinecraft().player.getEntityWorld().getChunk(pos);
 			return LuaValue.valueOf(getBlockLight(c, pos));
 		}
 	}
@@ -57,11 +59,11 @@ public class LightAt{
 			if(args.narg()==3) {
 				pos = new BlockPos(args.arg1().checkint(), args.arg(2).checkint(), args.arg(3).checkint());
 			}else if(args.narg()==0) {
-				pos = Minecraft.getMinecraft().player.getPosition();
+				pos = AdvancedMacros.getMinecraft().player.getPosition();
 			}else {
 				throw new LuaError("Invalid args: NONE or X,Y,Z");
 			}
-			Chunk c = Minecraft.getMinecraft().player.getEntityWorld().getChunk(pos);
+			Chunk c = AdvancedMacros.getMinecraft().player.getEntityWorld().getChunk(pos);
 			return LuaValue.valueOf(getSkyLight(c, pos));
 		}
 	}

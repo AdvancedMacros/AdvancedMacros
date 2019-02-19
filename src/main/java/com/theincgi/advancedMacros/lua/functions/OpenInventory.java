@@ -7,6 +7,7 @@ import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -60,7 +61,7 @@ public class OpenInventory extends ZeroArgFunction{
 
 		@Override
 		public Varargs invoke(Varargs args) {
-			Minecraft mc = Minecraft.getMinecraft();
+			Minecraft mc = AdvancedMacros.getMinecraft();
 			GuiContainer container;
 			if(mc.currentScreen instanceof GuiContainer) {
 				container = (GuiContainer) mc.currentScreen;
@@ -316,16 +317,16 @@ public class OpenInventory extends ZeroArgFunction{
 	//	private static class CloseInventory extends ZeroArgFunction{
 	//		@Override
 	//		public LuaValue call() {
-	//			Minecraft.getMinecraft().player.closeScreenAndDropStack();
+	//			AdvancedMacros.getMinecraft().player.closeScreenAndDropStack();
 	//			return LuaValue.NONE;
 	//		}
 	//	}
 	//	private static class SwapStack extends TwoArgFunction{
 	//		@Override
 	//		public LuaValue call(LuaValue arg1, LuaValue arg2) {
-	//			InventoryPlayer inv = Minecraft.getMinecraft().player.inventory;
-	//			ContainerPlayer  invContainer =(ContainerPlayer) Minecraft.getMinecraft().player.inventoryContainer;
-	//			NetHandlerPlayClient nhpc = Minecraft.getMinecraft().getConnection();
+	//			InventoryPlayer inv = AdvancedMacros.getMinecraft().player.inventory;
+	//			ContainerPlayer  invContainer =(ContainerPlayer) AdvancedMacros.getMinecraft().player.inventoryContainer;
+	//			NetHandlerPlayClient nhpc = AdvancedMacros.getMinecraft().getConnection();
 	//
 	//			int sourceSlot = arg1.checkint()-1;
 	//			int sinkSlot = arg2.checkint()-1;
@@ -352,9 +353,9 @@ public class OpenInventory extends ZeroArgFunction{
 	//	private static class SplitStack extends ThreeArgFunction{
 	//		@Override
 	//		public LuaValue call(LuaValue arg0, LuaValue arg1, LuaValue arg2) {
-	//			InventoryPlayer inv = Minecraft.getMinecraft().player.inventory;
-	//			ContainerPlayer  invContainer =(ContainerPlayer) Minecraft.getMinecraft().player.inventoryContainer;
-	//			NetHandlerPlayClient nhpc = Minecraft.getMinecraft().getConnection();
+	//			InventoryPlayer inv = AdvancedMacros.getMinecraft().player.inventory;
+	//			ContainerPlayer  invContainer =(ContainerPlayer) AdvancedMacros.getMinecraft().player.inventoryContainer;
+	//			NetHandlerPlayClient nhpc = AdvancedMacros.getMinecraft().getConnection();
 	//			ItemStack sourceStack = inv.getStackInSlot(arg1.checkint()-1);
 	//			ItemStack sinkStack = inv.getStackInSlot(arg1.checkint()-1);
 	//			if(!sourceStack.isEmpty() && 
@@ -387,7 +388,7 @@ public class OpenInventory extends ZeroArgFunction{
 	//		}
 	//	}
 	//	private static void doClick(int index, int buttonNum){
-	//		EntityPlayer player = Minecraft.getMinecraft().player;
+	//		EntityPlayer player = AdvancedMacros.getMinecraft().player;
 	//		ClickType clickType = ClickType.PICKUP;
 	//		hndlMsClick(index, buttonNum, clickType);
 	//		try {
@@ -397,11 +398,11 @@ public class OpenInventory extends ZeroArgFunction{
 	//		}
 	//	}
 	//	private static void hndlMsClick(int indx, int dragType, ClickType cType){
-	//		EntityPlayer player = Minecraft.getMinecraft().player;
+	//		EntityPlayer player = AdvancedMacros.getMinecraft().player;
 	//		
 	//		player.inventoryContainer.slotClick(indx, dragType, cType, player);
 	//		
-	//		NetHandlerPlayClient nhpc = Minecraft.getMinecraft().getConnection();
+	//		NetHandlerPlayClient nhpc = AdvancedMacros.getMinecraft().getConnection();
 	//		nhpc.sendPacket(new CPacketClickWindow(player.inventoryContainer.windowId,
 	//				indx, //ID of slot clicked TODO check me, idk if ID is slot ID or index 
 	//				dragType,//button num used 
@@ -411,19 +412,19 @@ public class OpenInventory extends ZeroArgFunction{
 	//	}
 	//	
 	private ClickType getCType() {
-		if(Minecraft.getMinecraft().player.inventory.getItemStack().isEmpty()){
+		if(AdvancedMacros.getMinecraft().player.inventory.getItemStack().isEmpty()){
 			return ClickType.PICKUP;
 		}
 		return ClickType.SWAP;
 	}
 	//	private void doClick(int index, ClickType type, int buttonNum){
 	//		System.out.println("Clicked on index "+index);
-	//		InventoryPlayer inv = Minecraft.getMinecraft().player.inventory;
+	//		InventoryPlayer inv = AdvancedMacros.getMinecraft().player.inventory;
 	//		
-	//		ContainerPlayer  invContainer =(ContainerPlayer) Minecraft.getMinecraft().player.inventoryContainer;
-	//		NetHandlerPlayClient nhpc = Minecraft.getMinecraft().getConnection();
+	//		ContainerPlayer  invContainer =(ContainerPlayer) AdvancedMacros.getMinecraft().player.inventoryContainer;
+	//		NetHandlerPlayClient nhpc = AdvancedMacros.getMinecraft().getConnection();
 	//		
-	//		invContainer.slotClick(index, 0, type, Minecraft.getMinecraft().player);
+	//		invContainer.slotClick(index, 0, type, AdvancedMacros.getMinecraft().player);
 	//		nhpc.sendPacket(new CPacketClickWindow(invContainer.windowId,
 	//				index, //ID of slot clicked TODO check me, idk if ID is slot ID or index 
 	//				buttonNum,//button num used 
@@ -435,8 +436,8 @@ public class OpenInventory extends ZeroArgFunction{
 	//	}
 
 	private static int getSlotNum(int invIndx){
-		InventoryPlayer inv = Minecraft.getMinecraft().player.inventory;
-		ContainerPlayer  invContainer =(ContainerPlayer) Minecraft.getMinecraft().player.inventoryContainer;
+		InventoryPlayer inv = AdvancedMacros.getMinecraft().player.inventory;
+		ContainerPlayer  invContainer =(ContainerPlayer) AdvancedMacros.getMinecraft().player.inventoryContainer;
 
 		if(inRange(invIndx, 0, 8)){
 			return invIndx+36;

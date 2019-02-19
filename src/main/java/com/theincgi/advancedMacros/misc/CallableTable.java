@@ -192,7 +192,7 @@ public class CallableTable extends LuaTable{
 	}
 
 	public static String getCurrentLanguage() {
-		return Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage().getLanguageCode();
+		return AdvancedMacros.getMinecraft().getLanguageManager().getCurrentLanguage().getLanguageCode();
 	}
 	public static JsonObject getDocJson() {
 		return getDocJson( getCurrentLanguage() );
@@ -203,7 +203,7 @@ public class CallableTable extends LuaTable{
 			return json;
 
 		try(
-				InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "newdocs/"+languageCode+".lang")).getInputStream();
+				InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "newdocs/"+languageCode+".lang")).getInputStream();
 				BufferedReader reader = new BufferedReader(new InputStreamReader(in));){
 			Gson g = new Gson();
 			JsonElement je = g.fromJson(reader, JsonElement.class);

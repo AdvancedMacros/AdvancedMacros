@@ -1,5 +1,7 @@
 package com.theincgi.advancedMacros.lua.scriptGui;
 
+import java.io.IOException;
+
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaTable;
@@ -8,6 +10,8 @@ import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.event.ForgeEventHandler;
@@ -20,6 +24,7 @@ import com.theincgi.advancedMacros.misc.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
 
 public class ScriptGui extends LuaTable implements InputSubscriber{
 	private static int counter = 1;
@@ -42,42 +47,96 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 					Utils.pcall(onGuiClose);
 				}
 				isOpen = false;
-				//GuiScreen tmp = Minecraft.getMinecraft().currentScreen;
+				//GuiScreen tmp = AdvancedMacros.getMinecraft().currentScreen;
 			}
 			@Override
 			public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 				lastMouseX = mouseX;
 				lastMouseY = mouseY;
 				if(parentGui!=null) {
+					GlStateManager.pushMatrix();
+					GlStateManager.translate(0, 0, -50);
 					parentGui.gui.drawScreen(mouseX, mouseY, partialTicks);
-					setDrawDefaultBackground(false);
+					GlStateManager.popMatrix();
+					//setDrawDefaultBackground(false);
 				}else {
-					setDrawDefaultBackground(true);
+					//setDrawDefaultBackground(true);
 				}
 				super.drawScreen(mouseX, mouseY, partialTicks);
 			};
 			@Override
 			public void onResize(Minecraft mcIn, int w, int h) {
-				super.onResize(mcIn, w, h);
-				if(onResize!=null)
-					Utils.pcall(onResize, valueOf(w), valueOf(h));
+				ScriptGui.this.onGuiResize(mcIn, w, h);
 			}
 			@Override
 			public boolean doesGuiPauseGame() {
 				return pausesGame;
 			}
 			@Override
+			protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+				if(!super.onMouseClicked(mouseX, mouseY, mouseButton))
+					if(!ScriptGui.this.onMouseClick(this, mouseX, mouseY, mouseButton))
+						if (parentGui != null)
+							parentGui.onMouseClick(parentGui.gui, mouseX, mouseY, mouseButton);
+			}
+			@Override
+			protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+				if(!super.onMouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick))
+					if(!ScriptGui.this.onMouseClickMove(this, mouseX, mouseY, clickedMouseButton, timeSinceLastClick))
+						if (parentGui != null)
+							parentGui.onMouseClickMove(parentGui.gui, mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+			}
+			@Override
+			protected void mouseReleased(int mouseX, int mouseY, int state) {
+				if(!super.onMouseReleased(mouseX, mouseY, state))
+					if(!ScriptGui.this.onMouseRelease(this, mouseX, mouseY, state))
+						if (parentGui != null)
+							parentGui.onMouseRelease(parentGui.gui, mouseX, mouseY, state);
+			}
+			@Override
+			public boolean onKeyTyped(char typedChar, int keyCode) {
+				return super.onKeyTyped(typedChar, keyCode) ||                //java effectively returns as soon as one is true. only one should run
+				 ScriptGui.this.onKeyPressed(this, typedChar, keyCode) ||
+				 (parentGui!=null && parentGui.onKeyPressed(parentGui.gui, typedChar, keyCode));
+			}
+			@Override
+			public boolean keyRepeated(char typedChar, int keyCode, int mod) {
+				return super.keyRepeated(typedChar, keyCode, mod) ||
+						ScriptGui.this.onKeyRepeat(this, typedChar, keyCode, mod) ||
+						 (parentGui!=null && parentGui.onKeyRepeat(parentGui.gui, typedChar, keyCode, mod));
+			}
+			@Override
+			public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
+				return super.onKeyRelease(gui, typedChar, keyCode)||
+						ScriptGui.this.onKeyRelease(this, typedChar, keyCode) ||
+						 (parentGui!=null && parentGui.onKeyRelease(parentGui.gui, typedChar, keyCode));
+			}
+			@Override
+			public boolean mouseScroll(int i) {
+				return super.mouseScroll(i) ||
+						ScriptGui.this.onScroll(this, i) ||
+						(parentGui!=null && parentGui.onScroll(parentGui.gui, i));
+			}
+			@Override
 			public String toString() {
 				return "ScriptGui:"+guiName;
 			}
 		};
-		gui.inputSubscribers.add(this); //tell yourself everything!
+		//gui.inputSubscribers.add(this); //tell yourself everything!
 		
 		for(OpCodes op : OpCodes.values()) {
 			set(op.name(), new CallableTable( op.getDocLocation() , new DoOperation( op ) ));
 		}
 		set("__class", "advancedMacros.ScriptGui");
 		addInputControls(this);
+	}
+	
+	public void onGuiResize(Minecraft mcIn, int w, int h) {
+		if(parentGui!=null)
+			parentGui.onGuiResize(mcIn, w, h);
+		gui.setWorldAndResolution(mcIn, w, h);
+		if(onResize!=null)
+			Utils.pcall(onResize, valueOf(w), valueOf(h));
 	}
 	
 	public class DoOperation extends VarArgFunction {
@@ -92,7 +151,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 		public Varargs invoke(Varargs args) {
 			switch (opCode) {
 			case close:
-				Minecraft.getMinecraft().displayGuiScreen(null);
+				AdvancedMacros.getMinecraft().displayGuiScreen(null);
 				return NONE;
 			case getName:
 				return LuaValue.valueOf(guiName);
@@ -100,7 +159,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				return parentGui == null? NIL : parentGui;
 			case getSize:{
 				LuaTable temp = new LuaTable();
-				Minecraft mc = Minecraft.getMinecraft();
+				Minecraft mc = AdvancedMacros.getMinecraft();
 				ScaledResolution scaled = new ScaledResolution(mc);
 				temp.set(1, LuaValue.valueOf(scaled.getScaledWidth()));
 				temp.set(2, LuaValue.valueOf(scaled.getScaledHeight()));
@@ -175,16 +234,30 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				cta.setHeight( args.optint(4, 0) );
 				cta.getCTA().setText( args.optstring(5, valueOf("")).tojstring() );
 				return cta;
-			case open:
+			case open:{
 				AdvancedMacros.forgeEventHandler.releaseAllKeys();
-				Minecraft.getMinecraft().addScheduledTask(()->{
-					Minecraft.getMinecraft().displayGuiScreen(gui);
-					Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
+				Integer mx = null, my=null;
+				if(args.isnumber(1) && args.isnumber(2)) {
+					mx = args.checkint(1);
+					my = args.checkint(2);
+					Minecraft mc = AdvancedMacros.getMinecraft();
+					ScaledResolution scaled = new ScaledResolution(mc);
+					mx = mx*(mc.displayWidth/scaled.getScaledWidth());
+					my = mc.displayHeight - my*(mc.displayHeight/scaled.getScaledHeight());
+				}
+				final Integer fmx = mx, fmy = my;
+				AdvancedMacros.getMinecraft().addScheduledTask(()->{
+					AdvancedMacros.getMinecraft().displayGuiScreen(gui);
+					Mouse.setGrabbed(false);
+					if(fmx!=null && fmy!=null)
+						Mouse.setCursorPosition(fmx, fmy);
+					//AdvancedMacros.getMinecraft().mouseHelper.ungrabMouseCursor();
 				});
 				if(onGuiOpen!=null)
 					onGuiOpen.call();
 				isOpen = true;
 				return LuaValue.NONE;
+			}
 			case isOpen:
 				return valueOf(isOpen);
 			case setName:
@@ -210,13 +283,14 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				return Utils.varargs(valueOf(lastMouseX), valueOf(lastMouseY));
 			}
 			case grabMouse:
-				Minecraft.getMinecraft().addScheduledTask(()->{
-					Minecraft.getMinecraft().mouseHelper.grabMouseCursor();
+				AdvancedMacros.getMinecraft().addScheduledTask(()->{
+					//AdvancedMacros.getMinecraft().mouseHelper.grabMouseCursor();
+					Mouse.setGrabbed(true);
 				});
 				return NONE;
 			case ungrabMouse:
-				Minecraft.getMinecraft().addScheduledTask(()->{
-					Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
+				AdvancedMacros.getMinecraft().addScheduledTask(()->{
+					Mouse.setGrabbed(false);//AdvancedMacros.getMinecraft().mouseHelper.ungrabMouseCursor();
 				});
 				return NONE;
 			case setPausesGame:

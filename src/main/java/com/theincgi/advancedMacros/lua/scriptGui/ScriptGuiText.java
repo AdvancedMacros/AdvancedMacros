@@ -66,7 +66,7 @@ public class ScriptGuiText extends ScriptGuiElement{
 		
 		GlStateManager.bindTexture(0);
 		GlStateManager.color(1, 1, 1);
-		//FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
+		//FontRenderer fr = AdvancedMacros.getMinecraft().fontRenderer;
 		//FontRenderer fr;
 		if(monospaced) {
 			GlStateManager.enableBlend();

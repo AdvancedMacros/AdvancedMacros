@@ -42,7 +42,7 @@ public class InputGUI extends Gui{
 	PropertyPalette propPalette = new PropertyPalette(new String[] {"promptGui"});
 	private ListManager listItemPicker = new ListManager(5, 19, 30, 30, /*new WidgetID(800), "colors.promptGUI"*/ propPalette);
 	private ListManager choices = new ListManager(5, 19, 30, 30, /*new WidgetID(800), "colors.promptGUI"*/ propPalette);
-	private static ItemRenderer itemRenderer = Minecraft.getMinecraft().getItemRenderer();
+	private static ItemRenderer itemRenderer = AdvancedMacros.getMinecraft().getItemRenderer();
 	public InputGUI(LuaDebug debug) {
 		this.debug = debug;
 		textInput.height=12;
@@ -139,18 +139,20 @@ public class InputGUI extends Gui{
 		}
 	}
 	@Override
-	public void keyRepeated(char typedChar, int keyCode, int mod) {
+	public boolean keyRepeated(char typedChar, int keyCode, int mod) {
 		super.keyRepeated(typedChar, keyCode, mod);
 		if(inputType==InputType.TEXT) {
 			if(mod%2==0)
 				textInput.textboxKeyTyped(typedChar, keyCode);
+			return textInput.isFocused();
 		}
+		return false;
 	}
 	private void close(LuaValue value) {
 		answer = value;
 		answered = true;
 		textInput.setFocused(false);
-		Minecraft.getMinecraft().player.closeScreen();
+		AdvancedMacros.getMinecraft().player.closeScreen();
 	}
 	
 	
@@ -404,7 +406,7 @@ public class InputGUI extends Gui{
 
 		@Override
 		public LuaValue invoke(Varargs args) {
-			while(Minecraft.getMinecraft().currentScreen==AdvancedMacros.runningScriptsGui) {
+			while(AdvancedMacros.getMinecraft().currentScreen==AdvancedMacros.runningScriptsGui) {
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
@@ -437,16 +439,16 @@ public class InputGUI extends Gui{
 						}
 						setInputType(inputType, arg0.tojstring()); //seems to effect the thread check
 					}
-					Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+					AdvancedMacros.getMinecraft().addScheduledTask(new Runnable() {
 						@Override
 						public void run() {
 							Mouse.setGrabbed(false);
 						}
 					});
 					
-					Minecraft.getMinecraft().displayGuiScreen(AdvancedMacros.inputGUI);
+					AdvancedMacros.getMinecraft().displayGuiScreen(AdvancedMacros.inputGUI);
 					//System.out.println("Not grabbed");
-					while(!answered && !stoped && (threadCheck!=Thread.currentThread() || Minecraft.getMinecraft().currentScreen==InputGUI.this)) {
+					while(!answered && !stoped && (threadCheck!=Thread.currentThread() || AdvancedMacros.getMinecraft().currentScreen==InputGUI.this)) {
 						try {
 							Thread.sleep(50);
 						} catch (InterruptedException e) {

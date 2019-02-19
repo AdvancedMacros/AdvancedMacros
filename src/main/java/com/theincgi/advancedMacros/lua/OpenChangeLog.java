@@ -20,7 +20,7 @@ public class OpenChangeLog extends ZeroArgFunction{
 	
 	public static void openChangeLog() {
 		try {
-			InputStream in = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/changelogviewer.lua")).getInputStream();
+			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/changelogviewer.lua")).getInputStream();
 			AdvancedMacros.globals.load(in, "changeLog", "t", AdvancedMacros.globals).call(valueOf("force"));
 			in.close();
 		} catch (Throwable e) {e.printStackTrace();}
