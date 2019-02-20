@@ -100,37 +100,40 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 		}
 		return false;
 	}
-	
+
 	/**very overridable, this is called after input subscribers have not claimed this event*/
 	public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
 		return false;
 	}
-	
+
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		if(drawDefaultBackground)
 			drawDefaultBackground();
 
-		int i = Mouse.getDWheel();
-		mouseScroll((int) Math.signum(i));
-		Stack<KeyTime> killList = new Stack<>();
-		for(KeyTime k:heldKeys){
-			k.fireKeyRepeat();
-			if(k.dead){
-				killList.push(k);
-			}
-		}
-		for (KeyTime keyTime : killList) {
-			boolean flag = false;
-			for (InputSubscriber inputSubscriber : inputSubscribers) {
-				if(inputSubscriber.onKeyRelease(this, keyTime.key, keyTime.keyCode)) {
-					flag = true;
-					break;
+		if(AdvancedMacros.getMinecraft().currentScreen == this) { //do not steal the child gui's events!
+			int i = Mouse.getDWheel();
+			if(i!=0)
+				mouseScroll((int) Math.signum(i));
+			Stack<KeyTime> killList = new Stack<>();
+			for(KeyTime k:heldKeys){
+				k.fireKeyRepeat();
+				if(k.dead){
+					killList.push(k);
 				}
 			}
-			if(!flag)
-				onKeyRelease(this, keyTime.key, keyTime.keyCode);
-			heldKeys.remove(keyTime);
+			for (KeyTime keyTime : killList) {
+				boolean flag = false;
+				for (InputSubscriber inputSubscriber : inputSubscribers) {
+					if(inputSubscriber.onKeyRelease(this, keyTime.key, keyTime.keyCode)) {
+						flag = true;
+						break;
+					}
+				}
+				if(!flag)
+					onKeyRelease(this, keyTime.key, keyTime.keyCode);
+				heldKeys.remove(keyTime);
+			}
 		}
 
 		synchronized (drawables) {
@@ -152,18 +155,18 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	//	public static ResourceLocation TEXTURE = new ResourceLocation("textures/gui/container/hopper.png");
 	public void drawImage(ResourceLocation texture, int x, int y, int wid, int hei, float uMin, float vMin, float uMax, float vMax){
 
-		
+
 		GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		
+
 		//GlStateManager.pushMatrix();
 		//GlStateManager.pushAttrib();
 
 		AdvancedMacros.getMinecraft().getTextureManager().bindTexture(texture);
-		
+
 		//GlStateManager.enableBlend();
 		//GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		//GlStateManager.color(1F, 1F, 1F, 1F);
@@ -176,9 +179,9 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 		buffer.pos(x+wid, y, 0).tex(uMax, vMin).endVertex();
 		Tessellator.getInstance().draw();
 
-		
+
 		GL11.glPopAttrib();
-		
+
 		//AdvancedMacros.getMinecraft().getTextureManager().
 		//GlStateManager.popMatrix();
 		//GlStateManager.popAttrib();
@@ -245,7 +248,7 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 		fontRendererIn.drawString(text, x-wid/2, y-fontRend.FONT_HEIGHT/2, color, false);
 	}
 
-	
+
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
 		onMouseClicked(mouseX, mouseY, mouseButton);
@@ -320,7 +323,7 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	public void onOpen(){
 
 	}
-	
+
 	public Object getFocusItem() {
 		//System.out.println("Foooocas "+focusItem);
 		return focusItem;

@@ -343,7 +343,8 @@ public class GraphicsContextControls extends LuaTable{
 				int flag = t.get("bold").optboolean(false)? Font.BOLD : Font.PLAIN;
 				flag = t.get("italic").optboolean(false)? flag | Font.ITALIC : flag;
 				f = new Font(t.get("name").checkjstring(), flag, t.get("size").optint(12)); //default size 12
-				throw new LuaError("Unimplemented"); //TODO
+				break;
+				//throw new LuaError("Unimplemented"); //TODO
 			}else{
 				f = Font.getFont(args.checkjstring(1));
 			}
@@ -356,6 +357,7 @@ public class GraphicsContextControls extends LuaTable{
 			int flag = args.optboolean(3, false)? Font.BOLD : Font.PLAIN;
 			flag = args.optboolean(4, false)? flag | Font.ITALIC : flag;
 			f = new Font(args.checkjstring(1), flag, args.checkint(2)); //name, size
+			break;
 		default:
 			throw new LuaError("Unexpected number of arguments");
 		}

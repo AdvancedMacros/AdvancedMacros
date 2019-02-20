@@ -71,6 +71,18 @@ public class Group extends LuaTable implements Moveable, InputSubscriber, Drawab
 				return t.unpack();
 			}
 		});
+		this.set("getX", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return valueOf(x);
+			}
+		});
+		this.set("getY", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return valueOf(y);
+			}
+		});
 		this.set("setParent", new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg) {
