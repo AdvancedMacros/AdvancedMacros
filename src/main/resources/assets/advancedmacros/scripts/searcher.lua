@@ -11,12 +11,16 @@ if(#package.path <= #("?.lua"))then
 end
 
 function loader(name)
-  --log(name)
-  --log( filesystem.resolve(name, 2))
-  local name = filesystem.resolve(name, 2)
-  if filesystem.exists( name ) then
-    return function() run( name ) end
+  local name = "/"..filesystem.resolve(name, 2)
+  local nameL = name..".lua"
+  
+  if filesystem.exists( nameL ) then
+    return function() return run( nameL ) end
   end
+  if filesystem.exists( name ) then
+    return function() return run( name ) end
+  end
+  
   --log( filesystem.resolve(name, 3))
   return nil
 end

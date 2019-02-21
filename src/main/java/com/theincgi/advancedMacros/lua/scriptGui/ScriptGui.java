@@ -298,6 +298,17 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				return NONE;
 			case isPausesGame:
 				return valueOf(pausesGame);
+			case clear:
+				gui.inputSubscribers.clear();
+				gui.clearDrawables();
+				return NONE;
+			case remove:{
+				if( args.arg1() instanceof ScriptGuiElement) {
+					ScriptGuiElement e = (ScriptGuiElement) args.arg1();
+					gui.removeDrawables(e);
+					gui.inputSubscribers.remove(e);
+				}
+			}
 			default:
 				throw new LuaError("This function hasn't been implemented D:");
 			}
@@ -305,6 +316,8 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 	}
 
 	public static enum OpCodes {
+		clear,
+		remove,
 		newRectangle,
 		newBox,
 		newGroup,

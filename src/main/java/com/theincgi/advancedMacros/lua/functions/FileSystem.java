@@ -32,6 +32,7 @@ public class FileSystem extends LuaTable{
 		set("mkDirs", new MkDirs());
 		set("isDir", new IsDir());
 		set("list", new List());
+		set("getParentDir", new ParentDir());
 		set("getMacrosAddress", new ZeroArgFunction() {
 			@Override public LuaValue call() {
 				return LuaValue.valueOf(AdvancedMacros.macrosFolder.toString());
@@ -221,7 +222,13 @@ public class FileSystem extends LuaTable{
 			return sChar;
 		}
 	}
-
+	private static class ParentDir extends OneArgFunction {
+		@Override
+		public LuaValue call(LuaValue arg) {
+			File f = Utils.parseFileLocation(arg);
+			return valueOf(f.getParent());
+		}
+	}
 	private static class ReadByte extends ZeroArgFunction{
 		FileInputStream fis;
 		Object syncLock;
