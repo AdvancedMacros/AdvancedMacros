@@ -45,7 +45,6 @@ local changeLog = {
   "   &7current gui's elements -> current gui -> parent gui's elements -> parent gui ...",
   " - Setting graphics fonts doesn't tell you that something is unimplemented anymore",
   " - Fixed require",
-  " - ",
   " &eOther:",
   " - Updated this gui to use the new scrollbar mechanic",
   " - Changed access to the Minecraft instance to the AdvancedMacros class",
