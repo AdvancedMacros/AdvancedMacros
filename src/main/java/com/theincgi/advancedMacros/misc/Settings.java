@@ -43,6 +43,7 @@ public class Settings {
 		System.out.println("Loading Advanced Macros settings...");
 		settings = new LuaTable(); //wipe everything out then read from file
 		if(settingsFile.exists()){
+			System.out.println("Settings file exists");
 			Scanner s = new Scanner(settingsFile);
 			s.nextLine(); //read "table 0"
 			HashMap<Integer, LuaTable> tbls = new HashMap<>();

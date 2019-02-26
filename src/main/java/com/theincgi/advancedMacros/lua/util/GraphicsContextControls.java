@@ -72,8 +72,8 @@ public class GraphicsContextControls extends LuaTable{
 					case 8:
 						int destX = args.optint(1, 1)-1;
 						int destY = args.optint(2, 1)-1;
-						int destW = args.optint(3, img.getWidth())+destX;
-						int destH = args.optint(4, img.getHeight())+destY;
+						int destW = args.optint(3, img.getWidth())+destX +1;
+						int destH = args.optint(4, img.getHeight())+destY +1;
 
 						int srcX = args.optint(5, 1) - 1;
 						int srcY = args.optint(6, 1) - 1;
