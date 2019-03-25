@@ -246,7 +246,8 @@ public class OpenInventory extends ZeroArgFunction{
 		brew.set("fuel", 5);
 		brew.set("input", 4);
 		brew.set("output", quickTable(1, 3));
-		brew.set("main", quickTable(10, 32));
+		brew.set("main", quickTable(6, 32));
+		brew.set("hotbar", quickTable(33, 41));
 
 		LuaTable chest = new LuaTable();
 		mapping.set("chest", chest);
