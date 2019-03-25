@@ -27,7 +27,7 @@ public class LuaTextComponent extends TextComponentString{
 					action.getmetatable().get("__call").isfunction()
 				) 
 			)
-			getStyle().setClickEvent( new LuaTextComponentClickEvent(action, this));
+			getStyle().setClickEvent( new LuaTextComponentClickEvent(action.isfunction()?action : action.getmetatable().get("__call"), this));
 		if( (action.isstring() || action.istable()) && allowHover) {
 			if(action.istable() && !action.get("click").isnil())
 				getStyle().setClickEvent(new LuaTextComponentClickEvent(action.get("click"), this));

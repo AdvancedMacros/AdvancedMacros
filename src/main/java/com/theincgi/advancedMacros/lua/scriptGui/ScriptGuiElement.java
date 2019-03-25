@@ -40,13 +40,39 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 	boolean visible = true;
 	private Group parent;
 	Object hoverTintLock = new Object(); 
-	
+	private Object  removeLock = new Object();
+	private boolean isRemoved = false;
 	public ScriptGuiElement(Gui gui, Group parent) {this(gui, parent, true);}
 	public ScriptGuiElement(Gui gui, Group parent, boolean addEventControls) {
 		gui.inputSubscribers.add(this);
 		gui.addDrawable(this);
-		
+
 		//generic properties
+		this.set("remove", new ZeroArgFunction() { //ready for garbag collectin
+			@Override
+			public LuaValue call() {
+				synchronized (removeLock) {
+					if(isRemoved) return NONE;
+					isRemoved = true;
+					gui.inputSubscribers.remove(ScriptGuiElement.this);
+					gui.removeDrawables(ScriptGuiElement.this);
+					return NONE;
+				}
+			}
+		});
+		this.set("unremove", new ZeroArgFunction() { //back from the dead
+			@Override
+			public LuaValue call() {
+				synchronized (removeLock) {
+					if(!isRemoved) return NONE;
+					isRemoved = false;
+					gui.inputSubscribers.add(ScriptGuiElement.this);
+					gui.addDrawable(ScriptGuiElement.this);
+					return NONE;
+				}
+			}
+		});
+
 		this.set("setVisible", new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg) {
@@ -115,8 +141,8 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 				return LuaValue.NONE;
 			}
 		});
-		
-		
+
+
 		this.set("setOpacity", new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg) {
@@ -130,7 +156,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 				return LuaValue.valueOf(color.getA()/255f);
 			}
 		});
-		
+
 		this.set("getWidth", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
@@ -175,8 +201,8 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 		//event section
 		if(addEventControls)
 			addInputControls(this);
-		
-		
+
+
 		this.set("setParent", new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg) {
@@ -218,7 +244,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 		parent.setParentControls(this);
 
 	}
-	
+
 	public void enableColorControl() {
 		set("setColor", new VarArgFunction() {
 			@Override
@@ -235,7 +261,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 			}
 		});
 	}
-	
+
 	public void enableSizeControl() {
 		set("setWidth", new OneArgFunction() {
 			@Override
@@ -323,9 +349,13 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 			}
 			mouseWasOver = now;
 		}
-		
+
 	}
 	
+	public static void resetMouseOver() {
+		
+	}
+
 	private void onMouseExit() {
 		if(onMouseExit!=null)
 			Utils.pcall(onMouseExit);
@@ -341,7 +371,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 		setX(x);
 		setY(y);
 	}
-	
+
 	@Override
 	public void setX(int x) {
 		this.x = x;
@@ -356,13 +386,13 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 	public void setY(double y) {
 		this.y = (float) y;
 	}
-	
+
 	@Override
 	public void setVisible(boolean b) {
 		visible = b;
 	}
 
-	
+
 
 	@Override
 	public int getX() {
@@ -441,7 +471,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 	public Color getHoverTint() {
 		return hoverTint;
 	}
-	
+
 	public void changeParent(Group g) {
 		if(parent!=null)
 			this.parent.children.remove(this);
@@ -450,4 +480,9 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 		g.children.add(this);
 	}
 
+//	@Override
+//	protected void finalize() throws Throwable {
+//		AdvancedMacros.logFunc.call("&6Debug: &eGui element is being finalized");
+//	}
+	
 }

@@ -62,6 +62,7 @@ function advancedMacros.inherit( baseClass )
     return baseClass
   end
   function class:isA( someClass )
+    assert(self, "Self can not be nil")
     assert(type(someClass)=="table", "Argument provided is not a class")
     local current = class
     while current do

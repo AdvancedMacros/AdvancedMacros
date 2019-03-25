@@ -13,6 +13,7 @@ import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
+import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
@@ -113,7 +114,7 @@ public class GraphicsContextControls extends LuaTable{
 
 			case clipRect:
 				g.clipRect(args.checkint(1)-1, args.checkint(2)-1, //x, y
-						args.checkint(3)-1, args.checkint(4)-1); //width, height
+						args.checkint(3), args.checkint(4)); //width, height
 				return NONE;
 			case getColor:
 				return new Color(g.getColor().getRGB()).toLuaValue(AdvancedMacros.COLOR_SPACE_IS_255);
@@ -249,7 +250,7 @@ public class GraphicsContextControls extends LuaTable{
 						args.checkint(3), args.checkint(4), //width, height
 						args.checkint(5), args.checkint(6));//arcStart, arcEnd
 				return NONE;
-			case drawPolyline: {
+			case drawPath: {
 				int[] xPoints, yPoints;
 				LuaTable points = args.checktable(1);
 				xPoints = new int[points.length()];
@@ -334,6 +335,27 @@ public class GraphicsContextControls extends LuaTable{
 		
 	}
 	
+	private static BufferedImage dummy = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+	public static class MeasureString extends VarArgFunction{
+		@Override
+		public Varargs invoke(Varargs args) {
+			String s = args.checkjstring(1);
+			
+			Font font = parseFont(args.checknotnil(2));
+			LuaTable out = new LuaTable();
+			FontMetrics fm = dummy.getGraphics().getFontMetrics( font );
+			out.set(1, fm.stringWidth(s));
+			out.set(2, fm.getHeight());
+			
+			LuaTable extra = new LuaTable();
+			out.set(3, extra);
+			extra.set("ascent", fm.getAscent());
+			extra.set("descent", fm.getDescent());
+			extra.set("leading", fm.getLeading());
+			return out.unpack();
+		}
+	}
+	
 	public static Font parseFont(Varargs args) {
 		Font f = null;
 		switch(args.narg()) {
@@ -376,7 +398,7 @@ public class GraphicsContextControls extends LuaTable{
 		drawString, 
 		fillPolygon, 
 		drawPolygon, 
-		drawPolyline, 
+		drawPath, 
 		fillArc, 
 		setColor,
 		setClearColor,
@@ -428,7 +450,7 @@ public class GraphicsContextControls extends LuaTable{
 			case drawLine:
 			case drawOval:
 			case drawPolygon:
-			case drawPolyline:
+			case drawPath:
 			case drawRect:
 			case drawRoundRect:
 			case drawString:

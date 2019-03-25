@@ -83,6 +83,7 @@ import com.theincgi.advancedMacros.lua.functions.os.GetOSMilliseconds;
 import com.theincgi.advancedMacros.lua.modControl.EditorControls;
 import com.theincgi.advancedMacros.lua.scriptGui.ScriptGui;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
+import com.theincgi.advancedMacros.lua.util.GraphicsContextControls;
 import com.theincgi.advancedMacros.lua.util.LuaMutex;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.CustomFontRenderer;
@@ -111,7 +112,7 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "7.2.0"; //${version} ??
+	public static final String VERSION = "7.3.0"; //${version} ??
 
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
@@ -253,6 +254,8 @@ public class AdvancedMacros {
 		imgTools.set("new", new BufferedImageControls.CreateImg());
 		imgTools.set("load", new BufferedImageControls.LoadImg());
 		imgTools.set("getFormats", new BufferedImageControls.GetFormats());
+		imgTools.set("getFonts", new BufferedImageControls.GetFonts());
+		imgTools.set("measureString", new GraphicsContextControls.MeasureString());
 		globals.set("image", imgTools);
 		//math tweaks
 		LuaTable math = globals.get("math").checktable();

@@ -16,6 +16,7 @@ import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
@@ -69,9 +70,18 @@ public class HoloBlock extends WorldHudItem{
 		if(texture!=null){
 			texture.bindTexture();
 			//GlStateManager.pushAttrib();
-			//GlStateManager.pushMatrix(); //TODO include obj rotation in another push pop matrix about here
+			GlStateManager.pushMatrix(); //TODO include obj rotation in another push pop matrix about here
+			
+			GlStateManager.translate(-playerX, -playerY, -playerZ);
+			GlStateManager.translate(x, y, z);
+			
+			GlStateManager.rotate(roll, 0, 0, 1);
+			GlStateManager.rotate(pitch, 1, 0, 0);
+			GlStateManager.rotate(yaw, 0, 1, 0);
 			
 			
+			GlStateManager.translate(-x, -y, -z);
+			GlStateManager.translate(playerX, playerY, playerZ);
 			
 			color.apply();
 
@@ -101,7 +111,7 @@ public class HoloBlock extends WorldHudItem{
 			}
 
 
-			//GlStateManager.popMatrix();//protection for not messing up matrix
+			GlStateManager.popMatrix();//protection for not messing up matrix
 			//GlStateManager.popAttrib();
 		}
 	}

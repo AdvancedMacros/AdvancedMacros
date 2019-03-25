@@ -43,6 +43,7 @@ public class MCTextBar extends ScriptGuiElement{
 		this.set("setSelectionSize", new TextFieldOp(Op.setSelection));
 		this.set("setText", new TextFieldOp(Op.setText));
 		this.set("setTextColor", new TextFieldOp(Op.setTextColor));
+		this.set("enableBackground", new TextFieldOp(Op.enableBackground));
 		set("__class", "advancedMacros.GuiMinecraftTextField");
 	}
 	
@@ -114,6 +115,10 @@ public class MCTextBar extends ScriptGuiElement{
 				return NONE;
 			case setTextColor:
 				textField.setTextColor(Utils.parseColor(args, AdvancedMacros.COLOR_SPACE_IS_255).toInt());
+				return NONE;
+			case enableBackground:
+				textField.setEnableBackgroundDrawing(args.optboolean(1, true));
+				return NONE;
 			default:
 				throw new LuaError("Unimplemented");
 			}
@@ -134,7 +139,8 @@ public class MCTextBar extends ScriptGuiElement{
 		setMaxStrLen,
 		setSelection,
 		setText,
-		setTextColor;
+		setTextColor,
+		enableBackground;
 		
 	}
 
@@ -164,6 +170,14 @@ public class MCTextBar extends ScriptGuiElement{
 		setY((int)y);
 	}
 	
+	@Override
+	public int getX() {
+		return textField.x;
+	}
+	@Override
+	public int getY() {
+		return textField.y;
+	}
 	
 	@Override
 	public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {

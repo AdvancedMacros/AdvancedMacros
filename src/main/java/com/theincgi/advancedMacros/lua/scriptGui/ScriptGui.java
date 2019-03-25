@@ -47,6 +47,12 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 					Utils.pcall(onGuiClose);
 				}
 				isOpen = false;
+				for(InputSubscriber s : inputSubscribers) {
+					if(s instanceof ScriptGuiElement ) {
+						ScriptGuiElement sge = (ScriptGuiElement)s;
+						sge.resetMouseOver();
+					}
+				}
 				//GuiScreen tmp = AdvancedMacros.getMinecraft().currentScreen;
 			}
 			@Override
@@ -302,13 +308,6 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				gui.inputSubscribers.clear();
 				gui.clearDrawables();
 				return NONE;
-			case remove:{
-				if( args.arg1() instanceof ScriptGuiElement) {
-					ScriptGuiElement e = (ScriptGuiElement) args.arg1();
-					gui.removeDrawables(e);
-					gui.inputSubscribers.remove(e);
-				}
-			}
 			default:
 				throw new LuaError("This function hasn't been implemented D:");
 			}
@@ -317,7 +316,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 
 	public static enum OpCodes {
 		clear,
-		remove,
+		//remove,
 		newRectangle,
 		newBox,
 		newGroup,

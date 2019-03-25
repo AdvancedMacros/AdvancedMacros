@@ -1,5 +1,7 @@
 package com.theincgi.advancedMacros.lua.util;
 
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +47,19 @@ public class BufferedImageControls extends LuaTable{
 			} catch (IOException e) {
 				throw new LuaError("IOException occurred, "+e.getMessage());
 			}
+		}
+	}
+	public static class GetFonts extends ZeroArgFunction{
+		@Override
+		public LuaValue call() {
+			LuaTable fonts = new LuaTable();
+			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+			for (Font font : ge.getAllFonts()) {
+				if(!font.getFontName().toLowerCase().contains("italic") && !font.getFontName().toLowerCase().contains("bold"))
+					fonts.set(fonts.length()+1, font.getFontName());
+			}
+			return fonts;
 		}
 	}
 	public static class GetFormats extends ZeroArgFunction {
@@ -128,11 +143,10 @@ public class BufferedImageControls extends LuaTable{
 			@Override
 			public LuaValue call() {
 				if (dynamicTexture != null) { 
-					Utils.runOnMCAndWait(()->{
+					AdvancedMacros.getMinecraft().addScheduledTask(()->{ //changed to non blocking to prevent possible thread locks
 						img.getRGB(0, 0, img.getWidth(), img.getHeight(), dynamicTexture.getTextureData(), 0, img.getWidth());
 						dynamicTexture.updateDynamicTexture();
 					});
-					
 				}
 				return NONE;
 				//throw new LuaError("Dynamic texture not created yet");

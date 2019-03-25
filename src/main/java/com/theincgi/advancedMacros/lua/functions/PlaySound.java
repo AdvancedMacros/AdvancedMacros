@@ -22,12 +22,13 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 
+@Deprecated
 public class PlaySound {
 	public static class FromFile extends OneArgFunction{
 
 
 
-		public LuaTable play(File f) {
+		public static LuaTable play(File f) {
 			try {
 				final Clip clip = AudioSystem.getClip();
 				clip.open(AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(f))));
@@ -58,7 +59,7 @@ public class PlaySound {
 				throw new LuaError("UnsupportedAudioFileException");
 			}
 		}
-		private class Cntrls{
+		public static class Cntrls{
 			Clip c;
 			boolean paused=false;
 			public Cntrls(Clip c) {

@@ -8,6 +8,7 @@ import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
 
+@Deprecated
 public class AdvLog extends OneArgFunction{
 	@Override
 	public LuaValue call(LuaValue arg0) {

@@ -531,7 +531,19 @@ public class Utils {
 		t.set("isSprinting", LuaValue.valueOf(entity.isSprinting()));
 		t.set("entityRiding", Utils.entityToTable(entity.getRidingEntity()));
 		t.set("isInvisible", LuaValue.valueOf(entity.isInvisible()));
-		t.set("nbt", NBTUtils.fromCompound(entity.serializeNBT()));
+		try{
+			t.set("nbt", NBTUtils.fromCompound(entity.serializeNBT()));
+		}catch (NullPointerException e) {
+			try {
+				NBTTagCompound ret = new NBTTagCompound();
+				entity.writeToNBT(ret);
+				t.set("nbt", NBTUtils.fromCompound(ret));
+			
+			}catch(Exception ex) {
+				ex.printStackTrace();
+				t.set("nbt", LuaValue.FALSE);
+			}
+		}
 		t.set("uuid", LuaValue.valueOf(entity.getUniqueID().toString()));
 		{
 			RayTraceResult rtr = entity.rayTrace(8, 0);
@@ -1003,7 +1015,7 @@ public class Utils {
 		pStyle.setObfuscated(false);
 		pStyle.setStrikethrough(false);
 		pStyle.setUnderlined(false);
-		//lua text component ce?
+		//lua text component ce? click event?
 		boolean ltcce = false;
 		int argNum = 1;
 		ClickEvent clickEvent = null;
@@ -1351,6 +1363,8 @@ public class Utils {
 		result.set("subHit", rtr.subHit);
 		return result;
 	}
+	
+	
 	/**Returns null when done if already on MC thread*/
 	public static Object runOnMCAndWait(Runnable r) {
 		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {

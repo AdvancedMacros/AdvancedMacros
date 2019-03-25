@@ -43,6 +43,7 @@ public class GetPlayerPos extends VarArgFunction{
 							t.set(1, LuaValue.valueOf(ForgeEventHandler.accuPlayerX(pt, player)));
 							t.set(2, LuaValue.valueOf(ForgeEventHandler.accuPlayerY(pt, player)));
 							t.set(3, LuaValue.valueOf(ForgeEventHandler.accuPlayerZ(pt, player)));
+							break;
 						}
 					}
 		//		}

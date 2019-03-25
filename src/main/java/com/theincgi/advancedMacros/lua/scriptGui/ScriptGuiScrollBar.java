@@ -212,4 +212,13 @@ public class ScriptGuiScrollBar extends ScriptGuiElement{
 	public void setPos(int x, int y) {
 		bar.setPos(x, y);
 	}
+	
+	@Override
+	public int getX() {
+		return bar.getX();
+	}
+	@Override
+	public int getY() {
+		return bar.getY();
+	}
 }

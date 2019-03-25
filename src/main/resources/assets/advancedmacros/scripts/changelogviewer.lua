@@ -17,6 +17,13 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  "&aBug fix:",
+  " - Fixed a bug where events that attempted to serialized NBT data of certain",
+  "   types of entities caused a crash",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 7.2.0",
   " &BFeatures:",
   " - Gui ScrollBar now has &bgetMaxItems&f and &bgetVisibleItems&f",
   " - &aimage.graphics&f now has rotate, scale, and string measurment functions",

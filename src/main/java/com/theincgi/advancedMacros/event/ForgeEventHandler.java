@@ -486,7 +486,7 @@ public class ForgeEventHandler {
 		e.set(3, Utils.itemStackToLuatable(event.getBow()));
 		e.set(4, LuaValue.valueOf(event.getCharge()));
 		e.set(5, LuaValue.valueOf(event.hasAmmo()));
-		fireEvent(EventName.ArrowFired, createEvent(EventName.ArrowFired));
+		fireEvent(EventName.ArrowFired, e);
 	}
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onAttackEntity(AttackEntityEvent event) {

@@ -104,6 +104,12 @@ public class HTTP extends OneArgFunction{
 			});
 		}
 		
+		@Override
+		protected void finalize() throws Throwable {
+			try{
+				conn.disconnect();
+			}catch(Exception e) {}
+		}
 		
 	}
 	
@@ -128,7 +134,7 @@ public class HTTP extends OneArgFunction{
 				@Override
 				public LuaValue call() {
 					try {
-						return LuaValue.valueOf((char)in.read());
+						return LuaValue.valueOf(String.valueOf((char)in.read()));
 					} catch (IOException e) {
 						return LuaValue.NIL;
 					}
