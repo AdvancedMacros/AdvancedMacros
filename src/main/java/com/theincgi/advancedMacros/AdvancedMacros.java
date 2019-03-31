@@ -208,6 +208,7 @@ public class AdvancedMacros {
 		globals.load(debug);
 		debugTable = globals.get("debug").checktable();
 		globals.set("_MOD_VERSION", VERSION);
+		globals.set("__GAME_VERSION", Minecraft.getMinecraft().getVersion());
 		
 		globals.set("advancedMacros", advancedMacrosTable);
 		LuaTable editor = new LuaTable();
