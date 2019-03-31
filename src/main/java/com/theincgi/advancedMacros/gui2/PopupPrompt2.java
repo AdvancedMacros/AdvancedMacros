@@ -83,9 +83,9 @@ public class PopupPrompt2 extends Gui{
 		addDrawable(ok);
 		addDrawable(cancel);
 		
-		inputSubscribers.add(choiceBox);
-		inputSubscribers.add(ok);
-		inputSubscribers.add(cancel);
+		addInputSubscriber(choiceBox);
+		addInputSubscriber(ok);
+		addInputSubscriber(cancel);
 		
 //		
 //		choiceBox.setOnOpen((int button, GuiButton sButton) -> {

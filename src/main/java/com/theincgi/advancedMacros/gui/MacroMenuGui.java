@@ -185,14 +185,14 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 			}
 		});
 
-		inputSubscribers.add(bindingsList);
-		inputSubscribers.add(profileSelect);
-		inputSubscribers.add(removeProfile);
-		inputSubscribers.add(addProfile);
-		inputSubscribers.add(showScriptManager);
+		addInputSubscriber(bindingsList);
+		addInputSubscriber(profileSelect);
+		addInputSubscriber(removeProfile);
+		addInputSubscriber(addProfile);
+		addInputSubscriber(showScriptManager);
 		//inputSubscribers.add(gotoSettings);
-		inputSubscribers.add(addBinding);
-		inputSubscribers.add(openChangeLog);
+		addInputSubscriber(addBinding);
+		addInputSubscriber(openChangeLog);
 
 		addDrawable(bindingsList);
 		addDrawable(profileSelect);
@@ -226,7 +226,11 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
     public void removeBinding(IBinding binding) {
     	Drawable drawable = binding.getDrawableElement();
     	removeDrawables(drawable);
-    	inputSubscribers.remove(drawable);
+    	if (binding instanceof InputSubscriber) {
+			InputSubscriber in = (InputSubscriber) binding;
+			removeInputSubscriber(in);
+			
+		}
     	bindingsList.remove(drawable);
     	markDirty();
     }

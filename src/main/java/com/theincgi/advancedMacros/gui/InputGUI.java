@@ -56,8 +56,8 @@ public class InputGUI extends Gui{
 				listItemPicker.add(new ItemOption(new ItemStack(item, 1, 0)));
 			//}
 		}
-		inputSubscribers.add(listItemPicker);
-		inputSubscribers.add(choices);
+		addInputSubscriber(listItemPicker);
+		addInputSubscriber(choices);
 		listItemPicker.setScrollSpeed(10);
 		choices.setScrollSpeed(10);
 		choices.setSpacing(3);

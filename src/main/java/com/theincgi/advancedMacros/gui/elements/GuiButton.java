@@ -14,6 +14,8 @@ import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
+import net.minecraft.client.renderer.GlStateManager;
+
 public class GuiButton extends GuiRect implements InputSubscriber, Focusable{
 //	Property colorText;
 //	Property clickSound;
@@ -153,7 +155,7 @@ public class GuiButton extends GuiRect implements InputSubscriber, Focusable{
 		
 		super.onDraw(gui, mouseX, mouseY, partialTicks);
 		if(texture!=null) {
-			
+			GlStateManager.bindTexture(0);
 //			GL11.glDisable(GL11.GL_ALPHA_TEST);
 //			GL11.glDepthMask(false);
 //			GL11.glDisable(GL11.GL_LIGHTING);

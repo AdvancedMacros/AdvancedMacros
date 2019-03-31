@@ -29,7 +29,7 @@ public class EditorGUI extends Gui{
 	}
 	
 	public EditorGUI() {
-		inputSubscribers.add(cta);
+		addInputSubscriber(cta);
 		gtf = new GuiTextField(0, getFontRend(), 6, 2, width/3, 20);
 		gtf.setCanLoseFocus(true);
 		
@@ -46,9 +46,9 @@ public class EditorGUI extends Gui{
 		//exit 	= new GuiButton(new WidgetID(302), 7+width/3, 				12	, width/4, 10, LuaValue.NIL, LuaValue.valueOf("Exit"), "editor.exit", Color.BLACK, Color.TEXT_8, Color.WHITE);
 		quickRun= new GuiButton(save.getX()+save.getWid(),12	, width/8, 10, LuaValue.NIL, LuaValue.valueOf("Run"), "editor","runButton");
 		//quickRun= new GuiButton(new WidgetID(303), save.getX()+save.getWid(),12	, width/8, 10, LuaValue.NIL, LuaValue.valueOf("Run"), "editor.run", Color.BLACK, Color.TEXT_8, Color.WHITE);
-		inputSubscribers.add(save);
-		inputSubscribers.add(exit);
-		inputSubscribers.add(quickRun);
+		addInputSubscriber(save);
+		addInputSubscriber(exit);
+		addInputSubscriber(quickRun);
 		save.setOnClick(new OnClickHandler() {
 			@Override
 			public void onClick(int button, GuiButton sButton) {

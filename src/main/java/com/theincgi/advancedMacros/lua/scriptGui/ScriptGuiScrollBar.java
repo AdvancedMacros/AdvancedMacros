@@ -24,7 +24,7 @@ public class ScriptGuiScrollBar extends ScriptGuiElement{
 			}
 
 		};
-		this.set("color", propPal.settings);
+		this.set("properties", propPal.settings); //color.colors was too ....ugh
 		this.set("setMaxItems", new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg) {
@@ -202,11 +202,11 @@ public class ScriptGuiScrollBar extends ScriptGuiElement{
 	}
 	@Override
 	public void setWidth(int i) {
-		bar.setWidth(i);
+		bar.setWidth(i-1); //frame wasn't included...
 	}
 	@Override
 	public void setHeight(int i) {
-		bar.setHeight(i);
+		bar.setHeight(i-1);
 	}
 	@Override
 	public void setPos(int x, int y) {

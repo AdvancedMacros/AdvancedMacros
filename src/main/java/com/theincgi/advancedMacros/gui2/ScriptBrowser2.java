@@ -102,15 +102,15 @@ public class ScriptBrowser2 extends Gui{
 		addDrawable(addressBackdrop);
 		addDrawable(pasteButton);
 
-		inputSubscribers.add(returnButton);
-		inputSubscribers.add(backButton);
-		inputSubscribers.add(forwardButton);
-		inputSubscribers.add(createFolderButton);
-		inputSubscribers.add(createFileButton);
+		addInputSubscriber(returnButton);
+		addInputSubscriber(backButton);
+		addInputSubscriber(forwardButton);
+		addInputSubscriber(createFolderButton);
+		addInputSubscriber(createFileButton);
 		//inputSubscribers.add(searchButton);
-		inputSubscribers.add(listManager);
-		inputSubscribers.add(filePreview);
-		inputSubscribers.add(pasteButton);
+		addInputSubscriber(listManager);
+		addInputSubscriber(filePreview);
+		addInputSubscriber(pasteButton);
 		//no popupPrompt, it gives itself the firstListener prop
 		
 		listManager.setModeFullBox(true);

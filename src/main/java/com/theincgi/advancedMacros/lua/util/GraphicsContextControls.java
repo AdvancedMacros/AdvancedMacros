@@ -74,14 +74,14 @@ public class GraphicsContextControls extends LuaTable{
 						int destX = args.optint(1, 1)-1;
 						int destY = args.optint(2, 1)-1;
 						int destW = args.optint(3, img.getWidth())+destX +1;
-						int destH = args.optint(4, img.getHeight())+destY +1;
+						int destH = args.optint(4, img.getHeight())+destY +1; 
 
 						int srcX = args.optint(5, 1) - 1;
 						int srcY = args.optint(6, 1) - 1;
 						int maxW = bic.getImg().getWidth() - srcX + 1;
 						int maxH = bic.getImg().getHeight() - srcY + 1;
-						int srcW = args.optint(7, maxW) + srcX;
-						int srcH = args.optint(8, maxH) + srcY;
+						int srcW = args.optint(7, maxW) + srcX -1;
+						int srcH = args.optint(8, maxH) + srcY-1;
 						
 						g.drawImage(bic.getImg(), destX, destY,
 												  destW, destH,

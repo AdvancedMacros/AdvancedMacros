@@ -44,7 +44,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 	private boolean isRemoved = false;
 	public ScriptGuiElement(Gui gui, Group parent) {this(gui, parent, true);}
 	public ScriptGuiElement(Gui gui, Group parent, boolean addEventControls) {
-		gui.inputSubscribers.add(this);
+		gui.addInputSubscriber(this);
 		gui.addDrawable(this);
 
 		//generic properties
@@ -52,9 +52,10 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 			@Override
 			public LuaValue call() {
 				synchronized (removeLock) {
+					System.out.println("******************\n******************\n******************\n");
 					if(isRemoved) return NONE;
 					isRemoved = true;
-					gui.inputSubscribers.remove(ScriptGuiElement.this);
+					gui.removeInputSubscriber(ScriptGuiElement.this);
 					gui.removeDrawables(ScriptGuiElement.this);
 					return NONE;
 				}
@@ -66,7 +67,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 				synchronized (removeLock) {
 					if(!isRemoved) return NONE;
 					isRemoved = false;
-					gui.inputSubscribers.add(ScriptGuiElement.this);
+					gui.addInputSubscriber(ScriptGuiElement.this);
 					gui.addDrawable(ScriptGuiElement.this);
 					return NONE;
 				}
@@ -233,14 +234,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 				return LuaValue.valueOf(mouseWasOver);
 			}
 		});
-		this.set("remove", new ZeroArgFunction() {
-			@Override
-			public LuaValue call() {
-				gui.removeDrawables(ScriptGuiElement.this);//.remove(this);
-				gui.inputSubscribers.remove(ScriptGuiElement.this);
-				return NONE;
-			}
-		});
+		
 		parent.setParentControls(this);
 
 	}

@@ -47,10 +47,12 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 					Utils.pcall(onGuiClose);
 				}
 				isOpen = false;
-				for(InputSubscriber s : inputSubscribers) {
-					if(s instanceof ScriptGuiElement ) {
-						ScriptGuiElement sge = (ScriptGuiElement)s;
-						sge.resetMouseOver();
+				synchronized (getInputSubscribers()) {
+					for(InputSubscriber s : getInputSubscribers()) {
+						if(s instanceof ScriptGuiElement ) {
+							ScriptGuiElement sge = (ScriptGuiElement)s;
+							sge.resetMouseOver();
+						}
 					}
 				}
 				//GuiScreen tmp = AdvancedMacros.getMinecraft().currentScreen;
@@ -102,20 +104,20 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 			@Override
 			public boolean onKeyTyped(char typedChar, int keyCode) {
 				return super.onKeyTyped(typedChar, keyCode) ||                //java effectively returns as soon as one is true. only one should run
-				 ScriptGui.this.onKeyPressed(this, typedChar, keyCode) ||
-				 (parentGui!=null && parentGui.onKeyPressed(parentGui.gui, typedChar, keyCode));
+						ScriptGui.this.onKeyPressed(this, typedChar, keyCode) ||
+						(parentGui!=null && parentGui.onKeyPressed(parentGui.gui, typedChar, keyCode));
 			}
 			@Override
 			public boolean keyRepeated(char typedChar, int keyCode, int mod) {
 				return super.keyRepeated(typedChar, keyCode, mod) ||
 						ScriptGui.this.onKeyRepeat(this, typedChar, keyCode, mod) ||
-						 (parentGui!=null && parentGui.onKeyRepeat(parentGui.gui, typedChar, keyCode, mod));
+						(parentGui!=null && parentGui.onKeyRepeat(parentGui.gui, typedChar, keyCode, mod));
 			}
 			@Override
 			public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
 				return super.onKeyRelease(gui, typedChar, keyCode)||
 						ScriptGui.this.onKeyRelease(this, typedChar, keyCode) ||
-						 (parentGui!=null && parentGui.onKeyRelease(parentGui.gui, typedChar, keyCode));
+						(parentGui!=null && parentGui.onKeyRelease(parentGui.gui, typedChar, keyCode));
 			}
 			@Override
 			public boolean mouseScroll(int i) {
@@ -129,14 +131,14 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 			}
 		};
 		//gui.inputSubscribers.add(this); //tell yourself everything!
-		
+
 		for(OpCodes op : OpCodes.values()) {
 			set(op.name(), new CallableTable( op.getDocLocation() , new DoOperation( op ) ));
 		}
 		set("__class", "advancedMacros.ScriptGui");
 		addInputControls(this);
 	}
-	
+
 	public void onGuiResize(Minecraft mcIn, int w, int h) {
 		if(parentGui!=null)
 			parentGui.onGuiResize(mcIn, w, h);
@@ -144,10 +146,10 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 		if(onResize!=null)
 			Utils.pcall(onResize, valueOf(w), valueOf(h));
 	}
-	
+
 	public class DoOperation extends VarArgFunction {
 		OpCodes opCode;
-		
+
 		public DoOperation(OpCodes opCode) {
 			super();
 			this.opCode = opCode;
@@ -305,7 +307,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 			case isPausesGame:
 				return valueOf(pausesGame);
 			case clear:
-				gui.inputSubscribers.clear();
+				gui.clearInputSubscribers();
 				gui.clearDrawables();
 				return NONE;
 			default:
@@ -338,7 +340,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 		isOpen,
 		getMousePos, 
 		grabMouse, ungrabMouse, isPausesGame, setPausesGame;
-		
+
 		public String[] getDocLocation() {
 			String[] out = new String[3];
 			out[0] = "gui";
@@ -346,8 +348,8 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 			out[2] = this.name();
 			return out;
 		}
-		
-		
+
+
 	}
 
 

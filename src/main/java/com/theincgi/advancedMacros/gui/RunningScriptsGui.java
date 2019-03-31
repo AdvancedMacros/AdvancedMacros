@@ -27,7 +27,7 @@ public class RunningScriptsGui extends Gui{
 		this.luaDebug = luaDebug;
 		listManager = new ListManager(5, 17, width-10, height-22, /*new WidgetID(700), "colors.runningScripts"*/ new PropertyPalette());
 		listManager.setDrawBG(false);
-		inputSubscribers.add(listManager);
+		addInputSubscriber(listManager);
 		luaDebug.addStatusListener(new StatusListener() {
 			@Override
 			public void onStatus(Thread sThread, Status status) {

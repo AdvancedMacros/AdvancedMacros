@@ -2,6 +2,7 @@ package com.theincgi.advancedMacros.gui;
 
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Stack;
 
 import org.lwjgl.input.Keyboard;
@@ -22,7 +23,7 @@ import net.minecraft.util.ResourceLocation;
 public class Gui extends net.minecraft.client.gui.GuiScreen{
 	FontRenderer fontRend = AdvancedMacros.getMinecraft().fontRenderer;
 	private LinkedList<KeyTime> heldKeys = new LinkedList<>();
-	public LinkedList<InputSubscriber> inputSubscribers = new LinkedList<>();
+	private LinkedList<InputSubscriber> inputSubscribers = new LinkedList<>();
 	/**The next key or mouse event will be sent to this before anything else*/
 	public InputSubscriber nextKeyListen = null;
 	private LinkedList<Drawable> drawables = new LinkedList<>();
@@ -30,6 +31,9 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	private Object focusItem = null;
 	/**Strictly key typed and mouse clicked events atm*/
 	public InputSubscriber firstSubsciber;
+
+	private Queue<InputSubscriber> inputSubscriberToAdd = new LinkedList<>(), inputSubscribersToRemove = new LinkedList<>();
+	private Queue<Drawable> drawableToAdd = new LinkedList<>(), drawableToRemove = new LinkedList<>();
 
 	private int repeatMod = 0;
 	private boolean drawDefaultBackground = true;
@@ -84,8 +88,10 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 			super.keyTyped(typedChar, keyCode);
 		} catch (IOException e) {}
 		heldKeys.add(new KeyTime(keyCode, typedChar));
-		for (InputSubscriber inputSubscriber : inputSubscribers) {
-			if(inputSubscriber.onKeyPressed(this, typedChar, keyCode)) return true;
+		synchronized (inputSubscribers) {
+			for (InputSubscriber inputSubscriber : inputSubscribers) {
+				if(inputSubscriber.onKeyPressed(this, typedChar, keyCode)) return true;
+			}
 		}
 		return false;
 	}
@@ -95,8 +101,10 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	 * <blockquote><br> if(mod%5==0){...} </code></blockquote>>*/
 	public boolean keyRepeated(char typedChar, int keyCode, int mod){
 		if(firstSubsciber!=null && firstSubsciber.onKeyRepeat(this, typedChar, keyCode, mod)){return true;}
-		for (InputSubscriber inputSubscriber : inputSubscribers) {
-			if(inputSubscriber.onKeyRepeat(this, typedChar, keyCode, mod)) return true;
+		synchronized (inputSubscribers) {
+			for (InputSubscriber inputSubscriber : inputSubscribers) {
+				if(inputSubscriber.onKeyRepeat(this, typedChar, keyCode, mod)) return true;
+			}
 		}
 		return false;
 	}
@@ -108,6 +116,34 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+		synchronized (inputSubscribers) {
+			synchronized (inputSubscriberToAdd) {
+				while(!inputSubscriberToAdd.isEmpty()) {
+					inputSubscribers.add( inputSubscriberToAdd.poll() );
+				}
+			}
+			synchronized (inputSubscribersToRemove) {
+				while(!inputSubscribersToRemove.isEmpty()) {
+					inputSubscribers.remove( inputSubscribersToRemove.poll() );
+				}
+			}
+			
+		}
+		synchronized (drawables) {
+			synchronized (drawableToAdd) {
+				while(!drawableToAdd.isEmpty()) {
+					drawables.add( drawableToAdd.poll() );
+				}
+			}
+			synchronized (drawableToRemove) {
+				while(!drawableToRemove.isEmpty()) {
+					drawables.remove( drawableToRemove.poll() );
+				}
+			}
+			
+		}
+
+
 		if(drawDefaultBackground)
 			drawDefaultBackground();
 
@@ -124,10 +160,12 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 			}
 			for (KeyTime keyTime : killList) {
 				boolean flag = false;
-				for (InputSubscriber inputSubscriber : inputSubscribers) {
-					if(inputSubscriber.onKeyRelease(this, keyTime.key, keyTime.keyCode)) {
-						flag = true;
-						break;
+				synchronized (inputSubscribers) {
+					for (InputSubscriber inputSubscriber : inputSubscribers) {
+						if(inputSubscriber.onKeyRelease(this, keyTime.key, keyTime.keyCode)) {
+							flag = true;
+							break;
+						}
 					}
 				}
 				if(!flag)
@@ -199,8 +237,7 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	//Called by drawScreen, gets overridden by gui
 	public boolean mouseScroll(int i){
 		if(firstSubsciber!=null && firstSubsciber.onScroll(this, i)) return true;
-		synchronized (drawables) {
-
+		synchronized (inputSubscribers) {
 			for (InputSubscriber inputSubscriber : inputSubscribers) {
 				if(inputSubscriber.onScroll(this, i)) return true;
 			}
@@ -260,9 +297,11 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 			super.mouseClicked(mouseX, mouseY, mouseButton);
 		} catch (IOException e) {}
 		//System.out.println("CLICK 1");
-		for (InputSubscriber inputSubscriber : inputSubscribers) {
-			if(inputSubscriber.onMouseClick(this, mouseX, mouseY, mouseButton))
-				return true;;
+		synchronized (inputSubscribers) { 
+			for (InputSubscriber inputSubscriber : inputSubscribers) {
+				if(inputSubscriber.onMouseClick(this, mouseX, mouseY, mouseButton))
+					return true;;
+			}
 		}
 		return false;
 	}
@@ -274,9 +313,11 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	public boolean onMouseReleased(int mouseX, int mouseY, int state) {
 		super.mouseReleased(mouseX, mouseY, state);
 		if(firstSubsciber!=null && firstSubsciber.onMouseRelease(this, mouseX, mouseY, state)){return true;}
-		for (InputSubscriber inputSubscriber : inputSubscribers) {
-			if(inputSubscriber.onMouseRelease(this, mouseX, mouseY, state))
-				return true;
+		synchronized (inputSubscribers) {
+			for (InputSubscriber inputSubscriber : inputSubscribers) {
+				if(inputSubscriber.onMouseRelease(this, mouseX, mouseY, state))
+					return true;
+			}
 		}
 		return false;
 	}
@@ -287,9 +328,11 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 	public boolean onMouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
 		super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
 		if(firstSubsciber!=null && firstSubsciber.onMouseClickMove(this, mouseX, mouseY, clickedMouseButton, timeSinceLastClick)) {return true;}
-		for (InputSubscriber inputSubscriber : inputSubscribers) {
-			if(inputSubscriber.onMouseClickMove(this, mouseX, mouseY, clickedMouseButton, timeSinceLastClick))
-				return true;
+		synchronized (inputSubscribers) {
+			for (InputSubscriber inputSubscriber : inputSubscribers) {
+				if(inputSubscriber.onMouseClickMove(this, mouseX, mouseY, clickedMouseButton, timeSinceLastClick))
+					return true;
+			}
 		}
 		return false;
 	}
@@ -346,19 +389,43 @@ public class Gui extends net.minecraft.client.gui.GuiScreen{
 		return drawDefaultBackground;
 	}
 
+
+
 	public void addDrawable(Drawable d) {
-		synchronized (drawables) {
-			drawables.add(d);
+		synchronized (drawableToAdd) {
+			drawableToAdd.add(d);
+		}
+	}
+	public void addInputSubscriber(InputSubscriber i) {
+		synchronized (inputSubscriberToAdd) {
+			inputSubscriberToAdd.add(i);
 		}
 	}
 	public void removeDrawables(Drawable d) {
-		synchronized (drawables) {
-			drawables.remove(d);
+		synchronized (drawableToRemove) {
+			drawableToRemove.add(d);
+		}
+	}
+	public void removeInputSubscriber(InputSubscriber i) {
+		synchronized (inputSubscribersToRemove) {
+			inputSubscribersToRemove.add(i);
 		}
 	}
 	public void clearDrawables() {
-		synchronized (drawables) {
-			drawables.clear();
+		synchronized (drawableToRemove) {
+			drawableToRemove.addAll(drawables);
 		}
+	}
+	public void clearInputSubscribers() {
+		synchronized (inputSubscribersToRemove) {
+			inputSubscribersToRemove.addAll(inputSubscribers);
+		}
+	}
+	/**
+	 * Synchronize usage on linked list!
+	 * do not use to add or remove elements directly
+	 * */
+	protected LinkedList<InputSubscriber> getInputSubscribers() {
+		return inputSubscribers;
 	}
 }
