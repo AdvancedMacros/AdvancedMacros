@@ -112,7 +112,7 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "7.3.0"; //${version} ??
+	public static final String VERSION = "7.4.0"; //${version} ??
 
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
@@ -238,7 +238,8 @@ public class AdvancedMacros {
 		globals.set("log", logFunc = new LuaFunctions.Log());
 		globals.set("advLog", new AdvLog());
 		globals.set("say", sayFunc = new LuaFunctions.Say());
-		globals.set("toast", new Toast());
+		globals.set("toast", new Toast.ToastNotification());
+		
 		globals.set("sleep", sleepFunc = new LuaFunctions.Sleep());
 		globals.set("print", new LuaFunctions.Debug());
 		globals.set("getSettings", new Settings.GetSettings());
@@ -292,10 +293,21 @@ public class AdvancedMacros {
 		globals.set("highlightEntity", new CallableTable(new String[] {"highlightEntity"}, new HighlightEntity()));
 
 		globals.set("getScreen", new GetScreen());
+<<<<<<< HEAD
 
 		globals.set("hud2D", new Hud2D());
 		globals.set("hud3D", new Hud3D());
 
+=======
+		
+		LuaTable hud2D;
+		globals.set("hud2D", hud2D = new Hud2D());
+		globals.set("hud3D",         new Hud3D());
+		hud2D.set("title", new Toast.ToastTitle());
+		hud2D.set("actionbar", new Toast.ToastActionBar());
+		
+		
+>>>>>>> 1d4f52f76a2ffc33c8a4027418a1eee5f42b359a
 		globals.set("rayTrace", RayTrace.getFunc());
 
 		new Action().getKeybindFuncts(globals);
