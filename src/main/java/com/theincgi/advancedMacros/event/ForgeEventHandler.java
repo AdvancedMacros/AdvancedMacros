@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -42,7 +41,6 @@ import com.theincgi.advancedMacros.misc.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -61,7 +59,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ChatType;
 import net.minecraftforge.client.event.ClientChatEvent;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -126,8 +123,6 @@ public class ForgeEventHandler {
 		Chat,					//COMPLETE
 		ChatFilter,				//COMPLETE
 		ChatSendFilter,
-		Title,
-		Actionbar,
 		//LoggedIn,
 		//LoggedOut,
 		JoinWorld,				//COMPLETE
@@ -481,73 +476,12 @@ public class ForgeEventHandler {
 				lastPlayerList.remove(s);
 			}//else System.out.println("Stayed");
 		}
-		checkTitle();
-	}
-
-
-	private Field titlesTimer, titleDisplayTime, titleFadeOutTime, titleFadeInTime, title, subtitle,
-	actionbarTimer, actionbarText, isColorized;
-	public void checkTitle() {
-		try {
-			Minecraft mc = AdvancedMacros.getMinecraft();
-			if(titlesTimer==null) { //special thanks to "MCP Mapping Viewer" by bspkrs 
-				titlesTimer = ReflectionHelper.findField(GuiIngame.class, "titlesTimer", "field_175195_w");
-				titleDisplayTime = ReflectionHelper.findField(GuiIngame.class, "titleDisplayTime", "field_175192_A");
-				titleFadeInTime = ReflectionHelper.findField(GuiIngame.class, "titleFadeIn", "field_175199_z");
-				titleFadeOutTime = ReflectionHelper.findField(GuiIngame.class, "titleFadeOut", "field_175193_B");
-				title = ReflectionHelper.findField(GuiIngame.class, "displayedTitle", "field_175201_x");
-				subtitle = ReflectionHelper.findField(GuiIngame.class, "displayedSubTitle", "field_175200_y");
-				actionbarTimer = ReflectionHelper.findField(GuiIngame.class, "overlayMessageTime", "field_73845_h");
-				actionbarText = ReflectionHelper.findField(GuiIngame.class, "overlayMessage", "field_73838_g");
-				isColorized = ReflectionHelper.findField(GuiIngame.class, "animateOverlayMessageColor", "field_73844_j");
-			}
-			GuiIngame gui = mc.ingameGUI;
-			{
-				int disp = titleDisplayTime.getInt(gui);
-				int fadeIn = titleFadeInTime.getInt(gui);
-				int fadeOut = titleFadeOutTime.getInt(gui);
-				int timer = titlesTimer.getInt(gui);
-				if(timer == (fadeIn + fadeOut + disp)-1) {
-					//AdvancedMacros.logFunc.call("&d&BDEBUG:&7 A new title has been displayed!");
-					String titleText, subtitleText;
-					titleText = Utils.fromMinecraftColorCodes((String)title.get(gui));
-					subtitleText = Utils.fromMinecraftColorCodes((String)subtitle.get(gui) );
-					
-					if(titleText.endsWith("&f")) titleText = titleText.substring(0, titleText.length()-2);
-					if(subtitleText.endsWith("&f")) subtitleText = subtitleText.substring(0, subtitleText.length()-2);
-					
-					LuaTable event = createEvent(EventName.Title);
-					event.set(3, LuaValue.valueOf( titleText ));
-					event.set(4, LuaValue.valueOf( subtitleText ));
-					event.set(5, disp);
-					event.set(6, fadeIn);
-					event.set(7, fadeOut);
-					fireEvent(EventName.Title, event);
-				}
-			}
-			{
-				int timer = actionbarTimer.getInt(gui);
-				if(timer == 59) { //hardcoded value from the class is 60, we see it one tick later
-					//AdvancedMacros.logFunc.call("&d&BDEBUG:&7 A new actionbar has been displayed!");
-					LuaTable event = createEvent(EventName.Actionbar);
-					String text = Utils.fromMinecraftColorCodes((String)actionbarText.get(gui));
-					if(text.endsWith("&f")) text = text.substring(0, text.length()-2);
-					event.set(3, LuaValue.valueOf( text ));
-					event.set(4, isColorized.getBoolean(gui));
-					fireEvent(EventName.Actionbar, event);
-				}
-			}
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
 
 	}
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onArrowFired(ArrowLooseEvent event){//CONFIRMED MP
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		LuaTable e = createEvent(EventName.ArrowFired);
 		e.set(3, Utils.itemStackToLuatable(event.getBow()));
 		e.set(4, LuaValue.valueOf(event.getCharge()));
@@ -556,13 +490,13 @@ public class ForgeEventHandler {
 	}
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onAttackEntity(AttackEntityEvent event) {
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		LuaTable e = createEvent(EventName.AttackEntity);
 		e.set(3, Utils.entityToTable(event.getTarget()));
 		fireEvent(EventName.AttackEntity, e);
 	}
 	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onEntityInteract(EntityInteract event) {  
+	public void onEntityInteract(EntityInteract event) {  //DEAD
 		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
 		LuaTable e = createEvent(EventName.EntityInteract);
 		e.set(3, Utils.entityToTable(event.getTarget()));
@@ -573,8 +507,8 @@ public class ForgeEventHandler {
 		fireEvent(EventName.EntityInteract, e);
 	}
 	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onBlockInteract(PlayerInteractEvent event) { 
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
+	public void onBlockInteract(PlayerInteractEvent event) { //CONFIRMED MP
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		if(event.getFace()==null) return;
 		LuaTable e = createEvent(EventName.BlockInteract);
 		e.set(3, Utils.blockPosToTable(event.getPos()));
@@ -585,16 +519,16 @@ public class ForgeEventHandler {
 		fireEvent(EventName.BlockInteract, e);
 	}
 
-	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onItemPickup(PlayerEvent.ItemPickupEvent event) { //DEAD //FIXME
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
-		LuaTable e = createEvent(EventName.ItemPickup);
-		e.set(3, Utils.itemStackToLuatable(event.getStack()));
-		fireEvent(EventName.ItemPickup, e);
-	}
+//	@SubscribeEvent @SideOnly(Side.CLIENT)
+//	public void onItemPickup(PlayerEvent.ItemPickupEvent event) { //DEAD //FIXME
+//		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
+//		LuaTable e = createEvent(EventName.ItemPickup);
+//		e.set(3, Utils.itemStackToLuatable(event.getStack()));
+//		fireEvent(EventName.ItemPickup, e);
+//	}
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onDimChange(PlayerEvent.PlayerChangedDimensionEvent event) { //DEAD //FIXME
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		LuaTable e = createEvent(EventName.DimensionChanged);
 		e.set(3, LuaValue.valueOf(event.toDim));
 		e.set(4, LuaValue.valueOf(event.fromDim));
@@ -602,7 +536,7 @@ public class ForgeEventHandler {
 	}
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onCraft(PlayerEvent.ItemCraftedEvent event) { //CONFIRMED MP
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		//System.out.println(event.getPhase());
 		LuaTable e = createEvent(EventName.ItemCrafted);
 		e.set(3, Utils.itemStackToLuatable(event.crafting));
@@ -621,7 +555,7 @@ public class ForgeEventHandler {
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onItemToss(ItemTossEvent event) {//FIXME DEAD
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return;
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		LuaTable e = createEvent(EventName.ItemTossed);
 		e.set(3, Utils.itemStackToLuatable(event.getEntityItem().getItem()));
 		fireEvent(EventName.ItemTossed, e);
@@ -630,7 +564,7 @@ public class ForgeEventHandler {
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onItemBreak(PlayerDestroyItemEvent event) { //FIXME ULTRA DEAD
 		ItemStack yeWhoBrokeith = event.getOriginal(); 
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return;
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		LuaTable e = createEvent(EventName.BreakItem);
 		e.set(3, Utils.itemStackToLuatable(yeWhoBrokeith));
 		fireEvent(EventName.BreakItem, e);
@@ -639,21 +573,21 @@ public class ForgeEventHandler {
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onJoinedWorld(FMLNetworkEvent.ClientConnectedToServerEvent event){
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
 		try {
 			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/changelogviewer.lua")).getInputStream();
 			LuaValue sFunc = AdvancedMacros.globals.load(in, "changeLog", "t", AdvancedMacros.globals);
 			LuaThread thread = new LuaThread(sFunc, "changelog");
 			thread.start();
 		} catch (Throwable e) {e.printStackTrace();}
-		//		Thread t = new Thread(()->{
-		//			try {
-		//				InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/changelogviewer.lua")).getInputStream();
-		//				AdvancedMacros.globals.load(in, "changeLog", "t", AdvancedMacros.globals).call();
-		//				in.close();
-		//			} catch (IOException e) {e.printStackTrace();}
-		//		});
-		//		t.start();
+//		Thread t = new Thread(()->{
+//			try {
+//				InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/changelogviewer.lua")).getInputStream();
+//				AdvancedMacros.globals.load(in, "changeLog", "t", AdvancedMacros.globals).call();
+//				in.close();
+//			} catch (IOException e) {e.printStackTrace();}
+//		});
+//		t.start();
 
 		LuaTable e = createEvent(EventName.JoinWorld);
 		e.set(3, event.getConnectionType()); //yeilded modded
@@ -808,7 +742,7 @@ public class ForgeEventHandler {
 					//					}
 					//					
 					//System.out.println(AdvancedMacros.getMinecraft().ingameGUI.getClass());
-
+					
 					fireEvent(EventName.ContainerOpen, e);
 
 				});
@@ -820,7 +754,7 @@ public class ForgeEventHandler {
 			args.set(3, controls);
 			args.set(4, name);
 
-
+			
 			fireEvent(EventName.GUIOpened, args);
 
 		}
@@ -865,13 +799,13 @@ public class ForgeEventHandler {
 			details.set("volume", 1);
 		}
 		try{details.set("pos", Utils.posToTable(sound.getXPosF(), sound.getYPosF(), sound.getZPosF()));}catch(NullPointerException e) {
-
+			
 		}
 		try{details.set("category", sound.getCategory().getName().toLowerCase());}catch(NullPointerException e) {
-
+			
 		}
 		event.set(4, details);
-
+		
 		fireEvent(EventName.Sound, event);
 		LuaTable controls = new LuaTable();
 		controls.set("isPlaying", new ZeroArgFunction() {
@@ -900,15 +834,14 @@ public class ForgeEventHandler {
 			LuaTable e = createEvent(EventName.Chat);
 			LuaTable e2 = createEvent(EventName.ChatFilter);
 			String unformated = event.getMessage().getUnformattedText();
-
 			Pair<String, LuaTable> pair   = Utils.codedFromTextComponent(event.getMessage());//fromMinecraftColorCodes(event.getMessage().getFormattedText());
 			String formated = pair.a;
-
+			
 			//formated = formated.substring(0, formated.length()-2);//gets rid of last &f that does nothing for us
 			//System.out.println(sEvent.getMessage().getSiblings());
 			//TODO simplfy formating
 			LuaTable actions = pair.b;
-
+			
 			e.set(3, formated);
 			e2.set(3, formated);
 			e.set(4, unformated);

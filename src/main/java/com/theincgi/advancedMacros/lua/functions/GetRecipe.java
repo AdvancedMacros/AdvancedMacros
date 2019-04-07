@@ -104,10 +104,10 @@ public class GetRecipe extends CallableTable {
 			return t;
 		}else if(r instanceof ShapedOreRecipe) {
 			ShapedOreRecipe sr = (ShapedOreRecipe) r;
-			t = dimTable(sr.getRecipeWidth(), sr.getRecipeHeight());
+			t = dimTable(sr.getWidth(), sr.getHeight());
 			for (int i = 0; i < sr.getIngredients().size(); i++) {
 				ItemStack[] match = sr.getIngredients().get(i).getMatchingStacks();
-				int u = realIndx(i, sr.getRecipeWidth(), sr.getRecipeHeight());
+				int u = realIndx(i, sr.getWidth(), sr.getHeight());
 				int x = u%3, y  = u/3;
 
 				for(int s = 0; s<match.length; s++) {
