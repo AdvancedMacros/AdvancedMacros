@@ -41,6 +41,8 @@ import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
+import net.minecraft.client.audio.ISoundEventListener;
+import net.minecraft.client.audio.SoundEventAccessor;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.gui.GuiMainMenu;
@@ -512,10 +514,10 @@ public class ForgeEventHandler {
 					String titleText, subtitleText;
 					titleText = Utils.fromMinecraftColorCodes((String)title.get(gui));
 					subtitleText = Utils.fromMinecraftColorCodes((String)subtitle.get(gui) );
-					
+
 					if(titleText.endsWith("&f")) titleText = titleText.substring(0, titleText.length()-2);
 					if(subtitleText.endsWith("&f")) subtitleText = subtitleText.substring(0, subtitleText.length()-2);
-					
+
 					LuaTable event = createEvent(EventName.Title);
 					event.set(3, LuaValue.valueOf( titleText ));
 					event.set(4, LuaValue.valueOf( subtitleText ));
@@ -847,47 +849,53 @@ public class ForgeEventHandler {
 		fireEvent(EventName.UseItem, e);
 	}
 
-	@SubscribeEvent
-	public void onSound(PlaySoundEvent pse) {
-		LuaTable event = createEvent(EventName.Sound);
-		event.set(3, pse.getName());
-		//TODO location ptich and volume pse.getSound().
-		LuaTable details = new LuaTable();
-		ISound sound = pse.getSound();
-		try {
-			details.set("pitch", sound.getPitch());
-		}catch (NullPointerException e) {
-			details.set("pitch", 1);
-		}
-		try{
-			details.set("volume", sound.getVolume());
-		}catch (NullPointerException e) {
-			details.set("volume", 1);
-		}
-		try{details.set("pos", Utils.posToTable(sound.getXPosF(), sound.getYPosF(), sound.getZPosF()));}catch(NullPointerException e) {
+	public final SoundListener SOUND_LISTENER = new SoundListener(); 
+	public class SoundListener implements ISoundEventListener {
+		@Override
+		public void soundPlay(ISound sound, SoundEventAccessor accessor) {
+			LuaTable event = createEvent(EventName.Sound);
+			event.set(3, sound.getSoundLocation().toString());
 
-		}
-		try{details.set("category", sound.getCategory().getName().toLowerCase());}catch(NullPointerException e) {
+			LuaTable details = new LuaTable();
 
-		}
-		event.set(4, details);
-
-		fireEvent(EventName.Sound, event);
-		LuaTable controls = new LuaTable();
-		controls.set("isPlaying", new ZeroArgFunction() {
-			@Override
-			public LuaValue call() {
-				return LuaValue.valueOf(pse.getManager().isSoundPlaying(pse.getSound()));
+			try {
+				details.set("pitch", sound.getPitch());
+			}catch (NullPointerException e) {
+				details.set("pitch", 1);
 			}
-		});
-		controls.set("stop", new ZeroArgFunction() {
-			@Override
-			public LuaValue call() {
-				pse.getManager().stopSound(pse.getSound());
-				return NONE;
+			try{
+				details.set("volume", sound.getVolume());
+			}catch (NullPointerException e) {
+				details.set("volume", 1);
 			}
-		});
-		event.set(4, controls);
+			try{details.set("pos", Utils.posToTable(sound.getXPosF(), sound.getYPosF(), sound.getZPosF()));}catch(NullPointerException e) {
+
+			}
+			try{details.set("category", sound.getCategory().getName().toLowerCase());}catch(NullPointerException e) {
+
+			}
+			event.set(4, details);
+
+			LuaTable controls = new LuaTable();
+			controls.set("isPlaying", new ZeroArgFunction() {
+				@Override
+				public LuaValue call() {
+					return LuaValue.valueOf(AdvancedMacros.getMinecraft().getSoundHandler().isSoundPlaying(sound));
+				}
+			});
+			controls.set("stop", new ZeroArgFunction() {
+				@Override
+				public LuaValue call() {
+					AdvancedMacros.getMinecraft().getSoundHandler().stopSound(sound);
+					return NONE;
+				}
+			});
+			event.set(5, controls);
+			fireEvent(EventName.Sound, event);
+
+		}
+
+	
 	}
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)

@@ -17,6 +17,18 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  " - &aBug fix:",
+  "   - Sound event's pitch and volume previously returned a value of 1 even if it wasn't",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 7.4.1",
+  " - &aBug fix:",
+  "   - Sound event now provides controls as 5th argument (previously missing)",
+   
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 7.4.0",
   " - &bFeatures:",
   "   - New &devents&f:",
   "     - Title",
