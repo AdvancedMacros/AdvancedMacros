@@ -48,7 +48,8 @@ public class RayTrace {
 			if(optVec.a == null) {
 				optVec.a = p.getPositionEyes(0);
 			}
-			double distance = p.REACH_DISTANCE.getDefaultValue();
+			double distance = mc.playerController.getBlockReachDistance();
+			
 			if(optVec.b.arg1().isnumber()) {
 				distance = optVec.b.arg1().checkdouble();
 				optVec.b = optVec.b.subargs(2);
@@ -61,7 +62,7 @@ public class RayTrace {
 
 			Vec3d end = optVec.a.add( vec.a.scale( distance ) );
 			RayTraceResult rtr = AdvancedMacros.getMinecraft().world.rayTraceBlocks( optVec.a, end, stopOnLiquid, false, true);
-			//AdvancedMacros.getMinecraft().objectMouseOver
+			//AdvancedMacros.getMinecraft().objectMouseOver;
 			LuaValue result = Utils.rayTraceResultToLuaValue(rtr);
 			return result;
 		}

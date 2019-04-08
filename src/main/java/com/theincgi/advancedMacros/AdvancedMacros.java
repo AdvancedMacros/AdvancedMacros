@@ -107,7 +107,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 
-@Mod(modid = AdvancedMacros.MODID, version = AdvancedMacros.VERSION)
+@Mod(modid = AdvancedMacros.MODID, version = AdvancedMacros.VERSION, acceptedMinecraftVersions = "1.12")
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
@@ -136,7 +136,7 @@ public class AdvancedMacros {
 	private JarLibSearcher jarLibSearcher;
 	private static Thread minecraftThread;
 	private static Minecraft mc;
-	
+
 	public static final boolean COLOR_SPACE_IS_255 = false;
 
 
@@ -160,14 +160,14 @@ public class AdvancedMacros {
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
-			
-			
+
+
 			loadFunctions();
 			loadLibJars();
-			
+
 			loadScripts();
-			
-			
+
+
 			otherCustomFontRenderer = new FontRendererOverride();
 			otherCustomFontRenderer.onResourceManagerReload(null);
 			//Utils.loadTextCodes();
@@ -179,9 +179,9 @@ public class AdvancedMacros {
 			runningScriptsGui = new RunningScriptsGui(debug);
 			Settings.save(); //changed order
 			macroMenuGui.updateProfileList();
-			Settings.getProfileList();//generate DEFAULT 
+			Settings.getProfileList();//generate DEFAULT
 			macroMenuGui.loadProfile("DEFAULT");
-			
+
 			globals.set("prompt", inputGUI.getPrompt());
 		}catch (Throwable t) {
 			t.printStackTrace();
@@ -208,14 +208,13 @@ public class AdvancedMacros {
 		globals.load(debug);
 		debugTable = globals.get("debug").checktable();
 		globals.set("_MOD_VERSION", VERSION);
-		globals.set("__GAME_VERSION", Minecraft.getMinecraft().getVersion());
-		
+    globals.set("__GAME_VERSION", Minecraft.getMinecraft().getVersion());
 		globals.set("advancedMacros", advancedMacrosTable);
 		LuaTable editor = new LuaTable();
 		advancedMacrosTable.set("editor", editor);
 		advancedMacrosTable.set("openChangeLog", new OpenChangeLog());
 		editor.set("jumpToLine", new EditorControls.JumpToLine());
-		
+
 		globals.set("run", new Call());
 		globals.set("pRun", new PCall());
 		globals.set("runThread", new RunThread());
@@ -224,11 +223,11 @@ public class AdvancedMacros {
 			thread.set("current", new LuaDebug.GetCurrent());
 			thread.set("listRunning", new LuaDebug.GetRunningScripts());
 		globals.set("thread", thread);
-		
+
 		globals.set("getProfile", new GetProfile());
 		globals.set("setProfile", new SetProfile());
 		globals.set("stopAllScripts", new StopAllScripts());
-		
+
 
 		try {
 			globals.set("listTextures", new GetTextureList());
@@ -240,18 +239,18 @@ public class AdvancedMacros {
 		globals.set("advLog", new AdvLog());
 		globals.set("say", sayFunc = new LuaFunctions.Say());
 		globals.set("toast", new Toast.ToastNotification());
-		
+
 		globals.set("sleep", sleepFunc = new LuaFunctions.Sleep());
 		globals.set("print", new LuaFunctions.Debug());
 		globals.set("getSettings", new Settings.GetSettings());
 		globals.set("newMutex", new LuaMutex());
-		
+
 		globals.get("os").set("millis", new GetOSMilliseconds());
 		globals.get("os").set("exit", LuaValue.NIL);
 		globals.get("os").set("getClipboard", new ClipBoard.GetClipboard());
 		globals.get("os").set("setClipboard", new ClipBoard.SetClipboard());
 		globals.get("string").set("trim", new StringTrim());
-		
+
 		LuaTable imgTools = new LuaTable();
 		imgTools.set("new", new BufferedImageControls.CreateImg());
 		imgTools.set("load", new BufferedImageControls.LoadImg());
@@ -264,7 +263,7 @@ public class AdvancedMacros {
 		math.set("ln", math.get("log")); //because log is some how base e instead of 10
 		math.set("log", new MathPlus.Log());
 		math.set("e", MathPlus.const_e);
-		
+
 		//		//5.3 string tweaks //migrated to org.luaj.vm2_v3_0_1.lib.StringLib
 		//		{
 		//			LuaTable string = globals.get("string").checktable();
@@ -287,21 +286,21 @@ public class AdvancedMacros {
 		globals.set("getRecipes", new GetRecipe());
 		globals.set("getFps", new GetFPS());
 		globals.set("getChunkUpdateCount", new GetChunkUpdates());
-		
+
 		globals.set("getEntityList", new GetEntityList());
 		globals.set("getEntity", new GetEntityData());
-		globals.set("getBoundingBox", new GetAABB().getFunc()); 
+		globals.set("getBoundingBox", new GetAABB().getFunc());
 		globals.set("highlightEntity", new CallableTable(new String[] {"highlightEntity"}, new HighlightEntity()));
-		
+
 		globals.set("getScreen", new GetScreen());
-		
+
 		LuaTable hud2D;
 		globals.set("hud2D", hud2D = new Hud2D());
 		globals.set("hud3D",         new Hud3D());
 		hud2D.set("title", new Toast.ToastTitle());
 		hud2D.set("actionbar", new Toast.ToastActionBar());
-		
-		
+
+
 		globals.set("rayTrace", RayTrace.getFunc());
 
 		new Action().getKeybindFuncts(globals);
@@ -316,7 +315,7 @@ public class AdvancedMacros {
 		globals.set("playSound", new PlaySound.FromFile());
 		globals.set("midi", new MidiLib2());
 		globals.set("customizeSkin", new SkinCustomizer());
-		
+
 		globals.set("isKeyDown", new IsKeyHeld());
 		globals.set("getHeldKeys", new AdvancedMacros().forgeEventHandler.new GetHeldKeys());
 		globals.set("filesystem", new FileSystem());
@@ -325,7 +324,7 @@ public class AdvancedMacros {
 		LuaTable guiStuff = new LuaTable();
 		guiStuff.set("new", new ScriptGui.CreateScriptGui());
 		globals.set("gui", guiStuff);
-		
+
 		LuaTable searchers = globals.get("package").get("searchers").checktable();
 		searchers.set(searchers.length() + 1, jarLibSearcher = new JarLibSearcher());
 		globals.set("getJarLibLoaders", new ZeroArgFunction() {public LuaValue call() {return jarLibSearcher.loaders;}});
@@ -343,7 +342,7 @@ public class AdvancedMacros {
 							Enumeration<JarEntry> e = jarFile.entries();
 							URL[] urls = { new URL("jar:file:" + f.getPath().replace('\\', '/') +"!/" )};
 							URLClassLoader cl = URLClassLoader.newInstance(urls, LuaPlugin.class.getClassLoader());
-							
+
 							while(e.hasMoreElements()) {
 								JarEntry je = e.nextElement();
 								if(je.isDirectory() || !je.getName().endsWith(".class"))
@@ -354,7 +353,7 @@ public class AdvancedMacros {
 									Class c = cl.loadClass(className);
 									if(c.getName().contains("DL4J4Lua"))
 										System.out.println("");
-									
+
 									if(LuaPlugin.class.isAssignableFrom(c)) {
 										if(LuaFunction.class.isAssignableFrom(c)) {
 											System.out.println("Loaded from jar "+c.getName());
@@ -384,8 +383,8 @@ public class AdvancedMacros {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+
 	private void loadScripts() {
 		try {
 			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/searcher.lua")).getInputStream();
@@ -463,7 +462,7 @@ public class AdvancedMacros {
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-		} 
+		}
 		return defaultRoot;
 	}
 	public static Thread getMinecraftThread() {
