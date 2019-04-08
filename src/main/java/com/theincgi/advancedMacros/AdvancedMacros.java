@@ -112,7 +112,7 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "7.4.0"; //${version} ??
+	public static final String VERSION = "7.4.2"; //${version} ??
 
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
@@ -153,7 +153,7 @@ public class AdvancedMacros {
 			customDocsFolder.mkdirs();
 			modKeybind = new KeyBinding("Bindings Menu", Keyboard.KEY_L, "AdvancedMacros");
 			MinecraftForge.EVENT_BUS.register(forgeEventHandler = new ForgeEventHandler());
-
+			getMinecraft().getSoundHandler().addListener(forgeEventHandler.SOUND_LISTENER);
 			ClientRegistry.registerKeyBinding(modKeybind);
 			try {
 				Settings.load();
