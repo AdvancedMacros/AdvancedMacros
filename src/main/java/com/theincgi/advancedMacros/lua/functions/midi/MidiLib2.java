@@ -15,7 +15,7 @@ public class MidiLib2 extends LuaTable{
 		this.set("getDevice", new GetMidiDevice());
 		this.set("openMidiFile", new OneArgFunction() {
 			@Override public LuaValue call(LuaValue arg) {
-				return new MidiFileInput(arg.checkjstring());
+				return new MidiFileInput(arg);
 			}
 		});
 		this.set("stopAll", new StopAll());

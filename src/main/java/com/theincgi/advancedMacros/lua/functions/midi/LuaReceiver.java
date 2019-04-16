@@ -23,13 +23,7 @@ public class LuaReceiver implements Receiver{
 	
 	public void tryEvent(LuaTable table) {
 		if(onEvent!=null)
-			try {
-				onEvent.call(table);
-			}catch (Throwable e) {
-				e.printStackTrace();
-				Utils.logError(Utils.toLuaError(e));
-				//throw new LuaError(e);
-			}
+			Utils.pcall(onEvent, table);
 	}
 	
 	@Override
@@ -61,7 +55,7 @@ public class LuaReceiver implements Receiver{
 				event.set("key", key);
 				event.set("velocity", vel);
 				
-				System.out.printf("NOTE OFF - Channel: %3d, Key: %3d, Vel: %3d\n", channel, key, vel);
+				//System.out.printf("NOTE OFF - Channel: %3d, Key: %3d, Vel: %3d\n", channel, key, vel);
 				
 				tryEvent(event);
 			}
@@ -79,7 +73,7 @@ public class LuaReceiver implements Receiver{
 				event.set("key", key); 
 				event.set("velocity", vel);
 				
-				System.out.printf("NOTE ON - Channel: %3d, Key: %3d, Vel: %3d\n", channel, key, vel);
+				//System.out.printf("NOTE ON - Channel: %3d, Key: %3d, Vel: %3d\n", channel, key, vel);
 
 				tryEvent(event);
 			}

@@ -18,14 +18,9 @@ import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.Utils;
 
 public class MidiFileInput extends LuaTable{
-	public MidiFileInput(String fileName) {
+	public MidiFileInput(LuaValue fileName) {
 		try {
-			File f;
-			if(fileName.contains(":")) {//absolute location
-				f = new File(fileName);
-			}else { //relative location (in macros folder)
-				f = new File(AdvancedMacros.macrosRootFolder, fileName);
-			}
+			File f = Utils.parseFileLocation(fileName);
 			
 			Sequencer sequencer = MidiSystem.getSequencer(false);
 			sequencer.setSequence(MidiSystem.getSequence(f));
@@ -113,6 +108,12 @@ public class MidiFileInput extends LuaTable{
 			this.set("getBPM", new ZeroArgFunction() {
 				@Override public LuaValue call() {
 					return LuaValue.valueOf(sequencer.getTempoInBPM());
+				}
+			});
+			this.set("getTicksPerMinute", new ZeroArgFunction() {
+				@Override
+				public LuaValue call() {
+					return valueOf(sequencer.getTempoInMPQ() * sequencer.getTempoInBPM());
 				}
 			});
 			this.set("getLength", new ZeroArgFunction() {

@@ -885,6 +885,11 @@ public class Utils {
 	/**nah, its invoke, but it has one return*/
 	public static LuaValue pcall(LuaFunction func, Varargs luaValues) {
 		try {
+			
+			if(AdvancedMacros.globals.getCurrentLuaThread()==null) {
+				org.luaj.vm2_v3_0_1.LuaThread luaThread = new org.luaj.vm2_v3_0_1.LuaThread(AdvancedMacros.globals, func);
+				AdvancedMacros.globals.setCurrentLuaThread(luaThread);
+			}
 			return func.invoke(luaValues).arg1();
 		}catch (Throwable e) {
 			logError(toLuaError(e));
