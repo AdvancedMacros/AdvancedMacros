@@ -17,6 +17,15 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  " - &aBug Fixes:",
+  "   - Fixed an issue where &bmidi&f lib could not handle events due to a null pointer",
+  "   - Fixed an issue where some classes where unavailable to the &aluajava&f lib",
+  "     &7(Related to the class loader that was previously being used)",
+  "   - Removed console spam from midi events",
+  " - &bFeatures:",
+  "   - Midi files are accessed like rest of mod",
+  "   - Midi files provide &bgetTicksPerMinute &7does not seem to be accurate though...",
+  
   " - &aBug fix:",
   "   - Sound event's pitch and volume previously returned a value of 1 even if it wasn't",
   
