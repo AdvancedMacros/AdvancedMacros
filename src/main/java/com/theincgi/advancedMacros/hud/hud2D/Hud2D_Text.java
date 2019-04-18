@@ -99,7 +99,9 @@ public class Hud2D_Text extends Hud2DItem {
 
 	@Override
 	public void render(float partialTicks) {
-		float dx = x, dy = y;
+		GlStateManager.pushMatrix();
+		applyTransformation();
+		float dx = 0, dy = 0;
 		if(allowFrameInterpolation) {
 			dx = interpolate(dx, lastX, partialTicks);
 			dy = interpolate(dy, lastY, partialTicks);
@@ -125,6 +127,7 @@ public class Hud2D_Text extends Hud2DItem {
 		GlStateManager.bindTexture(0);
 		//		AdvancedMacros.customFontRenderer.renderText(dx, dy, z, text, getOpacity(), size);
 		//	GlStateManager.disableBlend();
+		GlStateManager.popMatrix();
 	}
 
 }

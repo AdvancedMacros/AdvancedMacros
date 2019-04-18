@@ -64,8 +64,10 @@ public class Hud2D_Image extends Hud2D_Rectangle {
 
 	@Override
 	public void render(float partialTicks) {
+		GlStateManager.pushMatrix();
 		GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
-		float dx = x, dy = y, dw = wid, dh = hei;
+		applyTransformation();
+		float dx = 0, dy = 0, dw = wid, dh = hei;
 		if(allowFrameInterpolation) {
 			dx = interpolate(dx, lastX, partialTicks);
 			dy = interpolate(dy, lastY, partialTicks);
@@ -89,6 +91,7 @@ public class Hud2D_Image extends Hud2D_Rectangle {
 		Tessellator.getInstance().draw();
 		//GlStateManager.disableBlend();
 		GL11.glPopAttrib();
+		GlStateManager.popMatrix();
 	}
 	
 	

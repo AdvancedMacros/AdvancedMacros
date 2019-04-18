@@ -13,10 +13,13 @@ import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.hud.Destroyable;
 import com.theincgi.advancedMacros.misc.Utils;
 
+import net.minecraft.client.renderer.GlStateManager;
+
 public abstract class Hud2DItem implements Destroyable{
 	
 	float x, y, z;
 	float lastX, lastY;
+	float angle;
 	//protected float opacity;
 	protected boolean allowFrameInterpolation = false;
 	LuaValue controls;
@@ -67,6 +70,19 @@ public abstract class Hud2DItem implements Destroyable{
 				t.set(1, LuaValue.valueOf(x));
 				t.set(2, LuaValue.valueOf(y));
 				return t.unpack();
+			}
+		});
+		controls.set("setRot", new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg) {
+				angle = (float) arg.checkdouble();
+				return NONE;
+			}
+		});
+		controls.set("getRot", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return valueOf(angle);
 			}
 		});
 		controls.set("setOpacity", new OneArgFunction() {
@@ -161,7 +177,11 @@ public abstract class Hud2DItem implements Destroyable{
 		return controls.checktable();
 	}
 	
-	
+	protected void applyTransformation() {
+		GlStateManager.translate(x, y, 0);
+		GlStateManager.rotate(angle, 0, 0, 1);
+		//GlStateManager.translate(-x, -y, 0);
+	}
 	
 	public void destroy() {
 		disableDraw();

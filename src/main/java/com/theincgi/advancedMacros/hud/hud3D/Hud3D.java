@@ -60,6 +60,13 @@ public class Hud3D extends LuaTable{
 					pane.changeTexture(args.arg(5));
 				return pane.getControls();
 			}
+			case newObject:{
+				Hud3DElement element = new Hud3DElement();
+				element.setPos(	args.optint(1, (int) Math.floor(p.posX)),
+						  		args.optint(2, (int) Math.floor(p.posY)),
+					  			args.optint(3, (int) Math.floor(p.posZ)));
+				return element.getControls();
+			}
 			default:
 				throw new LuaError("Unimplemented function "+op);
 			}
@@ -70,6 +77,7 @@ public class Hud3D extends LuaTable{
 		newBlock,
 		newText,
 		newPane,
+		newObject,
 		clearAll;
 		
 		public String[] getDocLocation(){

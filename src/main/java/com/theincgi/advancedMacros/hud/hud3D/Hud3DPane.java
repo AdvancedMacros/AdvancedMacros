@@ -56,6 +56,18 @@ public class Hud3DPane extends WorldHudItem{
 	public void render(double playerX, double playerY, double playerZ) {
 		if(texture!=null)
 			texture.bindTexture();
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(-playerX, -playerY, -playerZ);
+		GlStateManager.translate(x, y, z);
+		
+		GlStateManager.rotate(roll, 0, 0, 1);
+		GlStateManager.rotate(pitch, 1, 0, 0);
+		GlStateManager.rotate(yaw, 0, 1, 0);
+		
+		
+		GlStateManager.translate(-x, -y, -z);
+		GlStateManager.translate(playerX, playerY, playerZ);
+		
 		color.apply();
 		switch (axisFace) {
 		case XYM:
@@ -95,6 +107,7 @@ public class Hud3DPane extends WorldHudItem{
 		default:
 			break;
 		}
+		GlStateManager.popMatrix();
 	}
 	
 	private static enum AxisFace {

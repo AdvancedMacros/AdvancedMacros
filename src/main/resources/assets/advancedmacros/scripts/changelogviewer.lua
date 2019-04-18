@@ -18,6 +18,12 @@ local changeLog = {
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
   " - &aBug Fixes:",
+  "   - Fixed unimplemented rotation in &ahud3D&f's &bpane",
+  " - &bFeatures:",
+  "  - Added rotation for all &ahud2D&f elements",
+  
+  
+  " - &aBug Fixes:",
   "   - Fixed an issue where &bmidi&f lib could not handle events due to a null pointer",
   "   - Fixed an issue where some classes where unavailable to the &aluajava&f lib",
   "     &7(Related to the class loader that was previously being used)",

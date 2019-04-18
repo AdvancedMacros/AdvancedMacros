@@ -50,8 +50,9 @@ public class Hud2D_Rectangle extends Hud2DItem {
 
 	@Override
 	public void render(float partialTicks) {
-			
-		float dx = x, dy = y, dw = wid, dh = hei;
+		GlStateManager.pushMatrix();
+		applyTransformation();
+		float dx = 0, dy = 0, dw = wid, dh = hei;
 		if(allowFrameInterpolation) {
 			dx = interpolate(dx, lastX, partialTicks);
 			dy = interpolate(dy, lastY, partialTicks);
@@ -59,6 +60,7 @@ public class Hud2D_Rectangle extends Hud2DItem {
 			dh = interpolate(dh, lastHei, partialTicks);
 		}
 		drawRectangle(dx, dy, dw, dh, color, z);
+		GlStateManager.popMatrix();
 	}
 
 	/**@param dx - draw X

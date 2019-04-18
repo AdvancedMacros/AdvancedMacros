@@ -28,8 +28,10 @@ public class Hud2D_Box extends Hud2D_Rectangle {
 	
 	@Override
 	public void render(float partialTicks) {
+		GlStateManager.pushMatrix();
 		GlStateManager.pushAttrib();
-		float dx = x, dy = y, dw = wid, dh = hei;
+		applyTransformation();
+		float dx = 0, dy = 0, dw = wid, dh = hei;
 		if(allowFrameInterpolation) {
 			dx = interpolate(dx, lastX, partialTicks);
 			dy = interpolate(dy, lastY, partialTicks);
@@ -43,6 +45,7 @@ public class Hud2D_Box extends Hud2D_Rectangle {
 		drawRectangle(dx, 		dy+dh-1, 	dw, 	thickness, 	color, z);
 		
 		GlStateManager.popAttrib();
+		GlStateManager.popMatrix();
 	}
 	
 	@Override
