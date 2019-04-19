@@ -60,7 +60,7 @@ public class Hud3D extends LuaTable{
 					pane.changeTexture(args.arg(5));
 				return pane.getControls();
 			}
-			case newObject:{
+			case newMesh:{
 				Hud3DElement element = new Hud3DElement();
 				element.setPos(	args.optint(1, (int) Math.floor(p.posX)),
 						  		args.optint(2, (int) Math.floor(p.posY)),
@@ -77,7 +77,7 @@ public class Hud3D extends LuaTable{
 		newBlock,
 		newText,
 		newPane,
-		newObject,
+		newMesh,
 		clearAll;
 		
 		public String[] getDocLocation(){

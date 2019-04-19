@@ -17,12 +17,25 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  " - &bFeatures:",
+  "  - Added new &ahud3D&f element '&bmesh&f' created by",
+  "    &bhud3D.newMesh( <x,y,z> )",
+  "    The &adata&f table in the controls is what defines the mesh's shape",
+  "    and render attibutes",
+  "    Valid modes are: '&astrip&f', '&afan&f', '&aquads&f', '&atriangles&f', and '&aquadStrip&f'",
+  "    Valid cull sides are: &efalse&f, '&afront&f', '&aback&f', '&afront and back&f'",
+  
+    "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 7.5.0",
   " - &aBug Fixes:",
   "   - Fixed unimplemented rotation in &ahud3D&f's &bpane",
   " - &bFeatures:",
   "  - Added rotation for all &ahud2D&f elements",
   
+  "&7"..DIVIDER,
   
+  "&b&BChange Log: &7version 7.4.1",
   " - &aBug Fixes:",
   "   - Fixed an issue where &bmidi&f lib could not handle events due to a null pointer",
   "   - Fixed an issue where some classes where unavailable to the &aluajava&f lib",
