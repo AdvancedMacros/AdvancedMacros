@@ -87,6 +87,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent.SaveToFile;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.ASMEventHandler;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.IEventListener;
 import net.minecraftforge.fml.common.eventhandler.ListenerList;
@@ -1103,22 +1104,32 @@ public class ForgeEventHandler {
 	//not including this world render, but its not for the trigger list
 
 	private Field MCForge_EventBusID;
+	private Field modContainer;
 	private void repostForgeEvent(Event event) {
 		try {
 			ListenerList list = event.getListenerList();
 			if(MCForge_EventBusID==null) {
 				MCForge_EventBusID = MinecraftForge.EVENT_BUS.getClass().getDeclaredField("busID");
 				MCForge_EventBusID.setAccessible(true);
+				modContainer = ASMEventHandler.class.getDeclaredField("owner");
+				modContainer.setAccessible(true);
 			}
 			int busId = MCForge_EventBusID.getInt(MinecraftForge.EVENT_BUS);
 			IEventListener[] listeners = list.getListeners(busId);
 			boolean flag = true;
 			for(int i = 0; i<listeners.length; i++) {
-				if(flag && listeners[i]!=this)
-					continue;
-				flag = false;
+				if(flag) {
+					IEventListener iel = listeners[i];
+					if(!(iel instanceof ASMEventHandler))
+						continue;
+					ASMEventHandler asmeh = (ASMEventHandler) iel;
+					if( AdvancedMacros.getModContainer().equals( modContainer.get(asmeh) ) )
+						flag = false;
+						continue;
+				}
 				listeners[i].invoke(event);
 			}
+			if(!event.isCanceled())
 			if(event instanceof ClientChatReceivedEvent) {
 				ClientChatReceivedEvent ccre = (ClientChatReceivedEvent) event;
 				AdvancedMacros.getMinecraft().ingameGUI.addChatMessage(ccre.getType(), ccre.getMessage());

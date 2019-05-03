@@ -17,6 +17,19 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  " - &aBuf fix:",
+  "  - Forwarded forge event's canceled property is now checked correctly",
+   
+    "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 7.7.1",
+  " - &aBug Fixes:",
+  "  - Actual fix for the forge event thing &7(whoops)",
+  
+   
+    "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 7.7.0",
   " - &bFeatures:",
   "  - Added chest label info to gui controls for the GuiOpened and ContainerOpened",
   "    events",

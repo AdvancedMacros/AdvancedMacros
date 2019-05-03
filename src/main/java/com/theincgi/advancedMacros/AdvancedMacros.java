@@ -96,13 +96,17 @@ import com.theincgi.advancedMacros.publicInterfaces.LuaPlugin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -112,7 +116,7 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "7.7.0"; //${version} ??
+	public static final String VERSION = "7.7.2"; //${version} ??
 
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
@@ -136,7 +140,7 @@ public class AdvancedMacros {
 	private JarLibSearcher jarLibSearcher;
 	private static Thread minecraftThread;
 	private static Minecraft mc;
-	
+	private static ModContainer advMacrosModContainer;
 	public static final boolean COLOR_SPACE_IS_255 = false;
 
 
@@ -152,7 +156,18 @@ public class AdvancedMacros {
 			macroSoundsFolder.mkdirs();
 			customDocsFolder.mkdirs();
 			modKeybind = new KeyBinding("Bindings Menu", Keyboard.KEY_L, "AdvancedMacros");
+			advMacrosModContainer = Loader.instance().activeModContainer();
 			MinecraftForge.EVENT_BUS.register(forgeEventHandler = new ForgeEventHandler());
+			
+//			Test code!
+//			MinecraftForge.EVENT_BUS.register(new Object() {
+//				@SubscribeEvent @SideOnly(Side.CLIENT)
+//				public void onChat(final ClientChatReceivedEvent sEvent){
+//					logFunc.call("The secondary event handler was called!");
+//					sEvent.setCanceled(true);
+//				}
+//			});
+			
 			getMinecraft().getSoundHandler().addListener(forgeEventHandler.SOUND_LISTENER);
 			ClientRegistry.registerKeyBinding(modKeybind);
 			try {
@@ -476,5 +491,9 @@ public class AdvancedMacros {
 	public static Minecraft getMinecraft() {
 		if (mc == null) mc = Minecraft.getMinecraft();
 		return mc;
+	}
+
+	public static ModContainer getModContainer() {
+		return advMacrosModContainer;
 	}
 }
