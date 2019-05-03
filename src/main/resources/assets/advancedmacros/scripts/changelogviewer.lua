@@ -20,6 +20,7 @@ local changeLog = {
   " - &bFeatures:",
   "  - Added chest label info to gui controls for the GuiOpened and ContainerOpened",
   "    events",
+  "  - &ahud2D&f's rectangle now has a &bsetSize&f function",
   " - &aBug Fixes:",
   "  - Fixed certain server messages for actionbar text would get added to the chat",
   "    &7...frequently",
