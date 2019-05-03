@@ -18,6 +18,19 @@ local changeLog = {
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
   " - &bFeatures:",
+  "  - Added chest label info to gui controls for the GuiOpened and ContainerOpened",
+  "    events",
+  " - &aBug Fixes:",
+  "  - Fixed certain server messages for actionbar text would get added to the chat",
+  "    &7...frequently",
+  "  - Chat filters now forward the forge event for ClientChatReceivedEvent",
+  "    Any event listeners fired after filtering will receive the filtered text component",
+  
+   
+    "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 7.6.0",
+  " - &bFeatures:",
   "  - Added new &ahud3D&f element '&bmesh&f' created by",
   "    &bhud3D.newMesh( <x,y,z> )",
   "    The &adata&f table in the controls is what defines the mesh's shape",

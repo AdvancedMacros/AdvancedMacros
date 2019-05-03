@@ -2,6 +2,7 @@ package com.theincgi.advancedMacros.hud.hud2D;
 
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
+import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.gui.Color;
@@ -35,6 +36,14 @@ public class Hud2D_Rectangle extends Hud2DItem {
 			@Override
 			public LuaValue call() {
 				return LuaValue.valueOf(wid);
+			}
+		});
+		getControls().set("setSize", new TwoArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg1, LuaValue arg2) {
+				wid = (float) arg1.checkdouble();
+				hei = (float) arg2.checkdouble();
+				return NONE;
 			}
 		});
 		getControls().set("getHeight", new ZeroArgFunction() {

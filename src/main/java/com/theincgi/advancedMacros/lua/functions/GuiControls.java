@@ -25,10 +25,12 @@ import net.minecraft.client.gui.GuiRepair;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiScreenBook;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.gui.inventory.GuiEditSign;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.inventory.ContainerEnchantment;
 import net.minecraft.inventory.ContainerRepair;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.CPacketCustomPayload;
@@ -78,6 +80,11 @@ public class GuiControls {
 			for (CommandOp r : CommandOp.values()) {
 				controls.set(r.name(), new CallableTable(r.getDocLocation(), new DoCommand(r, cb)));
 			}
+		}else if(gCon instanceof GuiChest) {
+			GuiChest gc = (GuiChest) gCon;
+			for(ChestOp op : ChestOp.values()) {
+				controls.set(op.name(), new CallableTable(op.getDocLocation(), new DoChestOp(op, gc)));
+			}
 		}
 		Gui whenOpened = gCon;
 		controls.set("isOpen", new ZeroArgFunction() {
@@ -102,7 +109,7 @@ public class GuiControls {
 		RepairOp op;
 		GuiRepair gr;
 		Method renameItem = ReflectionHelper.findMethod(GuiRepair.class, "renameItem", "func_147090_g", new Class[] {});
-		
+
 		Field anvil = ReflectionHelper.findField(GuiRepair.class, "anvil", "w", "field_147092_v");
 		Field nameField = ReflectionHelper.findField(GuiRepair.class, "nameField", "x", "field_147091_w");
 		public DoRepair(RepairOp op, GuiRepair gr) {
@@ -475,7 +482,7 @@ public class GuiControls {
 		//Method updateGui = ReflectionHelper.findMethod(GuiCommandBlock.class, "updateGui", "a");
 		Method updateTrack=ReflectionHelper.findMethod(GuiCommandBlock.class, "updateCmdOutput", "func_175388_a");
 		Method updateConditional=
-				            ReflectionHelper.findMethod(GuiCommandBlock.class, "updateConditional", "func_184077_i");
+				ReflectionHelper.findMethod(GuiCommandBlock.class, "updateConditional", "func_184077_i");
 		Method updateAutomatic = ReflectionHelper.findMethod(GuiCommandBlock.class, "updateAutoExec", "func_184076_j");
 		GuiTextField text;
 		public DoCommand(CommandOp op, GuiCommandBlock cb) {
@@ -587,7 +594,7 @@ public class GuiControls {
 		private void done() throws IllegalArgumentException, IllegalAccessException {
 			TileEntityCommandBlock block = (TileEntityCommandBlock) tecb.get(cb);
 			Minecraft mc = AdvancedMacros.getMinecraft();
-			
+
 			PacketBuffer packetbuffer = new PacketBuffer(Unpooled.buffer());
 			CommandBlockBaseLogic commandblockbaselogic = block.getCommandBlockLogic();
 			commandblockbaselogic.fillInInfo(packetbuffer);
@@ -604,6 +611,34 @@ public class GuiControls {
 			}
 
 			mc.displayGuiScreen((GuiScreen)null);
+		}
+	}
+	private static class DoChestOp extends VarArgFunction {
+		GuiChest gc;
+		ChestOp op;
+		private static Field upperChest = ReflectionHelper.findField(GuiChest.class, "upperChestInventory", "w", "field_147016_v");
+		private static Field lowerChest = ReflectionHelper.findField(GuiChest.class, "lowerChestInventory", "x", "field_147015_w");
+		static {
+			upperChest.setAccessible(true);
+			lowerChest.setAccessible(true);
+		}
+		public DoChestOp(ChestOp op, GuiChest gc) {
+			this.op = op;
+			this.gc = gc;
+		}
+		@Override
+		public Varargs invoke(Varargs args) {
+			try {
+				switch (op) {
+				case getLowerLabel: //Yes this is intentionally backwards, 'lower chest' is the top in the gui... idk why
+					return valueOf(	((IInventory)upperChest.get(gc)).getDisplayName().getUnformattedText() );
+				case getUpperLabel:
+					return valueOf(	((IInventory)lowerChest.get(gc)).getDisplayName().getUnformattedText() );
+				}
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
+			return NONE;
 		}
 	}
 	private static enum RepairOp {
@@ -676,6 +711,14 @@ public class GuiControls {
 		setMode;
 		public String[] getDocLocation() {
 			return new String[] {"guiEvent#commandBlock", name()};
+		}
+	}
+	private static enum ChestOp{
+		getUpperLabel,
+		getLowerLabel;
+
+		public String[] getDocLocation() {
+			return new String[] {"guiEvent#chest", name()};
 		}
 	}
 }

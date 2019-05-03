@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.jar.JarFile;
 
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
@@ -21,6 +22,8 @@ import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
+import org.luaj.vm2_v3_0_1.lib.jse.CoerceJavaToLua;
+import org.luaj.vm2_v3_0_1.lib.jse.LuajavaLib;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -64,6 +67,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ChatType;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.client.event.ClientChatEvent;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -72,6 +76,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
@@ -82,6 +87,9 @@ import net.minecraftforge.event.entity.player.PlayerEvent.SaveToFile;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.fml.common.eventhandler.IEventListener;
+import net.minecraftforge.fml.common.eventhandler.ListenerList;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -899,10 +907,11 @@ public class ForgeEventHandler {
 	}
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onChat(ClientChatReceivedEvent sEvent){//TODO out going chat msg filter
+	public void onChat(final ClientChatReceivedEvent sEvent){//TODO out going chat msg filter
 		final ClientChatReceivedEvent event = sEvent; //arg not final because it's acquired thru reflection
-
-
+		
+		
+		
 		JavaThread t = new JavaThread(()->{
 
 			LuaTable e = createEvent(EventName.Chat);
@@ -954,8 +963,13 @@ public class ForgeEventHandler {
 				for(int i = 1; i<=Math.max(toUnpack.length(), 2); i++)
 					e2.set(3+i, toUnpack.get(i));
 			}
-			if(e2.get(3).toboolean())
-				AdvancedMacros.logFunc.invoke(e2.unpack().subargs(3));
+			if(e2.get(3).toboolean()) {
+				//AdvancedMacros.logFunc.invoke(e2.unpack().subargs(3));
+				Pair<ITextComponent, Varargs> text = Utils.toTextComponent(e2.unpack().arg(3).checkjstring(), e2.unpack().subargs(4), true);
+				ClientChatReceivedEvent ccre = new ClientChatReceivedEvent(sEvent.getType(), text.a);
+				repostForgeEvent(ccre);
+
+			}
 
 			fireEvent(EventName.Chat, e);
 		});
@@ -1088,6 +1102,32 @@ public class ForgeEventHandler {
 	//+===================================================================================================+
 	//not including this world render, but its not for the trigger list
 
+	private Field MCForge_EventBusID;
+	private void repostForgeEvent(Event event) {
+		try {
+			ListenerList list = event.getListenerList();
+			if(MCForge_EventBusID==null) {
+				MCForge_EventBusID = MinecraftForge.EVENT_BUS.getClass().getDeclaredField("busID");
+				MCForge_EventBusID.setAccessible(true);
+			}
+			int busId = MCForge_EventBusID.getInt(MinecraftForge.EVENT_BUS);
+			IEventListener[] listeners = list.getListeners(busId);
+			boolean flag = true;
+			for(int i = 0; i<listeners.length; i++) {
+				if(flag && listeners[i]!=this)
+					continue;
+				flag = false;
+				listeners[i].invoke(event);
+			}
+			if(event instanceof ClientChatReceivedEvent) {
+				ClientChatReceivedEvent ccre = (ClientChatReceivedEvent) event;
+				AdvancedMacros.getMinecraft().ingameGUI.addChatMessage(ccre.getType(), ccre.getMessage());
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private void resetItemDurablitity(){
 		ItemStack i = AdvancedMacros.getMinecraft().player.getHeldItemMainhand();
 		lastItemDurablity = i.getMaxDamage()-i.getItemDamage();

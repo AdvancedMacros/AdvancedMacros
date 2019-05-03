@@ -178,7 +178,7 @@ public class GraphicsContextControls extends LuaTable{
 			case copyArea:
 				g.copyArea(args.checkint(1)-1, args.checkint(2)-1, //x, y
 						args.checkint(3), args.checkint(4), //width, height
-						args.checkint(5)-1, args.checkint(6)-1);//dx, dy
+						args.checkint(5), args.checkint(6));//dx, dy
 				return NONE;
 
 			case drawLine:
