@@ -123,4 +123,12 @@ public class LuaUserdata extends LuaValue {
 	public boolean eqmt( LuaValue val ) {
 		return m_metatable!=null && val.isuserdata()? LuaValue.eqmtcall(this, m_metatable, val, val.getmetatable()): false; 
 	}
+	
+//	@Override //TODO fix TheINCGI
+//	protected void finalize() throws Throwable {
+//		if(m_metatable!=null && m_metatable.istable() && m_metatable.get("__gc").isfunction()) {
+//			m_metatable.get("__gc").call();
+//		}
+//		super.finalize();
+//	}
 }

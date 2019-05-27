@@ -133,6 +133,8 @@ public class Utils {
 					}else{
 						return parseColor(val.checktable().unpack(), use255Space);
 					}
+				}else if(val.isfunction()) {
+					return parseColor(val.call(), use255Space);
 				}
 				break;
 			case 4:
@@ -680,13 +682,13 @@ public class Utils {
 	}
 
 	public static class NBTUtils{
-		private static LuaTable fromCompound(NBTTagCompound comp) {
+		public static LuaTable fromCompound(NBTTagCompound comp) {
 			LuaTable out = new LuaTable();
 			for(String k : comp.getKeySet())
 				out.set(k, fromBase(comp.getTag(k)));
 			return out;
 		}
-		private static LuaValue fromBase(NBTBase tag) {
+		public static LuaValue fromBase(NBTBase tag) {
 			LuaValue thisTag;
 			if(tag instanceof NBTTagByte){
 				thisTag = LuaValue.valueOf(((NBTTagByte) tag).getByte());
@@ -723,7 +725,7 @@ public class Utils {
 			}
 			return thisTag;
 		}
-		private static LuaTable fromTagList(NBTTagList list) {
+		public static LuaTable fromTagList(NBTTagList list) {
 			if(list==null) {
 				//System.err.println("Warning: Utils.fromTagList list was null");
 				return new LuaTable();

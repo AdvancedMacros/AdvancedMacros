@@ -8,11 +8,13 @@ import org.luaj.vm2_v3_0_1.lib.ThreeArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.Utils;
+import com.theincgi.advancedMacros.misc.Utils.NBTUtils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -143,7 +145,19 @@ public class GetPlayer extends OneArgFunction {
 		}
 		t.set("entityID", valueOf(player.getEntityId()));
 		t.set("gamemode", player.isSpectator()?"spectator":player.isCreative()?"creative":"survival");
-		
+		try{
+			t.set("nbt", NBTUtils.fromCompound(player.serializeNBT()));
+		}catch (NullPointerException e) {
+			try {
+				NBTTagCompound ret = new NBTTagCompound();
+				player.writeToNBT(ret);
+				t.set("nbt", NBTUtils.fromCompound(ret));
+			
+			}catch(Exception ex) {
+				ex.printStackTrace();
+				t.set("nbt", LuaValue.FALSE);
+			}
+		}
 		if(player.equals(AdvancedMacros.getMinecraft().player)) {
 			t.set("target", Utils.rayTraceResultToLuaValue(AdvancedMacros.getMinecraft().objectMouseOver));
 		}

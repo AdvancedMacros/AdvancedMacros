@@ -1362,4 +1362,12 @@ public class LuaTable extends LuaValue implements Metatable {
 	public LuaValue arrayget(LuaValue[] array, int index) {
 		return array[index];
 	}
+	
+//	@Override TODO fix TheINCGI
+//	protected void finalize() throws Throwable {
+//		if(m_metatable!=null && m_metatable.toLuaValue().get("__gc").isfunction()) {
+//			m_metatable.toLuaValue().get("__gc").call();
+//		}
+//		super.finalize();
+//	}
 }
