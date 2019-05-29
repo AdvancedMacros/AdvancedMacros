@@ -32,8 +32,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 
+import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
+
+import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.misc.Settings;
 
 /**
  * LuaValue that represents a Java class.
@@ -73,12 +78,13 @@ class JavaClass extends JavaInstance implements CoerceJavaToLua.Coercion {
 	}
 		
 	Field getField(LuaValue key) {
+		boolean allowPrivate = checkPrivateAccessSetting();
 		if ( fields == null ) {
 			Map m = new HashMap();
 			Field[] f = ((Class)m_instance).getFields();
 			for ( int i=0; i<f.length; i++ ) {
 				Field fi = f[i];
-				if ( Modifier.isPublic(fi.getModifiers()) ) {
+				if ( Modifier.isPublic(fi.getModifiers()) || allowPrivate ) {
 					m.put(LuaValue.valueOf(fi.getName()), fi);
 					try {
 						if (!fi.isAccessible())
@@ -93,17 +99,24 @@ class JavaClass extends JavaInstance implements CoerceJavaToLua.Coercion {
 	}
 	
 	LuaValue getMethod(LuaValue key) {
+		boolean allowPrivate = checkPrivateAccessSetting();
+		
 		if ( methods == null ) {
 			Map namedlists = new HashMap();
 			Method[] m = ((Class)m_instance).getMethods();
 			for ( int i=0; i<m.length; i++ ) {
 				Method mi = m[i];
-				if ( Modifier.isPublic( mi.getModifiers()) ) {
+				if ( Modifier.isPublic( mi.getModifiers()) || allowPrivate  ) {
 					String name = mi.getName();
 					List list = (List) namedlists.get(name);
 					if ( list == null )
 						namedlists.put(name, list = new ArrayList());
 					list.add( JavaMethod.forMethod(mi) );
+					try {
+						if (!mi.isAccessible())
+							mi.setAccessible(true);
+					} catch (SecurityException s) {
+					}
 				}
 			}
 			Map map = new HashMap();
@@ -132,6 +145,16 @@ class JavaClass extends JavaInstance implements CoerceJavaToLua.Coercion {
 		return (LuaValue) methods.get(key);
 	}
 	
+	private boolean checkPrivateAccessSetting() {
+		LuaValue luajavaSettings;
+		if((luajavaSettings = Settings.settings.get("luajava")).istable())
+			Settings.settings.set("luajava", luajavaSettings = new LuaTable());
+		if(!luajavaSettings.get("allowPrivateAccess").isboolean())
+			luajavaSettings.set("allowPrivateAccess", false);
+		
+		return luajavaSettings.get("allowPrivateAccess").optboolean(false);
+	}
+
 	Class getInnerClass(LuaValue key) {
 		if ( innerclasses == null ) {
 			Map m = new HashMap();
@@ -146,7 +169,9 @@ class JavaClass extends JavaInstance implements CoerceJavaToLua.Coercion {
 		}
 		return (Class) innerclasses.get(key);
 	}
-
+	
+	
+	
 	public LuaValue getConstructor() {
 		return getMethod(NEW);
 	}

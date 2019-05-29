@@ -19,6 +19,8 @@ import com.theincgi.advancedMacros.gui.elements.GuiButton;
 import com.theincgi.advancedMacros.gui.elements.Moveable;
 import com.theincgi.advancedMacros.misc.Utils;
 
+import net.minecraft.client.Minecraft;
+
 public abstract class ScriptGuiElement extends LuaTable implements Drawable, InputSubscriber, Moveable{
 	//enable/disable draw
 	//isDrawing
