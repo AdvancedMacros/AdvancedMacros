@@ -16,7 +16,7 @@ import com.theincgi.advancedMacros.misc.Utils;
 public abstract class WorldHudItem implements Destroyable {
 	protected DrawType drawType = DrawType.NO_XRAY;
 	private LuaValue controls;
-	Color color = Color.WHITE;
+	Color color = Color.WHITE.copy();
 	
 	public DrawType getDrawType() {
 		return drawType;

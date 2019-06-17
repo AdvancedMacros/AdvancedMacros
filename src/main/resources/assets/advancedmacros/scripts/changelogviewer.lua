@@ -17,7 +17,23 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
-  " - &aBuf fix:",
+  " - &aBug fix:",
+  "   - &ahud3D&f elements were using the same default color",
+  "     causing opacity to change for all elements with the default color",
+  "   - &ahud2D&f text's opacity now transitions smoothly",
+   
+    "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 7.7.3",
+  " - Colors can now accept functions, they will be called when they are parsed",
+  " - Added a setting for enabling access to non public fields and methods with luajava",
+  "   &7(getSettings().luajava.allowPrivateAccess)",
+  " - Player NBT is now accessable through &bgetPlayer&f()",
+   
+    "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 7.7.2",
+  " - &aBug fix:",
   "  - Forwarded forge event's canceled property is now checked correctly",
    
     "&7"..DIVIDER,

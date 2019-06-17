@@ -116,7 +116,7 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "7.7.2"; //${version} ??
+	public static final String VERSION = "7.7.4"; //${version} ??
 
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
@@ -393,7 +393,6 @@ public class AdvancedMacros {
 						System.err.println(e.getClass().getName() + ": " +e.getMessage());
 					}
 				}
-
 			}
 		}catch (Exception e) {
 			e.printStackTrace();

@@ -24,7 +24,7 @@ public abstract class Hud2DItem implements Destroyable{
 	protected boolean allowFrameInterpolation = false;
 	LuaValue controls;
 	private boolean isDrawing = false;
-	Color color = Color.BLACK;
+	Color color = Color.BLACK.copy();
 	
 	public Hud2DItem() {
 		this.controls = new LuaTable();
