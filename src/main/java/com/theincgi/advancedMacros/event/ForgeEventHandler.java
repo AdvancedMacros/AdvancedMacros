@@ -27,6 +27,7 @@ import org.luaj.vm2_v3_0_1.lib.jse.LuajavaLib;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Gui;
@@ -99,6 +100,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import scala.reflect.internal.Trees.New;
 
 public class ForgeEventHandler {
 	ConcurrentHashMap<Integer, Boolean> heldKeys = new ConcurrentHashMap<>(10);
@@ -907,11 +909,19 @@ public class ForgeEventHandler {
 	
 	}
 
+	
+	private static Object messageCounterLock = new Object();
+	private static long messageIndex = 0;
+	private static long nextMessageToAddToChat = 0;
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onChat(final ClientChatReceivedEvent sEvent){//TODO out going chat msg filter
 		final ClientChatReceivedEvent event = sEvent; //arg not final because it's acquired thru reflection
+		final long thisMessageIndex;
+		synchronized (messageCounterLock) {
+			thisMessageIndex = messageIndex++;
+		}
 		
-		
+		System.out.println("Got " + event.getMessage().getUnformattedText() + " as " + thisMessageIndex);
 		
 		JavaThread t = new JavaThread(()->{
 
@@ -964,17 +974,36 @@ public class ForgeEventHandler {
 				for(int i = 1; i<=Math.max(toUnpack.length(), 2); i++)
 					e2.set(3+i, toUnpack.get(i));
 			}
+			
+			
+			LuaValue timeoutProp = Settings.settings.get("chatFilterTimeout");
+			if(timeoutProp.isnil())
+				Settings.settings.set("chatFilterTimeout", 3000);
+			long timeout = System.currentTimeMillis() + timeoutProp.optlong(3000);
+			while(true) {
+				long current;
+				synchronized (messageCounterLock) {
+					if(nextMessageToAddToChat >= thisMessageIndex)
+						break;
+				}
+				if(System.currentTimeMillis() >= timeout)
+					break;
+				try {Thread.sleep(50);}catch(Exception ex) {}
+			}
+			
+			System.out.println("Adding msg "+thisMessageIndex);
 			if(e2.get(3).toboolean()) {
 				//AdvancedMacros.logFunc.invoke(e2.unpack().subargs(3));
 				Pair<ITextComponent, Varargs> text = Utils.toTextComponent(e2.unpack().arg(3).checkjstring(), e2.unpack().subargs(4), true);
 				ClientChatReceivedEvent ccre = new ClientChatReceivedEvent(sEvent.getType(), text.a);
 				repostForgeEvent(ccre);
-
 			}
-
 			fireEvent(EventName.Chat, e);
+			synchronized (messageCounterLock) {
+				nextMessageToAddToChat = Math.max(thisMessageIndex+1, nextMessageToAddToChat);
+			}
 		});
-		t.start();
+		t.start(); 
 
 		//		event.setCanceled(event.isCancelable() && eventExists(EventName.ChatFilter));
 		//		//		OnScriptFinish afterFormating = new OnScriptFinish() {

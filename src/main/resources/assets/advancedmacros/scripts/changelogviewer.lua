@@ -17,7 +17,19 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
-  " - &aBug fix:",
+  " - &aBug Fix:",
+  "  - Fixed an issue where the chat filter was causing messages to show up",
+  "    in the incorrect order.",
+  "    As a side effect of this fix ChatFilters taking longer than 3 seconds are",
+  "    not guaranteed to be in order (to make sure other messages still get through)",
+  "    The timeout value is configurable with &bgetSettings&f()&b.chatFilterTimeout",
+  "    &7(measured in milliseconds)",
+    
+    "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 7.7.4",
+  
+  " - &aBug Fix:",
   "   - &ahud3D&f elements were using the same default color",
   "     causing opacity to change for all elements with the default color",
   "   - &ahud2D&f text's opacity now transitions smoothly",
