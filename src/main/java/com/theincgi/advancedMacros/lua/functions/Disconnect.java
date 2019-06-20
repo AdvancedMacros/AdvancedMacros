@@ -28,7 +28,7 @@ public class Disconnect extends CallableTable {
 	public static void disconnect() { //FIXME
 		Minecraft mc = AdvancedMacros.getMinecraft();
 		Utils.runOnMCAndWait(()->{
-			if(mc.world != null && !mc.world.isRemote)
+			if(mc.world != null)
 				mc.world.sendQuittingDisconnectingPacket();
 			mc.loadWorld(null);
 			mc.displayGuiScreen(new GuiMainMenu());
