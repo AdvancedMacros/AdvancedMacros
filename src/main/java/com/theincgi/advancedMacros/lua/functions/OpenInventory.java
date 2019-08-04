@@ -256,11 +256,17 @@ public class OpenInventory extends ZeroArgFunction{
 		chest.set("contents", quickTable(1, 27));
 		chest.set("main", quickTable(28, 54));
 		chest.set("hotbar", quickTable(55, 63));
+		
+		LuaTable doubleChest = new LuaTable();
+		mapping.set("double chest", doubleChest);
+		doubleChest.set("contents", quickTable(1, 54));
+		doubleChest.set("main", quickTable(55, 81));
+		doubleChest.set("hotbar", quickTable(55,  63));
 
 		LuaTable craft = new LuaTable();
 		mapping.set("crafting table", craft);
 		craft.set("craftingIn", quickTable(2, 10));
-		craft.set("craftOut", 0);
+		craft.set("craftOut", 1);
 		craft.set("main", quickTable(11, 37));
 		craft.set("hotbar", quickTable(38, 46));
 

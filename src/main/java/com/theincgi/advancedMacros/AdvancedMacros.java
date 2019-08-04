@@ -54,6 +54,7 @@ import com.theincgi.advancedMacros.lua.functions.GetPlayerPos;
 import com.theincgi.advancedMacros.lua.functions.GetProfile;
 import com.theincgi.advancedMacros.lua.functions.GetRecipe;
 import com.theincgi.advancedMacros.lua.functions.GetScreen;
+import com.theincgi.advancedMacros.lua.functions.GetSound;
 import com.theincgi.advancedMacros.lua.functions.GetTextureList;
 import com.theincgi.advancedMacros.lua.functions.GetWorld;
 import com.theincgi.advancedMacros.lua.functions.HTTP;
@@ -116,7 +117,7 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "7.7.5"; //${version} ??
+	public static final String VERSION = "7.7.7"; //${version} ??
 
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
@@ -329,6 +330,7 @@ public class AdvancedMacros {
 		globals.set("getBiome", new GetBiome());
 
 		globals.set("playSound", new PlaySound.FromFile());
+		globals.set("getSound", new GetSound());
 		globals.set("midi", new MidiLib2());
 		globals.set("customizeSkin", new SkinCustomizer());
 		

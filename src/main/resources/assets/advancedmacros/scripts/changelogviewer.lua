@@ -17,6 +17,22 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  "&aBug Fix:",
+  " - &bgetSound&f was missing from the globals table since 7.3.0!"
+  
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 7.7.6",
+  " - &aBug Fix:",
+  " - &aBug Fix:",
+  "  - Fixed mapping for crafting tables output slot",
+  "  - Added missing mapping for &edouble chest",
+  
+      
+    "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 7.7.5",
   " - &aBug Fix:",
   "  - Fixed an issue where the chat filter was causing messages to show up",
   "    in the incorrect order.",
