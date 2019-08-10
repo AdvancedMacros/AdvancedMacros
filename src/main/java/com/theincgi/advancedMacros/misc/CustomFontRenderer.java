@@ -1,5 +1,6 @@
 package com.theincgi.advancedMacros.misc;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
@@ -7,7 +8,6 @@ import com.theincgi.advancedMacros.misc.Matrix.Axis;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
@@ -188,7 +188,7 @@ public class CustomFontRenderer {
 		}
 	}
 	private void setColor(Color color, float opaicty) {
-		GlStateManager.color(color.getR()/255f, color.getG()/255f, color.getB()/255f, opaicty);
+		GlStateManager.color4f(color.getR()/255f, color.getG()/255f, color.getB()/255f, opaicty);
 	}
 	public void renderText(double x, double y, float z, String text, float opacity, float textSize2d) {
 		boolean bold = false, italics = false;

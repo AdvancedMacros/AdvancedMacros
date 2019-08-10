@@ -7,15 +7,12 @@ import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.lwjgl.opengl.GL11;
 
-import com.theincgi.advancedMacros.AdvancedMacros;
-import com.theincgi.advancedMacros.gui.Color;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.CullFace;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
-import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.GlStateManager.CullFace;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
@@ -77,22 +74,22 @@ public class Hud3DElement extends WorldHudItem{
 		try {
 			GlStateManager.pushMatrix();
 			//GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
-			GlStateManager.translate(-playerX, -playerY, -playerZ);
-			GlStateManager.translate(x, y, z);
+			GlStateManager.translated(-playerX, -playerY, -playerZ);
+			GlStateManager.translatef(x, y, z);
 
-			GlStateManager.rotate(roll, 0, 0, 1);
-			GlStateManager.rotate(pitch, 1, 0, 0);
-			GlStateManager.rotate(yaw, 0, 1, 0);
+			GlStateManager.rotatef(roll, 0, 0, 1);
+			GlStateManager.rotatef(pitch, 1, 0, 0);
+			GlStateManager.rotatef(yaw, 0, 1, 0);
 
 
-			GlStateManager.translate(-x, -y, -z);
-			GlStateManager.translate(playerX, playerY, playerZ);
+			GlStateManager.translatef(-x, -y, -z);
+			GlStateManager.translated(playerX, playerY, playerZ);
 
 			LuaTable data = getControls().get("data").checktable();
 
 			GlStateManager.enableBlend();
-			GlStateManager.enableAlpha();
-			GlStateManager.enableDepth();
+			GlStateManager.enableAlphaTest();
+			GlStateManager.enableDepthTest();
 
 			LuaValue cullMode = data.get("cullFace");
 			if(cullMode.isnil() || cullMode.isboolean() && !cullMode.checkboolean()) {
@@ -167,10 +164,10 @@ public class Hud3DElement extends WorldHudItem{
 					VertexFormat type = DefaultVertexFormats.POSITION;
 					if(useTexture) {
 						texture.bindTexture();
-						GlStateManager.enableTexture2D();
+						GlStateManager.enableTexture();
 						type = DefaultVertexFormats.POSITION_TEX;
 					}else {
-						GlStateManager.disableTexture2D();
+						GlStateManager.disableTexture();
 					}
 
 					int gLMode = 	mode.equals("strip"		)? GL11.GL_TRIANGLE_STRIP :

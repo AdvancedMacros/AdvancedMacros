@@ -4,7 +4,7 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 
 public class Hud2D_Box extends Hud2D_Rectangle {
 	float thickness = 1, lastThickness = 1;
@@ -29,7 +29,7 @@ public class Hud2D_Box extends Hud2D_Rectangle {
 	@Override
 	public void render(float partialTicks) {
 		GlStateManager.pushMatrix();
-		GlStateManager.pushAttrib();
+		GlStateManager.pushTextureAttributes();
 		applyTransformation();
 		float dx = 0, dy = 0, dw = wid, dh = hei;
 		if(allowFrameInterpolation) {
@@ -44,7 +44,7 @@ public class Hud2D_Box extends Hud2D_Rectangle {
 		drawRectangle(dx+dw-1, 	dy, 	thickness, 	dh, 		color, z);
 		drawRectangle(dx, 		dy+dh-1, 	dw, 	thickness, 	color, z);
 		
-		GlStateManager.popAttrib();
+		GlStateManager.popAttributes();
 		GlStateManager.popMatrix();
 	}
 	

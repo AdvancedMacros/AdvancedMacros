@@ -7,7 +7,6 @@ import org.luaj.vm2_v3_0_1.lib.ThreeArgFunction;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.event.ForgeEventHandler.RenderFlags;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 
 public class HighlightEntity extends ThreeArgFunction{

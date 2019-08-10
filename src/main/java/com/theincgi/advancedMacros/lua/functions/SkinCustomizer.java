@@ -6,9 +6,8 @@ import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.entity.player.EnumPlayerModelParts;
+import net.minecraft.client.GameSettings;
+import net.minecraft.entity.player.PlayerModelPart;
 
 public class SkinCustomizer extends TwoArgFunction{
 	@Override
@@ -17,26 +16,26 @@ public class SkinCustomizer extends TwoArgFunction{
 		switch (arg0.checkjstring()) {
 		case "hat":
 		case "helmet":
-			set.setModelPartEnabled(EnumPlayerModelParts.HAT, arg1.checkboolean());
+			set.setModelPartEnabled(PlayerModelPart.HAT, arg1.checkboolean());
 			break;
 		case "jacket":
 		case "chest":
-			set.setModelPartEnabled(EnumPlayerModelParts.JACKET, arg1.checkboolean());
+			set.setModelPartEnabled(PlayerModelPart.JACKET, arg1.checkboolean());
 			break;
 		case "left leg":
-			set.setModelPartEnabled(EnumPlayerModelParts.LEFT_PANTS_LEG, arg1.checkboolean());
+			set.setModelPartEnabled(PlayerModelPart.LEFT_PANTS_LEG, arg1.checkboolean());
 			break;
 		case "right leg":
-			set.setModelPartEnabled(EnumPlayerModelParts.RIGHT_PANTS_LEG, arg1.checkboolean());
+			set.setModelPartEnabled(PlayerModelPart.RIGHT_PANTS_LEG, arg1.checkboolean());
 			break;
 		case "left arm":
-			set.setModelPartEnabled(EnumPlayerModelParts.LEFT_SLEEVE, arg1.checkboolean());
+			set.setModelPartEnabled(PlayerModelPart.LEFT_SLEEVE, arg1.checkboolean());
 			break;
 		case "right arm":
-			set.setModelPartEnabled(EnumPlayerModelParts.RIGHT_SLEEVE, arg1.checkboolean());
+			set.setModelPartEnabled(PlayerModelPart.RIGHT_SLEEVE, arg1.checkboolean());
 			break;
 		case "cape":
-			set.setModelPartEnabled(EnumPlayerModelParts.CAPE, arg1.checkboolean());
+			set.setModelPartEnabled(PlayerModelPart.CAPE, arg1.checkboolean());
 			break;
 
 		default:

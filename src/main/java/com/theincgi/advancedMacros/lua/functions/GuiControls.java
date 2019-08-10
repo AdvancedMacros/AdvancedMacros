@@ -15,78 +15,82 @@ import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Utils;
 
-import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiCommandBlock;
-import net.minecraft.client.gui.GuiEnchantment;
-import net.minecraft.client.gui.GuiMerchant;
-import net.minecraft.client.gui.GuiRepair;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiScreenBook;
-import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.gui.inventory.GuiChest;
-import net.minecraft.client.gui.inventory.GuiEditSign;
+import net.minecraft.client.gui.screen.AbstractCommandBlockScreen;
+import net.minecraft.client.gui.screen.CommandBlockScreen;
+import net.minecraft.client.gui.screen.EditBookScreen;
+import net.minecraft.client.gui.screen.EditSignScreen;
+import net.minecraft.client.gui.screen.EnchantmentScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.inventory.AnvilScreen;
+import net.minecraft.client.gui.screen.inventory.ChestScreen;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.screen.inventory.MerchantScreen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.inventory.ContainerEnchantment;
-import net.minecraft.inventory.ContainerRepair;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.client.CPacketCustomPayload;
-import net.minecraft.tileentity.CommandBlockBaseLogic;
-import net.minecraft.tileentity.TileEntityCommandBlock;
-import net.minecraft.tileentity.TileEntitySign;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.EnchantmentContainer;
+import net.minecraft.inventory.container.RepairContainer;
+import net.minecraft.item.MerchantOffer;
+import net.minecraft.item.MerchantOffers;
+import net.minecraft.tileentity.CommandBlockLogic;
+import net.minecraft.tileentity.CommandBlockTileEntity;
+import net.minecraft.tileentity.SignTileEntity;
+import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.village.MerchantRecipe;
-import net.minecraft.village.MerchantRecipeList;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class GuiControls {
 
 
 
-	public static LuaValue load(Gui gCon) {
+	public static LuaValue load(Screen gCon) {
 		LuaTable controls = new LuaTable();
-		if(gCon instanceof GuiRepair) {
-			GuiRepair gr = (GuiRepair) gCon;
+		if(gCon instanceof AnvilScreen) {
+			AnvilScreen gr = (AnvilScreen) gCon;
 			for (RepairOp r : RepairOp.values()) {
 				controls.set(r.name(), new CallableTable(r.getDocLocation(), new DoRepair(r, gr)));
 			}
-		}else if(gCon instanceof GuiMerchant) {
-			GuiMerchant gm = (GuiMerchant) gCon;
+		}else if(gCon instanceof MerchantScreen) {
+			MerchantScreen gm = (MerchantScreen) gCon;
 			for (TradeOp r : TradeOp.values()) {
 				controls.set(r.name(), new CallableTable(r.getDocLocation(), new DoTrade(r, gm)));
 			}
 
-		}else if(gCon instanceof GuiEnchantment) {
-			GuiEnchantment ge = (GuiEnchantment) gCon;
+		}else if(gCon instanceof EnchantmentScreen) {
+			EnchantmentScreen ge = (EnchantmentScreen) gCon;
 			for (EnchantOp r : EnchantOp.values()) {
 				controls.set(r.name(), new CallableTable(r.getDocLocation(), new DoEnchant(r, ge)));
 			}
-		}else if(gCon instanceof GuiEditSign) {
-			GuiEditSign es = (GuiEditSign) gCon;
+		}else if(gCon instanceof EditSignScreen) {
+			EditSignScreen es = (EditSignScreen) gCon;
 			for (SignOp r : SignOp.values()) {
 				controls.set(r.name(), new CallableTable(r.getDocLocation(), new DoSign(r, es)));
 			}
-		}else if(gCon instanceof GuiScreenBook) {
-			GuiScreenBook bk = (GuiScreenBook) gCon;
+		}else if(gCon instanceof EditBookScreen) {
+			EditBookScreen bk = (EditBookScreen) gCon;
 			for (BookOp r : BookOp.values()) {
 				controls.set(r.name(), new CallableTable(r.getDocLocation(), new DoBook(r, bk)));
-			}
-		}else if(gCon instanceof GuiCommandBlock) {
-			GuiCommandBlock cb = (GuiCommandBlock) gCon;
+			} 
+			//TODO read book screen thing
+		}else if(gCon instanceof CommandBlockScreen) {
+			CommandBlockScreen cb = (CommandBlockScreen) gCon;
 			for (CommandOp r : CommandOp.values()) {
 				controls.set(r.name(), new CallableTable(r.getDocLocation(), new DoCommand(r, cb)));
 			}
-		}else if(gCon instanceof GuiChest) {
-			GuiChest gc = (GuiChest) gCon;
+		}else if(gCon instanceof ChestScreen) {
+			ChestScreen gc = (ChestScreen) gCon;
 			for(ChestOp op : ChestOp.values()) {
 				controls.set(op.name(), new CallableTable(op.getDocLocation(), new DoChestOp(op, gc)));
 			}
-		}
-		Gui whenOpened = gCon;
+		}//else if(gCon instanceof ReadBookScreen) {
+//			ReadBookScreen rbs = (ReadBookScreen) gCon;
+//			for(ReadBookOp op : ReadBookOp.values()) {
+//				controls.set(op.name(),  new CallableTable(op.getDocLocation(), new DoReadBook(op, rbs)));
+//			}
+//		}
+		Screen whenOpened = gCon;
 		controls.set("isOpen", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
@@ -107,12 +111,13 @@ public class GuiControls {
 
 	private static class DoRepair extends VarArgFunction {
 		RepairOp op;
-		GuiRepair gr;
-		Method renameItem = ReflectionHelper.findMethod(GuiRepair.class, "renameItem", "func_147090_g", new Class[] {});
-
-		Field anvil = ReflectionHelper.findField(GuiRepair.class, "anvil", "w", "field_147092_v");
-		Field nameField = ReflectionHelper.findField(GuiRepair.class, "nameField", "x", "field_147091_w");
-		public DoRepair(RepairOp op, GuiRepair gr) {
+		AnvilScreen gr;
+		Method renameItem = ObfuscationReflectionHelper.findMethod(AnvilScreen.class, /*"renameItem",*/ "func_214075_a", new Class[] {}); //TESTME is this the right func? should be
+		
+		//Field anvil = ReflectionHelper.findField(AnvilScreen.class, "anvil", "w", "field_147092_v");
+		Field nameField = ObfuscationReflectionHelper.findField(AnvilScreen.class, "field_147091_w");
+		Field maxCost   = ObfuscationReflectionHelper.findField(RepairContainer.class, "field_82854_e");
+		public DoRepair(RepairOp op, AnvilScreen gr) {
 			super();
 			this.op = op;
 			this.gr = gr;
@@ -123,9 +128,9 @@ public class GuiControls {
 			switch (op) {
 			case getCost:{
 				try {
-					anvil.setAccessible(true);
-					ContainerRepair cr = (ContainerRepair) anvil.get(gr);
-					return valueOf(cr.maximumCost);
+					maxCost.setAccessible(true);
+					RepairContainer cr = (RepairContainer) gr.getContainer();// anvil.get(gr);
+					return valueOf(((IntReferenceHolder)maxCost.get(cr)).get());
 				} catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
 					throw new LuaError(e);
 				}
@@ -133,7 +138,7 @@ public class GuiControls {
 			case getName:
 				try {
 					nameField.setAccessible(true);
-					GuiTextField gtf = (GuiTextField) nameField.get(gr);
+					TextFieldWidget gtf = (TextFieldWidget) nameField.get(gr);
 					return valueOf(gtf.getText());
 				} catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
 					throw new LuaError(e);
@@ -141,7 +146,7 @@ public class GuiControls {
 			case setName:
 				try {
 					nameField.setAccessible(true);
-					GuiTextField gtf = (GuiTextField) nameField.get(gr);
+					TextFieldWidget gtf = (TextFieldWidget) nameField.get(gr);
 					gtf.setText(args.arg1().checkjstring());
 					renameItem.invoke(gr, new Object[] {});
 					return NONE;
@@ -155,8 +160,8 @@ public class GuiControls {
 	} 
 	private static class DoTrade extends VarArgFunction {
 		TradeOp op;
-		GuiMerchant gm;
-		public DoTrade(TradeOp op, GuiMerchant gm) {
+		MerchantScreen gm;
+		public DoTrade(TradeOp op, MerchantScreen gm) {
 			super();
 			this.op = op;
 			this.gm = gm;
@@ -166,22 +171,22 @@ public class GuiControls {
 			switch (op) {
 			case getTrades:{
 				LuaTable trades = new LuaTable();
-				MerchantRecipeList mrl = gm.getMerchant().getRecipes(AdvancedMacros.getMinecraft().player);
-				for(int i = 0; i<mrl.size(); i++) {
-					MerchantRecipe mr = mrl.get(i);
+				MerchantOffers offers = gm.getContainer().func_217051_h();
+				for(int i = 0; i<offers.size(); i++) {
+					MerchantOffer mr = offers.get(i);
 					LuaTable t = new LuaTable();
 					LuaTable inputs = new LuaTable();
 					t.set("input", inputs);
-					inputs.set(1,   Utils.itemStackToLuatable(mr.getItemToBuy()       ));
-					inputs.set(2,   Utils.itemStackToLuatable(mr.getSecondItemToBuy() ));
-					t.set("output", Utils.itemStackToLuatable(mr.getItemToSell()      ));
-					t.set("isEnabled", !mr.isRecipeDisabled());
+					inputs.set(1,   Utils.itemStackToLuatable(mr.func_222218_a()       	)); //first stack
+					inputs.set(2,   Utils.itemStackToLuatable(mr.func_222202_c() 		)); //second stack
+					t.set("output", Utils.itemStackToLuatable(mr.func_222200_d()      	)); //item sold
+					t.set("uses", mr.func_222213_g() 									 ); //uses remaining
 					trades.set(i+1, t);
 				}
 				return trades;
 			}
 			case getType:
-				return valueOf(gm.getMerchant().getDisplayName().getUnformattedText());
+				return valueOf(gm.getTitle().getUnformattedComponentText());
 			default:
 				throw new LuaError("Unimplemented function '"+op.name()+"'");
 			}
@@ -189,19 +194,16 @@ public class GuiControls {
 	}
 	private static class DoEnchant extends VarArgFunction {
 		EnchantOp op;
-		GuiEnchantment ge;
-		Field container = ReflectionHelper.findField(GuiEnchantment.class, "container", "H", "field_147075_G");
+		EnchantmentScreen ge;
 
-		public DoEnchant(EnchantOp op, GuiEnchantment ge) {
+		public DoEnchant(EnchantOp op, EnchantmentScreen ge) {
 			super();
 			this.op = op;
 			this.ge = ge;
 		}
 		@Override
 		public Varargs invoke(Varargs args) {
-			try {
-				container.setAccessible(true);
-				ContainerEnchantment ce = (ContainerEnchantment) container.get(ge);
+				EnchantmentContainer ce = ge.getContainer();
 				switch (op) {
 				case getOptions:{
 					LuaTable out = new LuaTable();
@@ -225,17 +227,14 @@ public class GuiControls {
 				default:
 					throw new LuaError("Unimplemented function '"+op.name()+"'");
 				}
-			} catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
-				throw new LuaError(e);
-			}
 		}
 	}
 	private static class DoSign extends VarArgFunction {
 		SignOp op;
-		GuiEditSign es;
-		Field tileSign = ReflectionHelper.findField(GuiEditSign.class, "tileSign", "a", "field_146848_f");
+		EditSignScreen es;
+		Field tileSign = ObfuscationReflectionHelper.findField(EditSignScreen.class, "field_146848_f");
 
-		public DoSign(SignOp op, GuiEditSign es) {
+		public DoSign(SignOp op, EditSignScreen es) {
 			super();
 			this.op = op;
 			this.es = es;
@@ -243,7 +242,7 @@ public class GuiControls {
 		@Override
 		public Varargs invoke(Varargs args) {
 			try {
-				TileEntitySign ts = (TileEntitySign) tileSign.get(es);
+				SignTileEntity ts = (SignTileEntity) tileSign.get(es);
 				switch (op) {
 				case getLines:{
 					LuaTable lines = new LuaTable();
@@ -260,12 +259,12 @@ public class GuiControls {
 				//					return lines;
 				//				}
 				case done:
-					if(es.mc==null) es.mc = AdvancedMacros.getMinecraft();
+					//TESTME es.mc is gone! prob ok tho if(es.mc==null) es.mc = AdvancedMacros.getMinecraft();
 					ts.markDirty();
 					AdvancedMacros.getMinecraft().displayGuiScreen(null);
 					return NONE;
 				case setLine:
-					ts.signText[args.checkint(1)] = new TextComponentString(args.optjstring(2, ""));
+					ts.signText[args.checkint(1)] = new StringTextComponent(args.optjstring(2, ""));
 					return NONE;
 					//				case setFormatedLine:
 					//					ts.signText[args.checkint(1)] = new TextComponentString(Utils.toMinecraftColorCodes(args.checkjstring(2)));
@@ -275,11 +274,11 @@ public class GuiControls {
 					if(args.arg1().istable()) {
 						LuaTable t = args.checktable(1);
 						for(int i=1; i<=ts.signText.length; i++) {
-							ts.signText[i-1] = new TextComponentString(t.get(i).optjstring(""));
+							ts.signText[i-1] = new StringTextComponent(t.get(i).optjstring(""));
 						}
 					}else {
 						for(int i = 1; i<=ts.signText.length; i++)
-							ts.signText[i-1] = new TextComponentString(args.optjstring(i, ""));
+							ts.signText[i-1] = new StringTextComponent(args.optjstring(i, ""));
 					}
 					return NONE;
 				}
@@ -293,26 +292,69 @@ public class GuiControls {
 			}
 		}
 	}
+	//nbt is good enough for now
+//	private static class DoReadBook extends VarArgFunction {
+//		ReadBookOp op;
+//		ReadBookScreen rbs;
+//		public DoReadBook(ReadBookOp op, ReadBookScreen rbs) {
+//			this.op = op;
+//			this.rbs = rbs;
+//		}
+//		
+//		@Override
+//		public Varargs invoke() {
+//			switch (op) {
+//			case currentPage:
+//				
+//			case getAuthor:
+//			case getText:
+//			case getTitle:
+//			case gotoPage:
+//			case pageCount:
+//			default:
+//				break;
+//			}
+//		}
+//	}
+	
+	//TODO readbookscreen
 	private static class DoBook extends VarArgFunction {
 		BookOp op;
-		GuiScreenBook book;
+		EditBookScreen book;
 		Method insert;
 		Method setTxt;
 		Method getTxt;
 		Method updateButtons;
 		Method sendBook;
 		Method addPage;
-
-		Field  pages     = ReflectionHelper.findField(GuiScreenBook.class, "bookTotalPages", "x", "field_146476_w");
-		Field  currPage  = ReflectionHelper.findField(GuiScreenBook.class, "currPage",       "y", "field_146484_x");
-		Field  isMod     = ReflectionHelper.findField(GuiScreenBook.class, "bookIsModified", "s", "field_146481_r");
-		Field  isUnsigned= ReflectionHelper.findField(GuiScreenBook.class, "bookIsUnsigned", "i", "field_146475_i");
-		Field  bookTitle = ReflectionHelper.findField(GuiScreenBook.class, "bookTitle",      "A", "field_146482_z");
-		Field  bookObj   = ReflectionHelper.findField(GuiScreenBook.class, "book",           "h", "field_146474_h");
+		Method getPageCount;
+		
+		Field  currPage  = ObfuscationReflectionHelper.findField(EditBookScreen.class, "field_214237_f");//"currPage",       "y", "field_146484_x");
+		Field  isMod     = ObfuscationReflectionHelper.findField(EditBookScreen.class, "field_214234_c");//"bookIsModified", "s", "field_146481_r");
+		//true because ReadBookScreen is for signed now //Field  isUnsigned= ObfuscationReflectionHelper.findField(EditBookScreen.class, "bookIsUnsigned", "i", "field_146475_i");
+		Field  bookTitle = ObfuscationReflectionHelper.findField(EditBookScreen.class, "field_214239_h");//"bookTitle",      "A", "field_146482_z");
+		Field  bookObj   = ObfuscationReflectionHelper.findField(EditBookScreen.class, "field_214233_b");//"book",           "h", "field_146474_h");
+		
+		//title
+		//sign
+		//save
+		//setText
+		//getText
+		//updateButtons
+		//addPage
+		//currentPage
+		//numPages
+		//isMod aka is dirty
+		
+		
+		//setPages
+		//getPages
+		
+		
 		//		Field  gettingSigned = 
 		//				           ReflectionHelper.findField(GuiScreenBook.class, "bookGettingSigned", "t", "field_146480_s");
 
-		public DoBook(BookOp op, GuiScreenBook book) {
+		public DoBook(BookOp op, EditBookScreen book) {
 			super();
 			//System.out.println(Arrays.toString(GuiScreenBook.class.getDeclaredMethods()));
 			//System.out.println(Arrays.toString(GuiScreenBook.class.getMethods()));
@@ -326,21 +368,22 @@ public class GuiControls {
 			sendBook.setAccessible(true);
 			addPage.setAccessible(true);
 
-			pages.setAccessible(true);
+			getPageCount.setAccessible(true);
 			currPage.setAccessible(true);
 			isMod.setAccessible(true);
-			isUnsigned.setAccessible(true);
+			//isUnsigned.setAccessible(true);
 			bookTitle.setAccessible(true);
 			//			gettingSigned.setAccessible(true);
 		}
 		private void loadReflects() {
-			insert = ReflectionHelper.findMethod(GuiScreenBook.class, "pageInsertIntoCurrent", 		"func_146459_b", String.class);
-			setTxt = ReflectionHelper.findMethod(GuiScreenBook.class, "pageSetCurrent", 		  	"func_146457_a", String.class);
-			getTxt = ReflectionHelper.findMethod(GuiScreenBook.class, "pageGetCurrent", 		  	"func_146456_p");
+			getPageCount 	= ObfuscationReflectionHelper.findMethod(EditBookScreen.class, "func_214199_a");  // formerly: "bookTotalPages", "x", "field_146476_w");
+			//insert 			= ObfuscationReflectionHelper.findMethod(EditBookScreen.class, "pageInsertIntoCurrent", 		"func_146459_b", String.class);
+			setTxt 			= ObfuscationReflectionHelper.findMethod(EditBookScreen.class, "func_214217_j");//"pageSetCurrent", 		  	"func_146457_a", String.class);
+			getTxt 			= ObfuscationReflectionHelper.findMethod(EditBookScreen.class, "func_214193_h");//"pageGetCurrent", 		  	"func_146456_p");
 			updateButtons = 
-					ReflectionHelper.findMethod(GuiScreenBook.class, "updateButtons", 				"func_146464_h");
-			sendBook=ReflectionHelper.findMethod(GuiScreenBook.class, "sendBookToServer", 			"func_146462_a", boolean.class);
-			addPage =ReflectionHelper.findMethod(GuiScreenBook.class, "addNewPage", 				"func_146461_i");
+					 ObfuscationReflectionHelper.findMethod(EditBookScreen.class, "func_214229_d");//"updateButtons", 				"func_146464_h");
+			sendBook=ObfuscationReflectionHelper.findMethod(EditBookScreen.class, "func_214198_a");//"sendBookToServer", 			"func_146462_a", boolean.class);
+			addPage =ObfuscationReflectionHelper.findMethod(EditBookScreen.class, "func_214215_f");//"addNewPage", 				"func_146461_i");
 		}
 		private void markDirty() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 			isMod.set(book, true);
@@ -348,7 +391,7 @@ public class GuiControls {
 		}
 		@Override
 		public Varargs invoke(Varargs args) {
-			try {
+			try { //WrittenBookItem; ClientPlayerEntity
 				switch (op) {
 				case sign:
 					String newTitle = args.checkjstring(1);
@@ -361,11 +404,11 @@ public class GuiControls {
 				case save:
 					sendBook.invoke(book, false);
 					break;
-				case getTitle:
-					return valueOf((String)bookTitle.get(book));
+//				case getTitle:
+//					return valueOf((String)bookTitle.get(book));
 
 				case isSigned:
-					return valueOf(!isUnsigned.getBoolean(book));
+					return FALSE;
 
 				case getText:
 					return LuaValue.valueOf((String)getTxt.invoke(book));
@@ -373,14 +416,15 @@ public class GuiControls {
 				case setText:
 					setTxt.invoke(book, "");
 					System.out.println(insert.getParameterTypes());
-					insert.invoke(book, args.checkjstring(1));
+					insert.invoke(book, args.checkjstring(1));      //insert is used to trim the text in a lazy way, setText doesnt
 					markDirty();
 					return NONE;
 
 				case getPages:{
 					int p = currPage.getInt(book);
 					LuaTable out = new LuaTable();
-					for(int i =0; i<pages.getInt(book); i++) {
+					int pages = (int) getPageCount.invoke(book);
+					for(int i =0; i<pages; i++) {
 						currPage.setInt(book, i);
 						out.set(i+1, (String)getTxt.invoke(book));
 					}
@@ -394,13 +438,13 @@ public class GuiControls {
 					for(int i =0; i< in.length(); i++) {
 						if(i>0) {
 							int cP = currPage.getInt(book);
-							int tP = pages.getInt(book);
+							int tP = (int) getPageCount.invoke(book);
 							if(cP < tP -1) {
 								currPage.set(book, cP+1);
-							}else if(isUnsigned.getBoolean(book)) {
+							}else{
 								addPage.invoke(book);
 								cP = currPage.getInt(book);
-								tP = pages.getInt(book);
+								tP = (int) getPageCount.invoke(book);
 								if(cP < tP -1) 
 									currPage.set(book, cP+1);
 								else
@@ -415,19 +459,19 @@ public class GuiControls {
 					return NONE;
 				}
 				case addPage:{
-					int old = pages.getInt(book);
+					int old = (int) getPageCount.invoke(book);
 					addPage.invoke(book);
-					return valueOf(pages.getInt(book) != old);
+					return valueOf((int) getPageCount.invoke(book) != old);
 				}
 				case nextPage:{
 					int cP = currPage.getInt(book);
-					int tP = pages.getInt(book);
+					int tP = (int) getPageCount.invoke(book);
 					if(cP < tP -1) {
 						currPage.set(book, cP+1);
-					}else if(isUnsigned.getBoolean(book)) {
+					}else {
 						addPage.invoke(book);
 						cP = currPage.getInt(book);
-						tP = pages.getInt(book);
+						tP = (int) getPageCount.invoke(book);
 						if(cP < tP -1) 
 							currPage.set(book, cP+1);
 						else
@@ -437,7 +481,7 @@ public class GuiControls {
 				}
 				case prevPage:{
 					int cP = currPage.getInt(book);
-					int tP = pages.getInt(book);
+					int tP = (int) getPageCount.invoke(book);
 					if(cP > 0)
 						currPage.setInt(book, cP-1);
 					else
@@ -448,15 +492,11 @@ public class GuiControls {
 					return valueOf(currPage.getInt(book)+1);
 				}
 				case gotoPage:{
-					currPage.setInt(book, Math.min(Math.max(0, args.checkint(1)-1), pages.getInt(book)));
+					currPage.setInt(book, Math.min(Math.max(0, args.checkint(1)-1), (int) getPageCount.invoke(book)));
 					return NONE;
 				}
 				case pageCount:{
-					return valueOf(pages.getInt(book));
-				}
-				case getAuthor:{
-					ItemStack bookData = (ItemStack) bookObj.get(book);
-					return valueOf(bookData.getTagCompound().getString("author"));
+					return valueOf((int) getPageCount.invoke(book));
 				}
 				default:
 					throw new LuaError("Unimplemented function '"+op.name()+"'");
@@ -469,23 +509,26 @@ public class GuiControls {
 	}
 	private static class DoCommand extends VarArgFunction {
 		CommandOp op;
-		GuiCommandBlock cb;
-		Field tecb = ReflectionHelper.findField(GuiCommandBlock.class, "commandBlock",     "g", "field_184078_g");
-		Field tf   = ReflectionHelper.findField(GuiCommandBlock.class, "commandTextField", "a", "field_146485_f");
-		Field conditional = ReflectionHelper.findField(GuiCommandBlock.class, "conditional", "z", "field_184084_y");
-		Field automatic   = ReflectionHelper.findField(GuiCommandBlock.class, "automatic", "A", "field_184085_z");
-		Field mode        = ReflectionHelper.findField(GuiCommandBlock.class, "commandBlockMode", "x", "field_184082_w");
-		Field output      = ReflectionHelper.findField(GuiCommandBlock.class, "previousOutputTextField", "f", "field_146486_g");
-		Field track       = ReflectionHelper.findField(GuiCommandBlock.class, "trackOutput", "w", "field_175389_t");
+		CommandBlockScreen cb;
+		Field tecb = ObfuscationReflectionHelper.findField(CommandBlockScreen.class, "field_184078_g");
+		Field tf   = ObfuscationReflectionHelper.findField(AbstractCommandBlockScreen.class, "field_195237_a");
+		Field conditional = ObfuscationReflectionHelper.findField(CommandBlockScreen.class, "field_184084_y");
+		Field automatic   = ObfuscationReflectionHelper.findField(CommandBlockScreen.class, "field_184085_z");
+		Field mode        = ObfuscationReflectionHelper.findField(CommandBlockScreen.class, "field_184082_w");
+		Field output      = ObfuscationReflectionHelper.findField(AbstractCommandBlockScreen.class, "field_195239_f");
+		Field track       = ObfuscationReflectionHelper.findField(CommandBlockScreen.class, "field_195242_i");
+		
+		Method sendUpdatePacket;
 
-		Method updateMode = ReflectionHelper.findMethod(GuiCommandBlock.class, "updateMode", "func_184073_g");
-		//Method updateGui = ReflectionHelper.findMethod(GuiCommandBlock.class, "updateGui", "a");
-		Method updateTrack=ReflectionHelper.findMethod(GuiCommandBlock.class, "updateCmdOutput", "func_175388_a");
-		Method updateConditional=
-				ReflectionHelper.findMethod(GuiCommandBlock.class, "updateConditional", "func_184077_i");
-		Method updateAutomatic = ReflectionHelper.findMethod(GuiCommandBlock.class, "updateAutoExec", "func_184076_j");
-		GuiTextField text;
-		public DoCommand(CommandOp op, GuiCommandBlock cb) {
+		//updateGui is public
+//		Method updateMode = ObfuscationReflectionHelper.findMethod(CommandBlockScreen.class, "updateMode", "func_184073_g");
+//		//Method updateGui = ReflectionHelper.findMethod(GuiCommandBlock.class, "updateGui", "a");
+//		Method updateTrack=ObfuscationReflectionHelper.findMethod(CommandBlockScreen.class, "updateCmdOutput", "func_175388_a");
+//		Method updateConditional=
+//				ObfuscationReflectionHelper.findMethod(CommandBlockScreen.class, "updateConditional", "func_184077_i");
+//		Method updateAutomatic = ObfuscationReflectionHelper.findMethod(CommandBlockScreen.class, "updateAutoExec", "func_184076_j");
+		TextFieldWidget text;
+		public DoCommand(CommandOp op, CommandBlockScreen cb) {
 			super();
 			this.op = op;
 			this.cb = cb;
@@ -496,12 +539,14 @@ public class GuiControls {
 			mode.setAccessible(true);
 			output.setAccessible(true);
 			track.setAccessible(true);
-			cb.initGui();
+			sendUpdatePacket = ObfuscationReflectionHelper.findMethod(CommandBlockScreen.class, "func_195235_a");
+			sendUpdatePacket.setAccessible(true);
+			//cb.initGui(); //TESTME command blocks
 			cb.updateGui();
 			try {
 				long timeout = System.currentTimeMillis()+400;
 				while(text==null) {
-					text = (GuiTextField) tf.get(cb);
+					text = (TextFieldWidget) tf.get(cb);
 					try {
 						Thread.sleep(20);
 					} catch (InterruptedException e) {break;}
@@ -517,12 +562,12 @@ public class GuiControls {
 		public Varargs invoke(Varargs args) {
 			try {
 				//TileEntityCommandBlock block = (TileEntityCommandBlock) tecb.get(cb);
-				text = (GuiTextField) tf.get(cb);
+				text = (TextFieldWidget) tf.get(cb);
 				switch (op) {
 				case isConditional:
 					return valueOf(conditional.getBoolean(cb));
 				case getMode:
-					switch ((TileEntityCommandBlock.Mode) mode.get(cb)) {
+					switch ((CommandBlockTileEntity.Mode) mode.get(cb)) {
 					case AUTO:
 						return valueOf("repeat");
 					case REDSTONE:
@@ -536,16 +581,16 @@ public class GuiControls {
 				case setMode:
 					switch (args.checkjstring(1)) {
 					case "repeat":
-						mode.set(cb, TileEntityCommandBlock.Mode.AUTO);
+						mode.set(cb, CommandBlockTileEntity.Mode.AUTO);
 						break;
 					case "impulse":
-						mode.set(cb, TileEntityCommandBlock.Mode.REDSTONE);
+						mode.set(cb, CommandBlockTileEntity.Mode.REDSTONE);
 						break;
 					case "chain":
-						mode.set(cb, TileEntityCommandBlock.Mode.SEQUENCE);
+						mode.set(cb, CommandBlockTileEntity.Mode.SEQUENCE);
 						break;
 					}
-					updateMode.invoke(cb);
+					cb.updateGui();
 					return NONE;
 				case setText:
 					text.setText(args.checkjstring(1));
@@ -558,31 +603,31 @@ public class GuiControls {
 				case isTrackOutput:
 					return valueOf(track.getBoolean(cb));
 				case setChain:
-					mode.set(cb, TileEntityCommandBlock.Mode.SEQUENCE);
-					updateMode.invoke(cb);
+					mode.set(cb, CommandBlockTileEntity.Mode.SEQUENCE);
+					cb.updateGui();
 					return NONE;
 				case setConditional:
 					conditional.setBoolean(cb, args.optboolean(1, true));
-					updateConditional.invoke(cb);
+					cb.updateGui();
 					return NONE;
 				case setImpulse:
-					mode.set(cb, TileEntityCommandBlock.Mode.REDSTONE);
-					updateMode.invoke(cb);
+					mode.set(cb, CommandBlockTileEntity.Mode.REDSTONE);
+					cb.updateGui();
 					break;
 				case setNeedsRedstone:
 					automatic.setBoolean(cb, !args.optboolean(1, true));
-					updateAutomatic.invoke(cb);
+					cb.updateGui();
 					return NONE;
 				case setRepeat:
-					mode.set(cb, TileEntityCommandBlock.Mode.AUTO);
-					updateMode.invoke(cb);
+					mode.set(cb, CommandBlockTileEntity.Mode.AUTO);
+					cb.updateGui();
 					return NONE;
 				case setTrackOutput:
 					track.setBoolean(cb, args.optboolean(1, true));
-					updateTrack.invoke(cb);
+					cb.updateGui();
 					return NONE;
 				case getOutput:
-					return valueOf(((GuiTextField)output.get(cb)).getText());
+					return valueOf(((TextFieldWidget)output.get(cb)).getText());
 				default:
 					throw new LuaError("Unimplemented function '"+op.name()+"'");
 				}
@@ -591,38 +636,27 @@ public class GuiControls {
 			}
 			return NONE;
 		}
-		private void done() throws IllegalArgumentException, IllegalAccessException {
-			TileEntityCommandBlock block = (TileEntityCommandBlock) tecb.get(cb);
-			Minecraft mc = AdvancedMacros.getMinecraft();
-
-			PacketBuffer packetbuffer = new PacketBuffer(Unpooled.buffer());
-			CommandBlockBaseLogic commandblockbaselogic = block.getCommandBlockLogic();
-			commandblockbaselogic.fillInInfo(packetbuffer);
-			packetbuffer.writeString(text.getText());
-			packetbuffer.writeBoolean(commandblockbaselogic.shouldTrackOutput());
-			packetbuffer.writeString(((TileEntityCommandBlock.Mode) mode.get(cb)).name());
-			packetbuffer.writeBoolean(this.conditional.getBoolean(cb));
-			packetbuffer.writeBoolean(this.automatic.getBoolean(cb));
-			mc.getConnection().sendPacket(new CPacketCustomPayload("MC|AutoCmd", packetbuffer));
-
+		private void done() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+			CommandBlockTileEntity block = (CommandBlockTileEntity) tecb.get(cb);
+			CommandBlockLogic commandblockbaselogic = block.getCommandBlockLogic();
+			sendUpdatePacket.invoke(cb, commandblockbaselogic);
 			if (!commandblockbaselogic.shouldTrackOutput())
 			{
 				commandblockbaselogic.setLastOutput((ITextComponent)null);
 			}
 
-			mc.displayGuiScreen((GuiScreen)null);
+			AdvancedMacros.getMinecraft().displayGuiScreen((Screen)null);
 		}
 	}
 	private static class DoChestOp extends VarArgFunction {
-		GuiChest gc;
+		ChestScreen gc;
 		ChestOp op;
-		private static Field upperChest = ReflectionHelper.findField(GuiChest.class, "upperChestInventory", "w", "field_147016_v");
-		private static Field lowerChest = ReflectionHelper.findField(GuiChest.class, "lowerChestInventory", "x", "field_147015_w");
+		private static Field playerInv = ObfuscationReflectionHelper.findField(ContainerScreen.class, "field_213127_e");
+		//private static Field title = ObfuscationReflectionHelper.findField(ChestScreen.class, "lowerChestInventory", "x", "field_147015_w");
 		static {
-			upperChest.setAccessible(true);
-			lowerChest.setAccessible(true);
+			playerInv.setAccessible(true);
 		}
-		public DoChestOp(ChestOp op, GuiChest gc) {
+		public DoChestOp(ChestOp op, ChestScreen gc) {
 			this.op = op;
 			this.gc = gc;
 		}
@@ -630,10 +664,10 @@ public class GuiControls {
 		public Varargs invoke(Varargs args) {
 			try {
 				switch (op) {
-				case getLowerLabel: //Yes this is intentionally backwards, 'lower chest' is the top in the gui... idk why
-					return valueOf(	((IInventory)upperChest.get(gc)).getDisplayName().getUnformattedText() );
+				case getLowerLabel: 
+					return valueOf( ((PlayerInventory)playerInv.get(gc)).getDisplayName().getUnformattedComponentText() );
 				case getUpperLabel:
-					return valueOf(	((IInventory)lowerChest.get(gc)).getDisplayName().getUnformattedText() );
+					return valueOf(	gc.getTitle().getUnformattedComponentText() );
 				}
 			}catch (Exception e) {
 				e.printStackTrace();
@@ -673,18 +707,30 @@ public class GuiControls {
 			return new String[] {"guiEvent#sign", name()};
 		}
 	}
+	
+//	private static enum ReadBookOp{
+//		getTitle,
+//		getAuthor,
+//		getText,
+//		gotoPage,
+//		currentPage,
+//		pageCount;
+//		public String[] getDocLocation() {
+//			return new String[] {"guiEvent#readBook", name()};
+//		}
+//	}
 	private static enum BookOp {
 		setText,
 		getText,
 		getPages,
 		setPages,
 		//		setTitle,
-		getAuthor,
+		//getAuthor,
 		addPage,
 		nextPage,
 		prevPage,
 		save,
-		getTitle,
+		//getTitle,
 		sign,
 		currentPage,
 		pageCount,

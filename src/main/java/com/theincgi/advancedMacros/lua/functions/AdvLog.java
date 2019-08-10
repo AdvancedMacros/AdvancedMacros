@@ -6,8 +6,6 @@ import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.Utils;
 
-import net.minecraft.client.Minecraft;
-
 @Deprecated
 public class AdvLog extends OneArgFunction{
 	@Override

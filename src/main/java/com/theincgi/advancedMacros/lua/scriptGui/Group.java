@@ -144,11 +144,12 @@ public class Group extends LuaTable implements Moveable, InputSubscriber, Drawab
 
 
 	@Override
-	public boolean onScroll(Gui gui, int i) {
+	public boolean onScroll(Gui gui, double i) {
+		int di = (int) Math.signum(i);
 		if(groupVisiblity)
 			for (int j = 0; j < children.size(); j++) {
 				if(children.get(j) instanceof InputSubscriber) {
-					InputSubscriber child = (InputSubscriber) children.get(i);
+					InputSubscriber child = (InputSubscriber) children.get(di);
 					if(child.onScroll(gui, i)) return true;
 				}
 			}
@@ -157,7 +158,7 @@ public class Group extends LuaTable implements Moveable, InputSubscriber, Drawab
 
 
 	@Override
-	public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
+	public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
 		if(groupVisiblity)
 			for (int j = 0; j < children.size(); j++) {
 				if(children.get(j) instanceof InputSubscriber) {
@@ -170,7 +171,7 @@ public class Group extends LuaTable implements Moveable, InputSubscriber, Drawab
 
 
 	@Override
-	public boolean onMouseRelease(Gui gui, int x, int y, int state) {
+	public boolean onMouseRelease(Gui gui, double x, double y, int state) {
 		if(groupVisiblity)
 			for (int j = 0; j < children.size(); j++) {
 				if(children.get(j) instanceof InputSubscriber) {
@@ -183,12 +184,12 @@ public class Group extends LuaTable implements Moveable, InputSubscriber, Drawab
 
 
 	@Override
-	public boolean onMouseClickMove(Gui gui, int x, int y, int buttonNum, long timeSinceClick) {
+	public boolean onMouseClickMove(Gui gui, double x, double y, int buttonNum, double q, double r) {
 		if(groupVisiblity)
 			for (int j = 0; j < children.size(); j++) {
 				if(children.get(j) instanceof InputSubscriber) {
 					InputSubscriber child = (InputSubscriber) children.get(j);
-					if(child.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick)) return true;
+					if(child.onMouseClickMove(gui, x, y, buttonNum, q, r)) return true;
 				}
 			}
 		return false;
@@ -196,29 +197,40 @@ public class Group extends LuaTable implements Moveable, InputSubscriber, Drawab
 
 
 	@Override
-	public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
+	public boolean onCharTyped(Gui gui, char typedChar, int mods) {
 		if(groupVisiblity)
 			for (int j = 0; j < children.size(); j++) {
 				if(children.get(j) instanceof InputSubscriber) {
 					InputSubscriber child = (InputSubscriber) children.get(j);
-					if(child.onKeyPressed(gui, typedChar, keyCode)) return true;
+					if(child.onCharTyped(gui, typedChar, mods)) return true;
 				}
 			}
 		return false;
 	}
-
-
 	@Override
-	public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
+	public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
 		if(groupVisiblity)
 			for (int j = 0; j < children.size(); j++) {
 				if(children.get(j) instanceof InputSubscriber) {
 					InputSubscriber child = (InputSubscriber) children.get(j);
-					if(child.onKeyRepeat(gui, typedChar, keyCode, repeatMod)) return true;
+					if(child.onKeyPressed(gui, keyCode, scanCode, modifiers)) return true;
 				}
 			}
 		return false;
 	}
+
+
+//	@Override
+//	public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
+//		if(groupVisiblity)
+//			for (int j = 0; j < children.size(); j++) {
+//				if(children.get(j) instanceof InputSubscriber) {
+//					InputSubscriber child = (InputSubscriber) children.get(j);
+//					if(child.onKeyRepeat(gui, typedChar, keyCode, repeatMod)) return true;
+//				}
+//			}
+//		return false;
+//	}
 
 
 	@Override

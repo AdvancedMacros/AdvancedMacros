@@ -2,11 +2,11 @@ package com.theincgi.advancedMacros.misc;
 
 import org.luaj.vm2_v3_0_1.LuaValue;
 
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.util.text.event.HoverEvent.Action;
 
-public class LuaTextComponent extends TextComponentString{
+public class LuaTextComponent extends StringTextComponent{
 	private String text;
 	private LuaValue action;
 	private boolean allowHover;

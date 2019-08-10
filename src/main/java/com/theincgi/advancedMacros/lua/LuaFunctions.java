@@ -15,7 +15,6 @@ import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Pair;
 import com.theincgi.advancedMacros.misc.Utils;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.ITextComponent;
 
 public class LuaFunctions {

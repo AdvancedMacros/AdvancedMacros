@@ -9,17 +9,16 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.AtlasTexture;//TextureMap;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class GetTextureList extends ZeroArgFunction{
 	private final Map<String, TextureAtlasSprite> mapRegisteredSprites;
 	
 	public GetTextureList() throws NoSuchFieldException, RuntimeException, IllegalAccessException {
-		TextureMap map = AdvancedMacros.getMinecraft().getTextureMapBlocks();
-		Field f = ReflectionHelper.findField(TextureMap.class, "mapRegisteredSprites", "field_110574_e", "j");
+		AtlasTexture map = AdvancedMacros.getMinecraft().getTextureMap();
+		Field f = ObfuscationReflectionHelper.findField(AtlasTexture.class, "field_94252_e"); //TESTME getTextureList
 		//Field f = TextureMap.class.getDeclaredField(isObf?"j":"mapRegisteredSprites");
 		f.setAccessible(true);
 		mapRegisteredSprites = (Map<String, TextureAtlasSprite>) f.get(map);
@@ -30,7 +29,7 @@ public class GetTextureList extends ZeroArgFunction{
 		LuaTable t = new LuaTable();
 		int i = 0;
 		for(TextureAtlasSprite o : mapRegisteredSprites.values()) {
-			t.set(++i, o.getIconName());
+			t.set(++i, o.getName().toString());
 		}
 		return t;
 	}

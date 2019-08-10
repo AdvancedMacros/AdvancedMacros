@@ -129,12 +129,12 @@ public class GuiRect implements Drawable, Moveable{
 		drawHei = (int) (hei*s);
 	}
 	public double getScale(){return scale;}
-	public boolean isInBounds(int x, int y){
+	public boolean isInBounds(double x, double y){
 		if(x>this.x && y>this.y && x<(this.x+wid) && y<(this.y+hei))
 			return true;
 		return false;
 	}
-	public static boolean isInBounds(int clickX, int clickY, int x, int y, int wid, int hei){
+	public static boolean isInBounds(double clickX, double clickY, double x, double y, double wid, double hei){
 		if(clickX>x && clickY>y && clickX<(x+wid) && clickY<(y+hei))
 			return true;
 		return false;
@@ -147,7 +147,7 @@ public class GuiRect implements Drawable, Moveable{
 	
 	protected void drawShade(Gui gui){
 		//GlStateManager.enableAlpha();
-		net.minecraft.client.gui.Gui.drawRect(drawX+1, drawY+1, drawX+drawWid, drawY+drawHei, shade.toInt());
+		net.minecraft.client.gui.screen.Screen.fill(drawX+1, drawY+1, drawX+drawWid, drawY+drawHei, shade.toInt());
 		//System.out.println(shade);
 	}
 	@Override

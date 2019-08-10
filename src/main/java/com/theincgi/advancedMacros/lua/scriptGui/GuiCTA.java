@@ -232,31 +232,31 @@ public class GuiCTA extends ScriptGuiElement{
 	}
 	
 	@Override
-	public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
+	public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
 		return cta.onMouseClick(gui, x, y, buttonNum);
 	}
 	@Override
-	public boolean onMouseClickMove(Gui gui, int x, int y, int buttonNum, long timeSinceClick) {
-		return cta.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick);
+	public boolean onMouseClickMove(Gui gui, double x, double y, int buttonNum, double q, double r) {
+		return cta.onMouseClickMove(gui, x, y, buttonNum, q, r);
 	}
 	@Override
-	public boolean onMouseRelease(Gui gui, int x, int y, int state) {
+	public boolean onMouseRelease(Gui gui, double x, double y, int state) {
 		return cta.onMouseRelease(gui, x, y, state);
 	}
 	@Override
-	public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
-		return cta.onKeyPressed(gui, typedChar, keyCode);
+	public boolean onCharTyped(Gui gui, char typedChar, int mods) {
+		return cta.onCharTyped(gui, typedChar, mods);
+	}
+	@Override
+	public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
+		return cta.onKeyPressed(gui, keyCode, scanCode, modifiers);
 	}
 	@Override
 	public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
 		return cta.onKeyRelease(gui, typedChar, keyCode);
 	}
 	@Override
-	public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
-		return cta.onKeyRepeat(gui, typedChar, keyCode, repeatMod);
-	}
-	@Override
-	public boolean onScroll(Gui g, int i) {
+	public boolean onScroll(Gui g, double i) {
 		return cta.onScroll(g, i);
 	}
 }

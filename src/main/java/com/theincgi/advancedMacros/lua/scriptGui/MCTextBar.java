@@ -1,5 +1,8 @@
 package com.theincgi.advancedMacros.lua.scriptGui;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
@@ -7,17 +10,18 @@ import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Gui;
+import com.theincgi.advancedMacros.misc.HIDUtils;
 import com.theincgi.advancedMacros.misc.Utils;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class MCTextBar extends ScriptGuiElement{
-	GuiTextField textField;
+	TextFieldWidget textField;
 	public MCTextBar(Gui gui, Group parent) {
 		super(gui, parent, true);
 		enableSizeControl();
-		textField = new GuiTextField(0, AdvancedMacros.getMinecraft().fontRenderer, 0, 0, 20, 20) {
+		textField = new TextFieldWidget(AdvancedMacros.getMinecraft().fontRenderer, 0, 0, 20, 20, "") {
 			@Override
 			public boolean isFocused() {
 				return gui.getFocusItem()==this; //not .equals, must be this object exactly
@@ -52,30 +56,36 @@ public class MCTextBar extends ScriptGuiElement{
 		super.onDraw(g, mouseX, mouseY, partialTicks);
 		if(!visible) return;
 		
-		textField.drawTextBox();
+		textField.render(mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
 	public int getItemHeight() {
-		return textField.height;
+		return textField.getHeight();
 	}
 	@Override
 	public int getItemWidth() {
-		return textField.width;
+		return textField.getWidth();
 	}
 	@Override
 	public void setWidth(int i) {
-		textField.width = i;
+		textField.setWidth(i);
 	}
 	@Override
 	public void setHeight(int i) {
-		textField.height = i;
+		textField.setHeight(i);
 	}
 	
+	
+	private static Method getMaxStringLength;
 	public class TextFieldOp extends VarArgFunction{
 		Op op;
 		public TextFieldOp(Op op) {
 			this.op = op;
+			if(getMaxStringLength==null) {
+				getMaxStringLength = ObfuscationReflectionHelper.findMethod(TextFieldWidget.class, "func_146208_g");
+				getMaxStringLength.setAccessible(true);
+			}
 		}
 		@Override
 		public Varargs invoke(Varargs args) {
@@ -83,7 +93,7 @@ public class MCTextBar extends ScriptGuiElement{
 			case cursorPos:
 				return LuaValue.valueOf(textField.getCursorPosition()+1);
 			case getSelRange:
-				return LuaValue.valueOf(textField.getSelectionEnd() - textField.getCursorPosition());
+				return LuaValue.valueOf(textField.getSelectedText().length());
 			case getSelText:
 				return LuaValue.valueOf(textField.getSelectedText());
 			case getText:
@@ -91,7 +101,11 @@ public class MCTextBar extends ScriptGuiElement{
 			case isFocused:
 				return LuaValue.valueOf(textField.isFocused());
 			case maxStrLen:
-				return LuaValue.valueOf(textField.getMaxStringLength());
+				try {
+					return LuaValue.valueOf((int)getMaxStringLength.invoke(textField));
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					throw new LuaError(e); //TESTME
+				}
 			case setCursorPos:
 				textField.setCursorPosition(args.arg1().checkint());
 				return NONE;
@@ -102,7 +116,7 @@ public class MCTextBar extends ScriptGuiElement{
 				textField.setEnabled(args.arg1().checkboolean());
 				return NONE;
 			case setFocused:
-				textField.setFocused(args.arg1().checkboolean());
+				textField.setFocused2(args.arg1().checkboolean());
 				return NONE;
 			case setMaxStrLen:
 				textField.setMaxStringLength(args.arg1().checkint());
@@ -180,11 +194,11 @@ public class MCTextBar extends ScriptGuiElement{
 	}
 	
 	@Override
-	public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
+	public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
 		if(textField.mouseClicked(x, y, buttonNum)) {
 			if (onMouseClick != null) 
 				Utils.pcall(onMouseClick, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(buttonNum));
-			textField.setFocused(true);
+			textField.setFocused2(true);
 			return true;
 		}
 		return false;
@@ -192,21 +206,16 @@ public class MCTextBar extends ScriptGuiElement{
 	
 	
 	@Override
-	public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
-		if(!textField.isFocused() || !visible)
-			return false;
-		textField.textboxKeyTyped(typedChar, keyCode);
-		if(onKeyPressed!=null)
-			Utils.pcall(onKeyPressed, valueOf(typedChar), valueOf(keyCode));
-		return true;
+	public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
+		return false;
 	}
 	@Override
-	public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
+	public boolean onCharTyped(Gui gui, char typedChar, int mods) {
 		if(!textField.isFocused() || !visible)
 			return false;
-		textField.textboxKeyTyped(typedChar, keyCode);
-		if(onKeyRepeated!=null)
-			Utils.pcall(onKeyRepeated, valueOf(typedChar), valueOf(keyCode));
+		textField.charTyped(typedChar, mods);
+		if(onCharTyped!=null)
+			Utils.pcall(onCharTyped, valueOf(typedChar), valueOf(typedChar), HIDUtils.Keyboard.modifiersToLuaTable(mods));
 		return true;
 	}
 	

@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
@@ -20,7 +21,7 @@ import org.luaj.vm2_v3_0_1.LuaThread;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import org.luaj.vm2_v3_0_1.lib.jse.JsePlatform;
-import org.lwjgl.input.Keyboard;
+import org.lwjgl.glfw.GLFW;
 
 import com.theincgi.advancedMacros.event.ForgeEventHandler;
 import com.theincgi.advancedMacros.gui.EditorGUI;
@@ -37,7 +38,6 @@ import com.theincgi.advancedMacros.lua.LuaDebug;
 import com.theincgi.advancedMacros.lua.LuaFunctions;
 import com.theincgi.advancedMacros.lua.OpenChangeLog;
 import com.theincgi.advancedMacros.lua.functions.Action;
-import com.theincgi.advancedMacros.lua.functions.AdvLog;
 import com.theincgi.advancedMacros.lua.functions.Call;
 import com.theincgi.advancedMacros.lua.functions.Connect;
 import com.theincgi.advancedMacros.lua.functions.Disconnect;
@@ -57,10 +57,12 @@ import com.theincgi.advancedMacros.lua.functions.GetScreen;
 import com.theincgi.advancedMacros.lua.functions.GetSound;
 import com.theincgi.advancedMacros.lua.functions.GetTextureList;
 import com.theincgi.advancedMacros.lua.functions.GetWorld;
+import com.theincgi.advancedMacros.lua.functions.HID;
 import com.theincgi.advancedMacros.lua.functions.HTTP;
 import com.theincgi.advancedMacros.lua.functions.IsKeyHeld;
 import com.theincgi.advancedMacros.lua.functions.LightAt;
 import com.theincgi.advancedMacros.lua.functions.MathPlus;
+import com.theincgi.advancedMacros.lua.functions.Narrate;
 import com.theincgi.advancedMacros.lua.functions.NewThread;
 import com.theincgi.advancedMacros.lua.functions.OpenInventory;
 import com.theincgi.advancedMacros.lua.functions.PCall;
@@ -88,7 +90,6 @@ import com.theincgi.advancedMacros.lua.util.GraphicsContextControls;
 import com.theincgi.advancedMacros.lua.util.LuaMutex;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.CustomFontRenderer;
-import com.theincgi.advancedMacros.misc.FontRendererOverride;
 import com.theincgi.advancedMacros.misc.JarLibSearcher;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
@@ -97,27 +98,22 @@ import com.theincgi.advancedMacros.publicInterfaces.LuaPlugin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.ModContainer;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 
-@Mod(modid = AdvancedMacros.MODID, version = AdvancedMacros.VERSION)
+@Mod(AdvancedMacros.MODID)
 public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "7.7.7"; //${version} ??
+	public static final String VERSION = "8.0.0"; // ??
 
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
@@ -136,7 +132,7 @@ public class AdvancedMacros {
 	public static final LuaDebug debug = new LuaDebug();
 	public static ForgeEventHandler forgeEventHandler;
 	public static final CustomFontRenderer customFontRenderer = new CustomFontRenderer();
-	public static FontRendererOverride otherCustomFontRenderer;
+	//public static FontRendererOverride otherCustomFontRenderer;
 	private static final DocumentationManager documentationManager = new DocumentationManager();
 	private JarLibSearcher jarLibSearcher;
 	private static Thread minecraftThread;
@@ -145,30 +141,37 @@ public class AdvancedMacros {
 	public static final boolean COLOR_SPACE_IS_255 = false;
 
 
-	@EventHandler @SideOnly(Side.CLIENT)//skipped the proxy system, this is only client side
-	public void init(FMLInitializationEvent event){
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
+	public AdvancedMacros() {
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::init);
+	}
+
+
+
+	private void init(final FMLClientSetupEvent event){
 		try {
-			if(event.getSide().isServer()){return;}
-			minecraftThread = Thread.currentThread();
+			Method getMCThread = ObfuscationReflectionHelper.findMethod(Minecraft.class, "func_213170_ax"); //getExecutionThread
+
+			minecraftThread = (Thread) getMCThread.invoke(getMinecraft());
 			globals.setLuaThread(minecraftThread, new LuaThread(globals));
+
 			macrosRootFolder.mkdirs();
 			macrosFolder.mkdirs();
 			macroSoundsFolder.mkdirs();
 			customDocsFolder.mkdirs();
-			modKeybind = new KeyBinding("Bindings Menu", Keyboard.KEY_L, "AdvancedMacros");
-			advMacrosModContainer = Loader.instance().activeModContainer();
+
+			modKeybind = new KeyBinding("Bindings Menu", GLFW.GLFW_KEY_L, "AdvancedMacros");
+			advMacrosModContainer = ModLoadingContext.get().getActiveContainer();
 			MinecraftForge.EVENT_BUS.register(forgeEventHandler = new ForgeEventHandler());
-			
-//			Test code!
-//			MinecraftForge.EVENT_BUS.register(new Object() {
-//				@SubscribeEvent @SideOnly(Side.CLIENT)
-//				public void onChat(final ClientChatReceivedEvent sEvent){
-//					logFunc.call("The secondary event handler was called!");
-//					sEvent.setCanceled(true);
-//				}
-//			});
-			
+
+			//			Test code!
+			//			MinecraftForge.EVENT_BUS.register(new Object() {
+			//				@SubscribeEvent @SideOnly(Side.CLIENT)
+			//				public void onChat(final ClientChatReceivedEvent sEvent){
+			//					logFunc.call("The secondary event handler was called!");
+			//					sEvent.setCanceled(true);
+			//				}
+			//			});
+
 			getMinecraft().getSoundHandler().addListener(forgeEventHandler.SOUND_LISTENER);
 			ClientRegistry.registerKeyBinding(modKeybind);
 			try {
@@ -176,16 +179,16 @@ public class AdvancedMacros {
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
-			
-			
+
+
 			loadFunctions();
 			loadLibJars();
-			
+
 			loadScripts();
-			
-			
-			otherCustomFontRenderer = new FontRendererOverride();
-			otherCustomFontRenderer.onResourceManagerReload(null);
+
+
+			//otherCustomFontRenderer = new FontRendererOverride();
+			//otherCustomFontRenderer.onResourceManagerReload();
 			//Utils.loadTextCodes();
 			macroMenuGui = new MacroMenuGui();
 			editorGUI = new EditorGUI();
@@ -197,16 +200,21 @@ public class AdvancedMacros {
 			macroMenuGui.updateProfileList();
 			Settings.getProfileList();//generate DEFAULT 
 			macroMenuGui.loadProfile("DEFAULT");
-			
+
 			globals.set("prompt", inputGUI.getPrompt());
+
+
+			postInit();
 		}catch (Throwable t) {
 			t.printStackTrace();
 		}
+
+
 	}
 
-	@SideOnly(Side.CLIENT)
-	public void postInit(FMLPostInitializationEvent event) {
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
+
+	private void postInit() {
+
 		editorGUI.postInit();
 
 	}
@@ -224,27 +232,27 @@ public class AdvancedMacros {
 		globals.load(debug);
 		debugTable = globals.get("debug").checktable();
 		globals.set("_MOD_VERSION", VERSION);
-		globals.set("__GAME_VERSION", Minecraft.getMinecraft().getVersion());
-		
+		globals.set("__GAME_VERSION", getMinecraft().getVersion());
+
 		globals.set("advancedMacros", advancedMacrosTable);
 		LuaTable editor = new LuaTable();
 		advancedMacrosTable.set("editor", editor);
 		advancedMacrosTable.set("openChangeLog", new OpenChangeLog());
 		editor.set("jumpToLine", new EditorControls.JumpToLine());
-		
+
 		globals.set("run", new Call());
 		globals.set("pRun", new PCall());
 		globals.set("runThread", new RunThread());
 		LuaTable thread = new LuaTable();
-			thread.set("new", new NewThread());
-			thread.set("current", new LuaDebug.GetCurrent());
-			thread.set("listRunning", new LuaDebug.GetRunningScripts());
+		thread.set("new", new NewThread());
+		thread.set("current", new LuaDebug.GetCurrent());
+		thread.set("listRunning", new LuaDebug.GetRunningScripts());
 		globals.set("thread", thread);
-		
+
 		globals.set("getProfile", new GetProfile());
 		globals.set("setProfile", new SetProfile());
 		globals.set("stopAllScripts", new StopAllScripts());
-		
+
 
 		try {
 			globals.set("listTextures", new GetTextureList());
@@ -253,21 +261,22 @@ public class AdvancedMacros {
 		}
 		globals.set("getBlockList", new GetBlockList());
 		globals.set("log", logFunc = new LuaFunctions.Log());
-		globals.set("advLog", new AdvLog());
+		//globals.set("advLog", new AdvLog());
 		globals.set("say", sayFunc = new LuaFunctions.Say());
 		globals.set("toast", new Toast.ToastNotification());
-		
+		globals.set("narrate", new Narrate());
+
 		globals.set("sleep", sleepFunc = new LuaFunctions.Sleep());
 		globals.set("print", new LuaFunctions.Debug());
 		globals.set("getSettings", new Settings.GetSettings());
 		globals.set("newMutex", new LuaMutex());
-		
+
 		globals.get("os").set("millis", new GetOSMilliseconds());
 		globals.get("os").set("exit", LuaValue.NIL);
 		globals.get("os").set("getClipboard", new ClipBoard.GetClipboard());
 		globals.get("os").set("setClipboard", new ClipBoard.SetClipboard());
 		globals.get("string").set("trim", new StringTrim());
-		
+
 		LuaTable imgTools = new LuaTable();
 		imgTools.set("new", new BufferedImageControls.CreateImg());
 		imgTools.set("load", new BufferedImageControls.LoadImg());
@@ -280,7 +289,7 @@ public class AdvancedMacros {
 		math.set("ln", math.get("log")); //because log is some how base e instead of 10
 		math.set("log", new MathPlus.Log());
 		math.set("e", MathPlus.const_e);
-		
+
 		//		//5.3 string tweaks //migrated to org.luaj.vm2_v3_0_1.lib.StringLib
 		//		{
 		//			LuaTable string = globals.get("string").checktable();
@@ -303,21 +312,21 @@ public class AdvancedMacros {
 		globals.set("getRecipes", new GetRecipe());
 		globals.set("getFps", new GetFPS());
 		globals.set("getChunkUpdateCount", new GetChunkUpdates());
-		
+
 		globals.set("getEntityList", new GetEntityList());
 		globals.set("getEntity", new GetEntityData());
 		globals.set("getBoundingBox", new GetAABB().getFunc()); 
 		globals.set("highlightEntity", new CallableTable(new String[] {"highlightEntity"}, new HighlightEntity()));
-		
+
 		globals.set("getScreen", new GetScreen());
-		
+
 		LuaTable hud2D;
 		globals.set("hud2D", hud2D = new Hud2D());
 		globals.set("hud3D",         new Hud3D());
 		hud2D.set("title", new Toast.ToastTitle());
 		hud2D.set("actionbar", new Toast.ToastActionBar());
-		
-		
+
+
 		globals.set("rayTrace", RayTrace.getFunc());
 
 		new Action().getKeybindFuncts(globals);
@@ -333,16 +342,21 @@ public class AdvancedMacros {
 		globals.set("getSound", new GetSound());
 		globals.set("midi", new MidiLib2());
 		globals.set("customizeSkin", new SkinCustomizer());
-		
+
 		globals.set("isKeyDown", new IsKeyHeld());
-		globals.set("getHeldKeys", new AdvancedMacros().forgeEventHandler.new GetHeldKeys());
+
+		LuaTable hid = new LuaTable();
+		hid.set("getState", new HID.GetHIDState());
+		hid.set("getTypes", new HID.GetHIDTypes());
+		globals.set("HID", hid);
+
 		globals.set("filesystem", new FileSystem());
 
 
 		LuaTable guiStuff = new LuaTable();
 		guiStuff.set("new", new ScriptGui.CreateScriptGui());
 		globals.set("gui", guiStuff);
-		
+
 		LuaTable searchers = globals.get("package").get("searchers").checktable();
 		searchers.set(searchers.length() + 1, jarLibSearcher = new JarLibSearcher());
 		globals.set("getJarLibLoaders", new ZeroArgFunction() {public LuaValue call() {return jarLibSearcher.loaders;}});
@@ -360,7 +374,7 @@ public class AdvancedMacros {
 							Enumeration<JarEntry> e = jarFile.entries();
 							URL[] urls = { new URL("jar:file:" + f.getPath().replace('\\', '/') +"!/" )};
 							URLClassLoader cl = URLClassLoader.newInstance(urls, LuaPlugin.class.getClassLoader());
-							
+
 							while(e.hasMoreElements()) {
 								JarEntry je = e.nextElement();
 								if(je.isDirectory() || !je.getName().endsWith(".class"))
@@ -371,7 +385,7 @@ public class AdvancedMacros {
 									Class c = cl.loadClass(className);
 									if(c.getName().contains("DL4J4Lua"))
 										System.out.println("");
-									
+
 									if(LuaPlugin.class.isAssignableFrom(c)) {
 										if(LuaFunction.class.isAssignableFrom(c)) {
 											System.out.println("Loaded from jar "+c.getName());
@@ -400,8 +414,8 @@ public class AdvancedMacros {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+
 	private void loadScripts() {
 		try {
 			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/searcher.lua")).getInputStream();
@@ -486,11 +500,11 @@ public class AdvancedMacros {
 		return minecraftThread;
 	}
 
-	public static boolean isServerSide() {
-		return (FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER); //lik srsly;
-	}
+	//	public static boolean isServerSide() {
+	//		return (); //lik srsly;
+	//	} //TODO
 	public static Minecraft getMinecraft() {
-		if (mc == null) mc = Minecraft.getMinecraft();
+		if (mc == null) mc = Minecraft.getInstance();
 		return mc;
 	}
 

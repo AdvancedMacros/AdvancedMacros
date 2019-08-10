@@ -10,7 +10,6 @@ import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.CallableTable;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScaledResolution;
 
 public class Hud2D extends LuaTable{
 	public Hud2D() {
@@ -39,11 +38,10 @@ public class Hud2D extends LuaTable{
 			case getSize:
 				LuaTable temp = new LuaTable();
 				Minecraft mc = AdvancedMacros.getMinecraft();
-				ScaledResolution scaled = new ScaledResolution(mc);
-				temp.set(1, LuaValue.valueOf(scaled.getScaledWidth()));
-				temp.set(2, LuaValue.valueOf(scaled.getScaledHeight()));
-				temp.set(3, valueOf(mc.displayWidth));
-				temp.set(4, valueOf(mc.displayHeight));
+				temp.set(1, LuaValue.valueOf(mc.mainWindow.getScaledWidth()));
+				temp.set(2, LuaValue.valueOf(mc.mainWindow.getScaledHeight()));
+				temp.set(3, valueOf(mc.mainWindow.getFramebufferWidth()));
+				temp.set(4, valueOf(mc.mainWindow.getFramebufferHeight()));
 				return temp.unpack();
 			case newBox:
 				Hud2D_Box box = new Hud2D_Box();

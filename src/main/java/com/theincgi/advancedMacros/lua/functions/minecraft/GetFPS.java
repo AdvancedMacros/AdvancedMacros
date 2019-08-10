@@ -3,7 +3,6 @@ package com.theincgi.advancedMacros.lua.functions.minecraft;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
-import com.theincgi.advancedMacros.lua.functions.MinecraftSettings;
 import com.theincgi.advancedMacros.misc.CallableTable;
 
 import net.minecraft.client.Minecraft;

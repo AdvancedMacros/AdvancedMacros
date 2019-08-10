@@ -3,8 +3,7 @@ package com.theincgi.advancedMacros.gui;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 
 public class Color {
 	int a,r,g,b;
@@ -152,7 +151,7 @@ public class Color {
 	}
 	
 	public void apply() {
-		GlStateManager.color(r/255f, g/255f, b/255f, a/255f);
+		GlStateManager.color4f(r/255f, g/255f, b/255f, a/255f);
 	}
 	
 	@Override

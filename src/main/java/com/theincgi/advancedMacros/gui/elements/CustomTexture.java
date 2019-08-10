@@ -5,11 +5,14 @@ import java.nio.ByteBuffer;
 
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
+
+//TODO check usage, LuaTexVal tends to get used, dont recall this as much
 public class CustomTexture{
 	BufferedImage bufferedImage;
 	ByteBuffer buffer;
@@ -40,7 +43,7 @@ public class CustomTexture{
 		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, bufferedImage.getWidth(), bufferedImage.getHeight(), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE	, buffer);
 	}
 	public void draw(int x, int y, int wid, int hei){
-		GlStateManager.pushAttrib();
+		GlStateManager.pushTextureAttributes();
 //		GlStateManager.enableLighting();
 //		//GlStateManager.disableDepth();
 		bindTex();
@@ -56,7 +59,7 @@ public class CustomTexture{
 		buffer.pos(x+hei, y, z).tex(uMax, vMin).endVertex();
 		Tessellator.getInstance().draw();
 		unbindTex();
-		GlStateManager.popAttrib();
+		GlStateManager.popAttributes();
 	}
 	private void unbindTex(){
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);

@@ -11,20 +11,21 @@ import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
-import org.lwjgl.input.Keyboard;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
-import com.theincgi.advancedMacros.event.ForgeEventHandler;
+import com.theincgi.advancedMacros.event.TaskDispatcher;
+import com.theincgi.advancedMacros.misc.HIDUtils.Keyboard;
 import com.theincgi.advancedMacros.misc.Utils;
 
+import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.network.play.client.CPacketPlayerDigging;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.client.util.InputMappings.Input;
+import net.minecraft.network.play.client.CPlayerDiggingPacket;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class Action {
 	Minecraft minecraft = AdvancedMacros.getMinecraft();
@@ -77,13 +78,13 @@ public class Action {
 		}
 	}
 	class Attack extends OneArgFunction{
-		final Method m = ReflectionHelper.findMethod(Minecraft.class, "clickMouse", "func_147116_af", new Class[] {});
+		final Method m = ObfuscationReflectionHelper.findMethod(Minecraft.class, "func_147116_af"); //clickMouse()
 		@Override
 		public LuaValue call(LuaValue arg) {
 			if(arg.isnil() || (arg.islong()&&arg.checklong()==0)){
 				Class c = minecraft.getClass();
 				m.setAccessible(true);
-				Utils.runOnMCAndWait(()-> {
+				TaskDispatcher.addTask(()-> {
 						try {
 							m.invoke(minecraft);
 						} catch (IllegalAccessException e) {
@@ -107,7 +108,7 @@ public class Action {
 		}
 	}
 	class Use extends OneArgFunction{
-		Method m = ReflectionHelper.findMethod(Minecraft.class, "rightClickMouse", "func_147121_ag", new Class[] {});
+		Method m = ObfuscationReflectionHelper.findMethod(Minecraft.class, "func_147121_ag");//"rightClickMouse", 
 		@Override
 		public LuaValue call(LuaValue arg) {
 			if(arg.isnil() || (arg.islong() && arg.checklong()==0)){
@@ -116,7 +117,7 @@ public class Action {
 
 				//Method m = c.getDeclaredMethod("rightClickMouse");
 				m.setAccessible(true);
-				Utils.runOnMCAndWait(()->{
+				TaskDispatcher.addTask(()->{
 						try {
 							m.invoke(minecraft);
 						} catch (IllegalAccessException e) {
@@ -144,11 +145,9 @@ public class Action {
 	class SwapHand extends ZeroArgFunction{
 		@Override
 		public LuaValue call() {
-			AdvancedMacros.getMinecraft().getConnection().sendPacket(
-					new CPacketPlayerDigging(
-							net.minecraft.network.play.client.CPacketPlayerDigging.Action.SWAP_HELD_ITEMS, 
-							BlockPos.ORIGIN, 
-							EnumFacing.DOWN));
+			if (!AdvancedMacros.getMinecraft().player.isSpectator()) {
+			    AdvancedMacros.getMinecraft().getConnection().sendPacket(new CPlayerDiggingPacket(CPlayerDiggingPacket.Action.SWAP_HELD_ITEMS, BlockPos.ZERO, Direction.DOWN));
+			}
 			//tapKeybind(sets.keyBindSwapHands);
 			
 			return LuaValue.NONE;
@@ -187,7 +186,7 @@ public class Action {
 			double x = args.arg(1).checkdouble();
 			double y = args.arg(2).checkdouble();
 			double z = args.arg(3).checkdouble();
-			EntityPlayerSP player = minecraft.player;
+			ClientPlayerEntity player = minecraft.player;
 			double dx = x-player.posX;
 			double dy = y-player.posY-player.getEyeHeight();
 			double dz = z-player.posZ;
@@ -214,7 +213,7 @@ public class Action {
 	class Key extends TwoArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg1, LuaValue arg2) {
-			holdKeybind(Keyboard.getKeyIndex(arg1.checkjstring()), arg2.optlong(0));
+			holdKeybind(Keyboard.codeOf(arg1.checkjstring()), arg2.optlong(0));
 			return LuaValue.NONE;
 		}
 	}
@@ -234,7 +233,7 @@ public class Action {
 				if(time>0){
 					AdvancedMacros.forgeEventHandler.lookTo((float)args.arg(1).todouble(), (float)args.arg(2).todouble(), time);
 				}else{
-					EntityPlayerSP player = AdvancedMacros.getMinecraft().player;
+					ClientPlayerEntity player = AdvancedMacros.getMinecraft().player;
 					player.rotationPitch = (float) args.arg(2).todouble();
 					player.rotationYaw = (float) args.arg(1).todouble();
 					System.out.println(player.rotationYaw);
@@ -270,9 +269,9 @@ public class Action {
 		return controls;
 	}
 	private void tapKeybind(KeyBinding kb){
-		tapKeybind(kb.getKeyCode());
+		tapKeybind(kb.getKey());
 	}
-	private void tapKeybind(int keyCode){
+	private void tapKeybind(Input keyCode){
 		Minecraft minecraft = AdvancedMacros.getMinecraft();
 		GameSettings sets = minecraft.gameSettings;
 		KeyBinding.setKeyBindState(keyCode, true);
@@ -286,13 +285,17 @@ public class Action {
 	}
 
 	private void holdKeybind(KeyBinding kb, long time){
-		holdKeybind(kb.getKeyCode(), time);
+		holdKeybind(kb.getKey(), time);
+	}
+	
+	private void holdKeybind(Input input, long time){
+		if(time==0){KeyBinding.setKeyBindState(input, false); return;} //changed for insant release
+		KeyBinding.setKeyBindState(input, true);
+		if(time<0){return;}
+		AdvancedMacros.forgeEventHandler.releaseKeybindAt(input, System.currentTimeMillis()+time);
 	}
 	private void holdKeybind(int keycode, long time){
-		if(time==0){KeyBinding.setKeyBindState(keycode, false); return;} //changed for insant release
-		KeyBinding.setKeyBindState(keycode, true);
-		if(time<0){return;}
-		AdvancedMacros.forgeEventHandler.releaseKeybindAt(keycode, System.currentTimeMillis()+time);
-
+		Input input =net.minecraft.client.util.InputMappings.getInputByCode(keycode, 0); //TESTME keybinding holds
+		holdKeybind(input, time);
 	}
 }

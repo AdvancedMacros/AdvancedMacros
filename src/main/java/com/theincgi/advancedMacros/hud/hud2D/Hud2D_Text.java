@@ -10,11 +10,11 @@ import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.theincgi.advancedMacros.AdvancedMacros;
-import com.theincgi.advancedMacros.misc.FontRendererOverride;
 import com.theincgi.advancedMacros.misc.Utils;
 
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.FontRenderer;
 
 public class Hud2D_Text extends Hud2DItem {
 	String text = "";
@@ -55,7 +55,7 @@ public class Hud2D_Text extends Hud2DItem {
 		getControls().set("getWidth", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return LuaValue.valueOf(AdvancedMacros.otherCustomFontRenderer.getStringWidth(widestLine(text)));
+				return LuaValue.valueOf(AdvancedMacros.getMinecraft().fontRenderer.getStringWidth(widestLine(text)));
 			}
 		});
 		getControls().set("getHeight", new ZeroArgFunction() {
@@ -68,7 +68,7 @@ public class Hud2D_Text extends Hud2DItem {
 			@Override
 			public Varargs invoke(Varargs args) {
 				LuaTable temp = new LuaTable();
-				temp.set(1, LuaValue.valueOf(AdvancedMacros.otherCustomFontRenderer.getStringWidth(widestLine(text))));
+				temp.set(1, LuaValue.valueOf(AdvancedMacros.getMinecraft().fontRenderer.getStringWidth(widestLine(text))));
 				temp.set(2, LuaValue.valueOf(size *countLines(text)));
 				return temp.unpack();
 			}
@@ -113,15 +113,17 @@ public class Hud2D_Text extends Hud2DItem {
 			Scanner s = new Scanner(text);
 			//GlStateManager.enableBlend();
 			//GlStateManager.enableAlpha();
-			GlStateManager.disableAlpha();
+			GlStateManager.disableAlphaTest();
 			//GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-			FontRendererOverride fr = AdvancedMacros.otherCustomFontRenderer;
+			FontRenderer fr = AdvancedMacros.getMinecraft().fontRenderer;//AdvancedMacros.otherCustomFontRenderer;
 			
-			float old = fr.FONT_HEIGHT;
-			fr.FONT_HEIGHT = (int)size;
+			//float old = fr.FONT_HEIGHT;
+			//fr.FONT_HEIGHT = (int)size;
+			GlStateManager.pushMatrix();
+			GlStateManager.translatef(0, 0, z);	//TESTME hud2d Z translate
 			for(int i = 0; s.hasNextLine(); i+=size)
-				fr.renderText(dx, dy+i, z, s.nextLine(), getOpacity(), size);//(text, (int)x, (int)y, color.toInt());
-			fr.FONT_HEIGHT = old;
+				fr.drawString(s.nextLine(), dx, dy+i, color.toInt());//(text, (int)x, (int)y, color.toInt());
+			GlStateManager.popMatrix();
 			s.close();
 			//GlStateManager.disableAlpha();
 		}

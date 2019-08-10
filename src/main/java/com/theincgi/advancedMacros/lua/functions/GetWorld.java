@@ -6,10 +6,12 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 public class GetWorld extends ZeroArgFunction {
 
@@ -33,7 +35,8 @@ public class GetWorld extends ZeroArgFunction {
 		b.set("centerX", worldBorder.getCenterX());
 		b.set("centerZ", worldBorder.getCenterZ());
 		b.set("warningDist", worldBorder.getWarningDistance());
-		b.set("dmgAmount", worldBorder.getDamageAmount());
+		b.set("dmgPerBlock", worldBorder.getDamagePerBlock());
+		b.set("dmgBuffer", worldBorder.getDamageBuffer());
 		b.set("radius", worldBorder.getDiameter()/2);
 		b.set("size", worldBorder.getSize());
 		t.set(string, b);
@@ -63,7 +66,7 @@ public class GetWorld extends ZeroArgFunction {
 		LuaTable t = new LuaTable();
 		set(t, "isRemote", world.isRemote);
 		set(t, "isDaytime",world.isDaytime());
-		set(t, "worldTime", world.getWorldTime());
+		set(t, "worldTime", world.getGameTime()); //TESTME
 		{
 			String stat;
 			if(world.isRaining() && world.isThundering()){
@@ -78,7 +81,7 @@ public class GetWorld extends ZeroArgFunction {
 			set(t, "weather", stat);
 		}
 		set(t, "moonPhase", world.getMoonPhase());
-		set(t, "cleanWeatherTime", world.getWorldInfo().getCleanWeatherTime());
+		set(t, "clearWeatherTime", world.getWorldInfo().getClearWeatherTime());
 		set(t, "rainTime", world.getWorldInfo().getRainTime());
 		set(t, "gameType", world.getWorldInfo().getGameType().getName());
 		set(t, "seed", world.getSeed());
@@ -87,8 +90,20 @@ public class GetWorld extends ZeroArgFunction {
 		set(t, "name", world.getWorldInfo().getWorldName());
 		set(t, "spawn", world.getSpawnPoint());
 		set(t, "border", world.getWorldBorder());
-		set(t, "isHardcore", world.getWorldInfo().isHardcoreModeEnabled());
+		set(t, "isHardcore", world.getWorldInfo().isHardcore());
 		set(t, "isDifficultyLocked", world.getWorldInfo().isDifficultyLocked());
+		set(t, "isSinglePlayer", AdvancedMacros.getMinecraft().isSingleplayer());
+		IntegratedServer is = AdvancedMacros.getMinecraft().getIntegratedServer();
+		set(t, "isLanHost", is!=null && is.getPublic());
+		set(t, "connectionType", NetworkHooks.getConnectionType(()->AdvancedMacros.getMinecraft().getConnection().getNetworkManager()).name() ); //yeilded modded
+		if(AdvancedMacros.getMinecraft().getCurrentServerData()!=null){
+			ServerData sd = AdvancedMacros.getMinecraft().getCurrentServerData();
+			if(sd!=null) {
+				t.set(5, sd.serverName==null? LuaValue.FALSE    : LuaValue.valueOf(sd.serverName));
+				t.set(6, sd.serverMOTD==null? LuaValue.FALSE    : LuaValue.valueOf(sd.serverMOTD));
+				t.set(7, sd.serverIP==null?   LuaValue.FALSE    : LuaValue.valueOf(sd.serverIP));
+			}
+		}
 		return t;
 	}
 }

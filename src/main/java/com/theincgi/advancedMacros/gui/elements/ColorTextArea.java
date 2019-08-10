@@ -16,8 +16,9 @@ import java.util.regex.Pattern;
 
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
-import org.lwjgl.input.Keyboard;
+import org.lwjgl.glfw.GLFW;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.event.ForgeEventHandler;
 import com.theincgi.advancedMacros.gui.Color;
@@ -26,11 +27,9 @@ import com.theincgi.advancedMacros.gui.Gui.Focusable;
 import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
 import com.theincgi.advancedMacros.gui.elements.GuiScrollBar.Orientation;
 import com.theincgi.advancedMacros.gui2.ScriptBrowser2;
+import com.theincgi.advancedMacros.misc.HIDUtils.Keyboard;
 import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Utils;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
 
 public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focusable{
 	//DoubleLinkedList<DoubleLinkedList<Unit>> text = new DoubleLinkedList<>();
@@ -181,9 +180,10 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	public void onDraw(Gui g, int mouseX, int mouseY, float partialTicks) {
 		if(wid==0 || hei==0 || !isVisible){return;}
 
-		GlStateManager.pushAttrib();
-		GlStateManager.enableAlpha();
+		GlStateManager.pushTextureAttributes();
+		GlStateManager.enableAlphaTest();
 		GlStateManager.enableBlend();
+		GlStateManager.bindTexture(0);
 		//update text color
 		//update bounds on scrollbar n stuff
 		//drawbg
@@ -222,7 +222,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		textChanged = false;
 		resized = false;
 		//System.out.println("Debug active");
-		GlStateManager.popAttrib();
+		GlStateManager.popAttributes();
 	}
 
 	private void offerTooltip(Gui g, int mx, int my) {
@@ -292,7 +292,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 				if(selection[dy][dx]){
 					int left = x+dx*charWid+2, top = y+dy*charHei+2;
 					int right= left+charWid, bottom = top+charHei;
-					net.minecraft.client.gui.Gui.drawRect(left, top, right, bottom, sCol);
+					net.minecraft.client.gui.screen.Screen.fill(left, top, right, bottom, sCol);
 				}
 			}
 		}
@@ -313,7 +313,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		right = left+charWid;
 		top = y+(cursor.getY()-viewY)*charHei+1;
 		bottom = top+charHei;
-		net.minecraft.client.gui.Gui.drawRect(left, top, right, bottom, col);
+		net.minecraft.client.gui.screen.Screen.fill(left, top, right, bottom, col);
 	}
 
 	/**load text from lines*/
@@ -374,7 +374,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 				if(quote[dy][dx]||isDrawing){
 					int left = x+dx*charWid+1, top = y+dy*charHei+1;
 					int right= left+charWid, bottom = top+charHei;
-					net.minecraft.client.gui.Gui.drawRect(left, top, right, bottom, boxFillColor);
+					net.minecraft.client.gui.screen.Screen.fill(left, top, right, bottom, boxFillColor);
 				}
 				isDrawing = quote[dy][dx];
 			}
@@ -459,7 +459,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 				//				}else if(cols[y][x]==null){
 				//					System.out.println("colors null");
 				//				}
-				int offset = (charWid - g.getFontRend().getCharWidth(visChars[y][x]))/2;
+				int offset = (int) ((charWid - g.getFontRend().getCharWidth(visChars[y][x]))/2);
 
 				String frmt = formating[y][x];
 				g.getFontRend().drawString(frmt+visChars[y][x], this.x+charWid*x+3+offset, this.y+charHei*y+4, cols[y][x].toInt());
@@ -686,7 +686,8 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	//	private 
 
 	@Override
-	public boolean onScroll(Gui gui, int i) {
+	public boolean onScroll(Gui gui, double i) {
+		i = Math.signum(i);
 		if(isFocused()){
 			if(!isShiftDown()){
 				vBar.onScroll(gui, i);
@@ -703,7 +704,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	}
 
 	@Override
-	public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
+	public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
 		if(hBar.onMouseClick(gui, x, y, buttonNum)){return textChanged=true;}
 		if(vBar.onMouseClick(gui, x, y, buttonNum)){return textChanged=true;}
 		if(GuiRect.isInBounds(x, y, this.x, this.y, this.wid, this.hei)) {
@@ -714,8 +715,8 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 			y -=this.y+4;
 			x /= charWid;
 			y /= charHei;
-			cursor.setY( Math.min(y+viewY, lines.size()-1));
-			cursor.setX(prefX =Math.min(lines.get(cursor.getY()).length(), x+viewX));
+			cursor.setY( Math.min(((int)y)+viewY, lines.size()-1));
+			cursor.setX(prefX =Math.min(lines.get(cursor.getY()).length(), ((int)x)+viewX));
 			resetBlinkOffset();
 
 			if(isShiftDown()){//set one of the selection spotts
@@ -803,21 +804,29 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	}
 
 	@Override
-	public boolean onMouseRelease(Gui gui, int x, int y, int state) {
+	public boolean onMouseRelease(Gui gui, double x, double y, int state) {
 		if(hBar.onMouseRelease(gui, x, y, state)){return textChanged=true;}
 		if(vBar.onMouseRelease(gui, x, y, state)){return textChanged=true;}
 		return false;
 	}
 
 	@Override
-	public boolean onMouseClickMove(Gui gui, int x, int y, int buttonNum, long timeSinceClick) {
-		if(hBar.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick)){return textChanged=true;}
-		if(vBar.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick)){return textChanged=true;}
+	public boolean onMouseClickMove(Gui gui, double x, double y, int buttonNum, double q, double r) {
+		if(hBar.onMouseClickMove(gui, x, y, buttonNum, q, r)){return textChanged=true;}
+		if(vBar.onMouseClickMove(gui, x, y, buttonNum, q, r)){return textChanged=true;}
 		return false;
 	}
 
 	@Override
-	public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) { //TODO any navKey + SHIFT use lastxy and current xy to make selection/expand
+	public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
+		return onKey(gui, (char)0, keyCode, modifiers);
+	}
+	@Override
+	public boolean onCharTyped(Gui gui, char typedChar, int mods) {
+		return onKey(gui, typedChar, 0, mods);
+	}
+	
+	private boolean onKey(Gui gui, char typedChar, int keyCode, int mods) { //TODO any navKey + SHIFT use lastxy and current xy to make selection/expand
 		//TODO snap to view if offscreen or arrow keys push offscreen
 		updateScrollbarContent(true);
 		if(!isCTRLDown() && isEditKey(typedChar, keyCode) && selectionStart!=null && selectionEnd!=null && isEditable){
@@ -837,14 +846,14 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 			selectionStart=null;
 			selectionEnd=null;
 			textChanged = true;
-			if(keyCode==Keyboard.KEY_DELETE || Keyboard.KEY_BACK==keyCode){
+			if(keyCode==GLFW.GLFW_KEY_DELETE || GLFW.GLFW_KEY_BACKSPACE==keyCode){
 				return true;
 			}
 			setNeedsSaveFlag(true);
 		}
 		if(!isFocused()){return false;}
 		switch (keyCode) {
-		case Keyboard.KEY_RETURN:{
+		case GLFW.GLFW_KEY_ENTER:{
 			if(!isEditable){return false;}
 			String tmp = lines.get(cursor.getY()).substring(cursor.getX());
 			lines.set(cursor.getY(), lines.get(cursor.getY()).substring(0,cursor.getX()));
@@ -855,7 +864,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 			setNeedsSaveFlag(true);
 			break;
 		}
-		case Keyboard.KEY_BACK:
+		case GLFW.GLFW_KEY_BACKSPACE:
 			if(!isEditable){return false;}
 			if(cursor.getX()>0){
 				lines.set(cursor.getY(), lines.get(cursor.getY()).substring(0, cursor.getX()-1)+lines.get(cursor.getY()).substring(cursor.getX()));
@@ -871,7 +880,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 			}
 			setNeedsSaveFlag(true);
 			break;
-		case Keyboard.KEY_UP:
+		case GLFW.GLFW_KEY_UP:
 			if(cursor.getY()>0){
 				cursor.addY(-1);
 				cursor.setX(Math.min(lines.get(cursor.getY()).length(), prefX));
@@ -879,7 +888,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 			if(selectionEnd!=null && isShiftDown())
 				selectionEnd.set(cursor);
 			break;
-		case Keyboard.KEY_DOWN:
+		case GLFW.GLFW_KEY_DOWN:
 			if(cursor.getY()<lines.size()-1){
 				cursor.addY(1);
 				cursor.setX(Math.min(lines.get(cursor.getY()).length(), prefX));
@@ -887,7 +896,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 			if(selectionEnd!=null && isShiftDown())
 				selectionEnd.set(cursor);
 			break;
-		case Keyboard.KEY_LEFT:
+		case GLFW.GLFW_KEY_LEFT:
 			if(cursor.getX()>0){
 				cursor.addX(-1);
 			}else if(cursor.getY()>0){
@@ -898,7 +907,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 			if(selectionEnd!=null && isShiftDown())
 				selectionEnd.set(cursor);
 			break;
-		case Keyboard.KEY_RIGHT:
+		case GLFW.GLFW_KEY_RIGHT:
 			if(cursor.getX()<lines.get(cursor.getY()).length()){
 				cursor.addX(1);
 			}else if(cursor.getY()<lines.size()-1){
@@ -909,7 +918,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 			if(selectionEnd!=null && isShiftDown())
 				selectionEnd.set(cursor);
 			break;
-		case Keyboard.KEY_DELETE:{
+		case GLFW.GLFW_KEY_DELETE:{
 			if(!isEditable){return false;}
 			String line = lines.get(cursor.getY());
 			if(cursor.getX()<line.length()){
@@ -921,42 +930,42 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 			setNeedsSaveFlag(true);
 			break;
 		}
-		case Keyboard.KEY_PRIOR:
+		case GLFW.GLFW_KEY_PAGE_DOWN: //TESTME page down in editor
 			vBar.focusToItem(cursor.getY()-visChars.length/2);
 			break;
-		case Keyboard.KEY_NEXT:
+		case GLFW.GLFW_KEY_PAGE_UP: //TESTME page up in editor
 			vBar.focusToItem(cursor.getY()+visChars.length/2);
 			break;
-		case Keyboard.KEY_TAB:
+		case GLFW.GLFW_KEY_TAB:
 			if(!isEditable){return false;}
 			for(int i = 0; i<propPalette.getValue("tabCount").optint(2); i++)
-				onKeyPressed(gui, ' ', Keyboard.KEY_SPACE);
+				onKeyPressed(gui, ' ', 0, 0);
 			setNeedsSaveFlag(true);
 			break;
-		case Keyboard.KEY_APPS:
+		case GLFW.GLFW_KEY_MENU:
 
 			break;
-		case Keyboard.KEY_PAUSE:
+		case GLFW.GLFW_KEY_PAUSE:
 			break;
-		case Keyboard.KEY_HOME:
+		case GLFW.GLFW_KEY_HOME:
 			cursor.setX(prefX=0);
 			updateScrollbarContent(true);
 			break;
-		case Keyboard.KEY_END:
+		case GLFW.GLFW_KEY_END:
 			cursor.setX(prefX=lines.get(cursor.getY()).length());
 			updateScrollbarContent(true);
 			break;
 		default:
 			if(isCTRLDown()){
 				//System.out.println("CONTROLL IS PRESS");
-				if(keyCode==Keyboard.KEY_A) {
+				if(keyCode==GLFW.GLFW_KEY_A) {
 					selectionStart = new Point(0, 0);
 					selectionEnd = new Point(lines.get(lines.size()-1).length(), lines.size()-1);
-				}else	if(keyCode==Keyboard.KEY_S){
+				}else	if(keyCode==GLFW.GLFW_KEY_S){
 					//System.out.println("Save>");
 					if(!isEditable){return false;}
 					save();
-				}else if(keyCode==Keyboard.KEY_C){
+				}else if(keyCode==GLFW.GLFW_KEY_C){
 					try{
 						String toClipboard = "";
 						for(int sl =  selectionStart.getY(); sl<=selectionEnd.getY(); sl++){
@@ -971,7 +980,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 					}catch (Exception e) {
 						e.printStackTrace();
 					}
-				}else if(keyCode==Keyboard.KEY_X){
+				}else if(keyCode==GLFW.GLFW_KEY_X){
 					if(!isEditable){return false;}
 					try{
 						String toClipboard = "";
@@ -1005,7 +1014,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 						e.printStackTrace();
 					}
 					setNeedsSaveFlag(true);
-				}else if(keyCode==Keyboard.KEY_V && isEditable){
+				}else if(keyCode==GLFW.GLFW_KEY_V && isEditable){
 					if(!isEditable){return false;}
 					//System.out.println("paste");
 					try {
@@ -1028,18 +1037,18 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 					} catch (Exception e) {
 					}
 					setNeedsSaveFlag(true);
-				}else if(keyCode==Keyboard.KEY_W && isEditable){
+				}else if(keyCode==GLFW.GLFW_KEY_W && isEditable){
 					//TODO exit editor with CTRL+W
 					System.out.println("Exit");
-				}else if(keyCode==Keyboard.KEY_G && isEditable){
+				}else if(keyCode==GLFW.GLFW_KEY_G && isEditable){
 					//TODO goto line popup
 					//TODO clickable errors that jump to line number
 					System.out.println("Goto line");
-				}else if(keyCode==Keyboard.KEY_R && isEditable) {
+				}else if(keyCode==GLFW.GLFW_KEY_R && isEditable) {
 					save();
 					ForgeEventHandler.closeMenu();
 					AdvancedMacros.runScript(ScriptBrowser2.getScriptPath(getScriptFile()));
-				}else if(keyCode==Keyboard.KEY_SPACE && isEditable){
+				}else if(keyCode==GLFW.GLFW_KEY_SPACE && isEditable){
 					if(!isEditable){return false;}
 					//TODO autocomplete!
 					System.out.println("Autocomplete");
@@ -1058,14 +1067,16 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		return isVisible && isFocused();
 	}
 	private boolean isEditKey(char typedChar, int keyCode) {
-		int[] blacklist = new int[]{Keyboard.KEY_APPS, Keyboard.KEY_DOWN, Keyboard.KEY_UP, Keyboard.KEY_LEFT, Keyboard.KEY_RIGHT,
-				Keyboard.KEY_PRIOR, Keyboard.KEY_NEXT, Keyboard.KEY_LSHIFT, Keyboard.KEY_RSHIFT,
-				Keyboard.KEY_LCONTROL, Keyboard.KEY_RCONTROL, Keyboard.KEY_HOME, Keyboard.KEY_END,
-				Keyboard.KEY_F1,Keyboard.KEY_F2,Keyboard.KEY_F3,Keyboard.KEY_F4,Keyboard.KEY_F5,Keyboard.KEY_F6,
-				Keyboard.KEY_F7,Keyboard.KEY_F8,Keyboard.KEY_F9,Keyboard.KEY_F10,Keyboard.KEY_F11,Keyboard.KEY_F12,
-				Keyboard.KEY_ESCAPE, Keyboard.KEY_LMENU, Keyboard.KEY_RMENU,
-				Keyboard.KEY_LMETA, Keyboard.KEY_RMETA, Keyboard.KEY_LWIN, Keyboard.KEY_RWIN, Keyboard.KEY_CAPITAL,
-				Keyboard.KEY_SCROLL, Keyboard.KEY_PAUSE};
+		int[] blacklist = new int[]{GLFW.GLFW_KEY_MENU, GLFW.GLFW_KEY_DOWN, GLFW.GLFW_KEY_UP, GLFW.GLFW_KEY_LEFT, GLFW.GLFW_KEY_RIGHT,
+				GLFW.GLFW_KEY_PAGE_DOWN, GLFW.GLFW_KEY_PAGE_UP, GLFW.GLFW_KEY_LEFT_SHIFT, GLFW.GLFW_KEY_RIGHT_SHIFT,
+				GLFW.GLFW_KEY_LEFT_CONTROL, GLFW.GLFW_KEY_RIGHT_CONTROL, GLFW.GLFW_KEY_HOME, GLFW.GLFW_KEY_END,
+				GLFW.GLFW_KEY_F1,GLFW.GLFW_KEY_F2,GLFW.GLFW_KEY_F3,GLFW.GLFW_KEY_F4,GLFW.GLFW_KEY_F5,GLFW.GLFW_KEY_F6,
+				GLFW.GLFW_KEY_F7,GLFW.GLFW_KEY_F8,GLFW.GLFW_KEY_F9,GLFW.GLFW_KEY_F10,GLFW.GLFW_KEY_F11,GLFW.GLFW_KEY_F12,
+				GLFW.GLFW_KEY_F13,GLFW.GLFW_KEY_F14,GLFW.GLFW_KEY_F15,GLFW.GLFW_KEY_F16,GLFW.GLFW_KEY_F17,GLFW.GLFW_KEY_F18,GLFW.GLFW_KEY_F19,
+				GLFW.GLFW_KEY_F20, GLFW.GLFW_KEY_F21, GLFW.GLFW_KEY_F22,GLFW.GLFW_KEY_F23,GLFW.GLFW_KEY_F24,GLFW.GLFW_KEY_F25,
+				GLFW.GLFW_KEY_ESCAPE, GLFW.GLFW_KEY_MENU,
+				GLFW.GLFW_KEY_LEFT_ALT, GLFW.GLFW_KEY_RIGHT_ALT, GLFW.GLFW_KEY_CAPS_LOCK,
+				GLFW.GLFW_KEY_SCROLL_LOCK, GLFW.GLFW_KEY_PAUSE};
 		if(typedChar==0)
 			return false;
 		for (int i : blacklist) {
@@ -1114,19 +1125,19 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	}
 
 	public static boolean isCTRLDown(){
-		return Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
+		return Keyboard.isDown(GLFW.GLFW_KEY_LEFT_CONTROL) || Keyboard.isDown(GLFW.GLFW_KEY_RIGHT_CONTROL);
 	}
 	public static boolean isShiftDown(){
-		return Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT); 
+		return Keyboard.isDown(GLFW.GLFW_KEY_LEFT_SHIFT) || Keyboard.isDown(GLFW.GLFW_KEY_RIGHT_SHIFT); 
 	}
-	@Override
-	public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
-		if(isFocused() && repeatMod%5==0 && !isCTRLDown()){
-			onKeyPressed(gui, typedChar, keyCode);
-			return true;
-		}
-		return false;
-	}
+//	@Override
+//	public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
+//		if(isFocused() && repeatMod%5==0 && !isCTRLDown()){
+//			onKeyPressed(gui, typedChar, keyCode);
+//			return true;
+//		}
+//		return false;
+//	}
 
 	@Override
 	public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
@@ -1172,7 +1183,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		resize(x, i);
 	}
 	public void resize(int newWid, int newHei){
-		if(newWid==0 || newHei==0 || g.width==0 || g.height==0 || AdvancedMacros.getMinecraft().displayWidth==0 || AdvancedMacros.getMinecraft().displayHeight==0)return;
+		if(newWid==0 || newHei==0 || g.width==0 || g.height==0 || AdvancedMacros.getMinecraft().mainWindow.getWidth()==0 || AdvancedMacros.getMinecraft().mainWindow.getHeight()==0)return;
 		if(wid!=newWid || hei!=newHei){ //something changed
 			////			if(texture!=null){
 			////				texture.deleteGlTexture();

@@ -1,30 +1,33 @@
 package com.theincgi.advancedMacros.gui;
 
-import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
+import java.util.Iterator;
 
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
+import org.lwjgl.glfw.GLFW;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.event.TaskDispatcher;
 import com.theincgi.advancedMacros.gui.elements.Drawable;
 import com.theincgi.advancedMacros.gui.elements.GuiRect;
 import com.theincgi.advancedMacros.gui.elements.ListManager;
 import com.theincgi.advancedMacros.gui.elements.Moveable;
 import com.theincgi.advancedMacros.lua.LuaDebug;
+import com.theincgi.advancedMacros.misc.HIDUtils.Mouse;
 import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -32,9 +35,9 @@ public class InputGUI extends Gui{
 	private Thread threadCheck;
 	InputType inputType;
 	private LuaDebug debug;
-	GuiTextField textInput = new GuiTextField(0, fontRend, 5, 5, 30, 12);
+	TextFieldWidget textInput = new TextFieldWidget(fontRend, 5, 5, 30, 12, "");
 	private IForgeRegistry<Item> blah = GameRegistry.findRegistry(Item.class);
-	private List<Item> itemList = blah.getValues();
+	private Collection<Item> itemList = blah.getValues();
 	private final int WHITE = Color.WHITE.toInt();
 	private String prompt;
 	private boolean answered = true;
@@ -45,15 +48,16 @@ public class InputGUI extends Gui{
 	private static ItemRenderer itemRenderer = AdvancedMacros.getMinecraft().getItemRenderer();
 	public InputGUI(LuaDebug debug) {
 		this.debug = debug;
-		textInput.height=12;
+		textInput.setHeight(12);
 		listItemPicker.setDrawBG(false);
 		listItemPicker.setAlwaysShowScroll(true);
 		listItemPicker.setSpacing(3);
-		for(int i = 0; i<itemList.size(); i++) {
-			Item item = itemList.get(i);
+		Iterator<Item> itemItter = itemList.iterator();
+		for(int i = 0; itemItter.hasNext(); i++) {
+			Item item = itemItter.next();
 			//argument for maxDamage is literally discarded
 			//for(int d = 0; d<item.getMaxDamage(ItemStack.EMPTY); d++) {
-				listItemPicker.add(new ItemOption(new ItemStack(item, 1, 0)));
+				listItemPicker.add(new ItemOption(new ItemStack(item, 1)));
 			//}
 		}
 		addInputSubscriber(listItemPicker);
@@ -71,7 +75,7 @@ public class InputGUI extends Gui{
 				this.inputType = inputType;
 				this.prompt = prompt;
 				answered=false;
-				textInput.setFocused(inputType==InputType.TEXT);
+				textInput.setFocused2(inputType==InputType.TEXT);
 				textInput.setVisible(inputType==InputType.TEXT);
 				textInput.setText("");
 				listItemPicker.setVisible(inputType==InputType.ITEM);
@@ -81,11 +85,16 @@ public class InputGUI extends Gui{
 	}
 
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-		super.drawScreen(mouseX, mouseY, partialTicks);
+	public ITextComponent getTitle() {
+		return new StringTextComponent("Input Screen");
+	}
+	
+	@Override
+	public void render(int mouseX, int mouseY, float partialTicks) {
+		super.render(mouseX, mouseY, partialTicks);
 		switch (inputType) {
 		case TEXT:
-			drawRect(1, height-49, width-1, height-1, 0xDD000000);
+			fill(1, height-49, width-1, height-1, 0xDD000000);
 			int drawHei = height-5;
 			textInput.y=(drawHei-=12);
 			drawHei-=5;
@@ -95,7 +104,7 @@ public class InputGUI extends Gui{
 			drawHei-=getFontRend().FONT_HEIGHT;
 			getFontRend().drawString(debug.getLabel(threadCheck), 5, drawHei, WHITE);
 
-			textInput.drawTextBox();
+			textInput.render(mouseX, mouseY, partialTicks);
 			break;
 		case ITEM:
 			getFontRend().drawString(debug.getLabel(threadCheck), 5, 5, WHITE);
@@ -112,9 +121,9 @@ public class InputGUI extends Gui{
 		}	
 	}
 	@Override
-	public void setWorldAndResolution(Minecraft mc, int width, int height) {
-		super.setWorldAndResolution(mc, width, height);
-		textInput.width=width-10;
+	public void resize(Minecraft mc, int width, int height) {
+		super.resize(mc, width, height);
+		textInput.setWidth(width-10);
 		listItemPicker.setPos(5, 25);
 		listItemPicker.setWidth(width/2-10);
 		listItemPicker.setHeight(height-60);
@@ -124,34 +133,37 @@ public class InputGUI extends Gui{
 		
 	}
 
+	
 	@Override
-	protected void keyTyped(char typedChar, int keyCode) throws IOException {
-		super.keyTyped(typedChar, keyCode);
-		if(keyCode==Keyboard.KEY_ESCAPE) {
+	public boolean charTyped(char typedChar, int keyCode) {
+		if(keyCode==GLFW.GLFW_KEY_ESCAPE) {
 			close(LuaValue.NIL);
+			return true;
 		}else if(inputType==InputType.TEXT) {
-			if(keyCode==Keyboard.KEY_RETURN) {
+			if(keyCode==GLFW.GLFW_KEY_ENTER) {
 				close(LuaValue.valueOf(textInput.getText()));
-				return;
+				return true;
 			}
 
-			textInput.textboxKeyTyped(typedChar, keyCode);
+			return textInput.charTyped(typedChar, keyCode);
 		}
+		
+		return super.charTyped(typedChar, keyCode);
 	}
-	@Override
-	public boolean keyRepeated(char typedChar, int keyCode, int mod) {
-		super.keyRepeated(typedChar, keyCode, mod);
-		if(inputType==InputType.TEXT) {
-			if(mod%2==0)
-				textInput.textboxKeyTyped(typedChar, keyCode);
-			return textInput.isFocused();
-		}
-		return false;
-	}
+//	@Override
+//	public boolean keyRepeated(char typedChar, int keyCode, int mod) {
+//		super.keyRepeated(typedChar, keyCode, mod);
+//		if(inputType==InputType.TEXT) {
+//			if(mod%2==0)
+//				textInput.charTyped(typedChar, keyCode);
+//			return textInput.isFocused();
+//		}
+//		return false;
+//	}
 	private void close(LuaValue value) {
 		answer = value;
 		answered = true;
-		textInput.setFocused(false);
+		textInput.setFocused2(false);
 		AdvancedMacros.getMinecraft().player.closeScreen();
 	}
 	
@@ -187,12 +199,12 @@ public class InputGUI extends Gui{
 		}
 
 		@Override
-		public boolean onScroll(Gui gui, int i) {
+		public boolean onScroll(Gui gui, double i) {
 			return false;
 		}
 
 		@Override
-		public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
+		public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
 			if(GuiRect.isInBounds(x, y, this.x, this.y, width, 20) && isVisible) {
 				close(Utils.itemStackToLuatable(stack));
 				return true;
@@ -200,22 +212,21 @@ public class InputGUI extends Gui{
 		}
 
 		@Override
-		public boolean onMouseRelease(Gui gui, int x, int y, int state) {
+		public boolean onMouseRelease(Gui gui, double x, double y, int state) {
+			return false;
+		}
+		@Override
+		public boolean onMouseClickMove(Gui gui, double x, double y, int buttonNum, double q, double r) {
 			return false;
 		}
 
-		@Override
-		public boolean onMouseClickMove(Gui gui, int x, int y, int buttonNum, long timeSinceClick) {
-			return false;
-		}
 
 		@Override
-		public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
+		public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
 			return false;
 		}
-
 		@Override
-		public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
+		public boolean onCharTyped(Gui gui, char typedChar, int mods) {
 			return false;
 		}
 
@@ -278,12 +289,12 @@ public class InputGUI extends Gui{
 			g.drawBoxedRectangle(x, y, width, 20, BGColor, FILLColor);
 			RenderHelper.disableStandardItemLighting();
 			RenderHelper.enableGUIStandardItemLighting();
-			itemRender.renderItemAndEffectIntoGUI(stack, x+3, y+2);
+			AdvancedMacros.getMinecraft().getItemRenderer().renderItemAndEffectIntoGUI(stack, x+3, y+2);
 			
 			if(GuiRect.isInBounds(mouseX, mouseY, this.x, this.y, width, 20)) {
-				net.minecraft.client.gui.Gui.drawRect(x, y, x+width, y+20, HEIGHLIGHT);
+				fill(x, y, x+width, y+20, HEIGHLIGHT);
 			}
-			g.getFontRend().drawString(stack.getDisplayName(), x+25, y+5, TEXTCOLOR);
+			g.getFontRend().drawString(stack.getDisplayName().getFormattedText(), x+25, y+5, TEXTCOLOR);
 			
 			
 		}
@@ -299,12 +310,12 @@ public class InputGUI extends Gui{
 		}
 
 		@Override
-		public boolean onScroll(Gui gui, int i) {
+		public boolean onScroll(Gui gui, double i) {
 			return false;
 		}
 
 		@Override
-		public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
+		public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
 			if(GuiRect.isInBounds(x, y, this.x, this.y, width, 20) && isVisible) {
 				close(LuaValue.valueOf(option));
 				return true;
@@ -312,22 +323,21 @@ public class InputGUI extends Gui{
 		}
 
 		@Override
-		public boolean onMouseRelease(Gui gui, int x, int y, int state) {
+		public boolean onMouseRelease(Gui gui, double x, double y, int state) {
 			return false;
 		}
 
 		@Override
-		public boolean onMouseClickMove(Gui gui, int x, int y, int buttonNum, long timeSinceClick) {
+		public boolean onMouseClickMove(Gui gui, double x, double y, int buttonNum, double q, double r) {
 			return false;
 		}
 
 		@Override
-		public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
+		public boolean onCharTyped(Gui gui, char typedChar, int mods) {
 			return false;
 		}
-
 		@Override
-		public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
+		public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
 			return false;
 		}
 
@@ -394,7 +404,7 @@ public class InputGUI extends Gui{
 			
 			
 			if(GuiRect.isInBounds(mouseX, mouseY, this.x, this.y, width, 20)) {
-				net.minecraft.client.gui.Gui.drawRect(x, y, x+width, y+20, HEIGHLIGHT);
+				fill(x, y, x+width, y+20, HEIGHLIGHT);
 			}
 			g.getFontRend().drawString(option, x+7, y+5, TEXTCOLOR);
 			
@@ -416,7 +426,7 @@ public class InputGUI extends Gui{
 			LuaValue arg0 = args.arg1();
 			LuaValue type = args.arg(2);
 			//System.out.println("Block Waiting");
-			AdvancedMacros.forgeEventHandler.releaseAllKeys();
+//			AdvancedMacros.forgeEventHandler.releaseAllKeys();
 			synchronized (InputGUI.this) {
 				//System.out.println("Block Entered!");
 				try {
@@ -439,7 +449,7 @@ public class InputGUI extends Gui{
 						}
 						setInputType(inputType, arg0.tojstring()); //seems to effect the thread check
 					}
-					AdvancedMacros.getMinecraft().addScheduledTask(new Runnable() {
+					TaskDispatcher.addTask(new Runnable() {
 						@Override
 						public void run() {
 							Mouse.setGrabbed(false);

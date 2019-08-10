@@ -12,10 +12,13 @@ import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.Language;
-import net.minecraft.entity.player.EnumPlayerModelParts;
-import net.minecraft.util.EnumHandSide;
+import net.minecraft.client.settings.AmbientOcclusionStatus;
+import net.minecraft.client.settings.CloudOption;
+import net.minecraft.client.settings.ParticleStatus;
+import net.minecraft.entity.player.PlayerModelPart;
+import net.minecraft.util.HandSide;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.world.EnumDifficulty;
+import net.minecraft.world.Difficulty;
 
 public class MinecraftSettings extends LuaTable {
 	public MinecraftSettings() {
@@ -24,9 +27,7 @@ public class MinecraftSettings extends LuaTable {
 		}
 	}
 	
-	private static final String[] CLOUDS_MODE = new String[] {"off","fast","fancy"};
 	private static final String[] GUI_SCALE = new String[] {"auto", "small", "normal", "large"};
-	private static final String[] PARTICLE_MODE = new String[] {"minimal","decresed","all"};
 	private static final String[] PERSPECTIVE = new String[] {"first","front","back"};
 	
 	private static class DoOp extends VarArgFunction {
@@ -39,17 +40,17 @@ public class MinecraftSettings extends LuaTable {
 			Minecraft mc = AdvancedMacros.getMinecraft();
 			switch (code) {
 			case getFov:
-				return valueOf(mc.gameSettings.fovSetting);
+				return valueOf(mc.gameSettings.fov);
 			case getRenderDistance:
 				return valueOf(mc.gameSettings.renderDistanceChunks);
 			case getSkinCustomization:{
-				Set<EnumPlayerModelParts> s = mc.gameSettings.getModelParts();
+				Set<PlayerModelPart> s = mc.gameSettings.getModelParts();
 				if(args.arg1().isnil()) {
 					LuaTable out = new LuaTable();
-					for (EnumPlayerModelParts part : EnumPlayerModelParts.values()) {
+					for (PlayerModelPart part : PlayerModelPart.values()) {
 						out.set(part.name().toLowerCase().replace('_', ' '), false);
 					}
-					for (EnumPlayerModelParts part : s) {
+					for (PlayerModelPart part : s) {
 						out.set(part.name().toLowerCase().replace('_', ' '), true);
 					}
 				}else {
@@ -60,38 +61,34 @@ public class MinecraftSettings extends LuaTable {
 						key = "chest";
 					key = key.toUpperCase();
 					key = key.replace(' ', '_');
-					return valueOf(s.contains(EnumPlayerModelParts.valueOf(key)));
+					return valueOf(s.contains(PlayerModelPart.valueOf(key)));
 				}
 			}
 			case getVolume:
-				return valueOf(mc.gameSettings.getSoundLevel(SoundCategory.getByName(args.checkjstring(1).toUpperCase())));
+				return valueOf(mc.gameSettings.getSoundLevel(SoundCategory.valueOf(args.checkjstring(1).toUpperCase())));
 			case isFullscreen:
-				return valueOf(mc.isFullScreen());
+				return valueOf(mc.mainWindow.isFullscreen());
 			case setFov:
-				mc.gameSettings.fovSetting = (float) args.checkdouble(1);
+				mc.gameSettings.fov = (float) args.checkdouble(1);
 				return NONE;
 			case setFullscreen:
-				if(mc.isFullScreen() != args.optboolean(1, true))
-					mc.toggleFullscreen();
+				if(mc.mainWindow.isFullscreen() != args.optboolean(1, true))
+					mc.mainWindow.toggleFullscreen();
 				return NONE;
 			case setRenderDistance:
 				mc.gameSettings.renderDistanceChunks = Math.max(2, Math.min(args.checkint(1), 32));
 				return NONE;
 			case setVolume:
-				mc.gameSettings.setSoundLevel(SoundCategory.getByName(args.checkjstring(1)), (float) args.checkdouble(2));
+				mc.gameSettings.setSoundLevel(SoundCategory.valueOf(args.checkjstring(1).toUpperCase()), (float) args.checkdouble(2));
 				return NONE;
 			case getMaxFps:
-				return valueOf(mc.gameSettings.limitFramerate);
+				return valueOf(mc.gameSettings.framerateLimit);
 			case setMaxFps:
-				mc.gameSettings.limitFramerate = Math.max(1, args.checkint(1));
+				mc.gameSettings.framerateLimit = Math.max(1, args.checkint(1));
 				return NONE;
 			case getSmoothLighting:{
 				String mode = "INVALID";
-				switch(mc.gameSettings.ambientOcclusion){
-				case 0: mode = "off";    break;
-				case 1: mode = "minimum";break;
-				case 2: mode = "maximum";break;
-				}
+				name = mc.gameSettings.ambientOcclusionStatus.name().toLowerCase();
 				return valueOf(mode);
 			}
 			case getChatHeightFocused:
@@ -105,7 +102,7 @@ public class MinecraftSettings extends LuaTable {
 			case getChatWidth:
 				return valueOf(mc.gameSettings.chatWidth);
 			case getCloudsMode:
-				return valueOf(CLOUDS_MODE[mc.gameSettings.clouds]);
+				return valueOf(mc.gameSettings.cloudOption.name().toLowerCase());
 			case getDifficulty:
 				return valueOf(mc.gameSettings.difficulty.name().toLowerCase());
 			case getGuiScale:
@@ -115,7 +112,7 @@ public class MinecraftSettings extends LuaTable {
 			case getLanguages:{
 				LuaTable langs = new LuaTable();
 				for(Language l : mc.getLanguageManager().getLanguages()) {
-					langs.set(langs.length()+1, l.getLanguageCode());
+					langs.set(langs.length()+1, l.getCode());
 				}
 			}
 			case getLastServer:
@@ -127,7 +124,7 @@ public class MinecraftSettings extends LuaTable {
 			case getMouseSensitivity:
 				return valueOf(mc.gameSettings.mouseSensitivity);
 			case getParticleLevel:
-				return valueOf(PARTICLE_MODE[mc.gameSettings.particleSetting]);
+				return valueOf(mc.gameSettings.particles.name().toLowerCase());
 			case getPerspective:
 				return valueOf(PERSPECTIVE[mc.gameSettings.thirdPersonView]);
 				
@@ -153,23 +150,16 @@ public class MinecraftSettings extends LuaTable {
 			case isViewBobbing:
 				return valueOf(mc.gameSettings.viewBobbing);
 			case isVsync:
-				return valueOf(mc.gameSettings.enableVsync);
+				return valueOf(mc.gameSettings.vsync);
 				
 				
 			case setAdvancedItemTooltips:
 				mc.gameSettings.advancedItemTooltips = args.arg1().checkboolean();
 				return NONE;
 			case setSmoothLighting:{
-				switch (args.arg1().checkjstring().toLowerCase()) {
-				case "off":
-					mc.gameSettings.ambientOcclusion = 0; break;
-				case "min":
-				case "minimum":
-					mc.gameSettings.ambientOcclusion = 1; break;
-				case "max":
-				case "maximum":
-					mc.gameSettings.ambientOcclusion = 2; break;
-				}
+				AmbientOcclusionStatus status = AmbientOcclusionStatus.valueOf(args.arg1().checkjstring().toUpperCase());
+				if(status == null) throw new LuaError("Invalid option '"+args.arg1().checkjstring()+"'");
+				mc.gameSettings.ambientOcclusionStatus = status;
 				return NONE;
 			}
 			case setAutoJump:
@@ -197,19 +187,12 @@ public class MinecraftSettings extends LuaTable {
 				return NONE;
 				
 			case setCloudsMode:
-				switch(args.arg1().checkjstring().toLowerCase()) {
-				case "off":
-					mc.gameSettings.clouds = 0; break;
-				case "fast":
-					mc.gameSettings.clouds = 1; break;
-				case "fancy":
-					mc.gameSettings.clouds = 2; break;
-				default:
-					throw new LuaError("Invalid mode [off/fast/fancy]");
-				}
+					CloudOption co = CloudOption.valueOf( args.arg1().checkjstring().toUpperCase() );
+					if(co == null) throw new LuaError("Invalid option '"+args.arg1().checkjstring()+"'");
+					mc.gameSettings.cloudOption = co;
 				return NONE;
 			case setDifficulty:
-				mc.gameSettings.difficulty = args.arg1().isnumber()? EnumDifficulty.byId(args.arg1().checkint()) : EnumDifficulty.valueOf(args.arg1().checkjstring().toUpperCase());
+				mc.gameSettings.difficulty = args.arg1().isnumber()? Difficulty.byId(args.arg1().checkint()) : Difficulty.valueOf(args.arg1().checkjstring().toUpperCase());
 				return NONE;
 			case setEntityShadows:
 				mc.gameSettings.entityShadows = args.arg1().checkboolean();
@@ -239,14 +222,14 @@ public class MinecraftSettings extends LuaTable {
 				return NONE;
 			case setLanguage: 
 				for(Language l : mc.getLanguageManager().getLanguages()) {
-					if(l.getLanguageCode().toLowerCase() == args.checkjstring(1).toLowerCase()) {
-						mc.gameSettings.language = l.getLanguageCode();
+					if(l.getCode().toLowerCase() == args.checkjstring(1).toLowerCase()) {
+						mc.gameSettings.language = l.getCode();
 						return NONE;
 					}
 				}
 				throw new LuaError("Invalid languge code ("+args.checkjstring(1)+")");
 			case setMainHandSide:
-				mc.gameSettings.mainHand = EnumHandSide.valueOf(args.checkjstring(1).toUpperCase());
+				mc.gameSettings.mainHand = HandSide.valueOf(args.checkjstring(1).toUpperCase());
 				return NONE;
 			case setMipmapLevels:
 				mc.gameSettings.mipmapLevels = Utils.clamp(0, args.checkint(1), 4);
@@ -255,24 +238,10 @@ public class MinecraftSettings extends LuaTable {
 				mc.gameSettings.mouseSensitivity = (float) Utils.clamp(0.0, args.checkdouble(1), 1.0);
 				return NONE;
 			case setParticleLevel:
-				switch (args.checkjstring(1).toLowerCase()) {
-				case "min":
-				case "minimal":
-				case "minimum":
-					mc.gameSettings.particleSetting = 0;
+				ParticleStatus s = ParticleStatus.valueOf(args.checkjstring(1).toLowerCase());
+				if(s==null) throw new LuaError("Invalid particle level '"+args.checkjstring(1)+"'");
+				mc.gameSettings.particles = s;
 					return NONE;
-				case "decresed":
-				case "some":
-					mc.gameSettings.particleSetting = 1;
-					return NONE;
-				case "max":
-				case "all":
-				case "maximum":
-					mc.gameSettings.particleSetting = 2;
-					return NONE;
-				default:
-					throw new LuaError("Unknown particle level '"+args.checkstring(1)+"' (use min/some/max or minimal/decresed/all)");
-				}
 			case setPauseOnLostFocus:
 				mc.gameSettings.pauseOnLostFocus = args.checkboolean(1);
 				return NONE;
@@ -302,7 +271,7 @@ public class MinecraftSettings extends LuaTable {
 				mc.gameSettings.viewBobbing = args.checkboolean(1);
 				return NONE;
 			case setVsync:
-				mc.gameSettings.enableVsync = args.checkboolean(1);
+				mc.gameSettings.vsync = args.checkboolean(1);
 				return NONE;
 			default:
 				throw new LuaError("Undefined op "+code.name());

@@ -8,12 +8,11 @@ import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.hud.Destroyable;
 import com.theincgi.advancedMacros.misc.Utils;
-
-import net.minecraft.client.renderer.GlStateManager;
 
 public abstract class Hud2DItem implements Destroyable{
 	
@@ -178,8 +177,8 @@ public abstract class Hud2DItem implements Destroyable{
 	}
 	
 	protected void applyTransformation() {
-		GlStateManager.translate(x, y, 0);
-		GlStateManager.rotate(angle, 0, 0, 1);
+		GlStateManager.translatef(x, y, 0);
+		GlStateManager.rotatef(angle, 0, 0, 1);
 		//GlStateManager.translate(-x, -y, 0);
 	}
 	

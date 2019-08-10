@@ -46,7 +46,7 @@ public class GuiDropDown implements Drawable, InputSubscriber, Moveable{
 		
 		dropButton = new GuiButton(x+width-height, 	y, 
 				height, 		height, 
-				Settings.getTextureID("resource:whiteDownTri.png"), LuaValue.NIL, propertyPalette.propertyPaletteOf("dropButton"));
+				Settings.getTextureID("resource:whitedowntri.png"), LuaValue.NIL, propertyPalette.propertyPaletteOf("dropButton"));
 		txtBG = new GuiRect(x, y, width-dropButton.getWid(), height, propertyPalette.propertyPaletteOf("textBackground"));
 		propertyPalette.addColorIfNil(Color.WHITE, "colors","text");
 //	}
@@ -178,7 +178,7 @@ public class GuiDropDown implements Drawable, InputSubscriber, Moveable{
 		onSelect = oSel;
 	}
 	
-	public boolean isInBounds(int x, int y){
+	public boolean isInBounds(double x, double y){
 		if(txtBG.getX()<=x && x <= dropButton.getX()+dropButton.getWid() && txtBG.getY() <= y){
 			if(listManager.isVisible()){
 				return y <= listManager.getY()+listManager.getItemHeight();
@@ -219,7 +219,7 @@ public class GuiDropDown implements Drawable, InputSubscriber, Moveable{
 		@Override
 		public void onDraw(Gui gui, int mouseX, int mouseY, float partialTicks) {
 			if(listManager.isVisible()){
-				gui.drawWorldBackground(10);
+				gui.renderBackground(10);
 //				listBG.setPos(x, listManager.getY());
 //				listBG.setWidth(listManager.getItemWidth()-listManager.scrollBar.getItemHeight());
 //				listBG.setHeight(listManager.getTotalHeight());
@@ -233,15 +233,16 @@ public class GuiDropDown implements Drawable, InputSubscriber, Moveable{
 	};
 	
 	@Override
-	public boolean onScroll(Gui gui, int i) {
+	public boolean onScroll(Gui gui, double i) {
 		//if(dropButton.onScroll(gui, i)){return true;}
+		i = Math.signum( i );
 		if(listManager.isVisible()){
 			if(listManager.onScroll(gui, i))return true;
 		}
 		return false;
 	}
 	@Override
-	public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
+	public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
 		if(dropButton.onMouseClick(gui, x, y, buttonNum)){return true;}
 		if(listManager.isVisible()){
 			if(listManager.onMouseClick(gui, x, y, buttonNum))return true;
@@ -249,7 +250,7 @@ public class GuiDropDown implements Drawable, InputSubscriber, Moveable{
 		return false;
 	}
 	@Override
-	public boolean onMouseRelease(Gui gui, int x, int y, int state) {
+	public boolean onMouseRelease(Gui gui, double x, double y, int state) {
 		if(dropButton.onMouseRelease(gui, x, y, state)){return true;}
 		if(listManager.isVisible()){
 			if(listManager.onMouseRelease(gui, x, y, state))return true;
@@ -257,26 +258,26 @@ public class GuiDropDown implements Drawable, InputSubscriber, Moveable{
 		return false;
 	}
 	@Override
-	public boolean onMouseClickMove(Gui gui, int x, int y, int buttonNum, long timeSinceClick) {
-		if(dropButton.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick)){return true;}
+	public boolean onMouseClickMove(Gui gui, double x, double y, int buttonNum, double q, double r) {
+		if(dropButton.onMouseClickMove(gui, x, y, buttonNum, q, r)){return true;}
 		if(listManager.isVisible()){
-			if(listManager.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))return true;
+			if(listManager.onMouseClickMove(gui, x, y, buttonNum, q, r))return true;
 		}
 		return false;
 	}
 	@Override
-	public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
-		if(dropButton.onKeyPressed(gui, typedChar, keyCode)){return true;}
+	public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
+		if(dropButton.onKeyPressed(gui, keyCode, scanCode, modifiers)){return true;}
 		if(listManager.isVisible()){
-			if(listManager.onKeyPressed(gui, typedChar, keyCode))return true;
+			if(listManager.onKeyPressed(gui, keyCode, scanCode, modifiers))return true;
 		}
 		return false;
 	}
 	@Override
-	public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
-		if(dropButton.onKeyRepeat(gui, typedChar, keyCode, repeatMod)){return true;}
+	public boolean onCharTyped(Gui gui, char typedChar, int mods) {
+		if(dropButton.onCharTyped(gui, typedChar, mods)){return true;}
 		if(listManager.isVisible()){
-			if(listManager.onKeyRepeat(gui, typedChar, keyCode, repeatMod))return true;
+			if(listManager.onCharTyped(gui, typedChar, mods))return true;
 		}
 		return false;
 	}

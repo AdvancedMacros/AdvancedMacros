@@ -28,13 +28,15 @@ import com.theincgi.advancedMacros.gui.elements.PopupPrompt.Answer;
 import com.theincgi.advancedMacros.gui.elements.PopupPrompt.Choice;
 import com.theincgi.advancedMacros.gui.elements.WidgetID;
 import com.theincgi.advancedMacros.lua.LuaDebug;
-import com.theincgi.advancedMacros.lua.OpenChangeLog;
 import com.theincgi.advancedMacros.lua.LuaDebug.OnScriptFinish;
+import com.theincgi.advancedMacros.lua.OpenChangeLog;
 import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 
 public class MacroMenuGui extends Gui implements IBindingsGui{
 	//BufferedImage img = null;
@@ -181,7 +183,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 		openChangeLog.setOnClick(new OnClickHandler() {
 			@Override
 			public void onClick(int button, GuiButton sButton) {
-				OpenChangeLog.openChangeLog();
+				OpenChangeLog.openChangeLog(true);
 			}
 		});
 
@@ -205,7 +207,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 
 		//updateProfileList();
 //		profileSelect.select("DEFAULT"); done in INIT
-		onResize(AdvancedMacros.getMinecraft(), width, height);
+		resize(AdvancedMacros.getMinecraft(), width, height);
 
 	}
 	
@@ -376,8 +378,8 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 	
 	
 	@Override
-	public void onResize(Minecraft mcIn, int w, int h) {
-		super.onResize(mcIn, w, h);
+	public void resize(Minecraft mcIn, int w, int h) {
+		super.resize(mcIn, w, h);
 		addProfile.setPos(width-5-24, 5);
 		removeProfile.setPos(width-5-12, 5);
 		//gotoSettings.setPos(width-5-36, 17);
@@ -397,11 +399,11 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 	public void markDirty() {dirty = true; System.out.println("Profile marked for saving.");}
 	private boolean dirty = false;
 	@Override
-	public void onGuiClosed() {
+	public void onClose() {
 		updateProfileChanges();
-		super.onGuiClosed();
+		super.onClose();
 	}
-
+	
 	public void updateProfileChanges() {
 		if(!dirty) return;
 		dirty = false;
@@ -437,7 +439,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 	
 	
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+	public void render(int mouseX, int mouseY, float partialTicks) {
 		
 		
 		for(Moveable m: bindingsList.getItems()){
@@ -448,9 +450,9 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 
 			}
 		}
-		onResize(AdvancedMacros.getMinecraft(), width, height);
+		resize(AdvancedMacros.getMinecraft(), width, height);
 		//gb.setWidth(width-10);
-		super.drawScreen(mouseX, mouseY, partialTicks);
+		super.render(mouseX, mouseY, partialTicks);
 	}
 
 	public static void updateScriptList(){
@@ -474,6 +476,11 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 		return prompt.checkAns();
 	}
 
+	@Override
+	public ITextComponent getTitle() {
+		return new StringTextComponent("Bindings Menu");
+	}
+	
 	public static void showMenu(){
 		AdvancedMacros.getMinecraft().displayGuiScreen(AdvancedMacros.macroMenuGui.getGui());
 		AdvancedMacros.macroMenuGui.onGuiOpened();

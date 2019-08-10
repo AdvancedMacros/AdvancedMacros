@@ -26,6 +26,8 @@ import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Settings;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 
 public class ScriptBrowser2 extends Gui{
 
@@ -115,7 +117,7 @@ public class ScriptBrowser2 extends Gui{
 		
 		listManager.setModeFullBox(true);
 		
-		setWorldAndResolution(AdvancedMacros.getMinecraft(), width, height);
+		resize(AdvancedMacros.getMinecraft(), width, height);
 		
 		returnButton.setOnClick((int mouseButton, GuiButton b)->{
 			ForgeEventHandler.showPrevMenu();
@@ -296,13 +298,13 @@ public class ScriptBrowser2 extends Gui{
 		return a+" ("+i+")"+b;
 	}
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-		super.drawScreen(mouseX, mouseY, partialTicks);
+	public void render(int mouseX, int mouseY, float partialTicks) {
+		super.render(mouseX, mouseY, partialTicks);
 		this.getFontRend().drawString(pathText, returnButton.getX()+returnButton.getItemWidth()+2, 8, Color.WHITE.toInt());
 	}
 	@Override
-	public void setWorldAndResolution(Minecraft mc, int width, int height) {
-		super.setWorldAndResolution(mc, width, height);
+	public void resize(Minecraft mc, int width, int height) {
+		super.resize(mc, width, height);
 
 		//update sizes
 
@@ -339,6 +341,11 @@ public class ScriptBrowser2 extends Gui{
 		filePreview.setPos(5, listManager.getY() + listManager.getItemHeight()+5);
 	}
 
+	@Override
+	public ITextComponent getTitle() {
+		return new StringTextComponent("Script Browser");
+	}
+	
 	public void populateList(File folder) {
 		if(folder.isDirectory()) {
 			try {
@@ -461,11 +468,11 @@ public class ScriptBrowser2 extends Gui{
 			}
 		}
 		@Override
-		public boolean onScroll(Gui gui, int i) {
+		public boolean onScroll(Gui gui, double i) {
 			return false;
 		}
 		@Override
-		public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
+		public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
 			for (int i = 0; i < fileElements.length; i++) {
 				if(fileElements[i].button.onMouseClick(gui, x, y, buttonNum))
 					return true;
@@ -473,7 +480,7 @@ public class ScriptBrowser2 extends Gui{
 			return false;
 		}
 		@Override
-		public boolean onMouseRelease(Gui gui, int x, int y, int state) {
+		public boolean onMouseRelease(Gui gui, double x, double y, int state) {
 			for (int i = 0; i < fileElements.length; i++) {
 				if(fileElements[i].button.onMouseRelease(gui, x, y, state))
 					return true;
@@ -481,20 +488,20 @@ public class ScriptBrowser2 extends Gui{
 			return false;
 		}
 		@Override
-		public boolean onMouseClickMove(Gui gui, int x, int y, int buttonNum, long timeSinceClick) {
+		public boolean onMouseClickMove(Gui gui, double x, double y, int buttonNum, double q, double r) {
 			//System.out.println("Passing mouse Event");
 			for (int i = 0; i < fileElements.length; i++) {
-				if(fileElements[i].button.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))
+				if(fileElements[i].button.onMouseClickMove(gui, x, y, buttonNum, q, r))
 					return true;
 			};
 			return false;
 		}
 		@Override
-		public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
+		public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
 			return false;
 		}
 		@Override
-		public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
+		public boolean onCharTyped(Gui gui, char typedChar, int mods) {
 			return false;
 		}
 		@Override

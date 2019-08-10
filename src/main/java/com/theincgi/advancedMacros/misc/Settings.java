@@ -1,18 +1,17 @@
 package com.theincgi.advancedMacros.misc;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-
-import javax.imageio.ImageIO;
 
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
@@ -20,15 +19,16 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.event.TaskDispatcher;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
 import com.theincgi.advancedMacros.lua.ProtectedLuaTable;
 import com.theincgi.advancedMacros.lua.functions.MinecraftSettings;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -94,7 +94,7 @@ public class Settings {
 
 
 	private static transient net.minecraftforge.registries.IForgeRegistry<Block> blah = GameRegistry.findRegistry(Block.class);
-	private static transient List<Block> blockList = blah.getValues();
+	private static transient Collection<Block> blockList = blah.getValues();
 
 	/**nil if error loading, if exists, gets from table, if not will try to load<br>
 	 * use "resource:" at the beginning to specify something in the mod<br>
@@ -141,18 +141,11 @@ public class Settings {
 			//System.out.println("Resource is \""+file+"\"");
 			ResourceLocation r = new ResourceLocation(AdvancedMacros.MODID, file);
 			val = new LuaValTexture("resource:"+file, r);
-		}else if(file.equals("minecraft:blocks")){
-			file = file.substring("minecraft:".length());
-			//AdvancedMacros.getMinecraft().getTextureMapBlocks();
-			ResourceLocation r = TextureMap.LOCATION_BLOCKS_TEXTURE;//new ResourceLocation(file);
-			//ResourceLocation r = new ResourceLocation(file);
-			val = new LuaValTexture("game:"+file, r);
 		}else if(file.startsWith("block:")){
 			file = file.substring("block:".length());
 
-			TextureMap tm = AdvancedMacros.getMinecraft().getTextureMapBlocks();
-			TextureAtlasSprite sprite = tm.getTextureExtry(file);
-			ResourceLocation r = TextureMap.LOCATION_BLOCKS_TEXTURE;
+			ResourceLocation r = AtlasTexture.LOCATION_BLOCKS_TEXTURE;
+			TextureAtlasSprite sprite = AdvancedMacros.getMinecraft().getTextureMap().getSprite(r);
 			LuaValTexture tex;
 			val = tex = new LuaValTexture("game:"+file, r);
 			tex.setUV(sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV());
@@ -183,7 +176,7 @@ public class Settings {
 			if(Thread.currentThread() != AdvancedMacros.getMinecraftThread()) {
 				final String sFile = file;
 				final Thread callingThread = Thread.currentThread();
-				ListenableFuture<LuaValue> future = AdvancedMacros.getMinecraft().addScheduledTask(new Callable<LuaValue>() {
+				ListenableFuture<LuaValue> future = TaskDispatcher.addTask(new Callable<LuaValue>() {
 					@Override
 					public LuaValue call() throws Exception {
 						return loadTex(sFile, callingThread);
@@ -206,9 +199,9 @@ public class Settings {
 			}
 			DynamicTexture dTex;
 			if(caller!=null)
-				dTex = new DynamicTexture(ImageIO.read(Utils.parseFileLocation(caller, file, 1)/*new File(file)*/));
+				dTex = new DynamicTexture(NativeImage.read(new FileInputStream(Utils.parseFileLocation(caller, file, 1)))); //ImageIO.read(Utils.parseFileLocation(caller, file, 1)/*new File(file)*/));
 			else 
-				dTex = new DynamicTexture(ImageIO.read(Utils.parseFileLocation(file, 1)/*new File(file)*/));
+				dTex = new DynamicTexture(NativeImage.read(new FileInputStream(Utils.parseFileLocation(file, 1))));//ImageIO.read(Utils.parseFileLocation(file, 1)/*new File(file)*/));
 			return new LuaValTexture(file, dTex);
 		} catch (IOException e) {
 			return LuaValue.NIL;

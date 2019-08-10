@@ -10,7 +10,8 @@ import com.theincgi.advancedMacros.misc.Pair;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 
@@ -37,7 +38,7 @@ public class RayTrace {
 			//args: {vector}, <{from}>, <maxDist/REACH_LIMIT>, stopOnLiquid
 			//args: {vector}, <maxDist/REACH_LIMIT>, stopOnLiquid
 			Minecraft mc = AdvancedMacros.getMinecraft();
-			EntityPlayer p = mc.player;
+			PlayerEntity p = mc.player;
 
 
 			Pair<Vec3d, Varargs> vec   = Utils.consumeVector(  args  , true, true); //look angle
@@ -46,7 +47,7 @@ public class RayTrace {
 			}
 			Pair<Vec3d, Varargs> optVec = Utils.consumeVector( vec.b, true,  false); //from pos
 			if(optVec.a == null) {
-				optVec.a = p.getPositionEyes(0);
+				optVec.a = p.getEyePosition(AdvancedMacros.getMinecraft().getRenderPartialTicks()); 
 			}
 			double distance = p.REACH_DISTANCE.getDefaultValue();
 			if(optVec.b.arg1().isnumber()) {
@@ -60,7 +61,8 @@ public class RayTrace {
 
 
 			Vec3d end = optVec.a.add( vec.a.scale( distance ) );
-			RayTraceResult rtr = AdvancedMacros.getMinecraft().world.rayTraceBlocks( optVec.a, end, stopOnLiquid, false, true);
+			RayTraceContext rtc  = new RayTraceContext(optVec.a, end, RayTraceContext.BlockMode.OUTLINE, stopOnLiquid?RayTraceContext.FluidMode.ANY:RayTraceContext.FluidMode.NONE, p);
+			RayTraceResult rtr = AdvancedMacros.getMinecraft().world.rayTraceBlocks( rtc );
 			//AdvancedMacros.getMinecraft().objectMouseOver
 			LuaValue result = Utils.rayTraceResultToLuaValue(rtr);
 			return result;

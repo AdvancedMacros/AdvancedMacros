@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.Gui.Focusable;
@@ -14,13 +15,11 @@ import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
-import net.minecraft.client.renderer.GlStateManager;
-
 public class GuiButton extends GuiRect implements InputSubscriber, Focusable{
-//	Property colorText;
-//	Property clickSound;
-//	Property buttonImg;
-//	Property buttonText;
+	//	Property colorText;
+	//	Property clickSound;
+	//	Property buttonImg;
+	//	Property buttonText;
 	Color textColor;
 	private static final Color DEFAULT_TEXT_COLOR = Color.WHITE;
 	private LuaValTexture texture;
@@ -31,13 +30,13 @@ public class GuiButton extends GuiRect implements InputSubscriber, Focusable{
 	GuiAnimation scaleAnimation = new GuiAnimation(150,Interpolator.smooth);
 	private static final int disableColor = new Color(100, 0, 0, 0).toInt();
 	OnClickHandler onClick;
-	
-	
-	
+
+
+
 	//public boolean doScaleAnimation = true;
 	//private static final String defaultPropTableName = "colors.standardButton";
 	//GuiRect shade;
-//	PropertyPalette propertyPalette;
+	//	PropertyPalette propertyPalette;
 	/**Blank propPath will create a un bound propPalette*/
 	public GuiButton(int x, int y, int wid, int hei, LuaValue defaultImg, LuaValue defaultText, String... propPath) {
 		this(x, y, wid, hei, propPath.length==0? new PropertyPalette() : new PropertyPalette(propPath));
@@ -55,47 +54,47 @@ public class GuiButton extends GuiRect implements InputSubscriber, Focusable{
 		propPal.addColorIfNil(DEFAULT_TEXT_COLOR, "colors", "text");
 		textColor = propPal.getColor("colors", "text");
 	}
-	
-//	/**@param defaultImg - use Settings.getTextureID(String fileName)*/
-//	public GuiButton(WidgetID wID, int x, int y, int wid, int hei, LuaValue defaultImg, LuaValue defaultText, String nullOrTablePropName) {
-////		super(wID, x, y, wid, hei, 
-////				nullOrTablePropName = (nullOrTablePropName==null?defaultPropTableName:nullOrTablePropName));
-////		
-//////		LuaTable t = new LuaTable();
-//////		t.set(1, "text");
-//////		t.set(2, txt);
-//////		buttonContent = new Property("widgetContent."+wID.getID(), t, "content", wID);
-////		buttonImg = new Property("widgetContent."+wID.getID()+".img", defaultImg, "img", wID);
-////		buttonText = new Property("widgetContent."+wID.getID()+".text", defaultText, "text", wID);
-////		if(!buttonImg.getPropValue().isnil() && buttonImg.getPropValue() instanceof LuaValTexture){
-////			texture = (LuaValTexture) buttonImg.getPropValue();
-////		}
-////		if(!buttonText.getPropValue().isnil()){
-////			text = buttonText.getPropValue().checkjstring();
-////		}
-//		this(wID, x, y, wid, hei, defaultImg, defaultText, nullOrTablePropName, Color.BLACK, Color.WHITE, Color.WHITE);
+
+	//	/**@param defaultImg - use Settings.getTextureID(String fileName)*/
+	//	public GuiButton(WidgetID wID, int x, int y, int wid, int hei, LuaValue defaultImg, LuaValue defaultText, String nullOrTablePropName) {
+	////		super(wID, x, y, wid, hei, 
+	////				nullOrTablePropName = (nullOrTablePropName==null?defaultPropTableName:nullOrTablePropName));
+	////		
+	//////		LuaTable t = new LuaTable();
+	//////		t.set(1, "text");
+	//////		t.set(2, txt);
+	//////		buttonContent = new Property("widgetContent."+wID.getID(), t, "content", wID);
+	////		buttonImg = new Property("widgetContent."+wID.getID()+".img", defaultImg, "img", wID);
+	////		buttonText = new Property("widgetContent."+wID.getID()+".text", defaultText, "text", wID);
+	////		if(!buttonImg.getPropValue().isnil() && buttonImg.getPropValue() instanceof LuaValTexture){
+	////			texture = (LuaValTexture) buttonImg.getPropValue();
+	////		}
+	////		if(!buttonText.getPropValue().isnil()){
+	////			text = buttonText.getPropValue().checkjstring();
+	////		}
+	//		this(wID, x, y, wid, hei, defaultImg, defaultText, nullOrTablePropName, Color.BLACK, Color.WHITE, Color.WHITE);
 	//}
-//	public GuiButton(WidgetID wID, int x, int y, int wid, int hei, LuaValue defaultImg, LuaValue defaultText, String nullOrTablePropName, Color fill, Color frame, Color textColor) {
-//		super(wID, x, y, wid, hei, 
-//				nullOrTablePropName = (nullOrTablePropName==null?defaultPropTableName:nullOrTablePropName), fill, frame);
-//		
-////		LuaTable t = new LuaTable();
-////		t.set(1, "text");
-////		t.set(2, txt);
-////		buttonContent = new Property("widgetContent."+wID.getID(), t, "content", wID);
-//		buttonImg = new Property("widgetContent."+wID.getID()+".img", defaultImg, "img", wID);
-//		buttonText = new Property("widgetContent."+wID.getID()+".text", defaultText, "text", wID);
-//		if(!buttonImg.getPropValue().isnil() && buttonImg.getPropValue() instanceof LuaValTexture){
-//			texture = (LuaValTexture) buttonImg.getPropValue();
-//		}
-//		if(!buttonText.getPropValue().isnil()){
-//			//System.out.println(buttonText.getPropName());
-//			//System.out.println(Utils.LuaTableToString(buttonText.getPropValue().checktable()));
-//			text = buttonText.getPropValue().checkjstring();
-//		}
-//		this.textColor = textColor;
-//	}
-	
+	//	public GuiButton(WidgetID wID, int x, int y, int wid, int hei, LuaValue defaultImg, LuaValue defaultText, String nullOrTablePropName, Color fill, Color frame, Color textColor) {
+	//		super(wID, x, y, wid, hei, 
+	//				nullOrTablePropName = (nullOrTablePropName==null?defaultPropTableName:nullOrTablePropName), fill, frame);
+	//		
+	////		LuaTable t = new LuaTable();
+	////		t.set(1, "text");
+	////		t.set(2, txt);
+	////		buttonContent = new Property("widgetContent."+wID.getID(), t, "content", wID);
+	//		buttonImg = new Property("widgetContent."+wID.getID()+".img", defaultImg, "img", wID);
+	//		buttonText = new Property("widgetContent."+wID.getID()+".text", defaultText, "text", wID);
+	//		if(!buttonImg.getPropValue().isnil() && buttonImg.getPropValue() instanceof LuaValTexture){
+	//			texture = (LuaValTexture) buttonImg.getPropValue();
+	//		}
+	//		if(!buttonText.getPropValue().isnil()){
+	//			//System.out.println(buttonText.getPropName());
+	//			//System.out.println(Utils.LuaTableToString(buttonText.getPropValue().checktable()));
+	//			text = buttonText.getPropValue().checkjstring();
+	//		}
+	//		this.textColor = textColor;
+	//	}
+
 	public GuiButton setImg(String img){
 		if(texture!=null)
 			texture.deleteTex();
@@ -113,7 +112,7 @@ public class GuiButton extends GuiRect implements InputSubscriber, Focusable{
 		this.text = text;
 		return this;
 	}
-	
+
 	@Override
 	public void move(int x, int y) {
 		super.move(x, y);
@@ -127,66 +126,66 @@ public class GuiButton extends GuiRect implements InputSubscriber, Focusable{
 	@Override
 	public void onDraw(Gui gui, int mouseX, int mouseY, float partialTicks) {
 		if(!isVisible) return;
-//		GlStateManager.pushAttrib();
-//		GlStateManager.disableAlpha();
-//		GlStateManager.enableAlpha();
-//		
-//		GlStateManager.disableBlend();
-//		GlStateManager.enableBlend();
-//		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+		//		GlStateManager.pushAttrib();
+		//		GlStateManager.disableAlpha();
+		//		GlStateManager.enableAlpha();
+		//		
+		//		GlStateManager.disableBlend();
+		//		GlStateManager.enableBlend();
+		//		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 		int oldHeight = gui.getFontRend().FONT_HEIGHT;
-		gui.getFontRend().FONT_HEIGHT = this.getHei()-4;
+		//FIXME un-editable: gui.getFontRend().FONT_HEIGHT = this.getHei()-4;
 		if(super.doAnimation){
-		if(isInBounds(mouseX, mouseY)){
-			if(!scaleAnimation.isPlaying() && scaleAnimation.isAtStart()){
-				scaleAnimation.setReverse(false);
-				scaleAnimation.start();
-				//System.out.println("Start");
+			if(isInBounds(mouseX, mouseY)){
+				if(!scaleAnimation.isPlaying() && scaleAnimation.isAtStart()){
+					scaleAnimation.setReverse(false);
+					scaleAnimation.start();
+					//System.out.println("Start");
+				}
+			}else{
+				if(!scaleAnimation.isPlaying() && !scaleAnimation.isAtStart()){
+					scaleAnimation.setReverse(true);
+					scaleAnimation.start();
+				}
 			}
-		}else{
-			if(!scaleAnimation.isPlaying() && !scaleAnimation.isAtStart()){
-				scaleAnimation.setReverse(true);
-				scaleAnimation.start();
-			}
-		}
 		}
 		scale(GuiAnimation.map(scaleAnimation.doInterpolate(), 0, 1, 1, scaleTo)); //map p from [0,1] to [1,1.5]
 		//shade.scale(getScale());
-		
+
 		super.onDraw(gui, mouseX, mouseY, partialTicks);
 		if(texture!=null) {
 			GlStateManager.bindTexture(0);
-//			GL11.glDisable(GL11.GL_ALPHA_TEST);
-//			GL11.glDepthMask(false);
-//			GL11.glDisable(GL11.GL_LIGHTING);
+			//			GL11.glDisable(GL11.GL_ALPHA_TEST);
+			//			GL11.glDepthMask(false);
+			//			GL11.glDisable(GL11.GL_LIGHTING);
 			gui.drawImage(texture.getResourceLocation(), getDrawX()+1, getDrawY()+1, getDrawWid()-1, getDrawHei()-1, 0, 0, 1, 1);
 		}
 		if(isInBounds(mouseX, mouseY) && isEnabled){
 			drawShade(gui);
 		}
-		
-		
+
+
 		if(text!=null)
 			gui.drawCenteredString(gui.getFontRend(), text, getDrawX()+getDrawWid()/2, getDrawY()+getDrawHei()/2, textColor.toInt());
-		
-		gui.getFontRend().FONT_HEIGHT=oldHeight;
-		
+
+		//FIXME un-editable: gui.getFontRend().FONT_HEIGHT=oldHeight;
+
 		if(!isEnabled){
-			net.minecraft.client.gui.Gui.drawRect(getDrawX()+1, getDrawY()+1, getDrawX()+getDrawWid(), getDrawY()+getDrawHei(), disableColor);
+			net.minecraft.client.gui.screen.Screen.fill(getDrawX()+1, getDrawY()+1, getDrawX()+getDrawWid(), getDrawY()+getDrawHei(), disableColor);
 		}
-//		GlStateManager.popAttrib();
+		//		GlStateManager.popAttrib();
 	}
-	
+
 	public void setTextColor(Color textColor) {
 		this.textColor = textColor;
 	}
 	public Color getTextColor() {
 		return textColor;
 	}
-	
+
 	private boolean wasInBox = false;
 	@Override
-	public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
+	public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
 		if(!isVisible || !isEnabled)return false;
 		if(isInBounds(x, y)){
 			wasInBox = true;
@@ -196,10 +195,10 @@ public class GuiButton extends GuiRect implements InputSubscriber, Focusable{
 			wasInBox = false;
 			return false;
 		}
-		
+
 	}
 	@Override
-	public boolean onMouseRelease(Gui gui, int x, int y, int state) {
+	public boolean onMouseRelease(Gui gui, double x, double y, int state) {
 		//System.out.printf("In bounds: %s, wasInbounds %s\n",isInBounds(x, y),wasInBox);
 		if(wasInBox && isInBounds(x, y)){
 			//System.out.println("In bounds");
@@ -213,23 +212,22 @@ public class GuiButton extends GuiRect implements InputSubscriber, Focusable{
 	}
 
 	@Override
-	public boolean onScroll(Gui gui, int i) {
+	public boolean onScroll(Gui gui, double i) {
 		return false;
 	}
 
 	@Override
-	public boolean onMouseClickMove(Gui gui, int x, int y, int buttonNum, long timeSinceClick) {
+	public boolean onMouseClickMove(Gui gui, double x, double y, int buttonNum, double q, double r) {
 		if(gui.getFocusItem()==null) return false;
 		return gui.getFocusItem().equals(this);
 	}
 
 	@Override
-	public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
+	public boolean onCharTyped(Gui gui, char typedChar, int mods) {
 		return false;
 	}
-
 	@Override
-	public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
+	public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
 		return false;
 	}
 
@@ -243,24 +241,24 @@ public class GuiButton extends GuiRect implements InputSubscriber, Focusable{
 		LuaTable t = super.getWidgetControls();
 		return t;
 	}
-	
-	
-//	//load props called by super
-//	@Override
-//	protected void loadProps(String nullOrPropTableName) {
-//		nullOrPropTableName = nullOrPropTableName==null?defaultPropTableName:nullOrPropTableName;
-//		colorFill  = new Property(nullOrPropTableName+".fill" , fill.toLuaValue(),    "color.fill",  wID);
-//		colorFrame = new Property(nullOrPropTableName+".frame", frame.toLuaValue(),    "color.frame", wID);
-//		colorShade = new Property(nullOrPropTableName+".shade", DEFAULT_SHADE.toLuaValue(),         "color.shade", wID);
-//		//System.out.println("Blab is null "+textColor);
-//		colorText  = new Property(nullOrPropTableName+".text",  DEFAULT_TEXT_COLOR.toLuaValue(),"color.text",  wID);
-//		clickSound = new Property("sounds.standardButton.click", defaultClickProp, "sound.click", wID);
-//		System.out.println("Some propertys were set up");
-//	}
+
+
+	//	//load props called by super
+	//	@Override
+	//	protected void loadProps(String nullOrPropTableName) {
+	//		nullOrPropTableName = nullOrPropTableName==null?defaultPropTableName:nullOrPropTableName;
+	//		colorFill  = new Property(nullOrPropTableName+".fill" , fill.toLuaValue(),    "color.fill",  wID);
+	//		colorFrame = new Property(nullOrPropTableName+".frame", frame.toLuaValue(),    "color.frame", wID);
+	//		colorShade = new Property(nullOrPropTableName+".shade", DEFAULT_SHADE.toLuaValue(),         "color.shade", wID);
+	//		//System.out.println("Blab is null "+textColor);
+	//		colorText  = new Property(nullOrPropTableName+".text",  DEFAULT_TEXT_COLOR.toLuaValue(),"color.text",  wID);
+	//		clickSound = new Property("sounds.standardButton.click", defaultClickProp, "sound.click", wID);
+	//		System.out.println("Some propertys were set up");
+	//	}
 	public String getText() {
 		return text;
 	}
-	
+
 	public void setOnClick(OnClickHandler och) {
 		this.onClick = och;
 	}
@@ -289,7 +287,7 @@ public class GuiButton extends GuiRect implements InputSubscriber, Focusable{
 	public void setFocused(boolean f) {
 		//no focus needed
 	}
-	
 
-	
+
+
 }

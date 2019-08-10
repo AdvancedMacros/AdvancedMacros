@@ -3,8 +3,6 @@ package com.theincgi.advancedMacros.event;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -14,21 +12,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.jar.JarFile;
 
 import org.luaj.vm2_v3_0_1.LuaError;
-import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
-import org.luaj.vm2_v3_0_1.lib.jse.CoerceJavaToLua;
-import org.luaj.vm2_v3_0_1.lib.jse.LuajavaLib;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
+import org.objectweb.asm.Type;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager.CullFace;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.MacroMenuGui;
@@ -36,9 +33,11 @@ import com.theincgi.advancedMacros.gui.elements.ColorTextArea;
 import com.theincgi.advancedMacros.hud.hud2D.Hud2DItem;
 import com.theincgi.advancedMacros.hud.hud3D.WorldHudItem;
 import com.theincgi.advancedMacros.lua.LuaDebug.JavaThread;
-import com.theincgi.advancedMacros.lua.LuaDebug.LuaThread;
 import com.theincgi.advancedMacros.lua.LuaDebug.OnScriptFinish;
+import com.theincgi.advancedMacros.lua.OpenChangeLog;
 import com.theincgi.advancedMacros.lua.functions.GuiControls;
+import com.theincgi.advancedMacros.misc.HIDUtils.Keyboard;
+import com.theincgi.advancedMacros.misc.HIDUtils.Mouse;
 import com.theincgi.advancedMacros.misc.Pair;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
@@ -47,36 +46,30 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.ISoundEventListener;
 import net.minecraft.client.audio.SoundEventAccessor;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.GuiIngame;
-import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.IngameGui;
+import net.minecraft.client.gui.screen.MainMenuScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.client.network.NetworkPlayerInfo;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.GlStateManager.CullFace;
-import net.minecraft.client.renderer.GlStateManager.DestFactor;
-import net.minecraft.client.renderer.GlStateManager.SourceFactor;
+import net.minecraft.client.network.play.NetworkPlayerInfo;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.EnumHand;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.client.event.ClientChatEvent;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
@@ -87,23 +80,20 @@ import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.SaveToFile;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.eventhandler.ASMEventHandler;
-import net.minecraftforge.fml.common.eventhandler.Event;
-import net.minecraftforge.fml.common.eventhandler.IEventListener;
-import net.minecraftforge.fml.common.eventhandler.ListenerList;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.InputEvent;
+import net.minecraftforge.eventbus.ASMEventHandler;
+import net.minecraftforge.eventbus.ListenerList;
+import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.IEventListener;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.network.FMLNetworkEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import scala.reflect.internal.Trees.New;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.network.ConnectionType;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 public class ForgeEventHandler {
-	ConcurrentHashMap<Integer, Boolean> heldKeys = new ConcurrentHashMap<>(10);
 	int lastAir, lastHealth,
 	lastItemDurablity, lastHotbar, lastHunger;
 	boolean playerWasNull = true, lastSleepingState = false;
@@ -115,7 +105,7 @@ public class ForgeEventHandler {
 	//int lastDimension;
 	int[] lastArmourDurability = new int[4];
 	int lastXP, lastXPLevel;
-	int lastDim;
+	DimensionType lastDim;
 	boolean wasRaining, wasThundering;
 	/**Keeping this syncronized!*/
 	private LinkedList<WorldHudItem> worldHudItems = new LinkedList<>();
@@ -125,6 +115,7 @@ public class ForgeEventHandler {
 	private ConcurrentHashMap<String, Boolean> nowPlayerList = new ConcurrentHashMap<>();
 	public WeakHashMap<Entity, RenderFlags> entityRenderFlags = new WeakHashMap<>();
 	private boolean wasOnFire = false;
+
 	//private Queue<List<ItemStack>> receivedInventories = new LinkedList<>();
 	public ForgeEventHandler() {
 		heldMouseButtons = new ArrayList<>(Mouse.getButtonCount());
@@ -191,12 +182,10 @@ public class ForgeEventHandler {
 		Anything //also includes key event or mouse event,
 		;//	TEST;
 	}
-	public void releaseAllKeys() {
-		heldKeys.clear();
-	}
+
 	@SubscribeEvent
 	public void onKeyInput(InputEvent.KeyInputEvent event){
-		if(AdvancedMacros.modKeybind.isKeyDown()){ //TODO allow mouse buttons too
+		if(AdvancedMacros.modKeybind.isKeyDown()){ 
 			if(ColorTextArea.isCTRLDown()){
 				if(ColorTextArea.isShiftDown()) {
 					AdvancedMacros.stopAll();
@@ -207,28 +196,25 @@ public class ForgeEventHandler {
 				showMenu(AdvancedMacros.scriptBrowser2, AdvancedMacros.macroMenuGui.getGui());
 			}else{
 				if(AdvancedMacros.lastGui!=null){
-					AdvancedMacros.lastGui.showGui();
+					TaskDispatcher.delayTask(()->{
+						AdvancedMacros.lastGui.showGui();
+					}, 85);
 				}else{
 					MacroMenuGui.showMenu();
 				}
 			}
 		}else{
-			int eventKey = Keyboard.getEventKey();
-			boolean oldState = heldKeys.getOrDefault(eventKey, false);
-			if(oldState && Keyboard.isKeyDown(eventKey)){
-				//was in, is in now
-				return;  //blocks keyRepeats
-			}
-			if(Keyboard.isKeyDown(eventKey))
-				heldKeys.put(eventKey, true);
-			else
-				heldKeys.remove(eventKey);
+			int eventKey = event.getKey(); //TESTME
+			if(event.getAction() == GLFW.GLFW_REPEAT) return;
+
+			//Keyboard.onKey(eventKey, event.getAction());
+
 			LuaTable eventDat = new LuaTable();
 			eventDat.set(1, "key");
-			eventDat.set(2, Keyboard.getKeyName(eventKey));
-			eventDat.set(3, LuaValue.valueOf(Keyboard.isKeyDown(eventKey)?"down":"up"));
+			eventDat.set(2, Keyboard.nameOf(eventKey));
+			eventDat.set(3, LuaValue.valueOf(event.getAction()==GLFW.GLFW_PRESS?"down":"up"));
 			eventDat.set(4, LuaValue.valueOf(eventKey));
-			AdvancedMacros.macroMenuGui.fireEvent(true, Keyboard.getKeyName(eventKey), eventDat.unpack(), Keyboard.isKeyDown(eventKey), null);
+			AdvancedMacros.macroMenuGui.fireEvent(true, Keyboard.nameOf(eventKey), eventDat.unpack(), event.getAction()==GLFW.GLFW_PRESS, null);
 		}
 	}
 
@@ -256,13 +242,14 @@ public class ForgeEventHandler {
 		AdvancedMacros.macroMenuGui.fireEvent(true, buttonName, eDat.unpack(), state, null);
 	}
 
-	@SubscribeEvent @SideOnly(Side.CLIENT)
+	@SubscribeEvent 
 	public void onPlayerTick(TickEvent.PlayerTickEvent event){
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) 
-			return; //lik srsly
 		if(event.phase.equals(TickEvent.Phase.START)) return; //only do on the second half of tick after all stuff happens
+
+
+
 		for(int i = 0; i<Mouse.getButtonCount(); i++) {
-			boolean b = Mouse.isButtonDown(i);
+			boolean b = Mouse.isDown(i);
 			if(b!=heldMouseButtons.get(i)) {
 				onMouseClick(i, b);
 				heldMouseButtons.set(i, b);
@@ -274,11 +261,11 @@ public class ForgeEventHandler {
 		if(look!=null){
 			look.look();
 		}
-		LinkedList<Integer> toRemove = new LinkedList<>();
-		for(Integer i : keyBindReleaseMap.keySet()) {
+		LinkedList<net.minecraft.client.util.InputMappings.Input> toRemove = new LinkedList<>();
+		for(net.minecraft.client.util.InputMappings.Input i : keyBindReleaseMap.keySet()) { 
 			HeldKeybinds hk = keyBindReleaseMap.get(i);
 			if(hk.releaseTime<System.currentTimeMillis()) {
-				KeyBinding.setKeyBindState(hk.keyCode, false);
+				KeyBinding.setKeyBindState(i, false);
 				hk.done=true; //is this even needed anymore?
 				toRemove.add(i);
 			}
@@ -287,27 +274,29 @@ public class ForgeEventHandler {
 			keyBindReleaseMap.remove(toRemove.pop());
 		}
 
-		EntityPlayerSP player = AdvancedMacros.getMinecraft().player;
+		PlayerEntity player = AdvancedMacros.getMinecraft().player;
 		if(player==null){playerWasNull = true; return;}
 		if(playerWasNull){
 			resetLastStats();
 			playerWasNull=false;
 		}
 
-		if(player.dimension != lastDim) {
-			LuaTable e = createEvent(EventName.DimensionChanged);
-			e.set(3, LuaValue.valueOf(player.dimension));
-			e.set(4, LuaValue.valueOf(lastDim));
-			fireEvent(EventName.DimensionChanged, e);
+		if(!player.dimension .equals(lastDim)) {
+			if(lastDim!=null) {
+				LuaTable e = createEvent(EventName.DimensionChanged);
+				e.set(3, Utils.toTable(player.dimension));
+				e.set(4, Utils.toTable(lastDim));
+				fireEvent(EventName.DimensionChanged, e);
+			}
 			lastDim = player.dimension;
 		}
-		if(player.isPlayerSleeping() != lastSleepingState) {
-			if(player.isPlayerSleeping())
+		if(player.isSleeping() != lastSleepingState) {
+			if(player.isSleeping())
 				fireEvent(EventName.UseBed, createEvent(EventName.UseBed));
 			else {
 				fireEvent(EventName.WakeUp, createEvent(EventName.WakeUp));
 			}
-			lastSleepingState = player.isPlayerSleeping();
+			lastSleepingState = player.isSleeping();
 		}
 
 		//AirChanged
@@ -326,7 +315,7 @@ public class ForgeEventHandler {
 		boolean armorChanged = false;
 		int[] armorDurability = new int[4];
 		for (int i = 0; i < armorDurability.length; i++) {
-			int temp = armor.get(i).getMaxDamage() - armor.get(i).getItemDamage();
+			int temp = armor.get(i).getMaxDamage() - armor.get(i).getDamage();
 			if(temp!=lastArmourDurability[i]){armorChanged = true;}
 			armorDurability[i] = temp;
 		}
@@ -351,7 +340,7 @@ public class ForgeEventHandler {
 			Settings.settings.get("events").set("potionStatusFrequency", LuaValue.valueOf(20));
 			potionUpdateFrequency = 20;
 		}
-		for (PotionEffect e : player.getActivePotionEffects()) {
+		for (EffectInstance e : player.getActivePotionEffects()) {
 			LuaTable evnt = createEvent(EventName.PotionStatus);
 			int dur = e.getDuration()-1;
 			int ddur = (dur) / potionUpdateFrequency;
@@ -445,7 +434,7 @@ public class ForgeEventHandler {
 			resetItemDurablitity();
 			lastHeldItem=player.getHeldItemMainhand();
 		}
-		int currentDura = player.getHeldItemMainhand().getMaxDamage()-player.getHeldItemMainhand().getItemDamage();
+		int currentDura = player.getHeldItemMainhand().getMaxDamage()-player.getHeldItemMainhand().getDamage();
 		if(currentDura!=lastItemDurablity && !player.getHeldItemMainhand().isEmpty()){
 			LuaTable e = createEvent(EventName.ItemDurability);
 			e.set(3, Utils.itemStackToLuatable(player.getHeldItemMainhand()));
@@ -504,17 +493,17 @@ public class ForgeEventHandler {
 		try {
 			Minecraft mc = AdvancedMacros.getMinecraft();
 			if(titlesTimer==null) { //special thanks to "MCP Mapping Viewer" by bspkrs 
-				titlesTimer = ReflectionHelper.findField(GuiIngame.class, "titlesTimer", "field_175195_w");
-				titleDisplayTime = ReflectionHelper.findField(GuiIngame.class, "titleDisplayTime", "field_175192_A");
-				titleFadeInTime = ReflectionHelper.findField(GuiIngame.class, "titleFadeIn", "field_175199_z");
-				titleFadeOutTime = ReflectionHelper.findField(GuiIngame.class, "titleFadeOut", "field_175193_B");
-				title = ReflectionHelper.findField(GuiIngame.class, "displayedTitle", "field_175201_x");
-				subtitle = ReflectionHelper.findField(GuiIngame.class, "displayedSubTitle", "field_175200_y");
-				actionbarTimer = ReflectionHelper.findField(GuiIngame.class, "overlayMessageTime", "field_73845_h");
-				actionbarText = ReflectionHelper.findField(GuiIngame.class, "overlayMessage", "field_73838_g");
-				isColorized = ReflectionHelper.findField(GuiIngame.class, "animateOverlayMessageColor", "field_73844_j");
+				titlesTimer 		= ObfuscationReflectionHelper.findField(IngameGui.class, "field_175195_w"); //checked for 1.14.3
+				titleDisplayTime 	= ObfuscationReflectionHelper.findField(IngameGui.class, "field_175192_A");
+				titleFadeInTime 	= ObfuscationReflectionHelper.findField(IngameGui.class, "field_175199_z");
+				titleFadeOutTime 	= ObfuscationReflectionHelper.findField(IngameGui.class, "field_175193_B");
+				title 				= ObfuscationReflectionHelper.findField(IngameGui.class, "field_175201_x");
+				subtitle 			= ObfuscationReflectionHelper.findField(IngameGui.class, "field_175200_y");
+				actionbarTimer 		= ObfuscationReflectionHelper.findField(IngameGui.class, "field_73845_h");
+				actionbarText 		= ObfuscationReflectionHelper.findField(IngameGui.class, "field_73838_g");
+				isColorized 		= ObfuscationReflectionHelper.findField(IngameGui.class, "field_73844_j");
 			}
-			GuiIngame gui = mc.ingameGUI;
+			IngameGui gui = mc.ingameGUI;
 			{
 				int disp = titleDisplayTime.getInt(gui);
 				int fadeIn = titleFadeInTime.getInt(gui);
@@ -558,119 +547,110 @@ public class ForgeEventHandler {
 
 	}
 
-	@SubscribeEvent @SideOnly(Side.CLIENT)
+	@SubscribeEvent 
 	public void onArrowFired(ArrowLooseEvent event){//CONFIRMED MP
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
+
 		LuaTable e = createEvent(EventName.ArrowFired);
 		e.set(3, Utils.itemStackToLuatable(event.getBow()));
 		e.set(4, LuaValue.valueOf(event.getCharge()));
 		e.set(5, LuaValue.valueOf(event.hasAmmo()));
 		fireEvent(EventName.ArrowFired, e);
 	}
-	@SubscribeEvent @SideOnly(Side.CLIENT)
+	@SubscribeEvent 
 	public void onAttackEntity(AttackEntityEvent event) {
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
+
 		LuaTable e = createEvent(EventName.AttackEntity);
 		e.set(3, Utils.entityToTable(event.getTarget()));
 		fireEvent(EventName.AttackEntity, e);
 	}
-	@SubscribeEvent @SideOnly(Side.CLIENT)
+	@SubscribeEvent 
 	public void onEntityInteract(EntityInteract event) {  
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
+
 		LuaTable e = createEvent(EventName.EntityInteract);
 		e.set(3, Utils.entityToTable(event.getTarget()));
 		e.set(4, Utils.itemStackToLuatable(event.getItemStack()));
-		e.set(5, event.getHand().equals(EnumHand.MAIN_HAND)?"main hand":"off hand");
+		e.set(5, event.getHand().equals(Hand.MAIN_HAND)?"main hand":"off hand");
 		if(event.getFace()!=null)
 			e.set(6, LuaValue.valueOf(event.getFace().getName()));
 		fireEvent(EventName.EntityInteract, e);
 	}
-	@SubscribeEvent @SideOnly(Side.CLIENT)
+	@SubscribeEvent 
 	public void onBlockInteract(PlayerInteractEvent event) { 
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
+
 		if(event.getFace()==null) return;
 		LuaTable e = createEvent(EventName.BlockInteract);
 		e.set(3, Utils.blockPosToTable(event.getPos()));
 		e.set(4, Utils.itemStackToLuatable(event.getItemStack()));
-		e.set(5, event.getHand().equals(EnumHand.MAIN_HAND)?"main hand":"off hand");
+		e.set(5, event.getHand().equals(Hand.MAIN_HAND)?"main hand":"off hand");
 		if(event.getFace()!=null)
 			e.set(6, LuaValue.valueOf(event.getFace().getName()));
 		fireEvent(EventName.BlockInteract, e);
 	}
 
-	@SubscribeEvent @SideOnly(Side.CLIENT)
+	@SubscribeEvent 
 	public void onItemPickup(PlayerEvent.ItemPickupEvent event) { //DEAD //FIXME
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
+
 		LuaTable e = createEvent(EventName.ItemPickup);
 		e.set(3, Utils.itemStackToLuatable(event.getStack()));
 		fireEvent(EventName.ItemPickup, e);
 	}
-	@SubscribeEvent @SideOnly(Side.CLIENT)
+	@SubscribeEvent 
 	public void onDimChange(PlayerEvent.PlayerChangedDimensionEvent event) { //DEAD //FIXME
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
+
 		LuaTable e = createEvent(EventName.DimensionChanged);
-		e.set(3, LuaValue.valueOf(event.toDim));
-		e.set(4, LuaValue.valueOf(event.fromDim));
+		e.set(3, Utils.toTable(event.getTo()));
+		e.set(4, Utils.toTable(event.getFrom()));
 		fireEvent(EventName.DimensionChanged, e);
 	}
-	@SubscribeEvent @SideOnly(Side.CLIENT)
+	@SubscribeEvent 
 	public void onCraft(PlayerEvent.ItemCraftedEvent event) { //CONFIRMED MP
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
+
 		//System.out.println(event.getPhase());
 		LuaTable e = createEvent(EventName.ItemCrafted);
-		e.set(3, Utils.itemStackToLuatable(event.crafting));
+		e.set(3, Utils.itemStackToLuatable(event.getCrafting()));
 		LuaTable matrix = new LuaTable();
-		int size = (int) Math.sqrt(event.craftMatrix.getSizeInventory());
+		int size = (int) Math.sqrt(event.getInventory().getSizeInventory()); //craftMatrix, but named poorly imo (src says return craftMatrix)
 		for(int x = 1; x <= size; x++) {
 			LuaTable m = new LuaTable();
 			matrix.set(x, m);
 			for(int y = 1; y <= size; y++) {
-				m.set(y, Utils.itemStackToLuatable( event.craftMatrix.getStackInSlot( (x-1) + (y-1)*size) ));
+				m.set(y, Utils.itemStackToLuatable( event.getInventory().getStackInSlot( (x-1) + (y-1)*size) ));
 			}
 		}
 		e.set(4, matrix);
 		fireEvent(EventName.ItemCrafted, e);
 	}
 
-	@SubscribeEvent @SideOnly(Side.CLIENT)
+	@SubscribeEvent 
 	public void onItemToss(ItemTossEvent event) {//FIXME DEAD
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return;
 		LuaTable e = createEvent(EventName.ItemTossed);
 		e.set(3, Utils.itemStackToLuatable(event.getEntityItem().getItem()));
 		fireEvent(EventName.ItemTossed, e);
 	}
 
-	@SubscribeEvent @SideOnly(Side.CLIENT)
+	@SubscribeEvent 
 	public void onItemBreak(PlayerDestroyItemEvent event) { //FIXME ULTRA DEAD
 		ItemStack yeWhoBrokeith = event.getOriginal(); 
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return;
 		LuaTable e = createEvent(EventName.BreakItem);
 		e.set(3, Utils.itemStackToLuatable(yeWhoBrokeith));
 		fireEvent(EventName.BreakItem, e);
 	}
 
+	//FIXME event is missing D:
+	@SubscribeEvent 
+	public void onJoinedWorld(PlayerEvent.PlayerLoggedInEvent event){ //EntityJoinWorldEvent, GatherLoginPayloadsEvent, PlayerLoggedInEvent
 
-	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onJoinedWorld(FMLNetworkEvent.ClientConnectedToServerEvent event){
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
-		try {
-			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/changelogviewer.lua")).getInputStream();
-			LuaValue sFunc = AdvancedMacros.globals.load(in, "changeLog", "t", AdvancedMacros.globals);
-			LuaThread thread = new LuaThread(sFunc, "changelog");
-			thread.start();
-		} catch (Throwable e) {e.printStackTrace();}
-		//		Thread t = new Thread(()->{
-		//			try {
-		//				InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/changelogviewer.lua")).getInputStream();
-		//				AdvancedMacros.globals.load(in, "changeLog", "t", AdvancedMacros.globals).call();
-		//				in.close();
-		//			} catch (IOException e) {e.printStackTrace();}
-		//		});
-		//		t.start();
+		TaskDispatcher.delayTask(()->{
+			OpenChangeLog.openChangeLog(false);
+		}, 1500);
 
+		Minecraft mc = AdvancedMacros.getMinecraft();
 		LuaTable e = createEvent(EventName.JoinWorld);
-		e.set(3, event.getConnectionType()); //yeilded modded
-		e.set(4, LuaValue.valueOf(event.isLocal()?"SP":"MP")); //yeilded false on localhost multiplayer true on single player
+		if(mc.getConnection()!=null && mc.getConnection().getNetworkManager()!=null)
+			e.set(3, NetworkHooks.getConnectionType(()->mc.getConnection().getNetworkManager()).name() ); //yeilded modded
+		else
+			e.set(3, ConnectionType.MODDED.name());
+		e.set(4,  mc.isSingleplayer()?"SP":"MP");
 		if(AdvancedMacros.getMinecraft().getCurrentServerData()!=null){
 			ServerData sd = AdvancedMacros.getMinecraft().getCurrentServerData();
 			if(sd!=null) {
@@ -684,15 +664,14 @@ public class ForgeEventHandler {
 		resetLastStats();
 
 	}
-	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void OnLeaveWorld(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
+	@SubscribeEvent 
+	public void OnLeaveWorld(PlayerLoggedOutEvent event) {
 		LuaTable e = createEvent(EventName.LeaveWorld);
 		fireEvent(EventName.LeaveWorld, e);
 		lastPlayerList = null;
 	}
 
-	@SubscribeEvent @SideOnly(Side.CLIENT)
+	@SubscribeEvent 
 	public void  onWorldSaved(SaveToFile event) {
 		fireEvent(EventName.WorldSaved, createEvent(EventName.WorldSaved));
 	}
@@ -700,18 +679,18 @@ public class ForgeEventHandler {
 	private boolean startupHasFired = false;
 	@SubscribeEvent
 	public void onGuiStartup(GuiScreenEvent.InitGuiEvent.Post sEvent) {
-		if(sEvent.getGui().getClass().equals(GuiMainMenu.class)) {
+		if(sEvent.getGui().getClass().equals(MainMenuScreen.class)) {
 			if(startupHasFired) return;
-			AdvancedMacros.getMinecraft().addScheduledTask(()->{
-				fireEvent(EventName.Startup,ForgeEventHandler.createEvent(EventName.Startup));
-			});
+			//TaskDispatcher.addTask(()->{
+			fireEvent(EventName.Startup,ForgeEventHandler.createEvent(EventName.Startup));
+			//});
 			startupHasFired = true;
 		}
 	}
 
 	@SubscribeEvent
 	public void onGuiOpened(GuiOpenEvent sEvent) {
-		GuiScreen sGui = sEvent.getGui();
+		Screen sGui = sEvent.getGui();
 		if(sGui==null) {
 			AdvancedMacros.forgeEventHandler.fireEvent(EventName.GUIClosed, createEvent(EventName.GUIClosed));
 		}else{
@@ -748,7 +727,7 @@ public class ForgeEventHandler {
 				case "net.minecraft.client.gui.GuiRepair":
 					name = "anvil";
 					break;
-				case "net.minecraft.client.gui.inventory.GuiBeacon":
+				case "net.minecraft.client.gui.inventory.GuiBeacon": //FIXME names need the Screen versions
 					name = "beacon";
 					break;
 				case "net.minecraft.client.gui.inventory.GuiBrewingStand":
@@ -795,10 +774,10 @@ public class ForgeEventHandler {
 			final String fName = name;
 			final LuaValue controls = GuiControls.load(sGui);
 
-			if(sGui instanceof GuiContainer) {
+			if(sGui instanceof ContainerScreen) {
 				Thread test = new Thread(()->{
-					GuiContainer gCon = (GuiContainer) sGui; 
-					List<ItemStack> stacks = gCon.inventorySlots.getInventory(); 
+					ContainerScreen<?> gCon = (ContainerScreen) sGui; 
+					List<ItemStack> stacks = gCon.getContainer().getInventory(); 
 					LuaTable e = createEvent(EventName.ContainerOpen);
 
 					LuaTable ctrl;
@@ -841,9 +820,9 @@ public class ForgeEventHandler {
 
 
 
-	@SubscribeEvent @SideOnly(Side.CLIENT)
+	@SubscribeEvent 
 	public void onUseItem( LivingEntityUseItemEvent event) {//CONFIRMED MP
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; //lik srsly
+		//lik srsly
 		if(!event.getEntity().equals(AdvancedMacros.getMinecraft().player)) return;
 		int useItemFrequency = 1;
 		try{
@@ -863,7 +842,7 @@ public class ForgeEventHandler {
 	public final SoundListener SOUND_LISTENER = new SoundListener(); 
 	public class SoundListener implements ISoundEventListener {
 		@Override
-		public void soundPlay(ISound sound, SoundEventAccessor accessor) {
+		public void onPlaySound(ISound sound, SoundEventAccessor accessor) {
 			LuaTable event = createEvent(EventName.Sound);
 			event.set(3, sound.getSoundLocation().toString());
 
@@ -879,7 +858,7 @@ public class ForgeEventHandler {
 			}catch (NullPointerException e) {
 				details.set("volume", 1);
 			}
-			try{details.set("pos", Utils.posToTable(sound.getXPosF(), sound.getYPosF(), sound.getZPosF()));}catch(NullPointerException e) {
+			try{details.set("pos", Utils.posToTable(sound.getX(), sound.getY(), sound.getZ()));}catch(NullPointerException e) {
 
 			}
 			try{details.set("category", sound.getCategory().getName().toLowerCase());}catch(NullPointerException e) {
@@ -891,13 +870,13 @@ public class ForgeEventHandler {
 			controls.set("isPlaying", new ZeroArgFunction() {
 				@Override
 				public LuaValue call() {
-					return LuaValue.valueOf(AdvancedMacros.getMinecraft().getSoundHandler().isSoundPlaying(sound));
+					return LuaValue.valueOf(AdvancedMacros.getMinecraft().getSoundHandler().isPlaying(sound));
 				}
 			});
 			controls.set("stop", new ZeroArgFunction() {
 				@Override
 				public LuaValue call() {
-					AdvancedMacros.getMinecraft().getSoundHandler().stopSound(sound);
+					AdvancedMacros.getMinecraft().getSoundHandler().stop(sound);
 					return NONE;
 				}
 			});
@@ -906,28 +885,28 @@ public class ForgeEventHandler {
 
 		}
 
-	
+
 	}
 
-	
+
 	private static Object messageCounterLock = new Object();
 	private static long messageIndex = 0;
 	private static long nextMessageToAddToChat = 0;
-	@SubscribeEvent @SideOnly(Side.CLIENT)
+	@SubscribeEvent
 	public void onChat(final ClientChatReceivedEvent sEvent){//TODO out going chat msg filter
 		final ClientChatReceivedEvent event = sEvent; //arg not final because it's acquired thru reflection
 		final long thisMessageIndex;
 		synchronized (messageCounterLock) {
 			thisMessageIndex = messageIndex++;
 		}
-		
-		System.out.println("Got " + event.getMessage().getUnformattedText() + " as " + thisMessageIndex);
-		
+
+		System.out.println("Got " + event.getMessage().getUnformattedComponentText() + " as " + thisMessageIndex);
+
 		JavaThread t = new JavaThread(()->{
 
 			LuaTable e = createEvent(EventName.Chat);
 			LuaTable e2 = createEvent(EventName.ChatFilter);
-			String unformated = event.getMessage().getUnformattedText();
+			String unformated = event.getMessage().getUnformattedComponentText();
 
 			Pair<String, LuaTable> pair   = Utils.codedFromTextComponent(event.getMessage());//fromMinecraftColorCodes(event.getMessage().getFormattedText());
 			String formated = pair.a;
@@ -974,8 +953,8 @@ public class ForgeEventHandler {
 				for(int i = 1; i<=Math.max(toUnpack.length(), 2); i++)
 					e2.set(3+i, toUnpack.get(i));
 			}
-			
-			
+
+
 			LuaValue timeoutProp = Settings.settings.get("chatFilterTimeout");
 			if(timeoutProp.isnil())
 				Settings.settings.set("chatFilterTimeout", 3000);
@@ -990,7 +969,7 @@ public class ForgeEventHandler {
 					break;
 				try {Thread.sleep(50);}catch(Exception ex) {}
 			}
-			
+
 			System.out.println("Adding msg "+thisMessageIndex);
 			if(e2.get(3).toboolean()) {
 				//AdvancedMacros.logFunc.invoke(e2.unpack().subargs(3));
@@ -1057,15 +1036,15 @@ public class ForgeEventHandler {
 		AdvancedMacros.getMinecraft().ingameGUI.getChatGUI().addToSentMessages(event.getOriginalMessage());
 	}
 
-	@SubscribeEvent @SideOnly(Side.CLIENT)
+	@SubscribeEvent 
 	public void onEntityRender(RenderLivingEvent.Pre event) {
 		RenderFlags r = entityRenderFlags.get(event.getEntity());
 		if(r==null) return;
 
 		//event.getRenderer().setRenderOutlines(true);
 		boolean flag = false;
-		if(event.getEntity() instanceof EntityPlayer) {
-			EntityPlayer p = (EntityPlayer) event.getEntity();
+		if(event.getEntity() instanceof PlayerEntity) {
+			PlayerEntity p = (PlayerEntity) event.getEntity();
 			flag = p.isSneaking() | wasSneaking;
 			wasSneaking = p.isSneaking();
 		}
@@ -1082,7 +1061,7 @@ public class ForgeEventHandler {
 		r.reset();
 
 		if(r.xray) {
-			GlStateManager.disableDepth();
+			GlStateManager.disableDepthTest();
 		}
 	}
 
@@ -1090,42 +1069,47 @@ public class ForgeEventHandler {
 	private static Method getGlowMethod() {
 		if(glowMethod!=null)return glowMethod;
 		try {
-			return ReflectionHelper.findMethod(Entity.class, "setFlag", "func_70052_a", int.class, boolean.class);
+			return ObfuscationReflectionHelper.findMethod(Entity.class, "func_70052_a", int.class, boolean.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	@SubscribeEvent @SideOnly(Side.CLIENT)
+	@SubscribeEvent 
 	public void onEntityRender(RenderLivingEvent.Post event) {
 		RenderFlags r = entityRenderFlags.get(event.getEntity());
 		if(r==null) return;
 		if(r.xray)
-			GlStateManager.enableDepth();
+			GlStateManager.enableDepthTest();
 	}
 
+	//this is from the Screen class, skips the forge event though
 	private void forceSendMsg(String msg, boolean addToChat) {
-		Minecraft mc = AdvancedMacros.getMinecraft();
+		//msg = net.minecraftforge.event.ForgeEventFactory.onClientSendMessage(msg);
 		if (msg.isEmpty()) return;
-		if (addToChat)
-		{
-			mc.ingameGUI.getChatGUI().addToSentMessages(msg);
+		if (addToChat) {
+			AdvancedMacros.getMinecraft().ingameGUI.getChatGUI().addToSentMessages(msg);
 		}
-		if (net.minecraftforge.client.ClientCommandHandler.instance.executeCommand(mc.player, msg) != 0) return;
+		//if (net.minecraftforge.client.ClientCommandHandler.instance.executeCommand(mc.player, msg) != 0) return; //Forge: TODo Client command re-write
 
-		mc.player.sendChatMessage(msg);
+		AdvancedMacros.getMinecraft().player.sendChatMessage(msg);
 	}
 
-	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onItemPickup(EntityItemPickupEvent ipe){
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return;
+	@SubscribeEvent 
+	public void onItemPickup(EntityItemPickupEvent ipe){ //check net.minecraftforge.event.ForgeEventFactory onItemPickup
 		LuaTable e = createEvent(EventName.ItemPickup);
-		e.set(3, ipe.getEntityPlayer().getName());
+		e.set(3, Utils.codedFromTextComponent(ipe.getEntityPlayer().getName()).a);
 		e.set(4, Utils.itemStackToLuatable(ipe.getItem().getItem()));
 		fireEvent(EventName.ItemPickup, e);
 	}
 
+
+	@SubscribeEvent
+	public void postRenderGameLoop(TickEvent.RenderTickEvent event) { //runs very frequently, this is where the old add scheduled tasks use to go (close enough anyway)
+		if(event.phase.equals(Phase.END))
+			TaskDispatcher.runTasks();
+	}
 
 	//+===================================================================================================+
 	//|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~END OF FORGE EVENTS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|
@@ -1133,15 +1117,18 @@ public class ForgeEventHandler {
 	//not including this world render, but its not for the trigger list
 
 	private Field MCForge_EventBusID;
-	private Field modContainer;
+	private Field readable;
+	private String myOnChatMethodReadable;
 	private void repostForgeEvent(Event event) {
 		try {
 			ListenerList list = event.getListenerList();
 			if(MCForge_EventBusID==null) {
 				MCForge_EventBusID = MinecraftForge.EVENT_BUS.getClass().getDeclaredField("busID");
 				MCForge_EventBusID.setAccessible(true);
-				modContainer = ASMEventHandler.class.getDeclaredField("owner");
-				modContainer.setAccessible(true);
+				readable = ASMEventHandler.class.getDeclaredField("readable");
+				readable.setAccessible(true);
+				Method onChat = this.getClass().getDeclaredMethod("onChat", ClientChatReceivedEvent.class);
+				myOnChatMethodReadable = "ASM: " + this + " " + onChat.getName() + Type.getMethodDescriptor(onChat);
 			}
 			int busId = MCForge_EventBusID.getInt(MinecraftForge.EVENT_BUS);
 			IEventListener[] listeners = list.getListeners(busId);
@@ -1152,28 +1139,30 @@ public class ForgeEventHandler {
 					if(!(iel instanceof ASMEventHandler))
 						continue;
 					ASMEventHandler asmeh = (ASMEventHandler) iel;
-					if( AdvancedMacros.getModContainer().equals( modContainer.get(asmeh) ) )
+
+
+					if( myOnChatMethodReadable.equals(readable.get(asmeh)) )
 						flag = false;
-						continue;
+					continue;
 				}
 				listeners[i].invoke(event);
 			}
 			if(!event.isCanceled())
-			if(event instanceof ClientChatReceivedEvent) {
-				ClientChatReceivedEvent ccre = (ClientChatReceivedEvent) event;
-				AdvancedMacros.getMinecraft().ingameGUI.addChatMessage(ccre.getType(), ccre.getMessage());
-			}
+				if(event instanceof ClientChatReceivedEvent) {
+					ClientChatReceivedEvent ccre = (ClientChatReceivedEvent) event;
+					AdvancedMacros.getMinecraft().ingameGUI.addChatMessage(ccre.getType(), ccre.getMessage());
+				}
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void resetItemDurablitity(){
 		ItemStack i = AdvancedMacros.getMinecraft().player.getHeldItemMainhand();
-		lastItemDurablity = i.getMaxDamage()-i.getItemDamage();
+		lastItemDurablity = i.getMaxDamage()-i.getDamage();
 	}
 	private void resetLastStats(){
-		EntityPlayerSP player = AdvancedMacros.getMinecraft().player;
+		PlayerEntity player = AdvancedMacros.getMinecraft().player;
 		if(player==null){return;}
 		lastAir = player.getAir()/3;
 		lastHealth = (int) player.getHealth();
@@ -1186,7 +1175,7 @@ public class ForgeEventHandler {
 		boolean armorChanged = false;
 		int[] armorDurability = new int[4];
 		for (int i = 0; i < armorDurability.length; i++) {
-			int temp = armor.get(i).getMaxDamage() - armor.get(i).getItemDamage();
+			int temp = armor.get(i).getMaxDamage() - armor.get(i).getDamage();
 			if(temp!=lastArmourDurability[i]){armorChanged = true;}
 			armorDurability[i] = temp;
 		}
@@ -1197,7 +1186,7 @@ public class ForgeEventHandler {
 		lastXPLevel = player.experienceLevel;
 	}
 	//public static LuaTable worldHud = new LuaTable();
-	@SubscribeEvent @SideOnly(Side.CLIENT)
+	@SubscribeEvent 
 	public void onLastWorldRender(RenderWorldLastEvent rwle){
 		//		GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, AdvancedMacros.modelView3d);
 		//		GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, AdvancedMacros.projView3d);
@@ -1207,7 +1196,7 @@ public class ForgeEventHandler {
 		float p = AdvancedMacros.getMinecraft().getRenderPartialTicks();
 		Entity player = AdvancedMacros.getMinecraft().player;
 
-		GlStateManager.pushAttrib();
+		GlStateManager.pushTextureAttributes();
 		GlStateManager.enableCull();
 		GlStateManager.cullFace(CullFace.BACK);
 		GlStateManager.enableBlend();
@@ -1223,16 +1212,16 @@ public class ForgeEventHandler {
 			for (WorldHudItem worldHudItem : worldHudItems) {
 				//System.out.println(worldHudItem);
 				if(worldHudItem.getDrawType().isXRAY()){
-					GlStateManager.disableDepth();
+					GlStateManager.disableDepthTest();
 				}else{
-					GlStateManager.enableDepth();
+					GlStateManager.enableDepthTest();
 				}
-				GlStateManager.color(1, 1, 1, worldHudItem.getOpacity());
+				GlStateManager.color4f(1, 1, 1, worldHudItem.getOpacity());
 				worldHudItem.render(accuPlayerX(p, player), accuPlayerY(p, player), accuPlayerZ(p, player));
 			}
 		}
 		GlStateManager.disableBlend();//F1 is black otherwise
-		GlStateManager.popAttrib();
+		GlStateManager.popAttributes();
 	}
 
 	@SubscribeEvent
@@ -1251,7 +1240,7 @@ public class ForgeEventHandler {
 
 		//GlStateManager.enableBlend();
 		//GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 1);
-		GlStateManager.disableAlpha();
+		GlStateManager.disableAlphaTest();
 		//		GlStateManager.enableAlpha();
 		GlStateManager.bindTexture(0);
 		//GlStateManager.enableLighting();
@@ -1259,22 +1248,22 @@ public class ForgeEventHandler {
 		synchronized (hud2DItems) {
 			for (Hud2DItem hudItem : hud2DItems) {
 				//System.out.println(worldHudItem);
-				GlStateManager.color(1, 1, 1, hudItem.getOpacity()/255f);
+				GlStateManager.color4f(1, 1, 1, hudItem.getOpacity()/255f);
 				hudItem.render(p);
 			}
 		}
 		//GlStateManager.disableBlend();//F1 is black otherwise
 		GL11.glPopAttrib();
 		//GlStateManager.color(0, 0, 0, 0);
-		GlStateManager.color(1, 1, 1, 1);
+		GlStateManager.color4f(1, 1, 1, 1);
 		//GlStateManager.disableBlend();
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-		GlStateManager.disableAlpha();
-		GlStateManager.enableAlpha();
+		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.disableAlphaTest();
+		GlStateManager.enableAlphaTest();
 		GlStateManager.disableBlend();
 		GlStateManager.enableBlend();
-		GlStateManager.color(1, 1, 1, 1);
+		GlStateManager.color4f(1, 1, 1, 1);
 		//	GlStateManager.disableTexture2D();
 	}
 
@@ -1389,7 +1378,7 @@ public class ForgeEventHandler {
 
 	private Look look;
 	public void lookTo(float sYaw, float sPitch, long time) {
-		EntityPlayerSP player = AdvancedMacros.getMinecraft().player;
+		PlayerEntity player = AdvancedMacros.getMinecraft().player;
 		look = new Look(player.rotationYawHead, player.rotationPitch,sYaw, sPitch, time);
 
 	}
@@ -1407,7 +1396,7 @@ public class ForgeEventHandler {
 			this.toYaw = toYaw;
 			this.toPitch = toPitch;
 
-			EntityPlayerSP player = AdvancedMacros.getMinecraft().player;
+			PlayerEntity player = AdvancedMacros.getMinecraft().player;
 			player.rotationYaw = fixYaw( player.rotationYaw );
 			player.prevRotationYaw = fixYaw( player.prevRotationYaw );
 
@@ -1433,7 +1422,7 @@ public class ForgeEventHandler {
 		}
 		public void look(){
 			if(System.currentTimeMillis()<=time+start){
-				EntityPlayerSP player = AdvancedMacros.getMinecraft().player;
+				PlayerEntity player = AdvancedMacros.getMinecraft().player;
 
 
 				player.rotationYaw = interpolate(fromYaw, toYaw);
@@ -1448,29 +1437,26 @@ public class ForgeEventHandler {
 	}
 
 	private class HeldKeybinds{
-		int keyCode;
+		net.minecraft.client.util.InputMappings.Input input;
 		long releaseTime;
 		boolean done = false; //removal flag
-		public HeldKeybinds(int keyCode, long releaseTime) {
+		public HeldKeybinds(net.minecraft.client.util.InputMappings.Input input, long releaseTime) {
 			super();
-			this.keyCode = keyCode;
+			this.input = input;
 			this.releaseTime = releaseTime;
 		}
 
 	}
-	public ConcurrentHashMap<Integer, Boolean> getHeldKeys() {
-		return heldKeys;
-	}
-	public ArrayList<Boolean> getHeldMouseButtons() {
-		return heldMouseButtons;
-	}
+
+
 
 	private void populatePlayerList(ConcurrentHashMap<String, Boolean> map) {
 		Minecraft mc = AdvancedMacros.getMinecraft();
 		Iterator<NetworkPlayerInfo> iter = mc.getConnection().getPlayerInfoMap().iterator();
 		while(iter.hasNext()) {
 			NetworkPlayerInfo playerInfo = iter.next();
-			String name = mc.ingameGUI.getTabList().getPlayerName(playerInfo);
+
+			String name = Utils.codedFromTextComponent(mc.ingameGUI.getTabList().getDisplayName(playerInfo)).a;
 			String formated   = name
 					.replaceAll("&", "&&")
 					.replaceAll("\u00A7", "&")
@@ -1486,43 +1472,13 @@ public class ForgeEventHandler {
 	}
 
 	//private LinkedList<HeldKeybinds> heldKeybinds = new LinkedList<>();
-	ConcurrentHashMap<Integer, HeldKeybinds> keyBindReleaseMap = new ConcurrentHashMap<>();
-	public void releaseKeybindAt(int keycode, long l) {
+	ConcurrentHashMap<net.minecraft.client.util.InputMappings.Input, HeldKeybinds> keyBindReleaseMap = new ConcurrentHashMap<>();
+	public void releaseKeybindAt(net.minecraft.client.util.InputMappings.Input input, long l) {
 		//heldKeybinds.add(new HeldKeybinds(keycode, l));
-		keyBindReleaseMap.put(keycode, new HeldKeybinds(keycode, l));
+		keyBindReleaseMap.put(input, new HeldKeybinds(input, l));
 	}
 
-	public class GetHeldKeys extends ZeroArgFunction {
-		@Override
-		public LuaValue call() {
-			LuaTable t = new LuaTable();
-			int j = 1;
-			for(int i = 0; i<Keyboard.KEYBOARD_SIZE; i++) {
-				if(Keyboard.isKeyDown(i))
-					t.set(j++, Keyboard.getKeyName(i));
-			}
-			for(int i = 0; i < Mouse.getButtonCount(); i++) {
-				if(!Mouse.isButtonDown(i)) continue;
-				String s;
-				switch (i) {
-				case 0:
-					s = "LMB";
-					break;
-				case 1:
-					s = "RMB";
-					break;
-				case 2:
-					s = "MMB";
-					break;
-				default:
-					s = "MOUSE:"+i;
-					break;
-				}
-				t.set(j++, s);
-			}
-			return t;
-		}
-	}
+
 
 	public static class RenderFlags{
 		private boolean xray = false;

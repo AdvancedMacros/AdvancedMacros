@@ -157,7 +157,7 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 			//System.out.println(">>> "+x+" "+y+" "+wid+" "+len+" "+buttonLen+" "+buttonY);
 
 			if(anchorSet || isInButton(mouseX, mouseY)){
-				net.minecraft.client.gui.Gui.drawRect(x+1, buttonY, wid+x, buttonLen+buttonY+1, buttonShade);
+				net.minecraft.client.gui.screen.Screen.fill(x+1, buttonY, wid+x, buttonLen+buttonY+1, buttonShade);
 			}
 		}else if(orientation.isLEFTRIGHT()){
 			gui.drawBoxedRectangle(x, y, len, wid, barFrame, barBG); //track
@@ -170,7 +170,7 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 			
 			
 			if(anchorSet || isInButton(mouseX, mouseY)){
-				net.minecraft.client.gui.Gui.drawRect(getButtonX(),y+1,getButtonX()+getButtonLen(), y+wid, buttonShade);
+				net.minecraft.client.gui.screen.Screen.fill(getButtonX(),y+1,getButtonX()+getButtonLen(), y+wid, buttonShade);
 			}
 		}
 		//		gui.drawBoxedRectangle(x, y, 
@@ -205,8 +205,9 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	
 
 	@Override
-	public boolean onScroll(Gui gui, int sign) {
+	public boolean onScroll(Gui gui, double sign) {
 		double lastPos = getOffset();
+		sign = Math.signum(sign);
 		double i = sign*scrollSpeed;
 		if(visible<items){
 			setPos(pos - i);
@@ -215,7 +216,7 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 		return false;
 	}
 
-	private boolean isInButton(int mouseX, int mouseY){
+	private boolean isInButton(double mouseX, double mouseY){
 		if(orientation.isUPDOWN()){
 			int buttonY = getButtonY(), buttonLen = getButtonLen();
 			return (mouseX >= x+1 && 
@@ -236,11 +237,11 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 		return x+(int) (len*pos/items) +1;
 	}
 
-	private int anchorX=0, anchorY=0;
+	private double anchorX=0, anchorY=0; //TODO Is Drag's Q and R this?
 	private double anchorPos=0;
 	private boolean anchorSet = false;
 	@Override
-	public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
+	public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
 		if(!isInButton(x, y)) return false;
 		//System.out.println("Scrollbar: "+items+" v "+visible);
 		if(anchorSet){System.out.println("double anchor set"); return true;}
@@ -263,7 +264,7 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	}
 
 	@Override
-	public boolean onMouseRelease(Gui gui, int x, int y, int state) {
+	public boolean onMouseRelease(Gui gui, double x, double y, int state) {
 		if(anchorSet){
 			double pxlsMoved;
 			if(orientation.isUPDOWN()){
@@ -291,7 +292,7 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	}
 
 	@Override
-	public boolean onMouseClickMove(Gui gui, int x, int y, int buttonNum, long timeSinceClick) {
+	public boolean onMouseClickMove(Gui gui, double x, double y, int buttonNum, double q, double r) {
 		if(anchorSet){
 			if(orientation.isUPDOWN()){
 				setPos(anchorPos + (y-anchorY)/(double)len * items);
@@ -306,18 +307,13 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 
 
 	@Override
-	public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
+	public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
 		return false;
 	}
-
-
-
 	@Override
-	public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
+	public boolean onCharTyped(Gui gui, char typedChar, int mods) {
 		return false;
 	}
-
-
 
 	@Override
 	public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {

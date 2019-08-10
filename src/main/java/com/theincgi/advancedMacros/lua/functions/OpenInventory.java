@@ -8,28 +8,29 @@ import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.event.TaskDispatcher;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiEnchantment;
-import net.minecraft.client.gui.GuiHopper;
-import net.minecraft.client.gui.GuiMerchant;
-import net.minecraft.client.gui.GuiRepair;
-import net.minecraft.client.gui.inventory.GuiBeacon;
-import net.minecraft.client.gui.inventory.GuiBrewingStand;
-import net.minecraft.client.gui.inventory.GuiChest;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.gui.inventory.GuiCrafting;
-import net.minecraft.client.gui.inventory.GuiDispenser;
-import net.minecraft.client.gui.inventory.GuiFurnace;
-import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.client.gui.inventory.GuiScreenHorseInventory;
-import net.minecraft.client.gui.inventory.GuiShulkerBox;
-import net.minecraft.client.multiplayer.PlayerControllerMP;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.ContainerPlayer;
+import net.minecraft.client.gui.screen.EnchantmentScreen;
+import net.minecraft.client.gui.screen.HopperScreen;
+import net.minecraft.client.gui.screen.inventory.AnvilScreen;
+import net.minecraft.client.gui.screen.inventory.BeaconScreen;
+import net.minecraft.client.gui.screen.inventory.BrewingStandScreen;
+import net.minecraft.client.gui.screen.inventory.ChestScreen;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.screen.inventory.CraftingScreen;
+import net.minecraft.client.gui.screen.inventory.DispenserScreen;
+import net.minecraft.client.gui.screen.inventory.FurnaceScreen;
+import net.minecraft.client.gui.screen.inventory.HorseInventoryScreen;
+import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.gui.screen.inventory.MerchantScreen;
+import net.minecraft.client.gui.screen.inventory.ShulkerBoxScreen;
+import net.minecraft.client.multiplayer.PlayerController;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.ClickType;
+import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.ItemStack;
 
 public class OpenInventory extends ZeroArgFunction{
@@ -62,22 +63,22 @@ public class OpenInventory extends ZeroArgFunction{
 		@Override
 		public Varargs invoke(Varargs args) {
 			Minecraft mc = AdvancedMacros.getMinecraft();
-			GuiContainer container;
-			if(mc.currentScreen instanceof GuiContainer) {
-				container = (GuiContainer) mc.currentScreen;
+			ContainerScreen<?> container;
+			if(mc.currentScreen instanceof ContainerScreen<?>) {
+				container = (ContainerScreen<?>) mc.currentScreen;
 			}else{
-				container = new GuiInventory(mc.player);
+				container = new InventoryScreen(mc.player);
 			}
 
 			//ItemStack held = mc.player.inventory.getItemStack();
 
 
-			PlayerControllerMP ctrl = mc.playerController;
-			int wID = container.inventorySlots.windowId;
+			PlayerController ctrl = mc.playerController;
+			int wID = container.getContainer().windowId;
 
 			switch(code) {
 			case click:{
-				Utils.runOnMCAndWait(()->{
+				TaskDispatcher.addTask(()->{
 					int slotA = args.arg1().checkint();
 					int mouseButton = args.optint(2, 0);
 					ClickType type = ClickType.PICKUP;
@@ -87,7 +88,7 @@ public class OpenInventory extends ZeroArgFunction{
 				return NONE;
 			}
 			case closeAndDrop:
-				Utils.runOnMCAndWait(()->{
+				TaskDispatcher.addTask(()->{
 					ItemStack held = mc.player.inventory.getItemStack();
 					if(!held.isEmpty())
 						ctrl.windowClick(wID, -999, 0, ClickType.PICKUP, mc.player);
@@ -98,7 +99,7 @@ public class OpenInventory extends ZeroArgFunction{
 				mc.player.closeScreen();
 				return NONE;
 			case quick:{
-				Utils.runOnMCAndWait(()->{
+				TaskDispatcher.addTask(()->{
 					int slotA = args.arg1().checkint();
 					ClickType type = ClickType.QUICK_MOVE;
 					ctrl.windowClick(wID, slotA-1, 0, type, mc.player);
@@ -107,11 +108,11 @@ public class OpenInventory extends ZeroArgFunction{
 				return NONE;
 			}
 			case split:{
-				Utils.runOnMCAndWait(()->{
+				TaskDispatcher.addTask(()->{
 					int slotA = args.arg1().checkint();
 					ClickType type = ClickType.PICKUP;
 					int slotB = args.checkint(2);
-					if(container.inventorySlots.getSlot(slotB).getHasStack())
+					if(container.getContainer().getSlot(slotB).getHasStack())
 						throw new LuaError("Destination slot is occupied");
 					ctrl.windowClick(wID, slotA-1, 1, type, mc.player);
 					ctrl.windowClick(wID, slotB-1, 0, type, mc.player);
@@ -125,15 +126,15 @@ public class OpenInventory extends ZeroArgFunction{
 			}
 			case getSlot:{
 				int slotA = args.arg1().checkint();
-				return Utils.itemStackToLuatable( container.inventorySlots.getSlot(slotA-1).getStack() );
+				return Utils.itemStackToLuatable( container.getContainer().getSlot(slotA-1).getStack() );
 			}
 			case swap:{
-				Utils.runOnMCAndWait((Runnable)()->{
+				TaskDispatcher.addTask((Runnable)()->{
 					ItemStack held = mc.player.inventory.getItemStack();
 					int slotA = args.checkint(1);
 					int slotB = args.checkint(2);
-					ItemStack is1 = container.inventorySlots.getSlot(slotA).getStack();
-					ItemStack is2 = container.inventorySlots.getSlot(slotB).getStack();
+					ItemStack is1 = container.getContainer().getSlot(slotA).getStack();
+					ItemStack is2 = container.getContainer().getSlot(slotB).getStack();
 					if(is1.isEmpty() && is2.isEmpty()) return;
 
 					ClickType type = ClickType.PICKUP;
@@ -150,7 +151,7 @@ public class OpenInventory extends ZeroArgFunction{
 				return NONE;
 			}
 			case grabAll:{
-				Utils.runOnMCAndWait(()->{
+				TaskDispatcher.addTask(()->{
 					int slotA = args.checkint(1);
 					ctrl.windowClick(wID, slotA-1, 1, ClickType.PICKUP, mc.player);
 					ctrl.windowClick(wID, slotA-1, 1, ClickType.PICKUP_ALL, mc.player);
@@ -159,35 +160,35 @@ public class OpenInventory extends ZeroArgFunction{
 				return NONE;
 			}
 			case getType:
-				if(container instanceof GuiInventory)
+				if(container instanceof InventoryScreen)
 					return valueOf("inventory");
-				if (container instanceof GuiEnchantment)
+				if (container instanceof EnchantmentScreen)
 					return valueOf("enchantment table");
-				if(container instanceof GuiMerchant)
+				if(container instanceof MerchantScreen)
 					return valueOf("villager");
-				if(container instanceof GuiRepair)
+				if(container instanceof AnvilScreen)
 					return valueOf("anvil");
-				if(container instanceof GuiBeacon)
+				if(container instanceof BeaconScreen)
 					return valueOf("beacon");
-				if(container instanceof GuiBrewingStand)
+				if(container instanceof BrewingStandScreen)
 					return valueOf("brewing stand");
-				if(container instanceof GuiChest)
+				if(container instanceof ChestScreen)
 					return valueOf("chest");
-				if(container instanceof GuiCrafting)
+				if(container instanceof CraftingScreen)
 					return valueOf("crafting table");
-				if(container instanceof GuiDispenser)
+				if(container instanceof DispenserScreen)
 					return valueOf("dispenser");
-				if(container instanceof GuiFurnace)
+				if(container instanceof FurnaceScreen)
 					return valueOf("furnace");
-				if(container instanceof GuiHopper)
+				if(container instanceof HopperScreen)
 					return valueOf("hopper");
-				if(container instanceof GuiScreenHorseInventory)
+				if(container instanceof HorseInventoryScreen)
 					return valueOf("horse inventory");
-				if(container instanceof GuiShulkerBox)
+				if(container instanceof ShulkerBoxScreen)
 					return valueOf("shulker box");
 				return valueOf(container.getClass().toString());
 			case getTotalSlots: { //as suggested by swadicalrag
-				return valueOf(container.inventorySlots.inventorySlots.size());
+				return valueOf(container.getContainer().inventorySlots.size());
 			}
 			default:
 				break;
@@ -443,8 +444,8 @@ public class OpenInventory extends ZeroArgFunction{
 	//	}
 
 	private static int getSlotNum(int invIndx){
-		InventoryPlayer inv = AdvancedMacros.getMinecraft().player.inventory;
-		ContainerPlayer  invContainer =(ContainerPlayer) AdvancedMacros.getMinecraft().player.inventoryContainer;
+		PlayerInventory inv = AdvancedMacros.getMinecraft().player.inventory;
+		PlayerContainer  invContainer =(PlayerContainer) AdvancedMacros.getMinecraft().player.container;
 
 		if(inRange(invIndx, 0, 8)){
 			return invIndx+36;

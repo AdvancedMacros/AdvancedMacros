@@ -7,6 +7,7 @@ import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
@@ -15,7 +16,6 @@ import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
@@ -57,16 +57,16 @@ public class Hud3DPane extends WorldHudItem{
 		if(texture!=null)
 			texture.bindTexture();
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(-playerX, -playerY, -playerZ);
-		GlStateManager.translate(x, y, z);
+		GlStateManager.translated(-playerX, -playerY, -playerZ);
+		GlStateManager.translatef(x, y, z);
 		
-		GlStateManager.rotate(roll, 0, 0, 1);
-		GlStateManager.rotate(pitch, 1, 0, 0);
-		GlStateManager.rotate(yaw, 0, 1, 0);
+		GlStateManager.rotatef(roll, 0, 0, 1);
+		GlStateManager.rotatef(pitch, 1, 0, 0);
+		GlStateManager.rotatef(yaw, 0, 1, 0);
 		
 		
-		GlStateManager.translate(-x, -y, -z);
-		GlStateManager.translate(playerX, playerY, playerZ);
+		GlStateManager.translatef(-x, -y, -z);
+		GlStateManager.translated(playerX, playerY, playerZ);
 		
 		color.apply();
 		switch (axisFace) {

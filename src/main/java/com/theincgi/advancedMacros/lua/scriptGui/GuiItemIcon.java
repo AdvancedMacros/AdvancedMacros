@@ -5,20 +5,19 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.elements.GuiRect;
+import com.theincgi.advancedMacros.misc.Utils;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.RenderItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public class GuiItemIcon extends ScriptGuiElement{
-	static RenderItem itemRender = AdvancedMacros.getMinecraft().getRenderItem();
+	static ItemRenderer itemRender = AdvancedMacros.getMinecraft().getItemRenderer();
 	static FontRenderer fontRenderer = AdvancedMacros.getMinecraft().fontRenderer;
 
 	ItemStack itemStack;
@@ -63,10 +62,10 @@ public class GuiItemIcon extends ScriptGuiElement{
 		String end = text.substring(indx+1);
 		try {
 			int dmg = Integer.parseInt(end);
-			itemStack = new ItemStack(Item.getByNameOrId(text.substring(0, indx)));
-			itemStack.setItemDamage(dmg);
+			itemStack = Utils.itemStackFromName(text.substring(0, indx));
+			itemStack.setDamage(dmg);
 		}catch (NumberFormatException e) {
-			itemStack = new ItemStack(Item.getByNameOrId(text));
+			itemStack = Utils.itemStackFromName(text);
 		}
 
 	}

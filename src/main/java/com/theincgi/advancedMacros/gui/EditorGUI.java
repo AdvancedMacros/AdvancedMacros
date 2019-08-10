@@ -1,7 +1,5 @@
 package com.theincgi.advancedMacros.gui;
 
-import java.io.IOException;
-
 import org.luaj.vm2_v3_0_1.LuaValue;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
@@ -13,24 +11,26 @@ import com.theincgi.advancedMacros.gui2.ScriptBrowser2;
 import com.theincgi.advancedMacros.misc.PropertyPalette;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 
 public class EditorGUI extends Gui{
 
 	ColorTextArea cta = new ColorTextArea(this, "editor");
-	GuiTextField gtf;
+	TextFieldWidget gtf;
 	GuiButton save, exit, quickRun;
 	
 	//TODO autosave option property for run
 	
 	//TODO Help bar
 	public void postInit() {
-		gtf.setFocused(false); //FIXME somehow this causes an error with inventory tweaks.... idk how
+		gtf.setFocused2(false); 
 	}
 	
 	public EditorGUI() {
 		addInputSubscriber(cta);
-		gtf = new GuiTextField(0, getFontRend(), 6, 2, width/3, 20);
+		gtf = new TextFieldWidget(getFontRend(), 6, 2, width/3, 20, "");
 		gtf.setCanLoseFocus(true);
 		
 		{
@@ -91,12 +91,17 @@ public class EditorGUI extends Gui{
 		return cta;
 	}
 	
+	@Override
+	public ITextComponent getTitle() {
+		return new StringTextComponent("Script Editor");
+	}
+	
 	public void runScriptFromEditor() {
 		quickRun.getOnClickHandler().onClick(0, save);
 	}
 
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+	public void render(int mouseX, int mouseY, float partialTicks) {
 		if(cta.isNeedsSave()){
 			if(ColorTextArea.isCTRLDown()) {
 				exit.setFill(Color.TEXT_6);//Orange
@@ -106,8 +111,8 @@ public class EditorGUI extends Gui{
 		}else{
 			exit.setFill(Color.TEXT_2);//Green
 		}
-		super.drawScreen(mouseX, mouseY, partialTicks);
-		gtf.drawTextBox();
+		super.render(mouseX, mouseY, partialTicks);
+		gtf.render(mouseX, mouseY, partialTicks);
 		save.onDraw(this, mouseX, mouseY, partialTicks);
 		exit.onDraw(this, mouseX, mouseY, partialTicks);
 		quickRun.onDraw(this, mouseX, mouseY, partialTicks);
@@ -120,32 +125,35 @@ public class EditorGUI extends Gui{
 		ColorTextArea.updateKeywords();
 	}
 	@Override
-	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-		super.mouseClicked(mouseX, mouseY, mouseButton);
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
+		if(super.mouseClicked(mouseX, mouseY, mouseButton)) return true;
 		gtf.mouseClicked(mouseX, mouseY, mouseButton);
 		cta.setFocused(!gtf.isFocused());
+		return true;
+		
 	}
 	@Override
-	protected void keyTyped(char typedChar, int keyCode) throws IOException {
-		super.keyTyped(typedChar, keyCode);
+	public boolean charTyped(char typedChar, int keyCode) {
+		if(super.charTyped(typedChar, keyCode)) return true;
 		if(gtf.isFocused()){
-			gtf.textboxKeyTyped(typedChar, keyCode);
+			return gtf.charTyped(typedChar, keyCode);
 			//TODO what to do if the text box is updated here
 		}
+		return false;
 	}
 	
 	@Override
-	public void setWorldAndResolution(Minecraft mc, int width, int height) {
-		super.setWorldAndResolution(mc, width, height);
-		gtf.width = width/3;
+	public void resize(Minecraft mc, int width, int height) {
+		super.resize(mc, width, height);
+		gtf.setWidth(width/3);
 		save.setWidth(width/4);
 		exit.setWidth(width/4);
 		quickRun.setWidth(width/8);
 		save.setPos(7+width/3, 2);
 		exit.setPos(7+width/3, 12);
 		quickRun.setPos(save.getX()+save.getWid(), 12);
-		cta.setPos(5, gtf.y+gtf.height+1);
-		cta.resize(width-10, height-6-gtf.height);
+		cta.setPos(5, gtf.y+gtf.getHeight()+1);
+		cta.resize(width-10, height-6-gtf.getHeight());
 		
 	}
 	public void openScript(String sScript) {

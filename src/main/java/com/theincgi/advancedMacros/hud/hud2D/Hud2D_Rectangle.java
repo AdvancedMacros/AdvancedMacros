@@ -5,10 +5,10 @@ import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.theincgi.advancedMacros.gui.Color;
 
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
@@ -94,7 +94,7 @@ public class Hud2D_Rectangle extends Hud2DItem {
 		//a = ((float) ((Math.sin(System.currentTimeMillis()%100000/500f)+1 )/2)) * 1f + .0f;
 		a*=a;
 		//System.out.println(a);
-		GlStateManager.color(color.getR()/255f, color.getG()/255f, color.getB()/255f, a);//color.getA()/255f);
+		GlStateManager.color4f(color.getR()/255f, color.getG()/255f, color.getB()/255f, a);//color.getA()/255f);
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 //		
 //		GlStateManager.disableBlend();
@@ -113,7 +113,7 @@ public class Hud2D_Rectangle extends Hud2DItem {
 		buffer.pos(dx+dw 	, dy       	, z).endVertex(); //bottom right
 		
 		Tessellator.getInstance().draw();
-		GlStateManager.enableTexture2D();
+		GlStateManager.enableTexture();
 		//GlStateManager.disableBlend();
        // GlStateManager.disableBlend();
        // Gui.drawRect((int)dx, (int)dy, (int)dx+dw, (int)dy+dh, color.toInt());

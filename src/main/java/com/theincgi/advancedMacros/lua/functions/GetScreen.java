@@ -10,9 +10,12 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.event.TaskDispatcher;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
+import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.util.ScreenShotHelper;
 
 public class GetScreen extends ZeroArgFunction{
@@ -22,10 +25,12 @@ public class GetScreen extends ZeroArgFunction{
 	public LuaValue call() {
 		Minecraft mc = AdvancedMacros.getMinecraft();	
 		
-		ListenableFuture<BufferedImage> futureImage = mc.addScheduledTask(new Callable<BufferedImage>() {
+		ListenableFuture<BufferedImage> futureImage = TaskDispatcher.addTask(new Callable<BufferedImage>() {
 			@Override
 			public BufferedImage call() throws Exception {
-				return ScreenShotHelper.createScreenshot(mc.displayWidth, mc.displayHeight, mc.getFramebuffer());
+				NativeImage ni = ScreenShotHelper.createScreenshot(mc.mainWindow.getFramebufferWidth(), mc.mainWindow.getFramebufferHeight(), mc.getFramebuffer());
+				
+				return Utils.nativeImageToBufferedImage(ni);
 			}
 		});
 		

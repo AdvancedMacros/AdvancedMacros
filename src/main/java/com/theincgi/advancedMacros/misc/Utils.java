@@ -1,5 +1,6 @@
 package com.theincgi.advancedMacros.misc;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -7,8 +8,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,13 +15,13 @@ import javax.annotation.Nullable;
 
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
-import org.luaj.vm2_v3_0_1.LuaNumber;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
-import com.google.common.util.concurrent.ListenableFuture;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.event.ForgeEventHandler;
 import com.theincgi.advancedMacros.gui.Color;
@@ -31,41 +30,48 @@ import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
 import com.theincgi.advancedMacros.lua.util.ContainerControls;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import net.minecraft.client.renderer.texture.NativeImage;
+import net.minecraft.command.arguments.ItemParser;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagByte;
-import net.minecraft.nbt.NBTTagByteArray;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagDouble;
-import net.minecraft.nbt.NBTTagFloat;
-import net.minecraft.nbt.NBTTagInt;
-import net.minecraft.nbt.NBTTagIntArray;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagLong;
-import net.minecraft.nbt.NBTTagShort;
-import net.minecraft.nbt.NBTTagString;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.nbt.ByteArrayNBT;
+import net.minecraft.nbt.ByteNBT;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.DoubleNBT;
+import net.minecraft.nbt.FloatNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.IntArrayNBT;
+import net.minecraft.nbt.IntNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.LongNBT;
+import net.minecraft.nbt.ShortNBT;
+import net.minecraft.nbt.StringNBT;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.ITextComponent.Serializer;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.ClickEvent.Action;
 import net.minecraft.util.text.event.HoverEvent;
-import net.minecraftforge.oredict.OreDictionary;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 
 public class Utils {
 
@@ -392,9 +398,9 @@ public class Utils {
 	public static LuaValue itemStackToLuatable(ItemStack stack) {
 		if(stack.isEmpty()){return LuaValue.FALSE;}
 		LuaTable table = new LuaTable();
-		table.set("name", stack.getDisplayName()==null?LuaValue.NIL:LuaValue.valueOf(stack.getDisplayName()));
+		table.set("name", stack.getDisplayName()==null?LuaValue.NIL:LuaValue.valueOf(codedFromTextComponent(stack.getDisplayName()).a) );
 		table.set("id", stack.getItem().getRegistryName().toString());
-		table.set("dmg", stack.getItemDamage());
+		table.set("dmg", stack.getDamage());
 		table.set("maxDmg", stack.getMaxDamage());
 		table.set("amount", stack.getCount());
 		table.set("repairCost", stack.getRepairCost());
@@ -402,28 +408,25 @@ public class Utils {
 		table.set("nbt", NBTUtils.fromCompound(stack.serializeNBT()));
 		return table;
 	}
-	public static LuaTable blockToTable(IBlockState blockState, @Nullable TileEntity te) {
+	public static LuaTable blockToTable(BlockState blockState, @Nullable TileEntity te) {
 		Block block = blockState.getBlock();
 		LuaTable out = new LuaTable();
 		out.set("id", block.getRegistryName().toString());
-		out.set("name", block.getLocalizedName());
-		out.set("dmg", block.getMetaFromState(blockState));
+		out.set("name", block.getNameTextComponent().getFormattedText());
+		// looks like they dont have dmg values for blocks anymore? out.set("dmg", block.getMetaFromState(blockState));
 		if(te != null) {
 			out.set("nbt", Utils.NBTUtils.fromCompound(te.serializeNBT()));
 		}
-		String tool = block.getHarvestTool(blockState);
+		String tool = block.getHarvestTool(blockState).getName().toLowerCase();
 		if(tool!=null)
 			out.set("harvestTool", tool);
 
 		return out;
 	}
 	public static boolean itemsEqual(ItemStack sourceStack, ItemStack sinkStack) {
-		if(sourceStack.isEmpty()&&sinkStack.isEmpty())return true;
-		if(!sourceStack.getItem().equals(sinkStack.getItem())) return false;
-		if(sourceStack.getItemDamage()==OreDictionary.WILDCARD_VALUE || sinkStack.getItemDamage()==OreDictionary.WILDCARD_VALUE) return true;
-		return sourceStack.getItemDamage()==sinkStack.getItemDamage();
+		return ItemStack.areItemsEqual(sourceStack, sinkStack) && ItemStack.areItemStackTagsEqual(sourceStack, sinkStack);
 	}
-	public static LuaValue inventoryToTable(InventoryPlayer inventory, boolean collapseEmpty) {
+	public static LuaValue inventoryToTable(PlayerInventory inventory, boolean collapseEmpty) {
 		LuaTable t = new LuaTable();
 		for(int i = 0; i<inventory.getSizeInventory(); i++) {
 			LuaValue stack = itemStackToLuatable(inventory.getStackInSlot(i));
@@ -433,16 +436,27 @@ public class Utils {
 		t.set("mouse", itemStackToLuatable(inventory.getItemStack()));
 		return t;
 	}
-	public static LuaValue effectToTable(PotionEffect pe) {
+	public static LuaValue effectToTable(EffectInstance pe) {
 		LuaTable table = new LuaTable();
 		table.set("id", pe.getEffectName());
 		table.set("strength", pe.getAmplifier());
 		table.set("duration", pe.getDuration());
 		table.set("showsParticles", LuaValue.valueOf(pe.doesShowParticles()));
-		table.set("isAmbient", LuaValue.valueOf(pe.getIsAmbient()));
+		table.set("isAmbient", LuaValue.valueOf(pe.isAmbient()));
 		return table;
 	}
 
+	
+	public static AbstractClientPlayerEntity findPlayerByName(World world, String toFind) {
+		AbstractClientPlayerEntity[] players = (AbstractClientPlayerEntity[]) AdvancedMacros.getMinecraft().world.getPlayers().toArray();
+		for(int i = 0; i<players.length; i++) {
+			AbstractClientPlayerEntity acpe = players[i];
+			if(acpe.getName().getUnformattedComponentText().equals(toFind)) {
+				return acpe;
+			}
+		}
+		return null;
+	}
 
 	public static LuaTable blockPosToTable(BlockPos pos) {
 		LuaTable t = new LuaTable();        
@@ -462,7 +476,7 @@ public class Utils {
 	public static LuaValue entityToTable(Entity entity) {
 		if(entity==null) return LuaValue.FALSE;
 		LuaTable t = new LuaTable();
-		t.set("name", entity.getName());
+		t.set("name", entity.getName().getUnformattedComponentText());
 		t.set("class", entity.getClass().getName());
 		//t.set("inventory", Utils.inventoryToTable(entity.inventory, !(entity instanceof EntityPlayerSP)));
 		{
@@ -472,12 +486,12 @@ public class Utils {
 			pos.set(3, LuaValue.valueOf(entity.posZ));
 			t.set("pos", pos);
 		}
-		t.set("dimension", LuaValue.valueOf(entity.dimension));
+		t.set("dimension", toTable(entity.dimension));
 		t.set("pitch", entity.rotationPitch);
 		t.set("yaw", entity.rotationYaw);
 		t.set("fallDist", entity.fallDistance);
-		t.set("height", entity.height);
-		t.set("width", entity.width);
+		t.set("height", entity.getHeight());
+		t.set("width", entity.getWidth());
 		t.set("hurtResTime", entity.hurtResistantTime);
 		//t.set("isAirborne", LuaValue.valueOf(player.isAirBorne));
 		t.set("isCollidedHorz", LuaValue.valueOf(entity.collidedHorizontally));
@@ -486,7 +500,7 @@ public class Utils {
 		//t.set("maxHurtResTime", LuaValue.valueOf(entity.maxHurtResistantTime));
 		t.set("isNoClip", LuaValue.valueOf(entity.noClip));
 		t.set("onGround", LuaValue.valueOf(entity.onGround));
-		t.set("isInvulnerable", LuaValue.valueOf(entity.getIsInvulnerable()));
+		t.set("isInvulnerable", LuaValue.valueOf(entity.isInvulnerable()));
 		//		{
 		//			LuaTable pos = new LuaTable();
 		//			BlockPos p = entity.getBedLocation();
@@ -501,20 +515,21 @@ public class Utils {
 		{
 			LuaTable velocity = new LuaTable();
 			Entity e = entity.getLowestRidingEntity();
-			velocity.set(1, LuaValue.valueOf(e.motionX));
-			velocity.set(2, LuaValue.valueOf(e.motionY));
-			velocity.set(3, LuaValue.valueOf(e.motionZ));
+			Vec3d motion = e.getMotion();
+			velocity.set(1, LuaValue.valueOf(motion.x));
+			velocity.set(2, LuaValue.valueOf(motion.y));
+			velocity.set(3, LuaValue.valueOf(motion.z));
 			t.set("velocity", velocity);
 		}
 		//t.set("luck", entity.getLuck());
-		if(entity instanceof EntityLiving) {
-			EntityLiving living = (EntityLiving) entity;
+		if(entity instanceof LivingEntity) {
+			LivingEntity living = (LivingEntity) entity;
 			t.set("health", living.getHealth());
 			t.set("isOnLadder", LuaValue.valueOf(living.isOnLadder()));
 			{
 				LuaTable effects = new LuaTable();
 				int i = 1;
-				for(PotionEffect pe : living.getActivePotionEffects()) {
+				for(EffectInstance pe : living.getActivePotionEffects()) {
 					effects.set(i++, Utils.effectToTable(pe));
 				}
 				t.set("potionEffects", effects);
@@ -537,8 +552,8 @@ public class Utils {
 			t.set("nbt", NBTUtils.fromCompound(entity.serializeNBT()));
 		}catch (NullPointerException e) {
 			try {
-				NBTTagCompound ret = new NBTTagCompound();
-				entity.writeToNBT(ret);
+				CompoundNBT ret = new CompoundNBT();
+				ret = entity.getEntityData();//writeToNBT(ret);
 				t.set("nbt", NBTUtils.fromCompound(ret));
 			
 			}catch(Exception ex) {
@@ -548,9 +563,10 @@ public class Utils {
 		}
 		t.set("uuid", LuaValue.valueOf(entity.getUniqueID().toString()));
 		{
-			RayTraceResult rtr = entity.rayTrace(8, 0);
-			if(rtr!=null) {
-				BlockPos lookingAt = rtr.getBlockPos();
+			RayTraceResult rtr = entity.func_213324_a(8, AdvancedMacros.getMinecraft().getRenderPartialTicks(), false);
+			if(rtr!=null && rtr instanceof BlockRayTraceResult) {
+				BlockRayTraceResult brtr = (BlockRayTraceResult) rtr;
+				BlockPos lookingAt = brtr.getPos();
 				if(lookingAt!=null) {
 					LuaTable look = new LuaTable();
 					look.set(1, LuaValue.valueOf(lookingAt.getX()));
@@ -561,6 +577,19 @@ public class Utils {
 			}
 		}
 		return t;
+	}
+	
+	public static LuaTable toTable(DimensionType dt) {
+		if(dt == null) throw new NullPointerException("DimensionType provided is null");
+		LuaTable out = new LuaTable();
+		out.set("isVanilla", dt.isVanilla());
+		out.set("id", dt.getId());
+		out.set("name", dt.equals(DimensionType.OVERWORLD)?
+				"overworld" :
+					dt.equals(DimensionType.THE_END)?
+					"end":
+					dt.equals(DimensionType.THE_NETHER)?"nether":"unknown");  //TESTME check if name is reasonable too
+		return out;
 	}
 
 	public static ITextComponent luaTableToComponentJson(LuaTable table){
@@ -577,7 +606,7 @@ public class Utils {
 			}
 		}
 		System.out.println(msg+"]");
-		return Serializer.jsonToComponent(msg+"]");
+		return Serializer.fromJson(msg+"]");
 		//
 
 	}
@@ -682,40 +711,40 @@ public class Utils {
 	}
 
 	public static class NBTUtils{
-		public static LuaTable fromCompound(NBTTagCompound comp) {
+		public static LuaTable fromCompound(CompoundNBT comp) {
 			LuaTable out = new LuaTable();
-			for(String k : comp.getKeySet())
-				out.set(k, fromBase(comp.getTag(k)));
+			for(String k : comp.keySet())
+				out.set(k, fromBase(comp.get(k)));
 			return out;
 		}
-		public static LuaValue fromBase(NBTBase tag) {
+		public static LuaValue fromBase(INBT tag) {
 			LuaValue thisTag;
-			if(tag instanceof NBTTagByte){
-				thisTag = LuaValue.valueOf(((NBTTagByte) tag).getByte());
-			}else if(tag instanceof NBTTagShort){
-				thisTag = LuaValue.valueOf(((NBTTagShort) tag).getShort());
-			}else if(tag instanceof NBTTagInt){
-				thisTag = LuaValue.valueOf(((NBTTagInt) tag).getInt());
-			}else if(tag instanceof NBTTagLong){
-				thisTag = LuaValue.valueOf(((NBTTagLong) tag).getLong());
-			}else if(tag instanceof NBTTagFloat){
-				thisTag = LuaValue.valueOf(((NBTTagFloat) tag).getFloat());
-			}else if(tag instanceof NBTTagDouble){
-				thisTag = LuaValue.valueOf(((NBTTagDouble) tag).getDouble());
-			}else if(tag instanceof NBTTagByteArray){
-				byte[] bytes = ((NBTTagByteArray) tag).getByteArray();
+			if(tag instanceof ByteNBT){
+				thisTag = LuaValue.valueOf(((ByteNBT) tag).getByte());
+			}else if(tag instanceof ShortNBT){
+				thisTag = LuaValue.valueOf(((ShortNBT) tag).getShort());
+			}else if(tag instanceof IntNBT){
+				thisTag = LuaValue.valueOf(((IntNBT) tag).getInt());
+			}else if(tag instanceof LongNBT){
+				thisTag = LuaValue.valueOf(((LongNBT) tag).getLong());
+			}else if(tag instanceof FloatNBT){
+				thisTag = LuaValue.valueOf(((FloatNBT) tag).getFloat());
+			}else if(tag instanceof DoubleNBT){
+				thisTag = LuaValue.valueOf(((DoubleNBT) tag).getDouble());
+			}else if(tag instanceof ByteArrayNBT){
+				byte[] bytes = ((ByteArrayNBT) tag).getByteArray();
 				thisTag = new LuaTable();
 				for(int j = 0; j<bytes.length; j++){
 					thisTag.set(j+1, LuaValue.valueOf(bytes[j]));
 				}
-			}else if(tag instanceof NBTTagString){
-				thisTag = LuaValue.valueOf(((NBTTagString) tag).getString());
-			}else if(tag instanceof NBTTagList){
-				thisTag = fromTagList((NBTTagList) tag);
-			}else if(tag instanceof NBTTagCompound){
-				thisTag = fromCompound((NBTTagCompound) tag);
-			}else if(tag instanceof NBTTagIntArray){
-				int[] ints = ((NBTTagIntArray) tag).getIntArray();
+			}else if(tag instanceof StringNBT){
+				thisTag = LuaValue.valueOf(((StringNBT) tag).getString());
+			}else if(tag instanceof ListNBT){
+				thisTag = fromTagList((ListNBT) tag);
+			}else if(tag instanceof CompoundNBT){
+				thisTag = fromCompound((CompoundNBT) tag);
+			}else if(tag instanceof IntArrayNBT){
+				int[] ints = ((IntArrayNBT) tag).getIntArray();
 				thisTag = new LuaTable();
 				for(int j = 0; j<ints.length; j++){
 					thisTag.set(j+1, LuaValue.valueOf(ints[j]));
@@ -725,15 +754,15 @@ public class Utils {
 			}
 			return thisTag;
 		}
-		public static LuaTable fromTagList(NBTTagList list) {
+		public static LuaTable fromTagList(ListNBT list) {
 			if(list==null) {
 				//System.err.println("Warning: Utils.fromTagList list was null");
 				return new LuaTable();
 			}
 			LuaTable table = new LuaTable();
-			Iterator<NBTBase> iter = list.iterator();
+			Iterator<INBT> iter = list.iterator();
 			while(iter.hasNext()) {
-				NBTBase tag = iter.next();
+				INBT tag = iter.next();
 				table.set(table.length()+1, fromBase(tag));
 			}
 			return table;
@@ -1012,7 +1041,7 @@ public class Utils {
 
 	public static Pair<ITextComponent, Varargs> toTextComponent(String codedText, Varargs args, boolean allowHover, boolean allowFunctions) {
 		if(args == null) args = new LuaTable().unpack();
-		ITextComponent out = new TextComponentString("");
+		ITextComponent out = new StringTextComponent("");
 		StringBuilder temp = new StringBuilder();
 		Boolean bold = null, italics = null, obfusc = null, strike = null, underline = null;
 		TextFormatting color = null;
@@ -1040,7 +1069,7 @@ public class Utils {
 					}else if(isTextColorCode(next) || isTextStyleCode(next) || isSpecialCode(next) || next == '&') {
 						i++;
 						if(temp.length() > 0) {
-							ITextComponent component = ltcce&&allowFunctions? new LuaTextComponent(temp.toString(), args.arg(argNum++), allowHover) : new TextComponentString(temp.toString());
+							ITextComponent component = ltcce&&allowFunctions? new LuaTextComponent(temp.toString(), args.arg(argNum++), allowHover) : new StringTextComponent(temp.toString());
 							Style style = component.getStyle();
 							style.setBold(bold);
 							style.setItalic(italics);
@@ -1151,7 +1180,7 @@ public class Utils {
 			}
 		}
 		if(temp.length() > 0) {
-			ITextComponent component = ltcce&&allowFunctions? new LuaTextComponent(temp.toString(), args.arg(argNum++), allowHover) : new TextComponentString(temp.toString());
+			ITextComponent component = ltcce&&allowFunctions? new LuaTextComponent(temp.toString(), args.arg(argNum++), allowHover) : new StringTextComponent(temp.toString());
 			Style style = component.getStyle();
 			style.setBold(bold);
 			style.setItalic(italics);
@@ -1287,8 +1316,8 @@ public class Utils {
 	public static LuaValue toTable(Container container, boolean isReady) {
 		LuaTable out = new LuaTable();
 		LuaTable slots = new LuaTable();
-		for(int i = 0; i<container.inventoryItemStacks.size(); i++) {
-			slots.set(i, itemStackToLuatable(container.inventoryItemStacks.get(i)));
+		for(int i = 0; i<container.inventorySlots.size(); i++) {
+			slots.set(i, itemStackToLuatable(container.inventorySlots.get(i).getStack()));
 		}
 		out.set("slots", slots);
 		out.set("controls", new ContainerControls(container));
@@ -1345,71 +1374,81 @@ public class Utils {
 		if(rtr==null) return LuaValue.FALSE;
 		LuaTable result = new LuaTable();
 
-		switch (rtr.typeOfHit) {
+		switch (rtr.getType()) {
 		case MISS:
 			return LuaValue.FALSE;
 		case ENTITY:
-			result.set("entity", Utils.entityToTable(rtr.entityHit));
-			break;
+			if(rtr instanceof EntityRayTraceResult) {
+				EntityRayTraceResult ertr = (EntityRayTraceResult) rtr;
+				result.set("entity", Utils.entityToTable(ertr.getEntity()));
+			
+		}break;
 		case BLOCK:
-			BlockPos pos = rtr.getBlockPos();
-			result.set("pos", Utils.blockPosToTable(pos));
-			IBlockState ibs = mc.world.getBlockState(pos);
-			TileEntity te = mc.world.getTileEntity(pos);
-			result.set("block", Utils.blockToTable(ibs, te));
+			if(rtr instanceof BlockRayTraceResult) {
+				BlockRayTraceResult brtr = (BlockRayTraceResult) rtr;
+				BlockPos pos = brtr.getPos();
+				result.set("side", brtr.getFace().name().toLowerCase());
+				result.set("pos", Utils.blockPosToTable(pos));
+				BlockState ibs = mc.world.getBlockState(pos);
+				TileEntity te = mc.world.getTileEntity(pos);
+				result.set("block", Utils.blockToTable(ibs, te));
+			}break;
 		default:
 			break;
 		}
 		LuaTable vec3d = new LuaTable();
-		vec3d.set(1, rtr.hitVec.x);
-		vec3d.set(2, rtr.hitVec.y);
-		vec3d.set(3, rtr.hitVec.z);
+		vec3d.set(1, rtr.getHitVec().x);
+		vec3d.set(2, rtr.getHitVec().y);
+		vec3d.set(3, rtr.getHitVec().z);
 		result.set("vec", vec3d);
-		if( rtr.sideHit != null)
-			result.set("side", rtr.sideHit.name().toLowerCase());
 		result.set("subHit", rtr.subHit);
 		return result;
 	}
 	
 	
-	/**Returns null when done if already on MC thread*/
-	public static Object runOnMCAndWait(Runnable r) {
-		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {
-			r.run();
-			return null;
-		}
-		ListenableFuture<Object> a = AdvancedMacros.getMinecraft().addScheduledTask(r);
-		while(!a.isDone())
-			try {Thread.sleep(1);}catch (Exception e) {break;}
-		try {
-			return a.get();
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	public static <T> T  runOnMCAndWait(Callable<T> c) {
-		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {
-			try {
-				return c.call();
-			} catch (InterruptedException | ExecutionException | ClassCastException e) {
-				e.printStackTrace();
-				return null;
-			} catch (Exception e) {
-				Utils.logError(e);
-			}
-		}
-		ListenableFuture<T> a = AdvancedMacros.getMinecraft().addScheduledTask(c);
-		while(!a.isDone())
-			try {Thread.sleep(1);}catch (Exception e) {break;}
-		try {
-			return (T) a.get();
-		} catch (InterruptedException | ExecutionException | ClassCastException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+//	/**Returns null when done if already on MC thread*/
+//	public static Object runOnMCAndWait(Runnable r) {
+//		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {
+//			r.run();
+//			return null;
+//		}
+//		ListenableFuture<Object> a = AdvancedMacros.getMinecraft().addScheduledTask(r);
+//		while(!a.isDone())
+//			try {Thread.sleep(1);}catch (Exception e) {break;}
+//		try {
+//			return a.get();
+//		} catch (InterruptedException | ExecutionException e) {
+//			e.printStackTrace();
+//			return null;
+//		}
+//	}
+//
+//	public static <T> T  runOnMCAndWait(Callable<T> c) {
+//		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {
+//			try {
+//				return c.call();
+//			} catch (InterruptedException | ExecutionException | ClassCastException e) {
+//				e.printStackTrace();
+//				return null;
+//			} catch (Exception e) {
+//				Utils.logError(e);
+//			}
+//		}
+//		ListenableFuture<T> a = AdvancedMacros.getMinecraft().addScheduledTask(c);
+//		while(!a.isDone())
+//			try {Thread.sleep(1);}catch (Exception e) {break;}
+//		try {
+//			return (T) a.get();
+//		} catch (InterruptedException | ExecutionException | ClassCastException e) {
+//			e.printStackTrace();
+//			return null;
+//		}
+//	}
+//	
+//	public static void runOnMCLater(Runnable r) {
+//		//TODO
+//	}
+	
 	public static void waitTick() {
 		int t = AdvancedMacros.forgeEventHandler.getSTick();
 		while(t==AdvancedMacros.forgeEventHandler.getSTick()){
@@ -1424,10 +1463,61 @@ public class Utils {
 	public static int clamp(int min, int value, int max) {
 		return Math.max(min, Math.min(max, value));
 	}
-	public static LuaValue parseColor(MapColor mapColor) {
+	public static LuaValue parseColor(MaterialColor mapColor) {
 		return new Color(mapColor.colorValue | 0xFF000000).toLuaValue(false);
 	}
 	public static Varargs varargs(LuaValue...args) {
 		return LuaValue.varargsOf(args);
 	}
+	public static LuaTable toTable(Vec3d motion) {
+		LuaTable out = new LuaTable();
+		out.set(1, motion.x);
+		out.set(2, motion.y);
+		out.set(3, motion.z);
+		return out;
+	}
+	public static Item itemFromName(String name) {
+		try {
+			return (new ItemParser(new StringReader(name), false)).parse().getItem();
+		} catch (CommandSyntaxException e) {
+			return null;
+		}
+	}
+	public static ItemStack itemStackFromName(String name) {
+		return itemStackFromName(name, 1);
+	}
+	public static ItemStack itemStackFromName(String name, int qty) {
+		Item i = itemFromName(name);
+		if(i == null) return null;
+		return new ItemStack(i, qty);
+	}
+	public static BufferedImage nativeImageToBufferedImage(NativeImage ni) {
+		BufferedImage img = new BufferedImage(ni.getWidth(), ni.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		for(int y = 0; y<img.getHeight(); y++)
+			for(int x = 0; x<img.getHeight(); x++)
+				img.setRGB(x, y, nativeARGBFlip(ni.getPixelRGBA(x, y)));
+		return img;
+	}
+	public static void updateNativeImage(BufferedImage img, NativeImage dest) {
+		for(int y = 0; y<img.getHeight(); y++)
+			for(int x = 0; x<img.getHeight(); x++)
+				dest.setPixelRGBA(x, y, nativeARGBFlip(img.getRGB(x, y)));
+	}
+	/**
+	 * Native image has their "RGBA" as ABGR (RGBA backwards)
+	 * this Flips the B and the R in the int
+	 * (second and 4th bytes)
+	 * */ //nice and compact
+	private static int nativeARGBFlip(int color) {
+		return ((color & 0x00_00_00_FF)<<16) | ((color & (0x00_FF_00_00))>>16) | (color &0xFF_00_FF_00); //
+	}
+	/*private static int nativeARGBFlip(int color) {
+												//X Y Z W
+		int tmp =  color 		& 0xFF;         //0 0 0 W
+		color   =  color 		&~0xFF;         //X Y Z 0
+		color   = (color >> 16) & 0xFF | color; //0 0 0 Y -> X Y Z Y
+		color   =  color		&~(0xFF << 16); //X 0 Z Y
+		color  |=  tmp << 16;                   //X W Z Y
+		return color;
+	}*/
 }

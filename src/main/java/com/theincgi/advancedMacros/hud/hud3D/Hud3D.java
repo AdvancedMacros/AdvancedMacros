@@ -10,8 +10,7 @@ import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Utils;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 
 public class Hud3D extends LuaTable{
 	public Hud3D() {
@@ -29,7 +28,7 @@ public class Hud3D extends LuaTable{
 		}
 		@Override
 		public Varargs invoke(Varargs args) {
-			EntityPlayerSP p = AdvancedMacros.getMinecraft().player;
+			ClientPlayerEntity p = AdvancedMacros.getMinecraft().player;
 			switch (op) {
 			case clearAll:{
 				AdvancedMacros.forgeEventHandler.clearWorldHud();

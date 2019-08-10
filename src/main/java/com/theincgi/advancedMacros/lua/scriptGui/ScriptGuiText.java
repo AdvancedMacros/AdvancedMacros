@@ -7,14 +7,14 @@ import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.elements.GuiRect;
 import com.theincgi.advancedMacros.hud.hud2D.Hud2D_Rectangle;
-import com.theincgi.advancedMacros.misc.FontRendererOverride;
 import com.theincgi.advancedMacros.misc.Utils;
 
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.FontRenderer;
 
 public class ScriptGuiText extends ScriptGuiElement{
 	public int textSize = 12;
@@ -65,26 +65,23 @@ public class ScriptGuiText extends ScriptGuiElement{
 		if(!visible) return;
 		
 		GlStateManager.bindTexture(0);
-		GlStateManager.color(1, 1, 1);
+		GlStateManager.enableBlend();
+		GlStateManager.color3f(1, 1, 1);
+		GlStateManager.enableAlphaTest();
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		//FontRenderer fr = AdvancedMacros.getMinecraft().fontRenderer;
 		//FontRenderer fr;
 		if(monospaced) {
-			GlStateManager.enableBlend();
-			GlStateManager.enableAlpha();
-			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			AdvancedMacros.customFontRenderer.renderText(x, y, z, text, color.getA(), textSize);
 		}else {
 			Scanner s = new Scanner(text);
-			GlStateManager.enableBlend();
-			GlStateManager.enableAlpha();
-			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-			FontRendererOverride fr = AdvancedMacros.otherCustomFontRenderer;
-			float old = fr.FONT_HEIGHT;
-			//GlStateManager.bindTexture();
-			fr.FONT_HEIGHT = (int)textSize;
-			for(int i = 0; s.hasNextLine(); i+=textSize)
-				fr.renderText(x, y+i, z, s.nextLine(), color.getA(), textSize);//(text, (int)x, (int)y, color.toInt());
-			fr.FONT_HEIGHT = old;
+			FontRenderer fr = AdvancedMacros.getMinecraft().fontRenderer; //AdvancedMacros.otherCustomFontRenderer;
+			for(int i = 0; s.hasNextLine(); i+=textSize) {
+				GlStateManager.pushMatrix();
+				GlStateManager.translatef(0, 0, z);
+				fr.drawString(s.nextLine(), x, y+i,  color.toInt());//(text, (int)x, (int)y, color.toInt());
+				GlStateManager.popMatrix();
+			}
 			s.close();
 		}
 		

@@ -138,7 +138,7 @@ public class ScriptGuiScrollBar extends ScriptGuiElement{
 		bar.onDraw(g, mouseX, mouseY, partialTicks);
 	}
 	@Override
-	public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
+	public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
 		if(bar.onMouseClick(gui, x, y, buttonNum)) {
 			if (onMouseClick != null) 
 				Utils.pcall(onMouseClick, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(buttonNum));
@@ -147,14 +147,15 @@ public class ScriptGuiScrollBar extends ScriptGuiElement{
 		return false;
 	}
 	@Override
-	public boolean onMouseClickMove(Gui gui, int x, int y, int buttonNum, long timeSinceClick) {
-		if(bar.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick)) {
+	public boolean onMouseClickMove(Gui gui, double x, double y, int buttonNum, double q, double r) {
+		if(bar.onMouseClickMove(gui, x, y, buttonNum, q, r)) {
 			if(onMouseDrag!=null) {
 				LuaTable args = new LuaTable();
-				args.set(1, LuaValue.valueOf(x));
-				args.set(2, LuaValue.valueOf(y));
-				args.set(3, LuaValue.valueOf(buttonNum));
-				args.set(4, LuaValue.valueOf(timeSinceClick));
+				args.set(1, x);
+				args.set(2, y);
+				args.set(3, buttonNum);
+				args.set(4, q);
+				args.set(5, r);
 				Utils.pcall(onMouseDrag,args.unpack());
 			}
 			return true;
@@ -162,7 +163,7 @@ public class ScriptGuiScrollBar extends ScriptGuiElement{
 		return false;
 	}
 	@Override
-	public boolean onMouseRelease(Gui gui, int x, int y, int state) {
+	public boolean onMouseRelease(Gui gui, double x, double y, int state) {
 		if(bar.onMouseRelease(gui, x, y, state)) {
 			if(onMouseRelease!=null)
 				Utils.pcall(onMouseRelease, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(state));

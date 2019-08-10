@@ -1,6 +1,8 @@
 package com.theincgi.advancedMacros.lua.functions;
 
 import java.util.Iterator;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
@@ -9,17 +11,19 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.event.TaskDispatcher;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.network.NetworkPlayerInfo;
+import net.minecraft.client.network.play.NetworkPlayerInfo;
 
 public class GetPlayerList extends ZeroArgFunction {
 	@Override
 	public LuaValue call() {
-		final LuaTable table=new LuaTable();
-		ListenableFuture<Object> f = AdvancedMacros.getMinecraft().addScheduledTask(new Runnable() {
+		
+		ListenableFuture<LuaTable> f = TaskDispatcher.addTask(new Callable<LuaTable>() {
 			@Override
-			public void run() {
+			public LuaTable call() throws Exception {
+				LuaTable table=new LuaTable();
 				int i = 1;
 //				NetworkPlayerInfo[] list = (NetworkPlayerInfo[]) AdvancedMacros.getMinecraft().player.connection.getPlayerInfoMap().toArray();
 //				
@@ -32,7 +36,7 @@ public class GetPlayerList extends ZeroArgFunction {
 				Iterator<NetworkPlayerInfo> iter = mc.getConnection().getPlayerInfoMap().iterator();
 				while(iter.hasNext()) {
 					NetworkPlayerInfo playerInfo = iter.next();
-					String name = mc.ingameGUI.getTabList().getPlayerName(playerInfo);
+					String name = mc.ingameGUI.getTabList().getDisplayName(playerInfo).getUnformattedComponentText();
 					String formated   = name
 							.replaceAll("&", "&&")
 							.replaceAll("\u00A7", "&")
@@ -45,7 +49,7 @@ public class GetPlayerList extends ZeroArgFunction {
 					if(name!=null)
 						table.set(i++, formated);
 				}
-				
+				return table;
 			}
 		});
 		while(!f.isDone()) {
@@ -55,7 +59,11 @@ public class GetPlayerList extends ZeroArgFunction {
 				throw new LuaError("Thread interrupted");
 			}
 		}
-		return table;
+		try {
+			return f.get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new LuaError(e);
+		}
 	}
 
 }

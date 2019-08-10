@@ -18,11 +18,13 @@ import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.event.TaskDispatcher;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.NativeImage;
 
 public class BufferedImageControls extends LuaTable{
 	BufferedImage img;
@@ -143,8 +145,8 @@ public class BufferedImageControls extends LuaTable{
 			@Override
 			public LuaValue call() {
 				if (dynamicTexture != null) { 
-					AdvancedMacros.getMinecraft().addScheduledTask(()->{ //changed to non blocking to prevent possible thread locks
-						img.getRGB(0, 0, img.getWidth(), img.getHeight(), dynamicTexture.getTextureData(), 0, img.getWidth());
+					TaskDispatcher.addTask(()->{ //changed to non blocking to prevent possible thread locks
+						Utils.updateNativeImage(img, dynamicTexture.getTextureData()); //TODO see if this can be moved outside the TaskDispatcher's call
 						dynamicTexture.updateDynamicTexture();
 					});
 				}
@@ -156,14 +158,28 @@ public class BufferedImageControls extends LuaTable{
 
 
 	}
+	
+	public void updateTexture() {
+		NativeImage ni = dynamicTexture.getTextureData();
+		for(int y=0; y<img.getHeight(); y++) {
+			for(int x=0; x<img.getHeight(); x++) {
+				int c = img.getRGB(x, y);
+				ni.setPixelRGBA(x, y, c);
+			}
+		}
+		dynamicTexture.updateDynamicTexture();
+	}
 
 	public BufferedImage getImg() {
 		return img;
 	}
 	private void createTexture() {
-		Utils.runOnMCAndWait(()->{
-			dynamicTexture = new DynamicTexture(img);
-			tex = new LuaValTexture(dynamicTexture);
+		TaskDispatcher.addTask(new Runnable() {
+			@Override public void run() {	
+				dynamicTexture = new DynamicTexture(img.getWidth(), img.getHeight(), true);
+				updateTexture();
+				tex = new LuaValTexture(dynamicTexture);
+			}
 		});
 	}
 	public DynamicTexture getDynamicTexture() {

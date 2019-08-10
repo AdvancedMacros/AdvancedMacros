@@ -2,40 +2,38 @@ package com.theincgi.advancedMacros.lua.functions.entity;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
-import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Pair;
 import com.theincgi.advancedMacros.misc.Utils;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EntitySelectors;
+import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.World;
 
 public class GetAABB {
 	@SuppressWarnings("unchecked")
-	private static final Predicate<Entity> ARROW_TARGETS = Predicates.and(EntitySelectors.NOT_SPECTATING, EntitySelectors.IS_ALIVE, new Predicate<Entity>()
-	{
-		public boolean apply(@Nullable Entity p_apply_1_)
-		{
-			return p_apply_1_.canBeCollidedWith();
-		}
-	});
+	//private static final Predicate<Entity> ARROW_TARGETS = Predicates.and(EntityPredicates.NOT_SPECTATING, EntityPredicates.IS_ALIVE); //new Predicate<Entity>()
+//	{
+//		public boolean apply(@Nullable Entity p_apply_1_)
+//		{
+//			return p_apply_1_.canBeCollidedWith();
+//		}
+//	}
 	private CallableTable func;
 	private static final String[] LOCATION = {"entity","getAABB"};
 	public GetAABB() {
@@ -64,16 +62,16 @@ public class GetAABB {
 				}else {
 					pos = new BlockPos(args.arg(1).checkdouble(), args.arg(2).checkdouble(), args.arg(3).checkdouble());
 				}
-				IBlockState block = world.getBlockState(pos);
-				AxisAlignedBB bb = block.getSelectedBoundingBox(world, pos);
+				BlockState block = world.getBlockState(pos);
+				AxisAlignedBB bb = block.getCollisionShape(world, pos).getBoundingBox();
 				if(bb==null) return FALSE;
 				LuaTable out = new LuaTable();
 				out.set(1, new AABB(bb));
-				out.set(2, !block.getBlock().isPassable(world, pos));
+				out.set(2, !block.getCollisionShape(world, pos).equals(VoxelShapes.empty()));
 				return out.unpack();
 			}else if(args.narg() == 1) {
 				Entity e = world.getEntityByID(args.arg1().checkint());
-				AxisAlignedBB bb = e.getEntityBoundingBox();
+				AxisAlignedBB bb = e.getBoundingBox();
 				if(bb==null) return FALSE;
 				return new AABB(bb, e);
 			}else {
@@ -92,6 +90,7 @@ public class GetAABB {
 			for (OpCode code : OpCode.values()) {
 				this.set(code.name(), new DoOp(code));
 			}
+			entity = entity==null? AdvancedMacros.getMinecraft().player : entity;
 			this.set("__class", "AxisAlignedBoudingBox");
 		}
 
@@ -157,18 +156,18 @@ public class GetAABB {
 						return new AABB(aabb.union(a.aabb));
 					}
 					throw new LuaError("Not an Axis Aligned Bounding Box");
-				case calculateIntercept:{
-					Pair<Vec3d, Varargs> v1 = Utils.consumeVector(args, false, false);
-					Pair<Vec3d, Varargs> v2 = Utils.consumeVector(v1.b, false, false);
-					return Utils.rayTraceResultToLuaValue(aabb.calculateIntercept(v1.a, v2.a));
-				}
+//				case calculateIntercept:{
+//					Pair<Vec3d, Varargs> v1 = Utils.consumeVector(args, false, false);
+//					Pair<Vec3d, Varargs> v2 = Utils.consumeVector(v1.b, false, false);
+//					return Utils.rayTraceResultToLuaValue(aabb.calculateIntercept(v1.a, v2.a)); //raytrace now?
+//				}
 				case findEntityOnPath: {
 					World world = AdvancedMacros.getMinecraft().world;
 					Pair<Vec3d, Varargs> v1 = Utils.consumeVector(args, false, false);
 					Entity entity = null;
 					Vec3d start = aabb.getCenter();
 					Vec3d end   = start.add(v1.a);
-					List<Entity> list = world.getEntitiesInAABBexcluding(entity, aabb.expand(v1.a.x, v1.a.y, v1.a.z).grow(1.0D), ARROW_TARGETS);
+					List<Entity> list = world.getEntitiesInAABBexcluding(entity, aabb.expand(v1.a.x, v1.a.y, v1.a.z).grow(1.0D), Predicates.alwaysTrue());
 					double d0 = 0.0D;
 
 					for (int i = 0; i < list.size(); ++i) {
@@ -176,23 +175,15 @@ public class GetAABB {
 
 						//				            if (entity1 != this.shootingEntity || this.ticksInAir >= 5)
 						//				            {
-						AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().grow(0.30000001192092896D);
-						RayTraceResult raytraceresult = axisalignedbb.calculateIntercept(start, end);
+						AxisAlignedBB axisalignedbb = entity1.getBoundingBox().grow(0.30000001192092896D);
+						EntityRayTraceResult entityRayTraceResult = ProjectileHelper.func_221269_a(world, entity, start, end, aabb, Predicates.alwaysTrue(), Double.MAX_VALUE);
 
-						if (raytraceresult != null)
+						if (entityRayTraceResult != null)
 						{
-							double d1 = start.squareDistanceTo(raytraceresult.hitVec);
-
-							if (d1 < d0 || d0 == 0.0D)
-							{
-								entity = entity1;
-								d0 = d1;
-							}
+							return Utils.rayTraceResultToLuaValue(entityRayTraceResult);
 						}
-						//				            }
-				}
-
-					return Utils.entityToTable(entity);
+						return NONE;
+					}
 				}
 				default:
 					throw new LuaError("Undefined operation: "+code.name());
@@ -212,7 +203,7 @@ public class GetAABB {
 			intersects,
 			offset,
 			union,
-			calculateIntercept, 
+			//calculateIntercept, 
 			findEntityOnPath;
 		}
 	}

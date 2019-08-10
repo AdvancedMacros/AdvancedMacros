@@ -103,7 +103,8 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 
 
 	@Override
-	public boolean onScroll(Gui gui, int i) {
+	public boolean onScroll(Gui gui, double i) {
+		i = Math.signum(i);
 		if(!isVisible)return false;
 		if(scrollBar.onScroll(gui, i))return true;
 		synchronized(this){
@@ -118,7 +119,7 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 	}
 
 	@Override
-	public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
+	public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
 		if(scrollBar.onMouseClick(gui, x, y, buttonNum))return true;
 		//System.out.println("CLICK ListManager");
 		synchronized(this){
@@ -133,7 +134,7 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 	}
 
 	@Override
-	public boolean onMouseRelease(Gui gui, int x, int y, int state) {
+	public boolean onMouseRelease(Gui gui, double x, double y, int state) {
 		if(scrollBar.onMouseRelease(gui, x, y, state))return true;
 		if(hand!=null){
 			place(getHoverSlot(y));
@@ -151,17 +152,17 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 
 	private int hoverslot = 0;
 	private boolean forceFrame = false;
-	private int getHoverSlot(int y) {
+	private int getHoverSlot(double y) {
 		return hoverslot;
 	}
 
 	@Override
-	public boolean onMouseClickMove(Gui gui, int x, int y, int buttonNum, long timeSinceClick) {
-		if(scrollBar.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))return true;
+	public boolean onMouseClickMove(Gui gui, double x, double y, int buttonNum, double q, double r) {
+		if(scrollBar.onMouseClickMove(gui, x, y, buttonNum, q, r))return true;
 		synchronized(this){
 			for (Moveable moveable : items) {
 				if(moveable instanceof InputSubscriber){
-					if(((InputSubscriber) moveable).onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))
+					if(((InputSubscriber) moveable).onMouseClickMove(gui, x, y, buttonNum, q, r))
 						return true;
 				}
 			}
@@ -170,14 +171,13 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 	}
 
 
-
 	@Override
-	public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
-		if(scrollBar.onKeyPressed(gui, typedChar, keyCode))return true;
-		synchronized(this){
+	public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
+		if(scrollBar.onKeyPressed(gui, keyCode, scanCode, modifiers)) return true;
+		synchronized (this) {
 			for (Moveable moveable : items) {
-				if(moveable instanceof InputSubscriber){
-					if(((InputSubscriber) moveable).onKeyPressed(gui, typedChar, keyCode))
+				if(moveable instanceof InputSubscriber) {
+					if(((InputSubscriber) moveable).onKeyPressed(gui, keyCode, scanCode, modifiers))
 						return true;
 				}
 			}
@@ -186,12 +186,12 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 	}
 
 	@Override
-	public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
-		if(scrollBar.onKeyRepeat(gui, typedChar, keyCode, repeatMod))return true;
-		synchronized(this){
+	public boolean onCharTyped(Gui gui, char typedChar, int mods) {
+		if(scrollBar.onCharTyped(gui, typedChar, mods)) return true;
+		synchronized (this) {
 			for (Moveable moveable : items) {
-				if(moveable instanceof InputSubscriber){
-					if(((InputSubscriber) moveable).onKeyRepeat(gui, typedChar, keyCode, repeatMod))
+				if(moveable instanceof InputSubscriber) {
+					if(((InputSubscriber) moveable).onCharTyped(gui, typedChar, mods))
 						return true;
 				}
 			}

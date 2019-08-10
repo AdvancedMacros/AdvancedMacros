@@ -17,9 +17,8 @@ import com.theincgi.advancedMacros.gui.Gui.InputSubscriber;
 import com.theincgi.advancedMacros.gui.elements.Drawable;
 import com.theincgi.advancedMacros.gui.elements.GuiButton;
 import com.theincgi.advancedMacros.gui.elements.Moveable;
+import com.theincgi.advancedMacros.misc.HIDUtils;
 import com.theincgi.advancedMacros.misc.Utils;
-
-import net.minecraft.client.Minecraft;
 
 public abstract class ScriptGuiElement extends LuaTable implements Drawable, InputSubscriber, Moveable{
 	//enable/disable draw
@@ -33,7 +32,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 	private Color hoverTint = Color.CLEAR;
 	private int colorTintInt;
 	LuaFunction onScroll, onMouseClick,
-	onMouseRelease, onMouseDrag, onKeyPressed, onKeyReleased, onKeyRepeated,
+	onMouseRelease, onMouseDrag, onKeyPressed, onKeyReleased, onCharTyped,
 	onMouseEnter, onMouseExit;
 	public float x, y;
 	float z;
@@ -326,10 +325,10 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 				return LuaValue.NONE;
 			}
 		});
-		s.set("setOnKeyRepeated", new OneArgFunction() {
+		s.set("setOnCharTyped", new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg) {
-				onKeyRepeated = arg.checkfunction();
+				onCharTyped = arg.checkfunction();
 				return LuaValue.NONE;
 			}
 		});
@@ -401,7 +400,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 	}
 
 	@Override
-	public boolean onScroll(Gui gui, int i) {
+	public boolean onScroll(Gui gui, double i) {
 		if(onScroll != null) {
 			return Utils.pcall(onScroll, LuaValue.valueOf(i)).toboolean();
 		}
@@ -409,43 +408,52 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 	}
 
 	@Override
-	public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
+	public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
 		if(onMouseClick != null && GuiButton.isInBounds(x, y, (int)this.x, (int)this.y, (int)wid, (int)hei))
 			return Utils.pcall(onMouseClick, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(buttonNum)).toboolean();
 		return false;
 	}
 
 	@Override
-	public boolean onMouseRelease(Gui gui, int x, int y, int state) {
+	public boolean onMouseRelease(Gui gui, double x, double y, int state) {
 		if(onMouseRelease!=null && GuiButton.isInBounds(x, y, (int)this.x, (int)this.y, (int)wid, (int)hei))
 			return Utils.pcall(onMouseRelease, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(state)).toboolean();
 		return false;
 	}
 
 	@Override
-	public boolean onMouseClickMove(Gui gui, int x, int y, int buttonNum, long timeSinceClick) {
+	public boolean onMouseClickMove(Gui gui, double x, double y, int buttonNum, double q, double r) {
 		if(onMouseDrag!=null && GuiButton.isInBounds(x, y, (int)this.x, (int)this.y, (int)wid, (int)hei)) {
 			LuaTable args = new LuaTable();
-			args.set(1, LuaValue.valueOf(x));
-			args.set(2, LuaValue.valueOf(y));
-			args.set(3, LuaValue.valueOf(buttonNum));
-			args.set(4, LuaValue.valueOf(timeSinceClick));
+			args.set(1, x);
+			args.set(2, y);
+			args.set(3, buttonNum);
+			args.set(4, q);
+			args.set(5, r);
 			return Utils.pcall(onMouseDrag,args.unpack()).toboolean();
 		}
 		return false;
 	}
-
+	
+	
 	@Override
-	public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
+	public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
 		if(onKeyPressed!=null)
-			return Utils.pcall(onKeyPressed, LuaValue.valueOf(typedChar), LuaValue.valueOf(keyCode)).toboolean();
+			return Utils.pcall(onKeyPressed, 
+					LuaValue.valueOf(keyCode), 
+					LuaValue.valueOf(scanCode),
+					HIDUtils.Keyboard.modifiersToLuaTable(modifiers)
+					).toboolean();
 		return false;
 	}
 
 	@Override
-	public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
-		if(onKeyRepeated!=null)
-			return Utils.pcall(onKeyRepeated, LuaValue.valueOf(typedChar), LuaValue.valueOf(keyCode), LuaValue.valueOf(repeatMod)).toboolean();
+	public boolean onCharTyped(Gui gui, char typedChar, int mods) {
+		if(onCharTyped!=null)
+			return Utils.pcall(onCharTyped,
+					LuaValue.valueOf(typedChar),
+					HIDUtils.Keyboard.modifiersToLuaTable(mods)
+					).toboolean();
 		return false;
 	}
 

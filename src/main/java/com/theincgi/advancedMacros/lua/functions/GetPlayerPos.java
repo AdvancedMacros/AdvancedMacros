@@ -10,8 +10,8 @@ import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.event.ForgeEventHandler;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
 public class GetPlayerPos extends VarArgFunction{
@@ -20,7 +20,7 @@ public class GetPlayerPos extends VarArgFunction{
 		
 		if(args.narg()==0){
 			BlockPos pos = AdvancedMacros.getMinecraft().player.getPosition();
-			EntityPlayer player = AdvancedMacros.getMinecraft().player;
+			PlayerEntity player = AdvancedMacros.getMinecraft().player;
 			LuaTable t = new LuaTable();
 			float pt = AdvancedMacros.getMinecraft().getRenderPartialTicks();
 			t.set(1, LuaValue.valueOf(ForgeEventHandler.accuPlayerX(pt, player)));
@@ -34,9 +34,9 @@ public class GetPlayerPos extends VarArgFunction{
 			//ListenableFuture<Object> f = AdvancedMacros.getMinecraft().addScheduledTask(new Runnable() { //scheduledTask is too slow
 			//	@Override
 			//	public void run() {
-				List<EntityPlayer> players = AdvancedMacros.getMinecraft().world.playerEntities;
+				List<AbstractClientPlayerEntity> players = AdvancedMacros.getMinecraft().world.getPlayers();
 					for(int i = 0; i<players.size(); i++) {
-						EntityPlayer player = players.get(i);
+						PlayerEntity player = players.get(i);
 					//for(EntityPlayer player : AdvancedMacros.getMinecraft().world.playerEntities){
 						if(player!=null && player.getName().equals(sPlayer)){
 							float pt = AdvancedMacros.getMinecraft().getRenderPartialTicks();

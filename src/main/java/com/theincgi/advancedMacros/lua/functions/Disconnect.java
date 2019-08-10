@@ -4,11 +4,11 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.event.TaskDispatcher;
 import com.theincgi.advancedMacros.misc.CallableTable;
-import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.gui.screen.MainMenuScreen;
 
 public class Disconnect extends CallableTable {
 
@@ -25,13 +25,13 @@ public class Disconnect extends CallableTable {
 	}
 	
 	
-	public static void disconnect() { //FIXME
+	public static void disconnect() { //FIXME? //TESTME
 		Minecraft mc = AdvancedMacros.getMinecraft();
-		Utils.runOnMCAndWait(()->{
+		TaskDispatcher.addTask(()->{
 			if(mc.world != null)
 				mc.world.sendQuittingDisconnectingPacket();
 			mc.loadWorld(null);
-			mc.displayGuiScreen(new GuiMainMenu());
+			mc.displayGuiScreen(new MainMenuScreen());
 		});
 	}
 }

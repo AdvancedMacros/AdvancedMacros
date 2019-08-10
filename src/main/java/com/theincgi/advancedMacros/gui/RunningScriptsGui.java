@@ -1,6 +1,5 @@
 package com.theincgi.advancedMacros.gui;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.luaj.vm2_v3_0_1.LuaValue;
@@ -18,6 +17,8 @@ import com.theincgi.advancedMacros.misc.Utils;
 import com.theincgi.advancedMacros.misc.Utils.TimeFormat;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 
 public class RunningScriptsGui extends Gui{
 	ListManager listManager;
@@ -68,16 +69,21 @@ public class RunningScriptsGui extends Gui{
 	}
 	
 	@Override
-	public void setWorldAndResolution(Minecraft mc, int width, int height) {
-		super.setWorldAndResolution(mc, width, height);
+	public ITextComponent getTitle() {
+		return new StringTextComponent("Running Scripts");
+	}
+	
+	@Override
+	public void resize(Minecraft mc, int width, int height) {
+		super.resize(mc, width, height);
 		listManager.setWidth(width-10);
 		listManager.setHeight(height-22);
 	}
 	
 	final int WHITE = Color.WHITE.toInt();
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-		super.drawScreen(mouseX, mouseY, partialTicks);
+	public void render(int mouseX, int mouseY, float partialTicks) {
+		super.render(mouseX, mouseY, partialTicks);
 		this.getFontRend().drawString("Running Scripts:", 5, 3, WHITE);
 		listManager.onDraw(this, mouseX, mouseY, partialTicks);
 	}
@@ -174,32 +180,31 @@ public class RunningScriptsGui extends Gui{
 		}
 
 		@Override
-		public boolean onScroll(Gui gui, int i) {
+		public boolean onScroll(Gui gui, double i) {
 			return false;
 		}
 
 		@Override
-		public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
+		public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
 			return stop.onMouseClick(gui, x, y, buttonNum);
 		}
 
 		@Override
-		public boolean onMouseRelease(Gui gui, int x, int y, int state) {
+		public boolean onMouseRelease(Gui gui, double x, double y, int state) {
 			return stop.onMouseRelease(gui, x, y, state);
 		}
 
 		@Override
-		public boolean onMouseClickMove(Gui gui, int x, int y, int buttonNum, long timeSinceClick) {
+		public boolean onMouseClickMove(Gui gui, double x, double y, int buttonNum, double q, double r) {
 			return false;
 		}
 
 		@Override
-		public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
+		public boolean onCharTyped(Gui gui, char typedChar, int mods) {
 			return false;
 		}
-
 		@Override
-		public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
+		public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
 			return false;
 		}
 

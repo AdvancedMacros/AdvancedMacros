@@ -18,7 +18,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.theincgi.advancedMacros.AdvancedMacros;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 
 public class CallableTable extends LuaTable{
@@ -192,7 +191,7 @@ public class CallableTable extends LuaTable{
 	}
 
 	public static String getCurrentLanguage() {
-		return AdvancedMacros.getMinecraft().getLanguageManager().getCurrentLanguage().getLanguageCode();
+		return AdvancedMacros.getMinecraft().getLanguageManager().getCurrentLanguage().getCode(); //TESTME for tooltips
 	}
 	public static JsonObject getDocJson() {
 		return getDocJson( getCurrentLanguage() );

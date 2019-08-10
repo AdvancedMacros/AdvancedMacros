@@ -1,8 +1,6 @@
 package com.theincgi.advancedMacros.lua.util;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.WeakHashMap;
 
 import org.luaj.vm2_v3_0_1.LuaError;

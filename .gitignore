@@ -20,3 +20,7 @@ build
 # other
 eclipse
 run
+
+# Files from Forge MDK
+forge*changelog.txt
+What I did to get it to work.txt

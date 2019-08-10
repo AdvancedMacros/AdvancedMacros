@@ -5,7 +5,6 @@ import java.util.LinkedList;
 
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
-import org.lwjgl.input.Keyboard;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.event.ForgeEventHandler;
@@ -18,6 +17,7 @@ import com.theincgi.advancedMacros.gui.MacroMenuGui;
 import com.theincgi.advancedMacros.gui.elements.GuiDropDown.OnSelectHandler;
 import com.theincgi.advancedMacros.gui2.PopupPrompt2.Result;
 import com.theincgi.advancedMacros.gui2.PopupPrompt2.ResultHandler;
+import com.theincgi.advancedMacros.misc.HIDUtils.Keyboard;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -271,13 +271,13 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber, IBinding
 		return sWid;
 	}
 	@Override
-	public boolean onScroll(Gui gui, int i) {
+	public boolean onScroll(Gui gui, double i) {
 		//if(scriptSelector.onScroll(gui, i))return true;
 		if(eventSelector.onScroll(gui, i))return true;
 		return false;
 	}
 	@Override
-	public boolean onMouseClick(Gui gui, int x, int y, int buttonNum) {
+	public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
 		
 		if(gui.nextKeyListen!=null){
 			switch (buttonNum) {
@@ -311,7 +311,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber, IBinding
 		return false;
 	}
 	@Override
-	public boolean onMouseRelease(Gui gui, int x, int y, int state) {
+	public boolean onMouseRelease(Gui gui, double x, double y, int state) {
 		if(removeButton		.onMouseRelease(gui, x, y, state))return true;
 		if(enableButton		.onMouseRelease(gui, x, y, state))return true;
 		if(modeButton		.onMouseRelease(gui, x, y, state))return true;
@@ -323,48 +323,38 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber, IBinding
 		return false;
 	}
 	@Override
-	public boolean onMouseClickMove(Gui gui, int x, int y, int buttonNum, long timeSinceClick) {
-		if(removeButton		.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))return true;
-		if(enableButton		.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))return true;
-		if(modeButton		.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))return true;
-		if(eventSelector	.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))return true;
-		if(pickScript		.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))return true;
-		if(editButton		.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))return true;
-		if(moveButton		.onMouseClickMove(gui, x, y, buttonNum, timeSinceClick))return true;
-		return false;
-	}
-	@Override
-	public boolean onKeyPressed(Gui gui, char typedChar, int keyCode) {
-		if(gui.nextKeyListen!=null){
-			eventSelector.dispText = Keyboard.getKeyName(keyCode);
-			((MacroMenuGui)gui).markDirty();
-			return true;
-		}
-//		if(ColorTextArea.isCTRLDown()){
-//			removeButton.setEnabled(true);
-//		}else{
-//			removeButton.setEnabled(false);
-//		}
+	public boolean onMouseClickMove(Gui gui, double x, double y, int buttonNum, double q, double r) {
+		if(removeButton		.onMouseClickMove(gui, x, y, buttonNum, q, r))return true;
+		if(enableButton		.onMouseClickMove(gui, x, y, buttonNum, q, r))return true;
+		if(modeButton		.onMouseClickMove(gui, x, y, buttonNum, q, r))return true;
+		if(eventSelector	.onMouseClickMove(gui, x, y, buttonNum, q, r))return true;
+		if(pickScript		.onMouseClickMove(gui, x, y, buttonNum, q, r))return true;
+		if(editButton		.onMouseClickMove(gui, x, y, buttonNum, q, r))return true;
+		if(moveButton		.onMouseClickMove(gui, x, y, buttonNum, q, r))return true;
 		return false;
 	}
 	
 	@Override
-	public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
+	public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
+		if(gui.nextKeyListen!=null){
+			eventSelector.dispText = Keyboard.nameOf(keyCode);
+			((MacroMenuGui)gui).markDirty();
+			return true;
+		}
+		return false;
+	}
+	@Override
+	public boolean onCharTyped(Gui gui, char typedChar, int mods) {
 		return false;
 	}
 	@Override
 	public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
-//		if(ColorTextArea.isCTRLDown()){
-//			removeButton.setEnabled(true);
-//		}else{
-//			removeButton.setEnabled(false);
-//		}
 		return false;
 	}
 	@Override
 	public void onDraw(Gui gui, int mouseX, int mouseY, float partialTicks) {
 		if(!isVisible) return;
-		gui.drawRect(x, y, x+fullWid, y+12, Color.BLACK.toInt());
+		gui.fill(x, y, x+fullWid, y+12, Color.BLACK.toInt());
 		removeButton.onDraw(gui, mouseX, mouseY, partialTicks);
 		enableButton.onDraw(gui, mouseX, mouseY, partialTicks);
 		modeButton.onDraw(gui, mouseX, mouseY, partialTicks);
@@ -573,7 +563,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber, IBinding
 			}
 			eventSelector.select(tojstring);
 		}else{
-			if(Keyboard.getKeyIndex(tojstring)!=Keyboard.KEY_NONE)
+			if(Keyboard.codeOf(tojstring)!=Keyboard.UNKNOWN_KEY_CODE)
 				eventSelector.dispText = tojstring;
 		}
 	}
