@@ -14,6 +14,7 @@ import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Pair;
 import com.theincgi.advancedMacros.misc.Utils;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -63,6 +64,7 @@ public class GetAABB {
 					pos = new BlockPos(args.arg(1).checkdouble(), args.arg(2).checkdouble(), args.arg(3).checkdouble());
 				}
 				BlockState block = world.getBlockState(pos);
+				if(block.isAir(world, pos)) return FALSE;
 				AxisAlignedBB bb = block.getCollisionShape(world, pos).getBoundingBox();
 				if(bb==null) return FALSE;
 				LuaTable out = new LuaTable();

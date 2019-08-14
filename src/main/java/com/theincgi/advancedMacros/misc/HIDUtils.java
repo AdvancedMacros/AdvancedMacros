@@ -97,9 +97,9 @@ public class HIDUtils {
 			switch (buttonNumber) {
 			case 0: return "LMB";
 			case 1: return "RMB";
-			case 3: return "MMB";
+			case 2: return "MMB";
 			default:
-				return MOUSE_PREFIX+buttonNumber+1;
+				return MOUSE_PREFIX+(buttonNumber+1);
 			}
 		}
 		public static int codeOf(String name) {
@@ -182,7 +182,7 @@ public class HIDUtils {
 			int jID = 0;
 			out = out == null ? new LuaTable() : out;
 			while(GLFW.glfwJoystickPresent(jID)) {
-				if(GLFW.glfwJoystickIsGamepad(jID)) continue;
+				if(GLFW.glfwJoystickIsGamepad(jID)) { jID++; continue;}
 				
 				LuaTable j = new LuaTable();
 				ByteBuffer buttons = GLFW.glfwGetJoystickButtons(jID);
@@ -211,7 +211,7 @@ public class HIDUtils {
 				
 				j.set("name", name);
 				j.set("guid", guid);
-				
+				out.set(jID+1, j);
 				jID++;
 			}
 			return out;
@@ -269,7 +269,7 @@ public class HIDUtils {
 			int jID = 0;
 			out = out == null ? new LuaTable() : out;
 			while(GLFW.glfwJoystickPresent(jID)) {
-				if(!GLFW.glfwJoystickIsGamepad(jID)) continue;
+				if(!GLFW.glfwJoystickIsGamepad(jID)) {jID++; continue;}
 				
 				LuaTable j = new LuaTable();
 				ByteBuffer buttons = GLFW.glfwGetJoystickButtons(jID);
@@ -298,7 +298,7 @@ public class HIDUtils {
 				
 				j.set("name", name);
 				j.set("guid", guid);
-				
+				out.set(jID+1, j);
 				jID++;
 			}
 			return out;
@@ -309,7 +309,7 @@ public class HIDUtils {
 	
 	
 	public static enum HatDir{
-		UP, RIGHT, DOWN, LEFT, UP_RIGHT, DOWN_RIGHT, DOWN_LEFT, UP_LEFT;
+		UP, RIGHT, DOWN, LEFT, UP_RIGHT, DOWN_RIGHT, DOWN_LEFT, UP_LEFT, NONE;
 		
 		public boolean isUp() {
 			return this.equals(UP) || this.equals(UP_LEFT) || this.equals(UP_RIGHT);
@@ -351,7 +351,7 @@ public class HIDUtils {
 			case GLFW.GLFW_HAT_RIGHT_DOWN:
 				return DOWN_RIGHT;
 			default:
-				return null;
+				return NONE;
 			}
 		}
 	}

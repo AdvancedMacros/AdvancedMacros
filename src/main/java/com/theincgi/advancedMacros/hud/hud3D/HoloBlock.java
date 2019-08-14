@@ -16,9 +16,13 @@ import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
+import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.gui.advancements.AdvancementState;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.Vec3d;
 
 public class HoloBlock extends WorldHudItem{
 	LuaValTexture texture;
@@ -70,6 +74,7 @@ public class HoloBlock extends WorldHudItem{
 		if(texture!=null){
 			texture.bindTexture();
 			//GlStateManager.pushAttrib();
+			
 			GlStateManager.pushMatrix(); //TODO include obj rotation in another push pop matrix about here
 			
 			GlStateManager.translated(-playerX, -playerY, -playerZ);
@@ -83,6 +88,9 @@ public class HoloBlock extends WorldHudItem{
 			GlStateManager.translated(-x, -y, -z);
 			GlStateManager.translated(playerX, playerY, playerZ);
 			
+			
+		
+		
 			color.apply();
 
 			if(texture!=null || textureNorth!=null) {

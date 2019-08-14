@@ -1204,10 +1204,11 @@ public class ForgeEventHandler {
 
 		//src color -> src color?
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-
+		GlStateManager.pushMatrix();
 
 		//GlStateManager.enableLighting();
-
+		
+		
 		synchronized (worldHudItems) {
 			for (WorldHudItem worldHudItem : worldHudItems) {
 				//System.out.println(worldHudItem);
@@ -1220,6 +1221,7 @@ public class ForgeEventHandler {
 				worldHudItem.render(accuPlayerX(p, player), accuPlayerY(p, player), accuPlayerZ(p, player));
 			}
 		}
+		GlStateManager.popMatrix();
 		GlStateManager.disableBlend();//F1 is black otherwise
 		GlStateManager.popAttributes();
 	}

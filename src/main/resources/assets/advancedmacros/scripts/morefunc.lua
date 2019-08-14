@@ -18,6 +18,48 @@ function math.map(x, iMin, iMax, oMin, oMax)
 end
 
 
+--attempts to pick an item from your inventory
+--if it exists it is picked from hotbar or moved to the prefered slot
+--slot number is returned or false if none found
+function pickItem(id, optHotbarSlot)
+    local inv = openInventory()
+    local map = inv.mapping[inv.getType()]
+    local optHotbarSlot = optHotbarSlot or 1
+    --scan hotbar first
+    for i, j in pairs(map.hotbar) do
+      local item = inv.getSlot( j )
+      if item and item.id == id then
+        setHotbar( i )
+        return j
+      end
+    end
+    local scanOrder = {
+            "main", "contents", "output"
+    }
+    for _,iType in pairs(scanOrder)do
+      --scan player inventory
+      if map[scanOrder] then
+        for i, j in pairs(map[scanOrder])do
+          local item = inv.getSlot(j)
+          if item and item.id == id then
+            local p = map.hotbar[optHotbarSlot]
+            inv.click( j ) --pickup
+            waitTick()
+            inv.click( p ) --place/swap
+            waitTick()
+            if inv.getHeld() then --place if swaped
+              inv.click( j )
+              waitTick()
+            end
+            --TODO close inventory maybe
+          return optHotbarSlot
+          end
+        end
+      end
+    end
+    return false
+end
+
 
 
 local function className()
