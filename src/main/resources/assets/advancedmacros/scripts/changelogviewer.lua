@@ -17,6 +17,15 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  " - Updated for &d&BMinecraft 1.14.4",
+  " - Added &bpickBlock&f( String:&ename&f, Number:&epref &f) which will move find an item in your inventory",
+  "   matching the &ename&f and move it into the &epref&f hotbar slot if it is not already in your hotbar",
+  "   If it is already in the hotbar it will select it",
+  "   Returns: slot number from &bopenInventory&f() or &6false",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 8.0.0",
   " - Updated for &d&BMinecraft 1.14.3",
   " - &cIMPORTANT:",
   "   - &bgetHeldKeys&f() has been replaced with HID.getState('keyboard')",
@@ -67,13 +76,13 @@ local changeLog = {
   "   - Created converter for BufferedImage and NativeImage for graphics lib",
   "   - Made the error for missing thread data in lua more verbose, but you shouldn't see it anyway",
   "   - Had to rename a ton of stuff on the Java side",
-
-
   
   "&7"..DIVIDER,
   
+  "&b&BChange Log: &7version 7.7.7",
   "&aBug Fix:",
   " - &bgetSound&f was missing from the globals table since 7.3.0!",
+  
   
   "&7"..DIVIDER,
   
