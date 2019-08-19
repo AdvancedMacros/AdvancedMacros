@@ -72,6 +72,7 @@ import net.minecraft.util.text.event.ClickEvent.Action;
 import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.common.ToolType;
 
 public class Utils {
 
@@ -417,9 +418,9 @@ public class Utils {
 		if(te != null) {
 			out.set("nbt", Utils.NBTUtils.fromCompound(te.serializeNBT()));
 		}
-		String tool = block.getHarvestTool(blockState).getName().toLowerCase();
+		ToolType tool = block.getHarvestTool(blockState);
 		if(tool!=null)
-			out.set("harvestTool", tool);
+			out.set("harvestTool", tool.getName().toLowerCase());
 
 		return out;
 	}

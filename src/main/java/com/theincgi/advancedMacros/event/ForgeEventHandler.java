@@ -1208,7 +1208,7 @@ public class ForgeEventHandler {
 
 		//GlStateManager.enableLighting();
 		
-		
+		GlStateManager.translated(0, -(player.getEyeHeight()), 0);
 		synchronized (worldHudItems) {
 			for (WorldHudItem worldHudItem : worldHudItems) {
 				//System.out.println(worldHudItem);

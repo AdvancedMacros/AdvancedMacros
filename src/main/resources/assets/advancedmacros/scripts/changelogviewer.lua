@@ -17,6 +17,16 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  "&a&BBug Fixes:",
+  " - '&6block:minecraft:block/red_stained_glass' types of textures are working again, check out the",
+  "   &blistTextures&f() function to get a complet list of options",
+  " - Hud elements are no longer shifted by the player's eye height &7(there is still something noticable",
+  "   &7when shifting...)",
+  
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 8.0.1",
   " - Updated for &d&BMinecraft 1.14.4",
   " - Added &bpickBlock&f( String:&ename&f, Number:&epref &f) which will move find an item in your inventory",
   "   matching the &ename&f and move it into the &epref&f hotbar slot if it is not already in your hotbar",

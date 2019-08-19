@@ -6,6 +6,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.Settings;
 
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.ResourceLocation;
 
@@ -54,6 +55,10 @@ public class LuaValTexture extends LuaValue{
 		dTex = null;
 	}
 
+	public void setBlockResource() {
+		this.r = AtlasTexture.LOCATION_BLOCKS_TEXTURE;
+	}
+	
 	@Override
 	public String typename() {
 		return TYPE_NAMES[type()];

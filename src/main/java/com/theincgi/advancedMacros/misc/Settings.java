@@ -144,10 +144,16 @@ public class Settings {
 		}else if(file.startsWith("block:")){
 			file = file.substring("block:".length());
 
-			ResourceLocation r = AtlasTexture.LOCATION_BLOCKS_TEXTURE;
+			//ResourceLocation r = AtlasTexture.LOCATION_BLOCKS_TEXTURE;
+			ResourceLocation r;
+			if(file.contains(":"))
+				r = new ResourceLocation(file.substring(0, file.indexOf(":")), file.substring(file.indexOf(":")+1));
+			else
+				r = new ResourceLocation(file);
 			TextureAtlasSprite sprite = AdvancedMacros.getMinecraft().getTextureMap().getSprite(r);
 			LuaValTexture tex;
 			val = tex = new LuaValTexture("game:"+file, r);
+			tex.setBlockResource();
 			tex.setUV(sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV());
 
 		}else{
