@@ -8,6 +8,7 @@ import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.IChunk;
@@ -20,11 +21,12 @@ public class GetBlock extends ThreeArgFunction{
 		IChunk chunk = AdvancedMacros.getMinecraft().world.getChunk(pos);
 		
 		TileEntity te = AdvancedMacros.getMinecraft().world.getTileEntity(pos);
-		if(AdvancedMacros.getMinecraft().world.getChunkProvider().isChunkLoaded(chunk.getPos())){
-			return LuaValue.FALSE;
-		}
+//		if(AdvancedMacros.getMinecraft().world.getChunkProvider().isChunkLoaded(chunk.getPos())){
+//			return LuaValue.FALSE;
+//		}
 		
 		BlockState block = chunk.getBlockState(new BlockPos(x,y,z));
+		if(block.getBlock().equals(Blocks.VOID_AIR)) return FALSE;
 		LuaTable result = Utils.blockToTable(block, te);
 		BlockState s;
 		result.set("mapColor", Utils.parseColor(block.getMaterialColor(AdvancedMacros.getMinecraft().player.world, pos)));

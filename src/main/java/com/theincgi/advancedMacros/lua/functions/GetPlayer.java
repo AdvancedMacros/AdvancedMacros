@@ -124,8 +124,9 @@ public class GetPlayer extends OneArgFunction {
 		{
 			LuaTable effects = new LuaTable();
 			int i = 1;
-			for(EffectInstance pe : player.getActivePotionEffects()) {
-				effects.set(i++, Utils.effectToTable(pe));
+			for(Object pe : player.getActivePotionEffects().toArray()) {
+				if(pe instanceof EffectInstance)
+					effects.set(i++, Utils.effectToTable((EffectInstance) pe));
 			}
 			t.set("potionEffects", effects);
 		}

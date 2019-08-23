@@ -175,7 +175,7 @@ class JavaClass extends JavaInstance implements CoerceJavaToLua.Coercion {
 		return (LuaValue) methods.get(key);
 	}
 
-	private boolean checkPrivateAccessSetting() {
+	private boolean checkPrivateAccessSetting() { //TODO make this a setting of _T
 		LuaValue luajavaSettings;
 		if(!(luajavaSettings = Settings.settings.get("luajava")).istable())
 			Settings.settings.set("luajava", luajavaSettings = new LuaTable());

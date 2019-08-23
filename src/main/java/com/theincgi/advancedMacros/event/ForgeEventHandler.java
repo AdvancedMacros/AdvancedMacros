@@ -1260,6 +1260,7 @@ public class ForgeEventHandler {
 		GlStateManager.color4f(1, 1, 1, 1);
 		//GlStateManager.disableBlend();
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		
 		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 		GlStateManager.disableAlphaTest();
 		GlStateManager.enableAlphaTest();

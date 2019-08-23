@@ -38,6 +38,7 @@ import org.luaj.vm2_v3_0_1.Print;
 import org.luaj.vm2_v3_0_1.Prototype;
 import org.luaj.vm2_v3_0_1.Varargs;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.lua.LuaDebug;
 
 /** 
@@ -930,5 +931,13 @@ public class DebugLib extends TwoArgFunction {
 	    }
 	  }
 	  return setreg;
+	}
+	
+	
+	/**From the stack trace, top, theincgi*/
+	public static String getSourceName(LuaThread lt) {
+		CallStack cs = (CallStack) lt.callstack;
+		CallFrame cf = cs.getCallFrame(1);
+		return cf.sourceline();
 	}
 }

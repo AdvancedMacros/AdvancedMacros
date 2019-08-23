@@ -17,6 +17,7 @@ import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.event.TaskDispatcher;
 import com.theincgi.advancedMacros.gui.Color;
@@ -160,6 +161,7 @@ public class BufferedImageControls extends LuaTable{
 	}
 	
 	public void updateTexture() {
+		tex.bindTexture();
 		NativeImage ni = dynamicTexture.getTextureData();
 		for(int y=0; y<img.getHeight(); y++) {
 			for(int x=0; x<img.getHeight(); x++) {
@@ -174,13 +176,16 @@ public class BufferedImageControls extends LuaTable{
 		return img;
 	}
 	private void createTexture() {
-		TaskDispatcher.addTask(new Runnable() {
+		TaskDispatcher.waitFor(TaskDispatcher.addTask(new Runnable() {
 			@Override public void run() {	
-				dynamicTexture = new DynamicTexture(img.getWidth(), img.getHeight(), true);
-				updateTexture();
-				tex = new LuaValTexture(dynamicTexture);
+				synchronized (BufferedImageControls.this) {
+					if(dynamicTexture!= null && tex !=null) return;
+					dynamicTexture = new DynamicTexture(img.getWidth(), img.getHeight(), true);
+					updateTexture();
+					tex = new LuaValTexture(dynamicTexture);
+				}
 			}
-		});
+		}));
 	}
 	public DynamicTexture getDynamicTexture() {
 		if (dynamicTexture == null) {

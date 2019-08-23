@@ -88,6 +88,7 @@ import com.theincgi.advancedMacros.lua.scriptGui.ScriptGui;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
 import com.theincgi.advancedMacros.lua.util.GraphicsContextControls;
 import com.theincgi.advancedMacros.lua.util.LuaMutex;
+import com.theincgi.advancedMacros.lua.util._S;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.CustomFontRenderer;
 import com.theincgi.advancedMacros.misc.JarLibSearcher;
@@ -113,7 +114,7 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "8.0.2"; // ??
+	public static final String VERSION = "8.0.3"; // ??
 
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
@@ -152,7 +153,8 @@ public class AdvancedMacros {
 			Method getMCThread = ObfuscationReflectionHelper.findMethod(Minecraft.class, "func_213170_ax"); //getExecutionThread
 
 			minecraftThread = (Thread) getMCThread.invoke(getMinecraft());
-			globals.setLuaThread(minecraftThread, new LuaThread(globals));
+			globals.setLuaThread(minecraftThread, new LuaThread(globals)); //minecraft thread
+			globals.setLuaThread(Thread.currentThread(), new LuaThread(globals)); //init thread
 
 			macrosRootFolder.mkdirs();
 			macrosFolder.mkdirs();
@@ -233,7 +235,10 @@ public class AdvancedMacros {
 		debugTable = globals.get("debug").checktable();
 		globals.set("_MOD_VERSION", VERSION);
 		globals.set("__GAME_VERSION", getMinecraft().getVersion());
-
+		
+		//globals.set("_S", new _S());
+		
+		
 		globals.set("advancedMacros", advancedMacrosTable);
 		LuaTable editor = new LuaTable();
 		advancedMacrosTable.set("editor", editor);

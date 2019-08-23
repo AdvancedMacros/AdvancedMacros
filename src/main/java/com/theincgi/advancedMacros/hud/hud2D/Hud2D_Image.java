@@ -17,6 +17,7 @@ import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 public class Hud2D_Image extends Hud2D_Rectangle {
@@ -90,6 +91,7 @@ public class Hud2D_Image extends Hud2D_Rectangle {
 		buffer.pos(dx+dw	, y     , z).tex(uMax, vMin).endVertex();
 		Tessellator.getInstance().draw();
 		//GlStateManager.disableBlend();
+		
 		GL11.glPopAttrib();
 		GlStateManager.popMatrix();
 	}

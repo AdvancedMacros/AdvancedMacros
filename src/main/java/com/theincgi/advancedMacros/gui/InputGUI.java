@@ -135,20 +135,26 @@ public class InputGUI extends Gui{
 
 	
 	@Override
-	public boolean charTyped(char typedChar, int keyCode) {
+	public boolean charTyped(char typedChar, int mods) {
+		if(inputType==InputType.TEXT) {
+			return textInput.charTyped(typedChar, mods);
+		}
+		
+		return super.charTyped(typedChar, mods);
+	}
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if(keyCode==GLFW.GLFW_KEY_ESCAPE) {
 			close(LuaValue.NIL);
 			return true;
-		}else if(inputType==InputType.TEXT) {
-			if(keyCode==GLFW.GLFW_KEY_ENTER) {
-				close(LuaValue.valueOf(textInput.getText()));
-				return true;
-			}
-
-			return textInput.charTyped(typedChar, keyCode);
+		}else if(keyCode==GLFW.GLFW_KEY_ENTER) {
+			close(LuaValue.valueOf(textInput.getText()));
+			return true;
 		}
-		
-		return super.charTyped(typedChar, keyCode);
+		if(inputType==InputType.TEXT) {
+			return textInput.keyPressed(keyCode, scanCode, modifiers);
+		}
+		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 //	@Override
 //	public boolean keyRepeated(char typedChar, int keyCode, int mod) {

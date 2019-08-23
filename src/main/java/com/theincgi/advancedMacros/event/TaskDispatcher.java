@@ -10,6 +10,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.luaj.vm2_v3_0_1.LuaError;
+
 import com.google.common.util.concurrent.ListenableFuture;
 import com.theincgi.advancedMacros.AdvancedMacros;
 
@@ -97,6 +99,13 @@ public class TaskDispatcher {
 		if(cTasks+rTasks>0) System.out.println("Tasks dispatched: "+(cTasks+rTasks));
 	}
 	
+	public static void waitFor(ListenableFuture<?> f){
+		while(!f.isDone()) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {throw new LuaError(e);}
+		}
+	}
 	
 	private static class CallableTask<U> {
 		Callable<U> c;
@@ -184,6 +193,7 @@ public class TaskDispatcher {
 				future.markDone( c.call() );
 			} catch (Exception e) {
 				err = e;
+				future.markDone(null);
 			}
 		}
 	}
@@ -268,9 +278,10 @@ public class TaskDispatcher {
 		protected void call() {
 			try {
 				r.run();
-				future.markDone();
 			} catch (Exception e) {
 				err = e;
+			}finally{
+				future.markDone();
 			}
 		}
 	}

@@ -17,6 +17,15 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  "&a&BBug FIxes:",
+  " - Fixed &bprompt&f()",
+  " - Fixed &bgetBlock&f()",
+  " - &bgetPlayer&f() shouldn't cause ConcurrentModification error from changes in potion status",
+  " - Fixed an issue where creating a texture would freeze the script &7Textures still broken :(",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 8.0.2",
   "&a&BBug Fixes:",
   " - '&6block:minecraft:block/red_stained_glass' types of textures are working again, check out the",
   "   &blistTextures&f() function to get a complet list of options",

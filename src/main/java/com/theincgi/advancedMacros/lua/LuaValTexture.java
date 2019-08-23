@@ -4,10 +4,12 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.event.TaskDispatcher;
 import com.theincgi.advancedMacros.misc.Settings;
 
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.util.ResourceLocation;
 
 public class LuaValTexture extends LuaValue{
@@ -50,9 +52,12 @@ public class LuaValTexture extends LuaValue{
 	}
 	
 	public void deleteTex(){
-		if(dTex==null){return;}
-		dTex.deleteGlTexture();
-		dTex = null;
+		TaskDispatcher.addTask(()->{
+			if(dTex==null){return;}
+			//TODO keep an eye out for decomp src to see if this is needed here or if it happens in delete dTex.getTextureData().close();
+			dTex.deleteGlTexture();
+			dTex = null;
+		});
 	}
 
 	public void setBlockResource() {
