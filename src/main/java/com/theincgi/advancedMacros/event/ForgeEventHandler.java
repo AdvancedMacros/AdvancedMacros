@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -115,6 +116,7 @@ public class ForgeEventHandler {
 	private ConcurrentHashMap<String, Boolean> nowPlayerList = new ConcurrentHashMap<>();
 	public WeakHashMap<Entity, RenderFlags> entityRenderFlags = new WeakHashMap<>();
 	private boolean wasOnFire = false;
+	private HashMap<Integer, Integer> repeatingKeys = new HashMap<>();
 
 	//private Queue<List<ItemStack>> receivedInventories = new LinkedList<>();
 	public ForgeEventHandler() {
@@ -205,7 +207,20 @@ public class ForgeEventHandler {
 			}
 		}else{
 			int eventKey = event.getKey(); //TESTME
-			if(event.getAction() == GLFW.GLFW_REPEAT) return;
+			Screen s = AdvancedMacros.getMinecraft().currentScreen;
+			if(event.getAction() == GLFW.GLFW_PRESS) {
+				repeatingKeys.put(event.getScanCode(), 0);
+			}
+			if(event.getAction() == GLFW.GLFW_REPEAT && s == null) return;
+			if(s!=null) {
+				if(s instanceof Gui) {
+					Gui g = (Gui)s;
+					int n;
+					repeatingKeys.put(event.getScanCode(), n = (repeatingKeys.getOrDefault(event.getScanCode(), 0)+1));
+					g.onKeyRepeated(g, event.getKey(), event.getScanCode(), event.getModifiers(), n);
+				}
+				return;
+			}
 
 			//Keyboard.onKey(eventKey, event.getAction());
 

@@ -205,6 +205,8 @@ public class PopupPrompt implements InputSubscriber, Drawable{
 	public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
 		if(keyCode == GLFW.GLFW_KEY_ENTER)
 			ok.onClick.onClick(-1, ok);
+		if(inputBox.isFocused())
+			return inputBox.keyPressed(keyCode, scanCode, modifiers);
 		return isVisible;
 	}
 	@Override
@@ -214,8 +216,12 @@ public class PopupPrompt implements InputSubscriber, Drawable{
 		return isVisible;
 	}
 	@Override
-	public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
+	public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
 		return isVisible;
+	}
+	@Override
+	public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
+		return onKeyPressed(gui, keyCode, scanCode, modifiers);
 	}
 	public static class Answer{
 		public Choice c;

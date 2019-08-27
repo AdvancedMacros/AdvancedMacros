@@ -252,8 +252,12 @@ public class GuiCTA extends ScriptGuiElement{
 		return cta.onKeyPressed(gui, keyCode, scanCode, modifiers);
 	}
 	@Override
-	public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
-		return cta.onKeyRelease(gui, typedChar, keyCode);
+	public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
+		return cta.onKeyPressed(gui, keyCode, scanCode, modifiers);
+	}
+	@Override
+	public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
+		return cta.onKeyRepeat(gui, keyCode, scanCode, modifiers, n);
 	}
 	@Override
 	public boolean onScroll(Gui g, double i) {

@@ -209,7 +209,11 @@ public class RunningScriptsGui extends Gui{
 		}
 
 		@Override
-		public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
+		public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
+			return false;
+		}
+		@Override
+		public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
 			return false;
 		}
 		

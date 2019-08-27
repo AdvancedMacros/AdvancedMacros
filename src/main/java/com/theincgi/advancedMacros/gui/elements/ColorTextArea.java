@@ -1138,9 +1138,16 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 //		}
 //		return false;
 //	}
+	@Override
+	public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
+		if(isFocused() && n%4==0 && !isCTRLDown()) {
+			return onKeyPressed(gui, keyCode, scanCode, modifiers);
+		}
+		return false;
+	}
 
 	@Override
-	public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
+	public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
 		return false;
 	}
 

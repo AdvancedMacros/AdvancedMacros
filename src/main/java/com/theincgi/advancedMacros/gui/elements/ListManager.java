@@ -200,12 +200,25 @@ public class ListManager implements InputSubscriber, Drawable, Moveable{
 	}
 
 	@Override
-	public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
-		if(scrollBar.onKeyRelease(gui, typedChar, keyCode))return true;
+	public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
+		if(scrollBar.onKeyRepeat(gui, keyCode, scanCode, modifiers, n))return true;
 		synchronized(this){
 			for (Moveable moveable : items) {
 				if(moveable instanceof InputSubscriber){
-					if(((InputSubscriber) moveable).onKeyRelease(gui, typedChar, keyCode))
+					if(((InputSubscriber) moveable).onKeyRepeat(gui, keyCode, scanCode, modifiers, n))
+						return true;
+				}
+			}
+		}
+		return false;
+	}
+	@Override
+	public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
+		if(scrollBar.onKeyRelease(gui, keyCode, scanCode, modifiers))return true;
+		synchronized(this){
+			for (Moveable moveable : items) {
+				if(moveable instanceof InputSubscriber){
+					if(((InputSubscriber) moveable).onKeyRelease(gui, keyCode, scanCode, modifiers))
 						return true;
 				}
 			}

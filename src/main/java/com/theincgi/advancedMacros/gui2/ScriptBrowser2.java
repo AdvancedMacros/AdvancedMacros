@@ -505,7 +505,11 @@ public class ScriptBrowser2 extends Gui{
 			return false;
 		}
 		@Override
-		public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
+		public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
+			return false;
+		}
+		@Override
+		public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
 			return false;
 		}
 	}

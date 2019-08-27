@@ -156,6 +156,10 @@ public class InputGUI extends Gui{
 		}
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
+	@Override
+	public boolean onKeyRepeated(Gui gui, int keyCode, int scanCode, int mods, int n) {
+		return super.onKeyRepeated(gui, keyCode, scanCode, mods, n) || (n%2==0 && textInput.keyPressed(keyCode, scanCode, mods));
+	}
 //	@Override
 //	public boolean keyRepeated(char typedChar, int keyCode, int mod) {
 //		super.keyRepeated(typedChar, keyCode, mod);
@@ -237,7 +241,11 @@ public class InputGUI extends Gui{
 		}
 
 		@Override
-		public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
+		public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
+			return false;
+		}
+		@Override
+		public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
 			return false;
 		}
 
@@ -348,7 +356,11 @@ public class InputGUI extends Gui{
 		}
 
 		@Override
-		public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
+		public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
+			return false;
+		}
+		@Override
+		public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
 			return false;
 		}
 

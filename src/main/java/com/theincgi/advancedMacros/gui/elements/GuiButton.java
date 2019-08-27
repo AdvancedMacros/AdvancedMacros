@@ -232,7 +232,11 @@ public class GuiButton extends GuiRect implements InputSubscriber, Focusable{
 	}
 
 	@Override
-	public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
+	public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
+		return false;
+	}
+	@Override
+	public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
 		return false;
 	}
 

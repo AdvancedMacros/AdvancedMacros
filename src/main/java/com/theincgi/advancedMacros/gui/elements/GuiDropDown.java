@@ -282,10 +282,18 @@ public class GuiDropDown implements Drawable, InputSubscriber, Moveable{
 		return false;
 	}
 	@Override
-	public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
-		if(dropButton.onKeyRelease(gui, typedChar, keyCode)){return true;}
+	public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
+		if(dropButton.onKeyRelease(gui, keyCode, scanCode, modifiers)){return true;}
 		if(listManager.isVisible()){
-			if(listManager.onKeyRelease(gui, typedChar, keyCode))return true;
+			if(listManager.onKeyRelease(gui, keyCode, scanCode, modifiers))return true;
+		}
+		return false;
+	}
+	@Override
+	public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
+		if(dropButton.onKeyRepeat(gui, keyCode, scanCode, modifiers, n)){return true;}
+		if(listManager.isVisible()){
+			if(listManager.onKeyRepeat(gui, keyCode, scanCode, modifiers, n))return true;
 		}
 		return false;
 	}

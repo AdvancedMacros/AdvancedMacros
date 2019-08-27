@@ -105,28 +105,33 @@ public class Gui extends Screen implements INestedGuiEventHandler {
 	}
 	
 	
-//	/**fires after key has been held in for a time
-//	 * mod will always be positive
-//	 * <br><b>Tip</b>: Use mod to reduce key repeat speed.
-//	 * <blockquote><br> if(mod%5==0){...} </code></blockquote>>*/
-//	public boolean keyRepeated(char typedChar, int keyCode, int mod){
-//		if(firstSubsciber!=null && firstSubsciber.onKeyRepeat(this, typedChar, keyCode, mod)){return true;}
-//		synchronized (inputSubscribers) {
-//			for (InputSubscriber inputSubscriber : inputSubscribers) {
-//				if(inputSubscriber.onKeyRepeat(this, typedChar, keyCode, mod)) return true;
-//			}
-//		}
-//		return false;
-//	}
-	
-//	@Override
-//	public boolean keyPressed(int keyCode, int p_keyPressed_2_, int p_keyPressed_3_) {
-//		// TODO Auto-generated method stub
-//		return super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
-//	}
+	/**fires after key has been held in for a time
+	 * mod will always be positive
+	 * <br><b>Tip</b>: Use mod to reduce key repeat speed.
+	 * <blockquote><br> if(mod%5==0){...} </code></blockquote>>*/
+	public boolean onKeyRepeated(Gui gui, int keyCode, int scanCode, int mods, int n){
+		if(firstSubsciber!=null && firstSubsciber.onKeyRepeat(gui, keyCode, scanCode, mods, n)){return true;}
+		synchronized (inputSubscribers) {
+			for (InputSubscriber inputSubscriber : inputSubscribers) {
+				if(inputSubscriber.onKeyRepeat(gui, keyCode, scanCode, mods, n)) return true;
+			}
+		}
+		return false;
+	}
 
+	@Override
+	public boolean keyReleased(int p_223281_1_, int p_223281_2_, int p_223281_3_) {
+		return onKeyRelease(this, p_223281_1_, p_223281_2_, p_223281_3_);
+	}
+	
 	/**very overridable, this is called after input subscribers have not claimed this event*/
-	public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
+	public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
+		if(firstSubsciber!=null && firstSubsciber.onKeyRelease(this, keyCode, scanCode, modifiers)){return true;}
+		synchronized (inputSubscribers) {
+			for (InputSubscriber inputSubscriber : inputSubscribers) {
+				if(inputSubscriber.onKeyRelease(this, keyCode, scanCode, modifiers)) return true;
+			}
+		}
 		return false;
 	}
 
@@ -366,11 +371,11 @@ public class Gui extends Screen implements INestedGuiEventHandler {
 		public boolean onCharTyped(Gui gui, char typedChar, int mods);
 		/**aka keyTyped*/
 		public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers);
-//		/**@param typedChar char value of typed key<br>
-//		 * @param keycode   number for key, typed char cant  have [up arrow] for example<br>
-//		 * @param repeatMod for reducing the number of repeat events, you can use % on this and pick say 1 in 3 events to use*/
-//		public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod);
-		public boolean onKeyRelease(Gui gui, char typedChar, int keyCode);
+		/**@param typedChar char value of typed key<br>
+		 * @param keycode   number for key, typed char cant  have [up arrow] for example<br>
+		 * @param repeatMod for reducing the number of repeat events, you can use % on this and pick say 1 in 3 events to use*/
+		public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n);
+		public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers);
 
 	}
 

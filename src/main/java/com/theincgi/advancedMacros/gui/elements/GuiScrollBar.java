@@ -21,13 +21,13 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	//public boolean needsFocus = false;
 	private boolean isVisible=true;
 	private double scrollSpeed = 1;
-	
+
 	PropertyPalette propertyPalette;
-	
+
 	public GuiScrollBar(int x, int y, int wid, int len, Orientation or, String...propPath) {
 		this(x, y, wid, len, or, propPath.length==0 ? new PropertyPalette() : new PropertyPalette(propPath));
 	}
-	
+
 	public GuiScrollBar(int x, int y, int wid, int len, Orientation or, PropertyPalette propPal) {
 		this.propertyPalette = propPal;
 		this.x = x;
@@ -42,42 +42,42 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 		propPal.addColorIfNil(new Color(  0, 	 97, 	255), "colors", "buttonDetail");
 		propPal.addColorIfNil(GuiRect.DEFAULT_SHADE,          "colors", "buttonShade");
 	}
-	
-//	public GuiScrollBar(WidgetID wID, int x, int y, int wid, int len, Orientation or) {
-//		this.wID = wID;
-//		this.x = x;
-//		this.y = y;
-//		this.wid = wid;
-//		this.len = len;
-//		this.orientation = or;
-////		scrollbarFrame 			= new Property("colors.standardScrollbar.bgFrame", 		new Color(100, 	100, 	255).toLuaValue(), 	"bgFrame", 		wID);
-////		scrollbarBG    			= new Property("colors.standardScrollbar.bgFill",  		new Color(142, 	142, 	142).toLuaValue(), 	"bgFill",		wID);
-////		scrollBarButtonFrame 	= new Property("colors.standardScrollbar.buttonFrame", 	new Color(220,	220,	220).toLuaValue(), 	"buttonFrame",	wID);
-////		scrollBarButtonFill 	= new Property("colors.standardScrollbar.buttonFill", 	new Color(204, 	223, 	255).toLuaValue(), 	"buttonFill",	wID);
-////		scrollBarButtonDetail 	= new Property("colors.standardScrollbar.buttonDetail", new Color(0, 	97, 	255).toLuaValue(), 	"buttonDetail", wID);
-////		scrollBarButtonShade    = new Property("colors.standardScrollbar.buttonShade",  GuiRect.DEFAULT_SHADE.toLuaValue(), "buttonShade", wID);
-//
-//	}
-//	/**@param defPropPointerPrefix used to change table for color property defaults<br>
-//	 * param = "colors.dropDownBox" will put buttonFill in "colors.dropDownBox.buttonFill,<br>
-//	 * use this constructor if it is an element of something else*/
-//	public GuiScrollBar(WidgetID wID, int x, int y, int wid, int len, Orientation or, String defPropPointerPrefix) {
-//		defPropPointerPrefix = defPropPointerPrefix==null?"colors.standardScrollbar":defPropPointerPrefix;
-//		this.wID = wID;
-//		this.x = x;
-//		this.y = y;
-//		this.wid = wid;
-//		this.len = len;
-//		this.orientation = or;
-//		scrollbarFrame 			= new Property(defPropPointerPrefix+".bgFrame", 		new Color(100, 	100, 	255).toLuaValue(), 	"bgFrame", 		wID);
-//		scrollbarBG    			= new Property(defPropPointerPrefix+".bgFill",  		new Color(142, 	142, 	142).toLuaValue(), 	"bgFill",		wID);
-//		scrollBarButtonFrame 	= new Property(defPropPointerPrefix+".buttonFrame", 	new Color(220,	220,	220).toLuaValue(), 	"buttonFrame",	wID);
-//		scrollBarButtonFill 	= new Property(defPropPointerPrefix+".buttonFill", 		new Color(204, 	223, 	255).toLuaValue(), 	"buttonFill",	wID);
-//		scrollBarButtonDetail 	= new Property(defPropPointerPrefix+".buttonDetail", 	new Color(0, 	97, 	255).toLuaValue(), 	"buttonDetail", wID);
-//		scrollBarButtonShade    = new Property(defPropPointerPrefix+".buttonShade",  	GuiRect.DEFAULT_SHADE.toLuaValue(), 		"buttonShade", 	wID);
-//
-//	}
-	
+
+	//	public GuiScrollBar(WidgetID wID, int x, int y, int wid, int len, Orientation or) {
+	//		this.wID = wID;
+	//		this.x = x;
+	//		this.y = y;
+	//		this.wid = wid;
+	//		this.len = len;
+	//		this.orientation = or;
+	////		scrollbarFrame 			= new Property("colors.standardScrollbar.bgFrame", 		new Color(100, 	100, 	255).toLuaValue(), 	"bgFrame", 		wID);
+	////		scrollbarBG    			= new Property("colors.standardScrollbar.bgFill",  		new Color(142, 	142, 	142).toLuaValue(), 	"bgFill",		wID);
+	////		scrollBarButtonFrame 	= new Property("colors.standardScrollbar.buttonFrame", 	new Color(220,	220,	220).toLuaValue(), 	"buttonFrame",	wID);
+	////		scrollBarButtonFill 	= new Property("colors.standardScrollbar.buttonFill", 	new Color(204, 	223, 	255).toLuaValue(), 	"buttonFill",	wID);
+	////		scrollBarButtonDetail 	= new Property("colors.standardScrollbar.buttonDetail", new Color(0, 	97, 	255).toLuaValue(), 	"buttonDetail", wID);
+	////		scrollBarButtonShade    = new Property("colors.standardScrollbar.buttonShade",  GuiRect.DEFAULT_SHADE.toLuaValue(), "buttonShade", wID);
+	//
+	//	}
+	//	/**@param defPropPointerPrefix used to change table for color property defaults<br>
+	//	 * param = "colors.dropDownBox" will put buttonFill in "colors.dropDownBox.buttonFill,<br>
+	//	 * use this constructor if it is an element of something else*/
+	//	public GuiScrollBar(WidgetID wID, int x, int y, int wid, int len, Orientation or, String defPropPointerPrefix) {
+	//		defPropPointerPrefix = defPropPointerPrefix==null?"colors.standardScrollbar":defPropPointerPrefix;
+	//		this.wID = wID;
+	//		this.x = x;
+	//		this.y = y;
+	//		this.wid = wid;
+	//		this.len = len;
+	//		this.orientation = or;
+	//		scrollbarFrame 			= new Property(defPropPointerPrefix+".bgFrame", 		new Color(100, 	100, 	255).toLuaValue(), 	"bgFrame", 		wID);
+	//		scrollbarBG    			= new Property(defPropPointerPrefix+".bgFill",  		new Color(142, 	142, 	142).toLuaValue(), 	"bgFill",		wID);
+	//		scrollBarButtonFrame 	= new Property(defPropPointerPrefix+".buttonFrame", 	new Color(220,	220,	220).toLuaValue(), 	"buttonFrame",	wID);
+	//		scrollBarButtonFill 	= new Property(defPropPointerPrefix+".buttonFill", 		new Color(204, 	223, 	255).toLuaValue(), 	"buttonFill",	wID);
+	//		scrollBarButtonDetail 	= new Property(defPropPointerPrefix+".buttonDetail", 	new Color(0, 	97, 	255).toLuaValue(), 	"buttonDetail", wID);
+	//		scrollBarButtonShade    = new Property(defPropPointerPrefix+".buttonShade",  	GuiRect.DEFAULT_SHADE.toLuaValue(), 		"buttonShade", 	wID);
+	//
+	//	}
+
 
 	public void setItemCount(int items){
 		this.items = items;
@@ -102,7 +102,7 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 		public boolean isLEFTRIGHT(){
 			return this.equals(Orientation.LEFTRIGHT);
 		}
-		
+
 		@Override
 		public String toString() {
 			switch (this) {
@@ -119,7 +119,7 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 			case "horiz":
 			case "h":
 				return LEFTRIGHT;
-				
+
 			case "vertical":
 			case "vert":
 			case "v":
@@ -130,22 +130,22 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 			}
 		}
 	}
-	
+
 	public boolean isVisible() {
 		return isVisible;
 	}
-	
+
 	@Override
 	public void onDraw(Gui gui, int mouseX, int mouseY, float partialTicks) { //FIXME not OCD friendly
 		if(!isVisible()){return;}
-		
+
 		int barFrame =   propertyPalette.getColor("colors", "bgFrame").toInt(),
-		    barBG    =   propertyPalette.getColor("colors", "bgFill").toInt(),
-		    buttonFrame= propertyPalette.getColor("colors", "buttonFrame").toInt(),
-		    buttonFill = propertyPalette.getColor("colors", "buttonFill").toInt(),
-		    buttonDetail=propertyPalette.getColor("colors", "buttonDetail").toInt(),
-		    buttonShade =propertyPalette.getColor("colors", "buttonShade").toInt();
-		
+				barBG    =   propertyPalette.getColor("colors", "bgFill").toInt(),
+				buttonFrame= propertyPalette.getColor("colors", "buttonFrame").toInt(),
+				buttonFill = propertyPalette.getColor("colors", "buttonFill").toInt(),
+				buttonDetail=propertyPalette.getColor("colors", "buttonDetail").toInt(),
+				buttonShade =propertyPalette.getColor("colors", "buttonShade").toInt();
+
 		if(orientation.isUPDOWN()){
 			gui.drawBoxedRectangle(x, y, wid, len, barFrame, barBG); //track
 			int buttonLen = getButtonLen()-1;
@@ -161,14 +161,14 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 			}
 		}else if(orientation.isLEFTRIGHT()){
 			gui.drawBoxedRectangle(x, y, len, wid, barFrame, barBG); //track
-			
+
 			gui.drawBoxedRectangle(getButtonX(), y+1, getButtonLen()-1, wid-2, buttonFrame, buttonFill);
-			
+
 			gui.drawVerticalLine(getButtonX()+getButtonLen()/2, y+2, y+wid-2, buttonDetail);
 			gui.drawVerticalLine(getButtonX()+getButtonLen()/2-2, y+2, y+wid-2, buttonDetail);
 			gui.drawVerticalLine(getButtonX()+getButtonLen()/2+2, y+2, y+wid-2, buttonDetail);
-			
-			
+
+
 			if(anchorSet || isInButton(mouseX, mouseY)){
 				net.minecraft.client.gui.screen.Screen.fill(getButtonX(),y+1,getButtonX()+getButtonLen(), y+wid, buttonShade);
 			}
@@ -202,7 +202,7 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 		return (int) (len*(pos/items));
 	}
 
-	
+
 
 	@Override
 	public boolean onScroll(Gui gui, double sign) {
@@ -258,7 +258,7 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	public void resetAnchors(){
 		anchorSet = false;
 	}
-	
+
 	public boolean isFocused(Gui gui){
 		return gui.getFocusItem().equals(this);
 	}
@@ -316,13 +316,17 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	}
 
 	@Override
-	public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
+	public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
+		return false;
+	}
+	@Override
+	public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
 		return false;
 	}
 
 	Runnable r;
 
-	
+
 	public void setOnChange(Runnable r){
 		this.r = r;
 	}
@@ -352,7 +356,7 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	public int getItemWidth() {
 		return orientation.isUPDOWN()?wid : len;
 	}
-	
+
 	/**length of scrollbar*/
 	public int getLen() {
 		return len;
@@ -400,15 +404,15 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	public int getItems() {
 		return items;
 	}
-	
-	
+
+
 	public void setScrollSpeed(double speed) {
 		scrollSpeed = speed;
 	}
 	public double getScrollSpeed() {
 		return scrollSpeed;
 	}
-	
+
 	/**Always focused*/
 	@Override
 	public boolean isFocused() {
@@ -417,9 +421,9 @@ public class GuiScrollBar implements Drawable, InputSubscriber, Focusable, Movea
 	/**Always focused*/
 	@Override
 	public void setFocused(boolean unused) {
-		
+
 	}
-	
+
 	/**4.0.0b - needs testing*/
 	public void setOrientation(Orientation orientation) {
 		this.orientation = orientation;

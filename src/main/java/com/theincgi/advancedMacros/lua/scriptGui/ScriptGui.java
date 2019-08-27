@@ -29,7 +29,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 	String guiName = "generic_"+counter++;
 	Gui gui;
 	//LuaTable controls = new LuaTable();
-	LuaFunction onScroll, onMouseClick, onMouseRelease, onMouseDrag, onKeyPressed, onCharTyped, onKeyReleased, onGuiClose,
+	LuaFunction onScroll, onMouseClick, onMouseRelease, onMouseDrag, onKeyPressed, onCharTyped, onKeyReleased, onKeyRepeated, onGuiClose,
 	onGuiOpen, onResize;
 	Group guiGroup = new Group();
 	ScriptGui parentGui = null;
@@ -407,17 +407,17 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 		return false;
 	}
 	
-//	@Override
-//	public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
-//		if(onKeyRepeated!=null)
-//			return Utils.pcall(onKeyRepeated, LuaValue.valueOf(typedChar+""), LuaValue.valueOf(keyCode), LuaValue.valueOf(repeatMod)).optboolean(false);
-//		return false;
-//	}
+	@Override
+	public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
+		if(onKeyRepeated!=null)
+			return Utils.pcall(onKeyRepeated, LuaValue.valueOf(keyCode),LuaValue.valueOf(scanCode), LuaValue.valueOf(n),HIDUtils.Keyboard.modifiersToLuaTable(modifiers)).optboolean(false);
+		return false;
+	}
 
 	@Override
-	public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
+	public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
 		if(onKeyReleased!=null)
-			return Utils.pcall(onKeyReleased, LuaValue.valueOf(typedChar+""), LuaValue.valueOf(keyCode)).optboolean(false);
+			return Utils.pcall(onKeyReleased, LuaValue.valueOf(keyCode), LuaValue.valueOf(scanCode), HIDUtils.Keyboard.modifiersToLuaTable(modifiers)).optboolean(false);
 		return false;
 	}
 
@@ -505,17 +505,18 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 					ScriptGui.this.onCharTyped(gui, typedChar, mods) ||
 					(parentGui!=null && parentGui.onCharTyped(gui, typedChar, mods));
 		}
-//		@Override
-//		public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int mod) {
-//			return super.keyRepeated(typedChar, keyCode, mod) ||
-//					ScriptGui.this.onKeyRepeat(this, typedChar, keyCode, mod) ||
-//					(parentGui!=null && parentGui.onKeyRepeat(parentGui.gui, typedChar, keyCode, mod));
-//		}
 		@Override
-		public boolean onKeyRelease(Gui gui, char typedChar, int keyCode) {
-			return super.onKeyRelease(gui, typedChar, keyCode)||
-					ScriptGui.this.onKeyRelease(this, typedChar, keyCode) ||
-					(parentGui!=null && parentGui.onKeyRelease(parentGui.gui, typedChar, keyCode));
+		public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
+			return super.onKeyRepeated(gui, keyCode, scanCode, modifiers, n) ||
+					ScriptGui.this.onKeyRepeat(gui, keyCode, scanCode, modifiers, n) ||
+					(parentGui!=null && parentGui.onKeyRepeat(parentGui.gui, keyCode, scanCode, modifiers, n));
+		}
+		
+		@Override
+		public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
+			return super.onKeyRelease(gui, keyCode, scanCode, modifiers)||
+					ScriptGui.this.onKeyRelease(this, keyCode, scanCode, modifiers) ||
+					(parentGui!=null && parentGui.onKeyRelease(parentGui.gui, keyCode, scanCode, modifiers));
 		}
 		
 		@Override
