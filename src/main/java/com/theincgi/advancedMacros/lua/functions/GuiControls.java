@@ -112,7 +112,7 @@ public class GuiControls {
 	private static class DoRepair extends VarArgFunction {
 		RepairOp op;
 		AnvilScreen gr;
-		Method renameItem = ObfuscationReflectionHelper.findMethod(AnvilScreen.class, /*"renameItem",*/ "func_214075_a", new Class[] {}); //TESTME is this the right func? should be
+		Method renameItem = ObfuscationReflectionHelper.findMethod(AnvilScreen.class, /*"renameItem",*/ "func_214075_a", new Class[] {String.class}); //TESTME is this the right func? should be
 		
 		//Field anvil = ReflectionHelper.findField(AnvilScreen.class, "anvil", "w", "field_147092_v");
 		Field nameField = ObfuscationReflectionHelper.findField(AnvilScreen.class, "field_147091_w");
