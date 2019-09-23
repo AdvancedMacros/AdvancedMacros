@@ -77,6 +77,7 @@ import com.theincgi.advancedMacros.lua.functions.Toast;
 import com.theincgi.advancedMacros.lua.functions.entity.GetAABB;
 import com.theincgi.advancedMacros.lua.functions.entity.GetEntityData;
 import com.theincgi.advancedMacros.lua.functions.entity.GetEntityList;
+import com.theincgi.advancedMacros.lua.functions.entity.GetNBT;
 import com.theincgi.advancedMacros.lua.functions.entity.HighlightEntity;
 import com.theincgi.advancedMacros.lua.functions.midi.MidiLib2;
 import com.theincgi.advancedMacros.lua.functions.minecraft.GetChunkUpdates;
@@ -114,7 +115,7 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "8.0.3"; // ??
+	public static final String VERSION = "9.0.0"; // ??
 
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
@@ -312,6 +313,7 @@ public class AdvancedMacros {
 		globals.set("getLoadedPlayers", new GetLoadedPlayers()); //your loaded chunks
 		globals.set("getPlayerPos", new GetPlayerPos());
 		globals.set("getPlayerBlockPos", new GetPlayerBlockPos());
+		globals.set("getPlayerNBT", new GetNBT.GetPlayerNBT());
 
 		//globals.set("minecraft", new MinecraftFunctions());
 		globals.set("getRecipes", new GetRecipe());
@@ -320,6 +322,7 @@ public class AdvancedMacros {
 
 		globals.set("getEntityList", new GetEntityList());
 		globals.set("getEntity", new GetEntityData());
+		globals.set("getEntityNBT", new GetNBT.GetEntityNBT());
 		globals.set("getBoundingBox", new GetAABB().getFunc()); 
 		globals.set("highlightEntity", new CallableTable(new String[] {"highlightEntity"}, new HighlightEntity()));
 

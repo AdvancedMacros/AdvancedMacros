@@ -99,9 +99,9 @@ public class GetWorld extends ZeroArgFunction {
 		if(AdvancedMacros.getMinecraft().getCurrentServerData()!=null){
 			ServerData sd = AdvancedMacros.getMinecraft().getCurrentServerData();
 			if(sd!=null) {
-				t.set(5, sd.serverName==null? LuaValue.FALSE    : LuaValue.valueOf(sd.serverName));
-				t.set(6, sd.serverMOTD==null? LuaValue.FALSE    : LuaValue.valueOf(sd.serverMOTD));
-				t.set(7, sd.serverIP==null?   LuaValue.FALSE    : LuaValue.valueOf(sd.serverIP));
+				t.set("serverName", sd.serverName==null? LuaValue.FALSE    : LuaValue.valueOf(sd.serverName));
+				t.set("messageOfTheDay", sd.serverMOTD==null? LuaValue.FALSE    : LuaValue.valueOf(sd.serverMOTD));
+				t.set("ip", sd.serverIP==null?   LuaValue.FALSE    : LuaValue.valueOf(sd.serverIP));
 			}
 		}
 		return t;

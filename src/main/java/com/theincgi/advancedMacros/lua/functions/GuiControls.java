@@ -377,12 +377,12 @@ public class GuiControls {
 		}
 		private void loadReflects() {
 			getPageCount 	= ObfuscationReflectionHelper.findMethod(EditBookScreen.class, "func_214199_a");  // formerly: "bookTotalPages", "x", "field_146476_w");
-			//insert 			= ObfuscationReflectionHelper.findMethod(EditBookScreen.class, "pageInsertIntoCurrent", 		"func_146459_b", String.class);
-			setTxt 			= ObfuscationReflectionHelper.findMethod(EditBookScreen.class, "func_214217_j");//"pageSetCurrent", 		  	"func_146457_a", String.class);
+			insert 			= ObfuscationReflectionHelper.findMethod(EditBookScreen.class, "func_214202_k", String.class); //based entirely on the fact that function was void and refernced "MathHelper" before
+			setTxt 			= ObfuscationReflectionHelper.findMethod(EditBookScreen.class, "func_214217_j", String.class);//"pageSetCurrent", 		  	"func_146457_a", String.class);
 			getTxt 			= ObfuscationReflectionHelper.findMethod(EditBookScreen.class, "func_214193_h");//"pageGetCurrent", 		  	"func_146456_p");
 			updateButtons = 
 					 ObfuscationReflectionHelper.findMethod(EditBookScreen.class, "func_214229_d");//"updateButtons", 				"func_146464_h");
-			sendBook=ObfuscationReflectionHelper.findMethod(EditBookScreen.class, "func_214198_a");//"sendBookToServer", 			"func_146462_a", boolean.class);
+			sendBook=ObfuscationReflectionHelper.findMethod(EditBookScreen.class, "func_214198_a", boolean.class);//"sendBookToServer", 			"func_146462_a", boolean.class);
 			addPage =ObfuscationReflectionHelper.findMethod(EditBookScreen.class, "func_214215_f");//"addNewPage", 				"func_146461_i");
 		}
 		private void markDirty() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {

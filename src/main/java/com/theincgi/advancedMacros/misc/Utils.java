@@ -449,11 +449,13 @@ public class Utils {
 
 	
 	public static AbstractClientPlayerEntity findPlayerByName(World world, String toFind) {
-		AbstractClientPlayerEntity[] players = (AbstractClientPlayerEntity[]) AdvancedMacros.getMinecraft().world.getPlayers().toArray();
+		Object[] players = AdvancedMacros.getMinecraft().world.getPlayers().toArray();
 		for(int i = 0; i<players.length; i++) {
-			AbstractClientPlayerEntity acpe = players[i];
-			if(acpe.getName().getUnformattedComponentText().equals(toFind)) {
-				return acpe;
+			if(players[i] instanceof AbstractClientPlayerEntity) {
+				AbstractClientPlayerEntity acpe = (AbstractClientPlayerEntity)players[i];
+				if(acpe.getName().getUnformattedComponentText().equals(toFind)) {
+					return acpe;
+				}
 			}
 		}
 		return null;
