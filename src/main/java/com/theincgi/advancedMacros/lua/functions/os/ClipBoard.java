@@ -7,6 +7,9 @@ import java.awt.datatransfer.StringSelection;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
+import org.lwjgl.glfw.GLFW;
+
+import com.theincgi.advancedMacros.AdvancedMacros;
 
 public class ClipBoard {
 	public static class GetClipboard extends ZeroArgFunction {
@@ -24,12 +27,11 @@ public class ClipBoard {
 	}
 	
 	public static void setClipboard(String toClipboard) {
-		StringSelection ss = new StringSelection(toClipboard);
-		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, ss);
+		GLFW.glfwSetClipboardString(AdvancedMacros.getMinecraft().mainWindow.getHandle(), toClipboard);
 	}
 	public static String getClipboard() {
 		try {
-			return (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+			return GLFW.glfwGetClipboardString(AdvancedMacros.getMinecraft().mainWindow.getHandle());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

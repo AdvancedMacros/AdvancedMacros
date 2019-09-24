@@ -80,7 +80,7 @@ public class BufferedImageControls extends LuaTable{
 			return out;
 		}
 	}
-	
+
 
 	public BufferedImageControls(BufferedImage img) {
 		this.img = img;
@@ -105,12 +105,12 @@ public class BufferedImageControls extends LuaTable{
 		set("save", new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg, LuaValue optFormat) {
-					try {
-						File f = Utils.parseFileLocation(arg);//FileSystem.parseFileLocation(arg);
-						ImageIO.write(img, optFormat.optjstring("png"), f);
-					} catch (IOException e) {
-						throw new LuaError("IOException occurred, "+e.getMessage());
-					}
+				try {
+					File f = Utils.parseFileLocation(arg);//FileSystem.parseFileLocation(arg);
+					ImageIO.write(img, optFormat.optjstring("png"), f);
+				} catch (IOException e) {
+					throw new LuaError("IOException occurred, "+e.getMessage());
+				}
 				return NONE;
 			}
 		});
@@ -155,21 +155,25 @@ public class BufferedImageControls extends LuaTable{
 				//throw new LuaError("Dynamic texture not created yet");
 			}
 		});
-		
+
 
 
 	}
-	
+
 	public void updateTexture() {
-		tex.bindTexture();
-		NativeImage ni = dynamicTexture.getTextureData();
-		for(int y=0; y<img.getHeight(); y++) {
-			for(int x=0; x<img.getHeight(); x++) {
-				int c = img.getRGB(x, y);
-				ni.setPixelRGBA(x, y, c);
-			}
-		}
-		dynamicTexture.updateDynamicTexture();
+		TaskDispatcher.addTask(()->{
+			//tex.bindTexture();
+			
+			NativeImage ni = dynamicTexture.getTextureData();
+			Utils.updateNativeImage(img, ni);
+//			for(int y=0; y<img.getHeight(); y++) {
+//				for(int x=0; x<img.getHeight(); x++) {
+//					int c = img.getRGB(x, y);
+//					ni.setPixelRGBA(x, y, c);
+//				}
+//			}
+			dynamicTexture.updateDynamicTexture();
+		});
 	}
 
 	public BufferedImage getImg() {
@@ -181,8 +185,9 @@ public class BufferedImageControls extends LuaTable{
 				synchronized (BufferedImageControls.this) {
 					if(dynamicTexture!= null && tex !=null) return;
 					dynamicTexture = new DynamicTexture(img.getWidth(), img.getHeight(), true);
-					updateTexture();
 					tex = new LuaValTexture(dynamicTexture);
+					updateTexture();
+					
 				}
 			}
 		}));

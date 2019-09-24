@@ -447,7 +447,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 	public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
 		if(onKeyPressed!=null)
 			return Utils.pcall(onKeyPressed, 
-					LuaValue.valueOf(keyCode), 
+					LuaValue.valueOf(HIDUtils.Keyboard.nameOf(keyCode)), 
 					LuaValue.valueOf(scanCode),
 					HIDUtils.Keyboard.modifiersToLuaTable(modifiers)
 					).toboolean();
@@ -467,13 +467,13 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 	@Override
 	public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
 		if(onKeyReleased!=null)
-			return Utils.pcall(onKeyReleased, LuaValue.valueOf(keyCode), LuaValue.valueOf(scanCode), HIDUtils.Keyboard.modifiersToLuaTable(modifiers)).toboolean();
+			return Utils.pcall(onKeyReleased, LuaValue.valueOf(HIDUtils.Keyboard.nameOf(keyCode)), LuaValue.valueOf(scanCode), HIDUtils.Keyboard.modifiersToLuaTable(modifiers)).toboolean();
 		return false;
 	}
 	@Override
 	public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
 		if(onKeyRepeated!=null)
-			return Utils.pcall(onKeyRepeated, LuaValue.valueOf(keyCode), LuaValue.valueOf(scanCode), HIDUtils.Keyboard.modifiersToLuaTable(modifiers), LuaValue.valueOf(n)).toboolean();
+			return Utils.pcall(onKeyRepeated, LuaValue.valueOf(HIDUtils.Keyboard.nameOf(keyCode)), LuaValue.valueOf(scanCode), HIDUtils.Keyboard.modifiersToLuaTable(modifiers), LuaValue.valueOf(n)).toboolean();
 		return false;
 	}
 	public int getColorInt() {

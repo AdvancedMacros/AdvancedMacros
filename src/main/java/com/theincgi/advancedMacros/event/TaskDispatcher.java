@@ -96,15 +96,16 @@ public class TaskDispatcher {
 			for(int i = 0; i<rTasks; i++) 
 				runnableTasks.remove().call();
 		}catch (NoSuchElementException e) {}
-		if(cTasks+rTasks>0) System.out.println("Tasks dispatched: "+(cTasks+rTasks));
+		//if(cTasks+rTasks>0) System.out.println("Tasks dispatched: "+(cTasks+rTasks));
 	}
 	
-	public static void waitFor(ListenableFuture<?> f){
+	public static ListenableFuture<?> waitFor(ListenableFuture<?> f){
 		while(!f.isDone()) {
 			try {
 				Thread.sleep(10);
 			} catch (InterruptedException e) {throw new LuaError(e);}
 		}
+		return f;
 	}
 	
 	private static class CallableTask<U> {

@@ -974,9 +974,8 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 							end = ((sl==selectionEnd.getY())?selectionEnd.getX():lines.get(sl).length());
 							toClipboard+=lines.get(sl).substring(start, end) + (sl!=selectionEnd.getY()?"\n":"");
 						}
-						StringSelection ss = new StringSelection(toClipboard);
+						GLFW.glfwSetClipboardString(AdvancedMacros.getMinecraft().mainWindow.getHandle(), toClipboard);
 						System.out.println("Copied: '"+toClipboard+"'");
-						Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, ss);
 					}catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -1008,8 +1007,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 						//selectionStart.setCursorTo();
 						selectionStart=null;
 						selectionEnd=null;
-						StringSelection ss = new StringSelection(toClipboard);
-						Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, ss);
+						GLFW.glfwSetClipboardString(AdvancedMacros.getMinecraft().mainWindow.getHandle(), toClipboard);
 					}catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -1018,7 +1016,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 					if(!isEditable){return false;}
 					//System.out.println("paste");
 					try {
-						String data = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+						String data = GLFW.glfwGetClipboardString(AdvancedMacros.getMinecraft().mainWindow.getHandle());
 						Scanner s = new Scanner(data);
 						boolean multiline = false;
 						String lineStart = lines.get(cursor.getY()).substring(0, cursor.getX()), lineEnd = lines.get(cursor.getY()).substring(cursor.getX());

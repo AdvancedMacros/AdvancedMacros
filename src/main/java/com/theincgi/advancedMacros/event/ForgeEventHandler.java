@@ -114,7 +114,7 @@ public class ForgeEventHandler {
 	private LinkedList<WorldHudItem> worldHudItems = new LinkedList<>();
 	private LinkedList<Hud2DItem> hud2DItems = new LinkedList<>();
 	private int sTick = 0; private Object sTickSync = new Object();
-	private ConcurrentHashMap<UUID, String> lastPlayerList;
+	private ConcurrentHashMap<UUID, String> lastPlayerList = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<UUID, String> nowPlayerList = new ConcurrentHashMap<>();
 	public WeakHashMap<Entity, RenderFlags> entityRenderFlags = new WeakHashMap<>();
 	private boolean wasOnFire = false;
@@ -482,10 +482,12 @@ public class ForgeEventHandler {
 		for(UUID uuid: nowPlayerList.keySet()) {
 			if(!lastPlayerList.containsKey(uuid)) {
 				//player joined
+				String val = nowPlayerList.get(uuid);
+				if(val==null)continue;
 				LuaTable e = createEvent(EventName.PlayerJoin);
-				e.set(3, nowPlayerList.get(uuid));
+				e.set(3, val);
 				fireEvent(EventName.PlayerJoin, e);
-				lastPlayerList.put(uuid, nowPlayerList.get(uuid));
+				lastPlayerList.put(uuid, val);
 			}
 		}
 		for(UUID uuid: lastPlayerList.keySet()) {

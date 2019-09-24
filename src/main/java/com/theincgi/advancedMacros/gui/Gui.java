@@ -1,5 +1,6 @@
 package com.theincgi.advancedMacros.gui;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -21,6 +22,7 @@ import net.minecraft.util.ResourceLocation;
 public class Gui extends Screen implements INestedGuiEventHandler {
 	FontRenderer fontRend = AdvancedMacros.getMinecraft().fontRenderer;
 	//private LinkedList<KeyTime> heldKeys = new LinkedList<>();
+	private HashMap<Integer, Long> keyRepeatDelay = new HashMap<>();
 	private LinkedList<InputSubscriber> inputSubscribers = new LinkedList<>();
 	/**The next key or mouse event will be sent to this before anything else*/
 	public InputSubscriber nextKeyListen = null;
@@ -79,6 +81,7 @@ public class Gui extends Screen implements INestedGuiEventHandler {
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		keyRepeatDelay.put(scanCode, System.currentTimeMillis());
 		if(nextKeyListen!=null && nextKeyListen.onKeyPressed(this, keyCode, scanCode, modifiers)){nextKeyListen = null; return true;}
 		if(firstSubsciber!=null && firstSubsciber.onKeyPressed(this, keyCode, scanCode, modifiers)){return true;}
 		if(super.keyPressed(keyCode,scanCode, modifiers)) return true;
@@ -110,6 +113,9 @@ public class Gui extends Screen implements INestedGuiEventHandler {
 	 * <br><b>Tip</b>: Use mod to reduce key repeat speed.
 	 * <blockquote><br> if(mod%5==0){...} </code></blockquote>>*/
 	public boolean onKeyRepeated(Gui gui, int keyCode, int scanCode, int mods, int n){
+		if(!keyRepeatDelay.containsKey(scanCode)) return false; //safety check
+		if(keyRepeatDelay.get(scanCode) + 300 > System.currentTimeMillis()) return false; //wait a little while before key spaming
+		//TODO customize key repeat delay
 		if(firstSubsciber!=null && firstSubsciber.onKeyRepeat(gui, keyCode, scanCode, mods, n)){return true;}
 		synchronized (inputSubscribers) {
 			for (InputSubscriber inputSubscriber : inputSubscribers) {
