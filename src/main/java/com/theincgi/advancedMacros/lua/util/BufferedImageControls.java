@@ -161,7 +161,7 @@ public class BufferedImageControls extends LuaTable{
 	}
 
 	public void updateTexture() {
-		TaskDispatcher.addTask(()->{
+		//TaskDispatcher.addTask(()->{
 			//tex.bindTexture();
 			
 			NativeImage ni = dynamicTexture.getTextureData();
@@ -173,7 +173,7 @@ public class BufferedImageControls extends LuaTable{
 //				}
 //			}
 			dynamicTexture.updateDynamicTexture();
-		});
+		//});
 	}
 
 	public BufferedImage getImg() {
