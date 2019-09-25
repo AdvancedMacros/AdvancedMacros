@@ -18,6 +18,22 @@ local changeLog = {
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
   "&a&BBug Fixes:",
+  " - Fixed a crash with player &ejoin/leave event &7...in single player...",
+  " - &dTaskDispatcher&f is quiet now (console) &7[Internal]",
+  " - Text editor has clipboard functionality again",
+  " - &bos.getClipboard&f and &bos.setClipboard&f work again",
+  " - Gui's have a slight delay before key repeats are allowed",
+  "   should make typing a little nicer again",
+  " - &aImage&f textures are working again",
+  " - Script gui's key events (&eup, down, repeated&f) provide a key name instead of ",
+  "   a key code",
+  " - Fixed an issue where player names wouldn't show up in &bgetPlayerList&f on ",
+  "   some servers",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 9.0.0",
+  "&a&BBug Fixes:",
   " - Fixed issue where armor updates could crash the game if the player called &bgetPlayer",
   "   or &bgetEntityData&f on an entity with armor",
   "   as a result NBT info has been moved to a separate function which will access the info",

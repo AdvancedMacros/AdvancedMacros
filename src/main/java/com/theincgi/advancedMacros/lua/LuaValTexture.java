@@ -73,12 +73,12 @@ public class LuaValTexture extends LuaValue{
 		return r;
 	}
 	public void bindTexture() {
-		if(r!=null)
+		if(r!=null) {
 			AdvancedMacros.getMinecraft().getTextureManager().bindTexture(r);
-		else
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, dTex.getGlTextureId()); //GLStatemanager was spamming errors.... "OpenGL debug message, id=1281, source=API, type=ERROR, severity=HIGH, message=Error has been generated. GL error GL_INVALID_VALUE in (null): (ID: 173538523) Generic error"
-			//GlStateManager.bindTexture(dTex.getGlTextureId());  //
-			
+		}else {
+			//GL11.glBindTexture(GL11.GL_TEXTURE_2D, dTex.getGlTextureId()); //GLStatemanager was spamming errors.... "OpenGL debug message, id=1281, source=API, type=ERROR, severity=HIGH, message=Error has been generated. GL error GL_INVALID_VALUE in (null): (ID: 173538523) Generic error"
+			GlStateManager.bindTexture(dTex.getGlTextureId());  //
+		}
 	}
 	public DynamicTexture getDynamicTexture() {
 		return dTex;

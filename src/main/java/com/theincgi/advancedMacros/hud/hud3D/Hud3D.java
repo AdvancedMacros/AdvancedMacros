@@ -36,34 +36,34 @@ public class Hud3D extends LuaTable{
 			}
 			case newBlock:{
 				HoloBlock hb = new HoloBlock();
-				hb.setPos(args.optint(1, (int) Math.floor(p.posX)),
-						  args.optint(2, (int) Math.floor(p.posY)),
-						  args.optint(3, (int) Math.floor(p.posZ)));
+				hb.setPos((float)args.optdouble(1, (int) Math.floor(p.posX)),
+						(float)args.optdouble(2, (int) Math.floor(p.posY)),
+						(float)args.optdouble(3, (int) Math.floor(p.posZ)));
 				hb.setTexture(Utils.parseTexture(args.arg(4)));
 				return hb.getControls();
 			}
 			case newText:{
 				HudText text = new HudText();
 				text.setText(args.arg1().optjstring(""));
-				text.setPos(args.optint(2, (int) Math.floor(p.posX)),
-						  args.optint(3, (int) Math.floor(p.posY)),
-						  args.optint(4, (int) Math.floor(p.posZ)));
+				text.setPos((float)args.optdouble(2, (int) Math.floor(p.posX)),
+						(float)args.optdouble(3, (int) Math.floor(p.posY)),
+						(float)args.optdouble(4, (int) Math.floor(p.posZ)));
 				return text.getControls();
 			}
 			case newPane:{
 				Hud3DPane pane = new Hud3DPane(args.arg(1).checkjstring());
-				pane.setPos(args.optint(2, (int) Math.floor(p.posX)),
-						    args.optint(3, (int) Math.floor(p.posY)),
-						    args.optint(4, (int) Math.floor(p.posZ)));
+				pane.setPos((float)args.optdouble(2, (int) Math.floor(p.posX)),
+						(float)args.optdouble(3, (int) Math.floor(p.posY)),
+						(float)args.optdouble(4, (int) Math.floor(p.posZ)));
 				if(!args.arg(5).isnil())
 					pane.changeTexture(args.arg(5));
 				return pane.getControls();
 			}
 			case newMesh:{
 				Hud3DElement element = new Hud3DElement();
-				element.setPos(	args.optint(1, (int) Math.floor(p.posX)),
-						  		args.optint(2, (int) Math.floor(p.posY)),
-					  			args.optint(3, (int) Math.floor(p.posZ)));
+				element.setPos(	(float)args.optdouble(1, (int) Math.floor(p.posX)),
+						(float)args.optdouble(2, (int) Math.floor(p.posY)),
+						(float)args.optdouble(3, (int) Math.floor(p.posZ)));
 				return element.getControls();
 			}
 			default:

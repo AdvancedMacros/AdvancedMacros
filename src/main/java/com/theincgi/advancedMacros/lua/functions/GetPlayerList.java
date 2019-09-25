@@ -12,6 +12,7 @@ import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.event.TaskDispatcher;
+import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.play.NetworkPlayerInfo;
@@ -36,18 +37,11 @@ public class GetPlayerList extends ZeroArgFunction {
 				Iterator<NetworkPlayerInfo> iter = mc.getConnection().getPlayerInfoMap().iterator();
 				while(iter.hasNext()) {
 					NetworkPlayerInfo playerInfo = iter.next();
-					String name = mc.ingameGUI.getTabList().getDisplayName(playerInfo).getUnformattedComponentText();
-					String formated   = name
-							.replaceAll("&", "&&")
-							.replaceAll("\u00A7", "&")
-							.replaceAll("&k", "&O") //Obfuscated
-							.replaceAll("&l", "&B") //Bold
-							.replaceAll("&m", "&S") //Strikethru
-							.replaceAll("&o", "&I") //Italics
-							.replaceAll("&r", "&f")   //reset (to white in this case)
-							;
-					if(name!=null)
-						table.set(i++, formated);
+					String name = playerInfo.getDisplayName().getFormattedText();
+					if(name!=null) {
+						name = Utils.fromMinecraftColorCodes(name);
+						table.set(i++, name);
+					}
 				}
 				return table;
 			}
