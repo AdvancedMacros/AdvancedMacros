@@ -27,8 +27,8 @@ public class MCTextBar extends ScriptGuiElement{
 				return gui.getFocusItem()==this; //not .equals, must be this object exactly
 			}
 			@Override
-			public void setFocused(boolean isFocusedIn) {
-				super.setFocused(isFocusedIn);
+			public void setFocused2(boolean isFocusedIn) {
+				super.setFocused2(isFocusedIn);
 				gui.setFocusItem(isFocusedIn? this : null);
 			}
 		};
@@ -207,7 +207,12 @@ public class MCTextBar extends ScriptGuiElement{
 	
 	@Override
 	public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
-		return false;
+		if(!textField.isFocused() || !visible)
+			return false;
+		textField.keyPressed(keyCode, scanCode, modifiers);
+		if(onCharTyped!=null)
+			Utils.pcall(onKeyPressed, valueOf(HIDUtils.Keyboard.nameOf(keyCode)), valueOf(scanCode), HIDUtils.Keyboard.modifiersToLuaTable(modifiers));
+		return true;
 	}
 	@Override
 	public boolean onCharTyped(Gui gui, char typedChar, int mods) {

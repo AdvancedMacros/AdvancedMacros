@@ -41,6 +41,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.ByteArrayNBT;
 import net.minecraft.nbt.ByteNBT;
@@ -407,6 +408,17 @@ public class Utils {
 		table.set("repairCost", stack.getRepairCost());
 		table.set("enchants", NBTUtils.fromTagList(stack.getEnchantmentTagList()));
 		table.set("nbt", NBTUtils.fromCompound(stack.serializeNBT()));
+		LuaTable ctabs = new LuaTable();
+		table.set("tabs", ctabs);
+		int k = 1;
+		for(ItemGroup tab:stack.getItem().getCreativeTabs()) {
+			if(tab!=null) {
+				LuaTable cat = new LuaTable();
+				cat.set("label", tab.getTabLabel());
+				cat.set("icon", tab.getTabsImage().toString());
+				ctabs.set(k++, cat);
+			}
+		}
 		return table;
 	}
 	public static LuaTable blockToTable(BlockState blockState, @Nullable TileEntity te) {
