@@ -30,7 +30,7 @@ public class HTTP extends OneArgFunction{
 				if(sets.get("requestProperties").istable()) {
 					LuaTable t = sets.get("requestProperties").checktable();
 					for(LuaValue v : t.keys()) {
-						conn.setRequestProperty(v.checkjstring(), t.checkjstring());
+						conn.setRequestProperty(v.checkjstring(), t.get(v).checkjstring());
 					}
 				}
 				conn.setConnectTimeout(sets.get("timeout").optint(10) * 1000); //in seconds, default 10s
@@ -45,30 +45,30 @@ public class HTTP extends OneArgFunction{
 			} catch (MalformedURLException e) {
 				throw new LuaError("MalformedURLException occurred");
 			} catch (IOException e) {
-				throw new LuaError("IOException occurred");
+				e.printStackTrace();
+				throw new LuaError("IOException occurred: " + e.getCause());
 			}
 		}
-	
-	
-//	•GET 
-//	•POST 
-//	•HEAD 
-//	•OPTIONS 
-//	•PUT 
-//	•DELETE 
-//	•TRACE 
 
 	public static class LuaConnection extends LuaTable{
 		HttpURLConnection conn;
 
 		public LuaConnection(HttpURLConnection conn) throws IOException {
 			this.conn = conn;
-			this.set("input", new LuaInputStream(conn.getInputStream()));
+			this.set("input", new ZeroArgFunction() {@Override public LuaValue call() {try {
+				return new LuaInputStream(conn.getInputStream());
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new LuaError("IOException while retrieving Input Stream: " + e.getCause());
+			}}});
 			if(conn.getDoOutput())
-				this.set("output", new LuaOutputStream(conn.getOutputStream()));
-			if(conn.getErrorStream()!=null)
-				this.set("err", new LuaInputStream(conn.getErrorStream()));
-			
+				this.set("output", new ZeroArgFunction() {@Override public LuaValue call() {try {
+					return new LuaOutputStream(conn.getOutputStream());
+				} catch (IOException e) {
+					e.printStackTrace();
+					throw new LuaError("IOException while retrieving Output Stream: " + e.getCause());
+				}}});
+			this.set("err", new ZeroArgFunction() {@Override public LuaValue call() {return  conn.getErrorStream() != null ? new LuaInputStream(conn.getErrorStream()) : LuaValue.NIL;}} );
 			this.set("getURL", new ZeroArgFunction() {@Override	public LuaValue call() {return LuaValue.valueOf(conn.getURL().toString());}} );
 			this.set("getResponseCode", new ZeroArgFunction() {@Override	public LuaValue call() {try {return LuaValue.valueOf(conn.getResponseCode());}catch (IOException e) {return LuaValue.NIL;}}} );
 			this.set("getContentType", new ZeroArgFunction() {
