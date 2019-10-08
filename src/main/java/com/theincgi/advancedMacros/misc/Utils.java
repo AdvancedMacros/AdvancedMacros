@@ -41,6 +41,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.ByteArrayNBT;
 import net.minecraft.nbt.ByteNBT;
@@ -407,6 +408,17 @@ public class Utils {
 		table.set("repairCost", stack.getRepairCost());
 		table.set("enchants", NBTUtils.fromTagList(stack.getEnchantmentTagList()));
 		table.set("nbt", NBTUtils.fromCompound(stack.serializeNBT()));
+		LuaTable ctabs = new LuaTable();
+		table.set("tabs", ctabs);
+		int k = 1;
+		for(ItemGroup tab:stack.getItem().getCreativeTabs()) {
+			if(tab!=null) {
+				LuaTable cat = new LuaTable();
+				cat.set("label", tab.getTabLabel());
+				cat.set("icon", tab.getTabsImage().toString());
+				ctabs.set(k++, cat);
+			}
+		}
 		return table;
 	}
 	public static LuaTable blockToTable(BlockState blockState, @Nullable TileEntity te) {
@@ -449,11 +461,13 @@ public class Utils {
 
 	
 	public static AbstractClientPlayerEntity findPlayerByName(World world, String toFind) {
-		AbstractClientPlayerEntity[] players = (AbstractClientPlayerEntity[]) AdvancedMacros.getMinecraft().world.getPlayers().toArray();
+		Object[] players = AdvancedMacros.getMinecraft().world.getPlayers().toArray();
 		for(int i = 0; i<players.length; i++) {
-			AbstractClientPlayerEntity acpe = players[i];
-			if(acpe.getName().getUnformattedComponentText().equals(toFind)) {
-				return acpe;
+			if(players[i] instanceof AbstractClientPlayerEntity) {
+				AbstractClientPlayerEntity acpe = (AbstractClientPlayerEntity)players[i];
+				if(acpe.getName().getUnformattedComponentText().equals(toFind)) {
+					return acpe;
+				}
 			}
 		}
 		return null;
@@ -1501,7 +1515,7 @@ public class Utils {
 	}
 	public static void updateNativeImage(BufferedImage img, NativeImage dest) {
 		for(int y = 0; y<img.getHeight(); y++)
-			for(int x = 0; x<img.getHeight(); x++)
+			for(int x = 0; x<img.getWidth(); x++)
 				dest.setPixelRGBA(x, y, nativeARGBFlip(img.getRGB(x, y)));
 	}
 	/**

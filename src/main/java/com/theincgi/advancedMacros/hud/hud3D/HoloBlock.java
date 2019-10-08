@@ -127,10 +127,14 @@ public class HoloBlock extends WorldHudItem{
 	private void bindOrBind(LuaValTexture pref, LuaValTexture def) {
 		if(pref!=null) {
 			pref.bindTexture();
+			if(pref!=null)
+				setUV(pref.uMin(), pref.vMin(), pref.uMax(), pref.vMax());
 			return;
 		}
-		if(def!=null)
+		if(def!=null) {
 			def.bindTexture();
+			setUV(def.uMin(), def.vMin(), def.uMax(), def.vMax());
+		}
 	}
 
 	//north face
@@ -302,10 +306,10 @@ public class HoloBlock extends WorldHudItem{
 	private class ChangeTexture extends TwoArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg, LuaValue optSide) {
+			LuaValTexture tmp = Utils.parseTexture(arg);
 			if(optSide.isnil())
-				texture = Utils.parseTexture(arg);
+				texture = tmp;
 			else {
-				LuaValTexture tmp = Utils.parseTexture(arg);
 				switch (optSide.tojstring().toLowerCase()) {
 				case "up":
 				case "top":
@@ -337,8 +341,7 @@ public class HoloBlock extends WorldHudItem{
 			//				setTexture(tex = Utils.checkTexture(arg));
 			//			else
 			//				setTexture(tex = Utils.checkTexture(Settings.getTextureID(arg.checkjstring())));
-			if(texture!=null)
-				setUV(texture.uMin(), texture.vMin(), texture.uMax(), texture.vMax());
+			
 			return LuaValue.NONE;
 		}
 	}

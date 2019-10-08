@@ -20,6 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.dimension.DimensionType;
 public class GetPlayer extends OneArgFunction {
 
 	@Override
@@ -92,7 +93,7 @@ public class GetPlayer extends OneArgFunction {
 		t.set("isInvulnerable", LuaValue.valueOf(player.isInvulnerable()));
 		{
 			LuaTable pos = new LuaTable();
-			BlockPos p = player.getBedLocation();
+			BlockPos p = player.getBedLocation(DimensionType.OVERWORLD);
 			if(p!=null) {
 				pos.set(1, LuaValue.valueOf(p.getX()));
 				pos.set(2, LuaValue.valueOf(p.getY()));
@@ -149,18 +150,7 @@ public class GetPlayer extends OneArgFunction {
 		}
 		t.set("entityID", valueOf(player.getEntityId()));
 		t.set("gamemode", player.isSpectator()?"spectator":player.isCreative()?"creative":"survival");
-		try{
-			t.set("nbt", NBTUtils.fromCompound(player.serializeNBT()));
-		}catch (NullPointerException e) {
-			try {
-				CompoundNBT ret = player.getEntityData();
-				t.set("nbt", NBTUtils.fromCompound(ret));
-			
-			}catch(Exception ex) {
-				ex.printStackTrace();
-				t.set("nbt", LuaValue.FALSE);
-			}
-		}
+		
 		if(player.equals(AdvancedMacros.getMinecraft().player)) {
 			t.set("target", Utils.rayTraceResultToLuaValue(AdvancedMacros.getMinecraft().objectMouseOver));
 		}

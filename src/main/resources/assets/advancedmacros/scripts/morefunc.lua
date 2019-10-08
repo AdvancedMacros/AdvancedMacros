@@ -38,8 +38,8 @@ function pickItem(id, optHotbarSlot)
     }
     for _,iType in pairs(scanOrder)do
       --scan player inventory
-      if map[scanOrder] then
-        for i, j in pairs(map[scanOrder])do
+      if map[iType] then
+        for i, j in pairs(map[iType])do
           local item = inv.getSlot(j)
           if item and item.id == id then
             local p = map.hotbar[optHotbarSlot]

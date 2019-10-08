@@ -23,6 +23,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.World;
 
@@ -65,7 +66,9 @@ public class GetAABB {
 				}
 				BlockState block = world.getBlockState(pos);
 				if(block.isAir(world, pos)) return FALSE;
-				AxisAlignedBB bb = block.getCollisionShape(world, pos).getBoundingBox();
+				VoxelShape vs = block.getCollisionShape(world, pos);
+				if(vs.isEmpty()) return FALSE;
+				AxisAlignedBB bb = vs.getBoundingBox();
 				if(bb==null) return FALSE;
 				LuaTable out = new LuaTable();
 				out.set(1, new AABB(bb));

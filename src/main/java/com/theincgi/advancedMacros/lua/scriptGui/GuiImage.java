@@ -80,7 +80,7 @@ public class GuiImage extends ScriptGuiElement{
 		
 		
 		//GlStateManager.enable
-		GlStateManager.bindTexture(0);
+		//GlStateManager.bindTexture(0);
 		//GlStateManager.enableColorMaterial();
 		if(lvt!=null)
 			lvt.bindTexture();

@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -75,6 +76,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
@@ -112,8 +114,8 @@ public class ForgeEventHandler {
 	private LinkedList<WorldHudItem> worldHudItems = new LinkedList<>();
 	private LinkedList<Hud2DItem> hud2DItems = new LinkedList<>();
 	private int sTick = 0; private Object sTickSync = new Object();
-	private ConcurrentHashMap<String, Boolean> lastPlayerList;
-	private ConcurrentHashMap<String, Boolean> nowPlayerList = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<UUID, String> lastPlayerList = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<UUID, String> nowPlayerList = new ConcurrentHashMap<>();
 	public WeakHashMap<Entity, RenderFlags> entityRenderFlags = new WeakHashMap<>();
 	private boolean wasOnFire = false;
 	private HashMap<Integer, Integer> repeatingKeys = new HashMap<>();
@@ -380,7 +382,6 @@ public class ForgeEventHandler {
 			if(lastHealth==0 && health>=1){
 				fireEvent(EventName.Respawn, createEvent(EventName.Respawn));
 			}
-
 			LuaTable e = createEvent(EventName.HealthChanged);
 			e.set(3, LuaValue.valueOf(health));
 			e.set(4, LuaValue.valueOf(health-lastHealth));
@@ -478,24 +479,26 @@ public class ForgeEventHandler {
 		nowPlayerList.clear();
 		populatePlayerList(nowPlayerList);
 		//System.out.println(nowPlayerList);
-		for(String s: nowPlayerList.keySet()) {
-			if(!lastPlayerList.getOrDefault(s, false)) {
+		for(UUID uuid: nowPlayerList.keySet()) {
+			if(!lastPlayerList.containsKey(uuid)) {
 				//player joined
+				String val = nowPlayerList.get(uuid);
+				if(val==null)continue;
 				LuaTable e = createEvent(EventName.PlayerJoin);
-				e.set(3, s);
+				e.set(3, val);
 				fireEvent(EventName.PlayerJoin, e);
-				lastPlayerList.put(s, true);
+				lastPlayerList.put(uuid, val);
 			}
 		}
-		for(String s: lastPlayerList.keySet()) {
+		for(UUID uuid: lastPlayerList.keySet()) {
 			//	System.out.println("Checking: "+s);
-			if(!nowPlayerList.containsKey(s)) {
+			if(!nowPlayerList.containsKey(uuid)) {
 				//left world
 				//System.out.println("left");
 				LuaTable e = createEvent(EventName.PlayerLeave);
-				e.set(3, s);
+				e.set(3, lastPlayerList.get(uuid));
 				fireEvent(EventName.PlayerLeave, e);
-				lastPlayerList.remove(s);
+				lastPlayerList.remove(uuid);
 			}//else System.out.println("Stayed");
 		}
 		checkTitle();
@@ -578,6 +581,17 @@ public class ForgeEventHandler {
 		e.set(3, Utils.entityToTable(event.getTarget()));
 		fireEvent(EventName.AttackEntity, e);
 	}
+	//not in multi :c
+//	@SubscribeEvent
+//	public void onDeath(LivingDeathEvent event) {
+//		PlayerEntity player = AdvancedMacros.getMinecraft().player;
+//		if(event.getEntityLiving().equals(player)) {
+//			LuaTable table = createEvent(EventName.Death);
+//			table.set(3, event.getSource().damageType);
+//			fireEvent(EventName.Death, table);
+//		}
+//	}
+	
 	@SubscribeEvent 
 	public void onEntityInteract(EntityInteract event) {  
 
@@ -915,13 +929,13 @@ public class ForgeEventHandler {
 			thisMessageIndex = messageIndex++;
 		}
 
-		System.out.println("Got " + event.getMessage().getUnformattedComponentText() + " as " + thisMessageIndex);
+		System.out.println("Got " + event.getMessage().getString() + " as " + thisMessageIndex);
 
 		JavaThread t = new JavaThread(()->{
 
 			LuaTable e = createEvent(EventName.Chat);
 			LuaTable e2 = createEvent(EventName.ChatFilter);
-			String unformated = event.getMessage().getUnformattedComponentText();
+			String unformated = event.getMessage().getString();
 
 			Pair<String, LuaTable> pair   = Utils.codedFromTextComponent(event.getMessage());//fromMinecraftColorCodes(event.getMessage().getFormattedText());
 			String formated = pair.a;
@@ -1123,7 +1137,7 @@ public class ForgeEventHandler {
 	@SubscribeEvent
 	public void postRenderGameLoop(TickEvent.RenderTickEvent event) { //runs very frequently, this is where the old add scheduled tasks use to go (close enough anyway)
 		if(event.phase.equals(Phase.END))
-			TaskDispatcher.runTasks();
+			TaskDispatcher.runTasks(); //TODO trigger via hook so if someone disables the world render they can still use task dispatcher dependent functions
 	}
 
 	//+===================================================================================================+
@@ -1468,14 +1482,15 @@ public class ForgeEventHandler {
 
 
 
-	private void populatePlayerList(ConcurrentHashMap<String, Boolean> map) {
+	private void populatePlayerList(ConcurrentHashMap<UUID, String> map) {
 		Minecraft mc = AdvancedMacros.getMinecraft();
 		Iterator<NetworkPlayerInfo> iter = mc.getConnection().getPlayerInfoMap().iterator();
 		while(iter.hasNext()) {
 			NetworkPlayerInfo playerInfo = iter.next();
-
+			UUID uuid = playerInfo.getGameProfile().getId();
 			String name = Utils.codedFromTextComponent(mc.ingameGUI.getTabList().getDisplayName(playerInfo)).a;
-			String formated   = name
+			if(name!=null) {
+				String formated   = name
 					.replaceAll("&", "&&")
 					.replaceAll("\u00A7", "&")
 					.replaceAll("&k", "&O") //Obfuscated
@@ -1483,9 +1498,10 @@ public class ForgeEventHandler {
 					.replaceAll("&m", "&S") //Strikethru
 					.replaceAll("&o", "&I") //Italics
 					.replaceAll("&r", "&f")   //reset (to white in this case)
+					.replaceAll("&[^&]", "").replaceAll("&&", "&")
 					;
-			if(name!=null)
-				map.put(formated.replaceAll("&[^&]", "").replaceAll("&&", "&"), true);
+				map.put(uuid, formated);
+			}
 		}
 	}
 

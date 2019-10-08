@@ -1,12 +1,16 @@
 package com.theincgi.advancedMacros.lua.functions;
 
+import java.util.concurrent.ExecutionException;
+
 import org.luaj.vm2_v3_0_1.LuaError;
+import org.luaj.vm2_v3_0_1.LuaString;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.event.TaskDispatcher;
 import com.theincgi.advancedMacros.misc.CallableTable;
@@ -84,7 +88,6 @@ public class OpenInventory extends ZeroArgFunction{
 					ClickType type = ClickType.PICKUP;
 					ctrl.windowClick(wID, slotA-1, mouseButton, type, mc.player);
 				});
-				Utils.waitTick();
 				return NONE;
 			}
 			case closeAndDrop:
@@ -93,7 +96,6 @@ public class OpenInventory extends ZeroArgFunction{
 					if(!held.isEmpty())
 						ctrl.windowClick(wID, -999, 0, ClickType.PICKUP, mc.player);
 				});
-				Utils.waitTick();
 				return NONE;
 			case close:
 				mc.player.closeScreen();
@@ -104,21 +106,27 @@ public class OpenInventory extends ZeroArgFunction{
 					ClickType type = ClickType.QUICK_MOVE;
 					ctrl.windowClick(wID, slotA-1, 0, type, mc.player);
 				});
-				Utils.waitTick();
 				return NONE;
 			}
 			case split:{
-				TaskDispatcher.addTask(()->{
+				ListenableFuture<Void> x = TaskDispatcher.addTask(()->{
 					int slotA = args.arg1().checkint();
 					ClickType type = ClickType.PICKUP;
 					int slotB = args.checkint(2);
-					if(container.getContainer().getSlot(slotB).getHasStack())
-						throw new LuaError("Destination slot is occupied");
+					ItemStack is1 = container.getContainer().getSlot(slotA-1).getStack();
+					ItemStack is2 = container.getContainer().getSlot(slotB-1).getStack();
+					if(!is2.isEmpty() && !Utils.itemsEqual(is1, is2) )
+						throw new LuaError("Destination slot is occupied by a different item");
 					ctrl.windowClick(wID, slotA-1, 1, type, mc.player);
 					ctrl.windowClick(wID, slotB-1, 0, type, mc.player);
 				});
-				Utils.waitTick();
-				return NONE;
+				TaskDispatcher.waitFor(x);
+				try{
+					x.get();
+				}catch(Exception e) {
+					return FALSE;
+				}
+				return TRUE;
 			}
 			case getHeld:{
 				ItemStack held = mc.player.inventory.getItemStack();
@@ -133,8 +141,8 @@ public class OpenInventory extends ZeroArgFunction{
 					ItemStack held = mc.player.inventory.getItemStack();
 					int slotA = args.checkint(1);
 					int slotB = args.checkint(2);
-					ItemStack is1 = container.getContainer().getSlot(slotA).getStack();
-					ItemStack is2 = container.getContainer().getSlot(slotB).getStack();
+					ItemStack is1 = container.getContainer().getSlot(slotA-1).getStack();
+					ItemStack is2 = container.getContainer().getSlot(slotB-1).getStack();
 					if(is1.isEmpty() && is2.isEmpty()) return;
 
 					ClickType type = ClickType.PICKUP;
@@ -147,7 +155,6 @@ public class OpenInventory extends ZeroArgFunction{
 					if(held.isEmpty()) return;
 					ctrl.windowClick(wID, slotA-1, 1, type, mc.player);
 				});
-				Utils.waitTick();
 				return NONE;
 			}
 			case grabAll:{
@@ -156,39 +163,15 @@ public class OpenInventory extends ZeroArgFunction{
 					ctrl.windowClick(wID, slotA-1, 1, ClickType.PICKUP, mc.player);
 					ctrl.windowClick(wID, slotA-1, 1, ClickType.PICKUP_ALL, mc.player);
 				});
-				Utils.waitTick();
 				return NONE;
 			}
 			case getType:
-				if(container instanceof InventoryScreen)
-					return valueOf("inventory");
-				if (container instanceof EnchantmentScreen)
-					return valueOf("enchantment table");
-				if(container instanceof MerchantScreen)
-					return valueOf("villager");
-				if(container instanceof AnvilScreen)
-					return valueOf("anvil");
-				if(container instanceof BeaconScreen)
-					return valueOf("beacon");
-				if(container instanceof BrewingStandScreen)
-					return valueOf("brewing stand");
-				if(container instanceof ChestScreen)
-					return valueOf("chest");
-				if(container instanceof CraftingScreen)
-					return valueOf("crafting table");
-				if(container instanceof DispenserScreen)
-					return valueOf("dispenser");
-				if(container instanceof FurnaceScreen)
-					return valueOf("furnace");
-				if(container instanceof HopperScreen)
-					return valueOf("hopper");
-				if(container instanceof HorseInventoryScreen)
-					return valueOf("horse inventory");
-				if(container instanceof ShulkerBoxScreen)
-					return valueOf("shulker box");
-				return valueOf(container.getClass().toString());
+				return getType(container);
 			case getTotalSlots: { //as suggested by swadicalrag
 				return valueOf(container.getContainer().inventorySlots.size());
+			}
+			case getMap:{
+				return getMapping().get(getType(container));
 			}
 			default:
 				break;
@@ -198,6 +181,39 @@ public class OpenInventory extends ZeroArgFunction{
 
 	}
 
+	public LuaValue getType(ContainerScreen<?> container) {
+		if(container instanceof InventoryScreen)
+			return valueOf("inventory");
+		if (container instanceof EnchantmentScreen)
+			return valueOf("enchantment table");
+		if(container instanceof MerchantScreen)
+			return valueOf("villager");
+		if(container instanceof AnvilScreen)
+			return valueOf("anvil");
+		if(container instanceof BeaconScreen)
+			return valueOf("beacon");
+		if(container instanceof BrewingStandScreen)
+			return valueOf("brewing stand");
+		if(container instanceof ChestScreen) {
+			if(container.getContainer().inventorySlots.size()==90)
+				return valueOf("double chest");
+			return valueOf("chest");
+		}
+		if(container instanceof CraftingScreen)
+			return valueOf("crafting table");
+		if(container instanceof DispenserScreen)
+			return valueOf("dispenser");
+		if(container instanceof FurnaceScreen)
+			return valueOf("furnace");
+		if(container instanceof HopperScreen)
+			return valueOf("hopper");
+		if(container instanceof HorseInventoryScreen)
+			return valueOf("horse inventory");
+		if(container instanceof ShulkerBoxScreen)
+			return valueOf("shulker box");
+		return valueOf(container.getClass().toString());
+	}
+	
 	private static enum OpCode {
 		close,
 		closeAndDrop,
@@ -208,6 +224,7 @@ public class OpenInventory extends ZeroArgFunction{
 		quick,
 		grabAll,
 		getType,
+		getMap,
 		getTotalSlots,
 		click;
 
@@ -262,7 +279,7 @@ public class OpenInventory extends ZeroArgFunction{
 		mapping.set("double chest", doubleChest);
 		doubleChest.set("contents", quickTable(1, 54));
 		doubleChest.set("main", quickTable(55, 81));
-		doubleChest.set("hotbar", quickTable(55,  63));
+		doubleChest.set("hotbar", quickTable(82,  90));
 
 		LuaTable craft = new LuaTable();
 		mapping.set("crafting table", craft);

@@ -20,6 +20,13 @@ public class GetBlockList extends ZeroArgFunction{
 			t.set(item.getRegistryName().toString(), Utils.itemStackToLuatable(new ItemStack(item)));
 			
 		});
+		Registry.ITEM.forEach((b)->{
+			Item item = b;//Item.getItemFromBlock(b);
+			if(t.get(item.getRegistryName().toString()).isnil())
+				t.set(item.getRegistryName().toString(), Utils.itemStackToLuatable(new ItemStack(item)));
+			
+		});
+		
 		return t;
 	}
 

@@ -389,7 +389,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 	public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
 		if(onKeyPressed!=null)
 			return Utils.pcall(onKeyPressed, 
-					LuaValue.valueOf(keyCode),
+					LuaValue.valueOf(HIDUtils.Keyboard.nameOf(keyCode)),
 					LuaValue.valueOf(scanCode),
 					HIDUtils.Keyboard.modifiersToLuaTable(modifiers)
 				).optboolean(false);
@@ -410,14 +410,14 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 	@Override
 	public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
 		if(onKeyRepeated!=null)
-			return Utils.pcall(onKeyRepeated, LuaValue.valueOf(keyCode),LuaValue.valueOf(scanCode), LuaValue.valueOf(n),HIDUtils.Keyboard.modifiersToLuaTable(modifiers)).optboolean(false);
+			return Utils.pcall(onKeyRepeated, LuaValue.valueOf(HIDUtils.Keyboard.nameOf(keyCode)),LuaValue.valueOf(scanCode), LuaValue.valueOf(n),HIDUtils.Keyboard.modifiersToLuaTable(modifiers)).optboolean(false);
 		return false;
 	}
 
 	@Override
 	public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
 		if(onKeyReleased!=null)
-			return Utils.pcall(onKeyReleased, LuaValue.valueOf(keyCode), LuaValue.valueOf(scanCode), HIDUtils.Keyboard.modifiersToLuaTable(modifiers)).optboolean(false);
+			return Utils.pcall(onKeyReleased, LuaValue.valueOf(HIDUtils.Keyboard.nameOf(keyCode)), LuaValue.valueOf(scanCode), HIDUtils.Keyboard.modifiersToLuaTable(modifiers)).optboolean(false);
 		return false;
 	}
 
