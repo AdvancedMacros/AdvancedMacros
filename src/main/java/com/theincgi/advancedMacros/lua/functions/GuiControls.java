@@ -112,6 +112,7 @@ public class GuiControls {
 	private static class DoRepair extends VarArgFunction {
 		RepairOp op;
 		AnvilScreen gr;
+		Method renameItem = ObfuscationReflectionHelper.findMethod(AnvilScreen.class, /*"renameItem",*/ "func_214075_a", new Class[] {String.class}); //TESTME is this the right func? should be
 		
 		//Field anvil = ReflectionHelper.findField(AnvilScreen.class, "anvil", "w", "field_147092_v");
 		Field nameField = ObfuscationReflectionHelper.findField(AnvilScreen.class, "field_147091_w");
@@ -147,7 +148,7 @@ public class GuiControls {
 					nameField.setAccessible(true);
 					TextFieldWidget gtf = (TextFieldWidget) nameField.get(gr);
 					gtf.setText(args.arg1().checkjstring());
-					renameItem.invoke(gr, "");
+					renameItem.invoke(gr, new Object[] {});
 					return NONE;
 				} catch (SecurityException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 					throw new LuaError(e);
