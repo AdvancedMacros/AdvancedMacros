@@ -665,9 +665,9 @@ public class GuiControls {
 			try {
 				switch (op) {
 				case getLowerLabel: 
-					return valueOf( ((PlayerInventory)playerInv.get(gc)).getDisplayName().getUnformattedComponentText() );
+					return valueOf( Utils.fromMinecraftColorCodes(((PlayerInventory)playerInv.get(gc)).getDisplayName().getFormattedText()) );
 				case getUpperLabel:
-					return valueOf(	gc.getTitle().getUnformattedComponentText() );
+					return valueOf(	Utils.fromMinecraftColorCodes(gc.getTitle().getFormattedText()) );
 				}
 			}catch (Exception e) {
 				e.printStackTrace();

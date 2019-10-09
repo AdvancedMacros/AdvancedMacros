@@ -86,6 +86,7 @@ public class OpenInventory extends ZeroArgFunction{
 					int slotA = args.arg1().checkint();
 					int mouseButton = args.optint(2, 0);
 					ClickType type = ClickType.PICKUP;
+					if(mouseButton==2) type = ClickType.CLONE;
 					ctrl.windowClick(wID, slotA-1, mouseButton, type, mc.player);
 				});
 				return NONE;
