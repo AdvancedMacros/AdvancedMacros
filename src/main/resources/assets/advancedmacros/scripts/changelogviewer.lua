@@ -18,6 +18,19 @@ local changeLog = {
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
   "&a&BBug Fixes:",
+  " - Fixed MMB not working with inventory controls",
+  " - Fixed MC text bar for script gui's",
+  "   changed key event to use key name",
+  " - Anvil controls doesn't cause error anymore",
+  "&e&BOther:",
+  " - Item stacks include creative tab details now",
+
+  
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 9.0.1",
+  "&a&BBug Fixes:",
   " - Fixed a crash with player &ejoin/leave event &7...in single player...",
   " - &dTaskDispatcher&f is quiet now (console) &7[Internal]",
   " - Text editor has clipboard functionality again",

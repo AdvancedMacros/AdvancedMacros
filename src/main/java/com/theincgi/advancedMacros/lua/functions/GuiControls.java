@@ -148,7 +148,7 @@ public class GuiControls {
 					nameField.setAccessible(true);
 					TextFieldWidget gtf = (TextFieldWidget) nameField.get(gr);
 					gtf.setText(args.arg1().checkjstring());
-					renameItem.invoke(gr, new Object[] {});
+					renameItem.invoke(gr, "");
 					return NONE;
 				} catch (SecurityException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 					throw new LuaError(e);
