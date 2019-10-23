@@ -147,6 +147,8 @@ public class BufferedImageControls extends LuaTable{
 			public LuaValue call() {
 				if (dynamicTexture != null) { 
 					TaskDispatcher.addTask(()->{ //changed to non blocking to prevent possible thread locks
+						GlStateManager.bindTexture(0);
+						dynamicTexture.bindTexture();
 						Utils.updateNativeImage(img, dynamicTexture.getTextureData()); //TODO see if this can be moved outside the TaskDispatcher's call
 						dynamicTexture.updateDynamicTexture();
 					});
