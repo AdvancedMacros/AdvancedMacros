@@ -239,6 +239,8 @@ public class PopupPrompt2 extends Gui{
 			if(keyCode == GLFW.GLFW_KEY_ENTER) {
 				ok.getOnClickHandler().onClick(-1, ok);
 				return true;
+			}else {
+				if(textField.keyPressed(keyCode, scanCode, modifiers)) return true;
 			}
 		return false;
 	}
