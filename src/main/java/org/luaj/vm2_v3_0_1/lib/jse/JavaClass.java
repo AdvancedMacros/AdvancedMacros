@@ -189,7 +189,7 @@ class JavaClass extends JavaInstance implements CoerceJavaToLua.Coercion {
 		if ( innerclasses == null ) {
 			Map m = new HashMap();
 			Class[] c = ((Class)m_instance).getClasses();
-			for ( int i=0; i<c.length; i++ ) {
+			for ( int i=c.length-1; i>=0; i-- ) { //theincgi reversed, should not get super class X if child has X as well
 				Class ci = c[i];
 				String name = ci.getName();
 				String stub = name.substring(Math.max(name.lastIndexOf('$'), name.lastIndexOf('.'))+1);

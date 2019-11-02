@@ -89,6 +89,8 @@ public class LuajavaLib extends VarArgFunction {
 	static final int NEW			= 3;
 	static final int CREATEPROXY	= 4;
 	static final int LOADLIB		= 5;
+	static final int GETMETHOD      = 6; //class.x defaults to field if a matching method also exists
+
 
 	static final String[] NAMES = {
 		"bindClass", 
@@ -96,6 +98,7 @@ public class LuajavaLib extends VarArgFunction {
 		"new", 
 		"createProxy", 
 		"loadLib",
+		"getMethod",
 	};
 	
 	static final int METHOD_MODIFIERS_VARARGS = 0x80;
@@ -160,6 +163,24 @@ public class LuajavaLib extends VarArgFunction {
 				} else {
 					return NIL;
 				}
+			}
+			case GETMETHOD:{ //TheIncgi
+				LuaValue clazz = args.arg1();
+				LuaValue m;
+				if((clazz instanceof JavaClass)) {
+					m = ((JavaClass)clazz).getMethod(args.arg(2));
+					if ( m != null )
+						return m;
+				}else if(clazz instanceof JavaInstance) {
+					JavaInstance ji = (JavaInstance)clazz;
+					if(ji.jclass == null) {
+							ji.jclass = JavaClass.forClass(ji.m_instance.getClass());
+					}
+					m = ji.jclass.getMethod(args.arg(2));
+					if(m!=null) return m;
+				}
+				return NIL;
+				
 			}
 			default:
 				throw new LuaError("not yet supported: "+this);

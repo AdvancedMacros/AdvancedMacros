@@ -264,7 +264,7 @@ public class GuiControls {
 					AdvancedMacros.getMinecraft().displayGuiScreen(null);
 					return NONE;
 				case setLine:
-					ts.signText[args.checkint(1)] = new StringTextComponent(args.optjstring(2, ""));
+					ts.signText[args.checkint(1)-1] = new StringTextComponent(args.optjstring(2, ""));
 					return NONE;
 					//				case setFormatedLine:
 					//					ts.signText[args.checkint(1)] = new TextComponentString(Utils.toMinecraftColorCodes(args.checkjstring(2)));
