@@ -149,7 +149,7 @@ public class GetPlayer extends OneArgFunction {
 			}
 		}
 		t.set("entityID", valueOf(player.getEntityId()));
-		t.set("gamemode", player.isSpectator()?"spectator":player.isCreative()?"creative":"survival");
+		t.set("gamemode", player.isSpectator()?"spectator":player.isCreative()?"creative":"survival"); //FIXME ... adventure?
 		
 		if(player.equals(AdvancedMacros.getMinecraft().player)) {
 			t.set("target", Utils.rayTraceResultToLuaValue(AdvancedMacros.getMinecraft().objectMouseOver));

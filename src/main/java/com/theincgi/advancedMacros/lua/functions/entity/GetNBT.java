@@ -22,11 +22,12 @@ public class GetNBT {
 	public static class GetPlayerNBT extends OneArgFunction {
 		@Override
 		public LuaValue call(LuaValue arg) {
-			AbstractClientPlayerEntity  acpe;
+			AbstractClientPlayerEntity  acpe = null;
 			if(arg.isnil()) {
 				acpe = AdvancedMacros.getMinecraft().player;
 			}
-			acpe = Utils.findPlayerByName(AdvancedMacros.getMinecraft().world, arg.checkjstring());
+			if(acpe==null)
+				acpe = Utils.findPlayerByName(AdvancedMacros.getMinecraft().world, arg.checkjstring());
 			if(acpe!=null)
 				return getNbt(acpe);
 

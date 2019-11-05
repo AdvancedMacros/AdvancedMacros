@@ -87,9 +87,8 @@ public class MinecraftSettings extends LuaTable {
 				mc.gameSettings.framerateLimit = Math.max(1, args.checkint(1));
 				return NONE;
 			case getSmoothLighting:{
-				String mode = "INVALID";
 				name = mc.gameSettings.ambientOcclusionStatus.name().toLowerCase();
-				return valueOf(mode);
+				return valueOf(name);
 			}
 			case getChatHeightFocused:
 				return valueOf(mc.gameSettings.chatHeightFocused);
@@ -214,7 +213,8 @@ public class MinecraftSettings extends LuaTable {
 					throw new LuaError("Invalid scale [auto/small/normal/large]");
 				}
 				return NONE;
-			case setHeldItemTooltips:
+				//@Deprecated
+			case setHeldItemTooltips: //FIXME duplicate
 				mc.gameSettings.advancedItemTooltips = args.checkboolean(1);
 				return NONE;
 			case setInvertMouse:

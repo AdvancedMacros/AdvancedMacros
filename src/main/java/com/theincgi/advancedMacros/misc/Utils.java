@@ -433,7 +433,7 @@ public class Utils {
 		ToolType tool = block.getHarvestTool(blockState);
 		if(tool!=null)
 			out.set("harvestTool", tool.getName().toLowerCase());
-
+		
 		return out;
 	}
 	public static boolean itemsEqual(ItemStack sourceStack, ItemStack sinkStack) {
