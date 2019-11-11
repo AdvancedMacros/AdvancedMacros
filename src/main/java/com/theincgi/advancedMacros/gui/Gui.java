@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -84,7 +85,11 @@ public class Gui extends Screen implements INestedGuiEventHandler {
 		keyRepeatDelay.put(scanCode, System.currentTimeMillis());
 		if(nextKeyListen!=null && nextKeyListen.onKeyPressed(this, keyCode, scanCode, modifiers)){nextKeyListen = null; return true;}
 		if(firstSubsciber!=null && firstSubsciber.onKeyPressed(this, keyCode, scanCode, modifiers)){return true;}
-		if(super.keyPressed(keyCode,scanCode, modifiers)) return true;
+		
+		if (keyCode == GLFW.GLFW_KEY_ESCAPE && this.shouldCloseOnEsc()) {
+	         this.onClose();
+	         return true;
+		}
 		//heldKeys.add(new KeyTime(keyCode, typedChar));
 		synchronized (inputSubscribers) {
 			for (InputSubscriber inputSubscriber : inputSubscribers) {

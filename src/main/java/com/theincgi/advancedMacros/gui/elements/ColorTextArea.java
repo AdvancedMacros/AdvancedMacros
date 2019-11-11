@@ -939,7 +939,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		case GLFW.GLFW_KEY_TAB:
 			if(!isEditable){return false;}
 			for(int i = 0; i<propPalette.getValue("tabCount").optint(2); i++)
-				onKeyPressed(gui, ' ', 0, 0);
+				onCharTyped(gui, ' ', 0);
 			setNeedsSaveFlag(true);
 			break;
 		case GLFW.GLFW_KEY_MENU:
@@ -1076,7 +1076,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 				GLFW.GLFW_KEY_LEFT_ALT, GLFW.GLFW_KEY_RIGHT_ALT, GLFW.GLFW_KEY_CAPS_LOCK,
 				GLFW.GLFW_KEY_SCROLL_LOCK, GLFW.GLFW_KEY_PAUSE};
 		if(typedChar==0)
-			return false;
+			return keyCode==GLFW.GLFW_KEY_BACKSPACE || keyCode==GLFW.GLFW_KEY_DELETE;
 		for (int i : blacklist) {
 			if(keyCode==i)
 				return false;

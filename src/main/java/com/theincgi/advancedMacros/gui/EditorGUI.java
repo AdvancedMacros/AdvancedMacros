@@ -125,6 +125,11 @@ public class EditorGUI extends Gui{
 		ColorTextArea.updateKeywords();
 	}
 	@Override
+	public void onOpen() {
+		super.onOpen();
+		cta.setFocused(true);
+	}
+	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
 		if(super.mouseClicked(mouseX, mouseY, mouseButton)) return true;
 		gtf.mouseClicked(mouseX, mouseY, mouseButton);

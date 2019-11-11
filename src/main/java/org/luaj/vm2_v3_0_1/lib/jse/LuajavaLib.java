@@ -23,10 +23,16 @@ package org.luaj.vm2_v3_0_1.lib.jse;
 
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
 
 import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LuaError;
@@ -90,6 +96,13 @@ public class LuajavaLib extends VarArgFunction {
 	static final int CREATEPROXY	= 4;
 	static final int LOADLIB		= 5;
 	static final int GETMETHOD      = 6; //class.x defaults to field if a matching method also exists
+	static final int GETFIELD       = 7;
+	static final int GETDECLAREDMETHODS=8;
+	static final int GETDECLAREDFIELDS =9;
+	static final int GETSUPERCLASS  = 10;
+	static final int GETINTERFACES  = 11;
+	static final int INSTANCEOF     = 12;
+	static final int GETINNERCLASSES= 13;
 
 
 	static final String[] NAMES = {
@@ -99,6 +112,13 @@ public class LuajavaLib extends VarArgFunction {
 		"createProxy", 
 		"loadLib",
 		"getMethod",
+		"getField",
+		"getDeclaredMethods",
+		"getDeclaredFields",
+		"getSuperClass",
+		"getInterfaces",
+		"instanceof",
+		"getInnerClasses"
 	};
 	
 	static final int METHOD_MODIFIERS_VARARGS = 0x80;
@@ -164,7 +184,7 @@ public class LuajavaLib extends VarArgFunction {
 					return NIL;
 				}
 			}
-			case GETMETHOD:{ //TheIncgi
+			case GETMETHOD:{ //TheIncgi until default:
 				LuaValue clazz = args.arg1();
 				LuaValue m;
 				if((clazz instanceof JavaClass)) {
@@ -181,6 +201,167 @@ public class LuajavaLib extends VarArgFunction {
 				}
 				return NIL;
 				
+			}
+			case GETFIELD:{ //TODO test me
+				LuaValue clazz = args.arg1();
+				LuaValue m;
+				if((clazz instanceof JavaClass)) {
+					m = CoerceJavaToLua.coerce(((JavaClass)clazz).getField(args.arg(2)).get(clazz));
+					if ( m != null )
+						return m;
+				}else if(clazz instanceof JavaInstance) {
+					JavaInstance ji = (JavaInstance)clazz;
+					if(ji.jclass == null) {
+							ji.jclass = JavaClass.forClass(ji.m_instance.getClass());
+					}
+					m = CoerceJavaToLua.coerce(ji.jclass.getField(args.arg(2)).get(ji));
+					if(m!=null) return m;
+				}
+				return NIL;
+			}
+			case GETDECLAREDMETHODS:{
+				LuaValue clazz = args.arg1();
+				LuaTable out = new LuaTable();
+				HashMap<String, ArrayList<JavaMethod>> namedLists = new HashMap<>();
+				if(clazz instanceof JavaInstance) {
+					JavaInstance ji = (JavaInstance)clazz;
+					if(ji.jclass == null) 
+							ji.jclass = JavaClass.forClass(ji.m_instance.getClass());
+					clazz = ji.jclass;
+				}
+				if((clazz instanceof JavaClass)) {
+					JavaClass jc = (JavaClass) clazz;
+					if(jc.m_instance instanceof Class ) {
+						Class<?> theClass = (Class<?>) jc.m_instance;
+						Method[] m = theClass.getDeclaredMethods();
+						for ( int i=0; i<m.length; i++ ) {
+							Method mi = m[i];
+							String name = mi.getName();
+							namedLists.computeIfAbsent(name, e->{return new ArrayList<>();}).add(JavaMethod.forMethod(mi));
+							
+							try {
+								mi.setAccessible(true);
+							} catch (SecurityException s) {}
+						}
+						for(Entry<String, ArrayList<JavaMethod>> e : namedLists.entrySet()) {
+							out.set(e.getKey(), e.getValue().size() > 1?
+									new JavaMethod.Overload(e.getValue().toArray(new JavaMethod[e.getValue().size()])) :
+									e.getValue().get(0)
+									);
+						}
+					}
+				}
+				return out;
+			}
+			case GETDECLAREDFIELDS:{
+				LuaValue clazz = args.arg1();
+				LuaTable out = new LuaTable();
+				
+				if(clazz instanceof JavaInstance) {
+					JavaInstance ji = (JavaInstance)clazz;
+					if(ji.jclass == null) 
+							ji.jclass = JavaClass.forClass(ji.m_instance.getClass());
+					clazz = ji.jclass;
+				}
+				if((clazz instanceof JavaClass)) {
+					JavaClass jc = (JavaClass) clazz;
+					if(jc.m_instance instanceof Class ) {
+						Class<?> theClass = (Class<?>) jc.m_instance;
+						Field[] fs = theClass.getDeclaredFields();
+						for ( int i=0; i<fs.length; i++ ) {
+							Field f = fs[i];
+							String name = f.getName();
+							out.set(out.length()+1,name);
+							try {
+								f.setAccessible(true);
+							} catch (SecurityException s) {}
+						}
+					}
+				}
+				return out;
+			}
+			case GETSUPERCLASS:{
+				LuaValue clazz = args.arg1();
+				
+				if(clazz instanceof JavaInstance) {
+					JavaInstance ji = (JavaInstance)clazz;
+					if(ji.jclass == null) 
+							ji.jclass = JavaClass.forClass(ji.m_instance.getClass());
+					clazz = ji.jclass;
+				}
+				if((clazz instanceof JavaClass)) {
+					JavaClass jc = (JavaClass) clazz;
+					if(jc.m_instance instanceof Class ) {
+						return JavaClass.forClass( ((Class<?>)jc.m_instance).getSuperclass() );
+					}
+				}
+				return NIL;
+			}
+			case GETINTERFACES:{
+				LuaValue clazz = args.arg1();
+				LuaTable out = new LuaTable();
+				
+				if(clazz instanceof JavaInstance) {
+					JavaInstance ji = (JavaInstance)clazz;
+					if(ji.jclass == null) 
+							ji.jclass = JavaClass.forClass(ji.m_instance.getClass());
+					clazz = ji.jclass;
+				}
+				if((clazz instanceof JavaClass)) {
+					JavaClass jc = (JavaClass) clazz;
+					if(jc.m_instance instanceof Class ) {
+						Class<?> theClass = (Class<?>)jc.m_instance;
+						Class<?>[] interfaces = theClass.getInterfaces();
+						for(int i = 0; i<interfaces.length; i++)
+							out.set(i+1, JavaClass.forClass(interfaces[i]));
+					}
+				}
+				return out;
+			}
+			case INSTANCEOF:{
+				LuaValue clazz2 = args.arg(2);
+				LuaValue ji1    = args.arg(1);
+
+				JavaInstance ji;
+				if(ji1 instanceof JavaInstance) {
+					ji = (JavaInstance)ji1;
+					if(ji.jclass == null) 
+							ji.jclass = JavaClass.forClass(ji.m_instance.getClass());
+				}else {
+					throw new LuaError("Arg 1 must be instance of java object");
+				}
+				JavaClass jc2;
+				if(clazz2 instanceof JavaInstance) {
+					jc2 = (JavaClass) clazz2;
+					if(jc2.m_instance instanceof Class) {
+						return valueOf(((Class<?>)jc2.m_instance).isInstance( ji ));
+					}else{
+						throw new LuaError("Arg 2 must be an instance of a java class");
+					}
+				}else {
+					throw new LuaError("Arg 2 must be an instance of a java class");
+				}
+			}
+			case GETINNERCLASSES:{
+				LuaValue clazz = args.arg1();
+				LuaTable out = new LuaTable();
+				
+				if(clazz instanceof JavaInstance) {
+					JavaInstance ji = (JavaInstance)clazz;
+					if(ji.jclass == null) 
+							ji.jclass = JavaClass.forClass(ji.m_instance.getClass());
+					clazz = ji.jclass;
+				}
+				if((clazz instanceof JavaClass)) {
+					JavaClass jc = (JavaClass) clazz;
+					if(jc.m_instance instanceof Class ) {
+						Class<?> theClass = (Class<?>)jc.m_instance;
+						Class<?>[] innerClasses = theClass.getDeclaredClasses();
+						for(int i = 0; i<innerClasses.length; i++)
+							out.set(i+1, JavaClass.forClass(innerClasses[i]));
+					}
+				}
+				return out;
 			}
 			default:
 				throw new LuaError("not yet supported: "+this);

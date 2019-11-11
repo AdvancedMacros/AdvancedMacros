@@ -17,6 +17,18 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  "&bFeatures:",
+  " - This update &dbuffs&f the &aluajava&f library so you can target methods and",
+  "   fields more easily.",
+  "   You can also list properties of classes now such as methods, fields, parent class,",
+  "   interfaces, and inner classes.",
+  "&aBug Fixes:",
+  " - Editor crashed when typing after backspacing a selection",
+  " - Tabs are passed to gui's again",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 9.0.2",
   "&aBug Fixes:",
   " - LuaJava Access now prefers child class over parent when both provide the same class or attribute",
   " - Sign controls now output on the correct line, previously off by 1",

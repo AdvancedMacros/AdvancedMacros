@@ -54,9 +54,8 @@ class JavaClass extends JavaInstance implements CoerceJavaToLua.Coercion {
 	static final Map classes = Collections.synchronizedMap(new HashMap());
 
 	static final LuaValue NEW = valueOf("new");
-
-	Map fields;
-	Map methods;
+	Map<LuaValue, Field> fields;
+	Map<LuaValue, LuaValue> methods;
 	Map innerclasses;
 
 	static JavaClass forClass(Class c) {
@@ -114,7 +113,7 @@ class JavaClass extends JavaInstance implements CoerceJavaToLua.Coercion {
 		boolean allowPrivate = checkPrivateAccessSetting();
 
 		if ( methods == null ) {
-			Map namedlists = new HashMap();
+			Map namedlists = new HashMap<>();
 			Method[] m = ((Class)m_instance).getMethods();
 			for ( int i=0; i<m.length; i++ ) {
 				Method mi = m[i];
@@ -149,7 +148,7 @@ class JavaClass extends JavaInstance implements CoerceJavaToLua.Coercion {
 					}
 				}
 			}
-			Map map = new HashMap();
+			Map map = new HashMap<>();
 			Constructor[] c = ((Class)m_instance).getConstructors();
 			List list = new ArrayList();
 			for ( int i=0; i<c.length; i++ ) 
