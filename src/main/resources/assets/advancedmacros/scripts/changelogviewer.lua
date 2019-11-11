@@ -17,6 +17,20 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  "&aBug Fixes:",
+  " - LuaJava Access now prefers child class over parent when both provide the same class or attribute",
+  " - Sign controls now output on the correct line, previously off by 1",
+  " - Popup prompts for file name now accept control keys such as backspace",
+  " - Luajava will now prefer no args method over varargs method if no args are provided",
+  " - LuaJava now has a &bgetMethod&f function for selecting a method where a field name overlaps",
+  " - Getting the minecraft setting for smooth lighting will not return 'invalid' now",
+  " - Fixed a case where getPlayerNbt could return nothing if not using a player name",
+  " - &bgetPlayer&f().&eteam&f now returns &dfalse&f instead of '&6none&f' when no team is found",
+  
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 9.0.2",
   "&a&BBug Fixes:",
   " - Fixed MMB not working with inventory controls",
   " - Fixed MC text bar for script gui's",
@@ -24,7 +38,6 @@ local changeLog = {
   " - Anvil controls doesn't cause error anymore",
   "&e&BOther:",
   " - Item stacks include creative tab details now",
-
   
   
   "&7"..DIVIDER,

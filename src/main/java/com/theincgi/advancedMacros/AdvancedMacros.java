@@ -513,7 +513,7 @@ public class AdvancedMacros {
 	//		return (); //lik srsly;
 	//	} //TODO
 	public static Minecraft getMinecraft() {
-		if (mc == null) mc = Minecraft.getInstance();
+		if (mc == null) mc = Minecraft.getInstance(); 
 		return mc;
 	}
 
