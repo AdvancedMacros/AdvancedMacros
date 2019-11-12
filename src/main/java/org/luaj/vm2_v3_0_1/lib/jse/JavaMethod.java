@@ -143,7 +143,7 @@ class JavaMethod extends JavaMember {
 			int score = CoerceLuaToJava.SCORE_UNCOERCIBLE;
 			for ( int i=0; i<methods.length; i++ ) {
 				int s = methods[i].score(args);
-				if(methods[i].method.isVarArgs())s++; //theincgi
+				if(methods[i].method.isVarArgs() && args.narg()==0)s++; //theincgi
 				if ( s < score ) {
 					score = s;
 					best = methods[i];

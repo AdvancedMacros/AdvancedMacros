@@ -56,7 +56,7 @@ class JavaMember extends VarArgFunction {
 	
 	int score(Varargs args) {
 		int n = args.narg();
-		int s = n>fixedargs.length? CoerceLuaToJava.SCORE_WRONG_TYPE * (n-fixedargs.length): 0;
+		int s = n>fixedargs.length && varargs==null? CoerceLuaToJava.SCORE_WRONG_TYPE * (n-fixedargs.length): 0;
 		for ( int j=0; j<fixedargs.length; j++ )
 			s += fixedargs[j].score( args.arg(j+1) );
 		if ( varargs != null )

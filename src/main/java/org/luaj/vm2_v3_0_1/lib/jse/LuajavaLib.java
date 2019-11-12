@@ -103,6 +103,8 @@ public class LuajavaLib extends VarArgFunction {
 	static final int GETINTERFACES  = 11;
 	static final int INSTANCEOF     = 12;
 	static final int GETINNERCLASSES= 13;
+	static final int DESCRIBEMETHOD = 14;
+	static final int SPLITOVERLOADED =15;
 
 
 	static final String[] NAMES = {
@@ -118,7 +120,9 @@ public class LuajavaLib extends VarArgFunction {
 		"getSuperClass",
 		"getInterfaces",
 		"instanceof",
-		"getInnerClasses"
+		"getInnerClasses",
+		"describeMethod",
+		"splitOverloaded"
 	};
 	
 	static final int METHOD_MODIFIERS_VARARGS = 0x80;
@@ -363,6 +367,33 @@ public class LuajavaLib extends VarArgFunction {
 				}
 				return out;
 			}
+			case DESCRIBEMETHOD:{
+				LuaValue arg1 = args.arg1();
+				if(arg1 instanceof JavaMethod.Overload) {
+					JavaMethod.Overload ol = (JavaMethod.Overload)arg1;
+					LuaTable out = new LuaTable();
+					for(int i = 0; i<ol.methods.length; i++)
+						out.set(i+1, getMethodDescriptor(ol.methods[i].method));
+					return out;
+				}else if(arg1 instanceof JavaMethod) {
+					JavaMethod jm = (JavaMethod) arg1;
+					return valueOf(getMethodDescriptor(jm.method));
+				}else
+					throw new LuaError("Expected java method, got "+arg1.typename());
+			}
+			case SPLITOVERLOADED:{
+				LuaValue arg1 = args.arg1();
+				if(arg1 instanceof JavaMethod.Overload) {
+					JavaMethod.Overload ol = (JavaMethod.Overload)arg1;
+					LuaTable out = new LuaTable();
+					for (int i = 0; i < ol.methods.length; i++) {
+						out.set(i+1, ol.methods[i]);
+					}
+					return out;
+				}else if(arg1 instanceof JavaMethod)
+					return arg1;
+				throw new LuaError("Expected overloaded java method, got "+arg1.typename());
+			}
 			default:
 				throw new LuaError("not yet supported: "+this);
 			}
@@ -411,6 +442,44 @@ public class LuajavaLib extends VarArgFunction {
 			LuaValue result = func.invoke(v).arg1();
 			return CoerceLuaToJava.coerce(result, method.getReturnType());
 		}
+	}
+	
+	//https://stackoverflow.com/a/32155781
+	static String getDescriptorForClass(final Class c)
+	{
+	    if(c.isPrimitive())
+	    {
+	        if(c==byte.class)
+	            return "B";
+	        if(c==char.class)
+	            return "C";
+	        if(c==double.class)
+	            return "D";
+	        if(c==float.class)
+	            return "F";
+	        if(c==int.class)
+	            return "I";
+	        if(c==long.class)
+	            return "J";
+	        if(c==short.class)
+	            return "S";
+	        if(c==boolean.class)
+	            return "Z";
+	        if(c==void.class)
+	            return "V";
+	        throw new RuntimeException("Unrecognized primitive "+c);
+	    }
+	    if(c.isArray()) return c.getName().replace('.', '/');
+	    return ('L'+c.getName()+';').replace('.', '/');
+	}
+
+	static String getMethodDescriptor(Method m)
+	{
+ 	    String s="(";
+	    for(final Class c:(m.getParameterTypes()))
+	        s+=getDescriptorForClass(c);
+	    s+=')';
+	    return s+getDescriptorForClass(m.getReturnType());
 	}
 	
 }
