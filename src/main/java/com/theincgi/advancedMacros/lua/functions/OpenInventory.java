@@ -92,6 +92,19 @@ public class OpenInventory extends ZeroArgFunction{
 				});
 				return NONE;
 			}
+			case dragClick:{
+				TaskDispatcher.addTask(()->{
+					LuaValue slots = args.arg1().checktable();
+					int mouseButton = args.optint(2, 0) == 0 ? 1 : 5;
+					ctrl.windowClick(wID, -999, mouseButton-1, ClickType.QUICK_CRAFT, mc.player);
+					for (int i = 1; i <= slots.length(); i++) {
+						int slot = slots.get(i).checkint();
+						ctrl.windowClick(wID, slot-1, mouseButton, ClickType.QUICK_CRAFT, mc.player);
+					}
+					ctrl.windowClick(wID, -999, mouseButton+1, ClickType.QUICK_CRAFT, mc.player);
+				});
+				return NONE;
+			}
 			case closeAndDrop:
 				TaskDispatcher.addTask(()->{
 					ItemStack held = mc.player.inventory.getItemStack();
@@ -228,7 +241,8 @@ public class OpenInventory extends ZeroArgFunction{
 		getType,
 		getMap,
 		getTotalSlots,
-		click;
+		click,
+		dragClick;
 
 		public String[] getDocLocation() {
 			return new String[] {"openInventory()", name()};
