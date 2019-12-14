@@ -18,6 +18,7 @@ import com.theincgi.advancedMacros.gui.elements.GuiDropDown.OnSelectHandler;
 import com.theincgi.advancedMacros.gui2.PopupPrompt2.Result;
 import com.theincgi.advancedMacros.gui2.PopupPrompt2.ResultHandler;
 import com.theincgi.advancedMacros.misc.HIDUtils.Keyboard;
+import com.theincgi.advancedMacros.misc.HIDUtils.Mouse;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -567,7 +568,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber, IBinding
 			}
 			eventSelector.select(tojstring);
 		}else{
-			if(Keyboard.codeOf(tojstring)!=Keyboard.UNKNOWN_KEY_CODE)
+			if(Keyboard.codeOf(tojstring)!=Keyboard.UNKNOWN_KEY_CODE || Mouse.codeOf(tojstring)!=Mouse.UNKNOWN_MOUSE_BUTTON)
 				eventSelector.dispText = tojstring;
 		}
 	}
