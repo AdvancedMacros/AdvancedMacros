@@ -266,7 +266,8 @@ public class OpenInventory extends ZeroArgFunction{
 		LuaTable craft = new LuaTable();
 		mapping.set("crafting table", craft);
 		craft.set("craftingIn", quickTable(2, 10));
-		craft.set("craftOut", 1);
+		craft.set("craftingOut", 1);
+		craft.set("craftOut", 1); // FIXME: This needs to be removed in the next major release.
 		craft.set("main", quickTable(11, 37));
 		craft.set("hotbar", quickTable(38, 46));
 
