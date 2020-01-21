@@ -29,7 +29,7 @@ public class GetSound extends OneArgFunction{
 	}
 	
 	
-	public static LuaTable play(File f) {
+	public static LuaTable play(File f) { //rename
 		try {
 			final Clip clip = AudioSystem.getClip();
 			clip.open(AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(f))));
@@ -99,7 +99,7 @@ public class GetSound extends OneArgFunction{
 		private class Pause extends ZeroArgFunction{
 			@Override
 			public LuaValue call() {
-				paused = true;
+				paused = true; //TODO  If desired, the retained data can bediscarded by invoking the flush method.When audio capture or playback stops, a STOP event is generated.
 				c.stop();
 				return LuaValue.FALSE;
 			}

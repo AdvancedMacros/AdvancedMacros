@@ -214,8 +214,8 @@ public class MinecraftSettings extends LuaTable {
 				}
 				return NONE;
 				//@Deprecated
-			case setHeldItemTooltips: //FIXME duplicate
-				mc.gameSettings.advancedItemTooltips = args.checkboolean(1);
+			case setHeldItemTooltips: 
+				mc.gameSettings.heldItemTooltips = args.checkboolean(1);
 				return NONE;
 			case setInvertMouse:
 				mc.gameSettings.invertMouse = args.checkboolean(1);
