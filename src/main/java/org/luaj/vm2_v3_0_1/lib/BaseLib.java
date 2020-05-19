@@ -27,7 +27,6 @@ import java.io.InputStream;
 import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.Lua;
 import org.luaj.vm2_v3_0_1.LuaError;
-import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaString;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaThread;

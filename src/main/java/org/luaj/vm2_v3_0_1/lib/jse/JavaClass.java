@@ -32,12 +32,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.UUID;
 
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 
-import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.Settings;
 
 /**
@@ -56,9 +54,8 @@ class JavaClass extends JavaInstance implements CoerceJavaToLua.Coercion {
 	static final Map classes = Collections.synchronizedMap(new HashMap());
 
 	static final LuaValue NEW = valueOf("new");
-
-	Map fields;
-	Map methods;
+	Map<LuaValue, Field> fields;
+	Map<LuaValue, LuaValue> methods;
 	Map innerclasses;
 
 	static JavaClass forClass(Class c) {
@@ -116,7 +113,7 @@ class JavaClass extends JavaInstance implements CoerceJavaToLua.Coercion {
 		boolean allowPrivate = checkPrivateAccessSetting();
 
 		if ( methods == null ) {
-			Map namedlists = new HashMap();
+			Map namedlists = new HashMap<>();
 			Method[] m = ((Class)m_instance).getMethods();
 			for ( int i=0; i<m.length; i++ ) {
 				Method mi = m[i];
@@ -151,7 +148,7 @@ class JavaClass extends JavaInstance implements CoerceJavaToLua.Coercion {
 					}
 				}
 			}
-			Map map = new HashMap();
+			Map map = new HashMap<>();
 			Constructor[] c = ((Class)m_instance).getConstructors();
 			List list = new ArrayList();
 			for ( int i=0; i<c.length; i++ ) 
@@ -177,7 +174,7 @@ class JavaClass extends JavaInstance implements CoerceJavaToLua.Coercion {
 		return (LuaValue) methods.get(key);
 	}
 
-	private boolean checkPrivateAccessSetting() {
+	private boolean checkPrivateAccessSetting() { //TODO make this a setting of _T
 		LuaValue luajavaSettings;
 		if(!(luajavaSettings = Settings.settings.get("luajava")).istable())
 			Settings.settings.set("luajava", luajavaSettings = new LuaTable());
@@ -191,7 +188,7 @@ class JavaClass extends JavaInstance implements CoerceJavaToLua.Coercion {
 		if ( innerclasses == null ) {
 			Map m = new HashMap();
 			Class[] c = ((Class)m_instance).getClasses();
-			for ( int i=0; i<c.length; i++ ) {
+			for ( int i=c.length-1; i>=0; i-- ) { //theincgi reversed, should not get super class X if child has X as well
 				Class ci = c[i];
 				String name = ci.getName();
 				String stub = name.substring(Math.max(name.lastIndexOf('$'), name.lastIndexOf('.'))+1);
