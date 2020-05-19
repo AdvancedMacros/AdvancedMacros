@@ -27,7 +27,6 @@ import org.luaj.vm2_v3_0_1.lib.jse.LuajavaLib;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Gui;
