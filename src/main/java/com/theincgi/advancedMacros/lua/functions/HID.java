@@ -50,7 +50,7 @@ public class HID {
 					default: tmp = NIL;
 					}
 					if(args.narg()==1) return tmp;
-					out.set(tmp.arg(i).checkjstring(), tmp);
+					out.set(args.arg(i).checkjstring(), tmp);
 				}
 			}
 			return out;

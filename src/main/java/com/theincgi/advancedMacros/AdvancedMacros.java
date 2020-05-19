@@ -392,7 +392,7 @@ public class AdvancedMacros {
 								className = className.replace('/', '.');
 								try {
 									Class c = cl.loadClass(className);
-									if(c.getName().contains("DL4J4Lua"))
+									if(c.getName().contains("DL4J4Lua")) //TODO remove test code...
 										System.out.println("");
 
 									if(LuaPlugin.class.isAssignableFrom(c)) {
@@ -513,7 +513,7 @@ public class AdvancedMacros {
 	//		return (); //lik srsly;
 	//	} //TODO
 	public static Minecraft getMinecraft() {
-		if (mc == null) mc = Minecraft.getInstance(); 
+		if (mc == null) mc = Minecraft.getInstance();
 		return mc;
 	}
 

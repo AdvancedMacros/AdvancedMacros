@@ -198,7 +198,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber, IBinding
 //			}
 //		});
 		pickScript.setOnClick((int mb, GuiButton button)->{
-			AdvancedMacros.scriptBrowser2.setActivePath(scriptHome(script));  //FIXME NullPointerException
+			AdvancedMacros.scriptBrowser2.setActivePath(scriptHome(script));
 			AdvancedMacros.scriptBrowser2.setSelectedFile(script);
 			AdvancedMacros.scriptBrowser2.getSelection(AdvancedMacros.macroMenuGui.getGui(), new ResultHandler() {
 				@Override public boolean onResult(Result r) {
