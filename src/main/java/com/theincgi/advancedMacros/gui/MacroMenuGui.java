@@ -385,6 +385,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 		//gotoSettings.setPos(12*6+5, 17);
 		profileSelect.setPos(5, 5);
 		profileSelect.setWidth(w-35);
+		profileSelect.setMaxHeight(h/2);
 		openChangeLog.setPos(width -36-6, 17);
 		openChangeLog.setWidth(37);
 		

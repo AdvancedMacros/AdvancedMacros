@@ -221,7 +221,8 @@ public class Action {
 	class WaitTick extends ZeroArgFunction{
 		@Override
 		public LuaValue call() {
-			Utils.waitTick();
+			if(Thread.currentThread()!=AdvancedMacros.getMinecraftThread())
+				Utils.waitTick();
 			return LuaValue.NONE;
 		}
 	}

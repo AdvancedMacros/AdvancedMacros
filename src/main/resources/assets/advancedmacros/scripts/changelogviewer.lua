@@ -17,9 +17,37 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
-  "&aBug Fix:",
-  " - &bgetSound&f was missing from the globals table since 7.3.0!"
+  "&bFeatures:",
+  " - New function &brunOnMC&f(&7function <, args...>&f)",
+  " - Added &bgetMap&f() to &bopenInventory&f()'s controlls to match &61.14.4&f's functionality",
+  " - Added &aluajava&f's buffs to this version.",
+  " - Added &bluajava.findMethodByDescription&f(&7class, name, desc&f)",
+  "   from 1.14.4's script functions",
+  "&dImprovments:",
+  " - &bwaitTick&f no longer uses very small sleep increments, provides better accuracy",
+  " - Profiles in bindings menu shows more options before needing to scroll",
+  "&aBug Fixes:",
+  " - &a__GAME_VERSION&f will now be more consistent reading '&61.12.2&f', '&61.14.4&f', etc",
+  " - Written books now give the correct &dtitle&f instead of empty strings.",
+  "   &7Previously it would only give the title when you were about to sign the book.",
+  " - HTTP requests &breadChar&f() returns &eFALSE&f when there are no more chars",
+  "   left in the stream now.",
+  " - Fixed crafting table mapping having an inconsistant name for &ecraftingOut&7",
+  " - Fixes for &bhttpRequest&fs for &drequestProperties&f, and non-success-codes",
+  "&eAdditional Notes:",
+  " - &bwaitTick&f() will do nothing on the MC thread.",
+  "   This is to prevent the game from locking up",
+  " - &cYou should not use sleep on the MC thread.",
+  " - There are no thread controls for the MC thread",
+  " - &brunOnMC&f will return any values returned by the function provided",
+  " - &3Special thanks to anyone who contributed to this version's updates :)",
   
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 7.7.7b",
+  "&aBug Fix:",
+  " - &bgetSound&f was missing from the globals table since 7.3.0!",
+  " - missing comma in this change log broke this change log",
   
   "&7"..DIVIDER,
   

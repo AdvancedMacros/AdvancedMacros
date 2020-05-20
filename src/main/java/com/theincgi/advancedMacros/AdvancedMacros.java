@@ -37,7 +37,6 @@ import com.theincgi.advancedMacros.lua.LuaDebug;
 import com.theincgi.advancedMacros.lua.LuaFunctions;
 import com.theincgi.advancedMacros.lua.OpenChangeLog;
 import com.theincgi.advancedMacros.lua.functions.Action;
-import com.theincgi.advancedMacros.lua.functions.AdvLog;
 import com.theincgi.advancedMacros.lua.functions.Call;
 import com.theincgi.advancedMacros.lua.functions.Connect;
 import com.theincgi.advancedMacros.lua.functions.Disconnect;
@@ -66,6 +65,7 @@ import com.theincgi.advancedMacros.lua.functions.OpenInventory;
 import com.theincgi.advancedMacros.lua.functions.PCall;
 import com.theincgi.advancedMacros.lua.functions.PlaySound;
 import com.theincgi.advancedMacros.lua.functions.RayTrace;
+import com.theincgi.advancedMacros.lua.functions.RunOnMC;
 import com.theincgi.advancedMacros.lua.functions.RunThread;
 import com.theincgi.advancedMacros.lua.functions.SetProfile;
 import com.theincgi.advancedMacros.lua.functions.SkinCustomizer;
@@ -117,8 +117,9 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "7.7.7"; //${version} ??
-
+	public static final String VERSION = "7.8.0"; //${version} ??
+	public static final String GAME_VERSION = "1.12.2";
+	
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
 	public static final File macroSoundsFolder = new File(macrosRootFolder, "sounds");
@@ -224,7 +225,7 @@ public class AdvancedMacros {
 		globals.load(debug);
 		debugTable = globals.get("debug").checktable();
 		globals.set("_MOD_VERSION", VERSION);
-		globals.set("__GAME_VERSION", Minecraft.getMinecraft().getVersion());
+		globals.set("__GAME_VERSION", GAME_VERSION);
 		
 		globals.set("advancedMacros", advancedMacrosTable);
 		LuaTable editor = new LuaTable();
@@ -233,6 +234,7 @@ public class AdvancedMacros {
 		editor.set("jumpToLine", new EditorControls.JumpToLine());
 		
 		globals.set("run", new Call());
+		globals.set("runOnMC", new RunOnMC());
 		globals.set("pRun", new PCall());
 		globals.set("runThread", new RunThread());
 		LuaTable thread = new LuaTable();
@@ -253,7 +255,6 @@ public class AdvancedMacros {
 		}
 		globals.set("getBlockList", new GetBlockList());
 		globals.set("log", logFunc = new LuaFunctions.Log());
-		globals.set("advLog", new AdvLog());
 		globals.set("say", sayFunc = new LuaFunctions.Say());
 		globals.set("toast", new Toast.ToastNotification());
 		

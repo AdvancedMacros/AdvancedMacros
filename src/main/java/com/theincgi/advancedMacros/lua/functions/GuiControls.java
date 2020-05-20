@@ -362,6 +362,9 @@ public class GuiControls {
 					sendBook.invoke(book, false);
 					break;
 				case getTitle:
+					ItemStack is = (ItemStack) bookObj.get(book);
+					if(is.getItem().getRegistryName().toString().equals("minecraft:written_book"))
+						return valueOf(is.getDisplayName());
 					return valueOf((String)bookTitle.get(book));
 
 				case isSigned:
