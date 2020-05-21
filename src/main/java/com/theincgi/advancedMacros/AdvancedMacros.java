@@ -117,8 +117,8 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "9.2.0"; // ??
-	public static final String GAME_VERSION = "1.14.4";
+	public static final String VERSION = "10.0.0a"; // ??
+	public static final String GAME_VERSION = "1.15.2";
 
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");

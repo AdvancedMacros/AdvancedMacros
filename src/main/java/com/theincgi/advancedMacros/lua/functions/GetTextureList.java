@@ -1,6 +1,7 @@
 package com.theincgi.advancedMacros.lua.functions;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.luaj.vm2_v3_0_1.LuaTable;
@@ -17,11 +18,12 @@ public class GetTextureList extends ZeroArgFunction{
 	private final Map<String, TextureAtlasSprite> mapRegisteredSprites;
 	
 	public GetTextureList() throws NoSuchFieldException, RuntimeException, IllegalAccessException {
-		AtlasTexture map = AdvancedMacros.getMinecraft().getTextureMap();
-		Field f = ObfuscationReflectionHelper.findField(AtlasTexture.class, "field_94252_e"); //TESTME getTextureList
-		//Field f = TextureMap.class.getDeclaredField(isObf?"j":"mapRegisteredSprites");
-		f.setAccessible(true);
-		mapRegisteredSprites = (Map<String, TextureAtlasSprite>) f.get(map);
+		this.mapRegisteredSprites = new HashMap<String, TextureAtlasSprite>();
+//		AtlasTexture map = AdvancedMacros.getMinecraft().textureManager.getTexture(textureLocation)getTextureMap();
+//		Field f = ObfuscationReflectionHelper.findField(AtlasTexture.class, "field_94252_e"); //TESTME getTextureList
+//		//Field f = TextureMap.class.getDeclaredField(isObf?"j":"mapRegisteredSprites");
+//		f.setAccessible(true);
+//		mapRegisteredSprites = (Map<String, TextureAtlasSprite>) f.get(map);
 	}
 	
 	@Override

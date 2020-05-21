@@ -137,7 +137,7 @@ public class Action {
 	class Drop extends OneArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg) {
-			AdvancedMacros.getMinecraft().player.dropItem(arg.optboolean(false));
+			AdvancedMacros.getMinecraft().player.drop(arg.optboolean(false));
 			//tapKeybind(sets.keyBindDrop);
 			return LuaValue.NONE;
 		}

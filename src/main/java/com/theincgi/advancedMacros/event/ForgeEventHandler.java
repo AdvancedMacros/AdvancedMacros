@@ -937,7 +937,7 @@ public class ForgeEventHandler {
 			thisMessageIndex = messageIndex++;
 		}
 
-		System.out.println("Got " + event.getMessage().getString() + " as " + thisMessageIndex);
+		
 
 		JavaThread t = new JavaThread(()->{
 
@@ -1007,7 +1007,7 @@ public class ForgeEventHandler {
 				try {Thread.sleep(50);}catch(Exception ex) {}
 			}
 
-			System.out.println("Adding msg "+thisMessageIndex);
+			
 			if(e2.get(3).toboolean()) {
 				//AdvancedMacros.logFunc.invoke(e2.unpack().subargs(3));
 				Pair<ITextComponent, Varargs> text = Utils.toTextComponent(e2.unpack().arg(3).checkjstring(), e2.unpack().subargs(4), true);

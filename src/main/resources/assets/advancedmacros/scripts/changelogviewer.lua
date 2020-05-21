@@ -17,6 +17,20 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  " - Updated to 1.15.2",
+  " - New graphical bugs",
+  " - Hud3D elements render in incorrect locations and orientations",
+  " - Hud3D elements don't provided sided face culling right now, only true/false",
+  " - function for getting fps doesnt work currently",
+  " - function for getting chunk update count doesn't work currently",
+  " - getTextureList is currently broken",
+  " - block:resouce textures might work, not tested",
+  " - &cThis is an early build.",
+  
+   
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 9.2.0",
    "&bFeatures:",
    " - Added built in &eREPL&f. Press &eALT&f + &eMOD KEY&f to see it.",
    " - Added &brunOnMC&f(&7func, ...&f) to run code on the minecraft thread.",
