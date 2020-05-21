@@ -117,7 +117,7 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "7.8.0"; //${version} ??
+	public static final String VERSION = "7.9.0"; //${version} ??
 	public static final String GAME_VERSION = "1.12.2";
 	
 	public static final File macrosRootFolder = getRootFolder();
@@ -144,6 +144,7 @@ public class AdvancedMacros {
 	private static Minecraft mc;
 	private static ModContainer advMacrosModContainer;
 	public static final boolean COLOR_SPACE_IS_255 = false;
+	public static LuaValue repl;
 
 
 	@EventHandler @SideOnly(Side.CLIENT)//skipped the proxy system, this is only client side
@@ -421,6 +422,13 @@ public class AdvancedMacros {
 		try {
 			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/morefunc.lua")).getInputStream();
 			globals.load(in, "moreFunctions", "t", globals).call();
+			in.close();
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		try {
+			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/repl.lua")).getInputStream();
+			repl = globals.load(in, "REPL", "t", globals);
 			in.close();
 		} catch (Throwable e) {
 			e.printStackTrace();

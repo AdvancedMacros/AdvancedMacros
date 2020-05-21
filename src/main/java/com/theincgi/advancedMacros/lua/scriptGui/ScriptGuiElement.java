@@ -54,7 +54,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 			@Override
 			public LuaValue call() {
 				synchronized (removeLock) {
-					System.out.println("******************\n******************\n******************\n");
+					//System.out.println("******************\n******************\n******************\n");
 					if(isRemoved) return NONE;
 					isRemoved = true;
 					gui.removeInputSubscriber(ScriptGuiElement.this);

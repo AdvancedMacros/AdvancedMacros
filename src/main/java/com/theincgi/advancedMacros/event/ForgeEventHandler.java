@@ -34,6 +34,7 @@ import com.theincgi.advancedMacros.gui.MacroMenuGui;
 import com.theincgi.advancedMacros.gui.elements.ColorTextArea;
 import com.theincgi.advancedMacros.hud.hud2D.Hud2DItem;
 import com.theincgi.advancedMacros.hud.hud3D.WorldHudItem;
+import com.theincgi.advancedMacros.lua.LuaDebug;
 import com.theincgi.advancedMacros.lua.LuaDebug.JavaThread;
 import com.theincgi.advancedMacros.lua.LuaDebug.LuaThread;
 import com.theincgi.advancedMacros.lua.LuaDebug.OnScriptFinish;
@@ -206,6 +207,9 @@ public class ForgeEventHandler {
 				}
 			}else if(ColorTextArea.isShiftDown()){
 				showMenu(AdvancedMacros.scriptBrowser2, AdvancedMacros.macroMenuGui.getGui());
+			}else if(ColorTextArea.isAltDown()) {
+				LuaThread thread = new LuaThread(AdvancedMacros.repl, "REPL");
+				thread.start();
 			}else{
 				if(AdvancedMacros.lastGui!=null){
 					AdvancedMacros.lastGui.showGui();

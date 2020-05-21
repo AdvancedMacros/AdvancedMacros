@@ -1119,6 +1119,9 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	public static boolean isShiftDown(){
 		return Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT); 
 	}
+	public static boolean isAltDown() {
+		return Keyboard.isKeyDown(Keyboard.KEY_LMENU) || Keyboard.isKeyDown(Keyboard.KEY_RMENU); 
+	}
 	@Override
 	public boolean onKeyRepeat(Gui gui, char typedChar, int keyCode, int repeatMod) {
 		if(isFocused() && repeatMod%5==0 && !isCTRLDown()){

@@ -18,6 +18,17 @@ local changeLog = {
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
   "&bFeatures:",
+  " - A built in &eREPL&f has been added. It can be accessed with &eALT&f + the mod's keybinding.",
+  "&aBug Fixes:",
+  " - Removed a console spam from script elements",
+  " - Gui text uses correct width and height for clicking",
+  "&eAdditional Notes:",
+  " - Added resource images for &eglobe.png&f and &esandbox.png&f",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 7.8.0",
+  "&bFeatures:",
   " - New function &brunOnMC&f(&7function <, args...>&f)",
   " - Added &bgetMap&f() to &bopenInventory&f()'s controlls to match &61.14.4&f's functionality",
   " - Added &aluajava&f's buffs to this version.",
