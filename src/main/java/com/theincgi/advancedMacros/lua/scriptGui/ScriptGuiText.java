@@ -2,6 +2,7 @@ package com.theincgi.advancedMacros.lua.scriptGui;
 
 import java.util.Scanner;
 
+import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
@@ -10,6 +11,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Gui;
+import com.theincgi.advancedMacros.gui.elements.GuiButton;
 import com.theincgi.advancedMacros.gui.elements.GuiRect;
 import com.theincgi.advancedMacros.hud.hud2D.Hud2D_Rectangle;
 import com.theincgi.advancedMacros.misc.Utils;
@@ -120,5 +122,33 @@ public class ScriptGuiText extends ScriptGuiElement{
 	}
 	public String getText() {
 		return text;
+	}
+	
+	@Override
+	public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
+		if(onMouseClick != null && GuiButton.isInBounds(x, y, (int)this.x, (int)this.y, (int)getItemWidth(), (int)getItemHeight()))
+			return Utils.pcall(onMouseClick, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(buttonNum)).toboolean();
+		return false;
+	}
+
+	@Override
+	public boolean onMouseRelease(Gui gui, double x, double y, int state) {
+		if(onMouseRelease!=null && GuiButton.isInBounds(x, y, (int)this.x, (int)this.y, (int)getItemWidth(), (int)getItemHeight()))
+			return Utils.pcall(onMouseRelease, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(state)).toboolean();
+		return false;
+	}
+
+	@Override
+	public boolean onMouseClickMove(Gui gui, double x, double y, int buttonNum, double q, double r) {
+		if(onMouseDrag!=null && GuiButton.isInBounds(x, y, (int)this.x, (int)this.y, (int)getItemWidth(), (int)getItemHeight())) {
+			LuaTable args = new LuaTable();
+			args.set(1, x);
+			args.set(2, y);
+			args.set(3, buttonNum);
+			args.set(4, q);
+			args.set(5, r);
+			return Utils.pcall(onMouseDrag,args.unpack()).toboolean();
+		}
+		return false;
 	}
 }

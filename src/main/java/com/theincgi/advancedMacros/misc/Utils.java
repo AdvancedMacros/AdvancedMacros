@@ -398,7 +398,7 @@ public class Utils {
 		return f;
 	}
 	public static LuaValue itemStackToLuatable(ItemStack stack) {
-		if(stack.isEmpty()){return LuaValue.FALSE;}
+		if(stack==null || stack.isEmpty()){return LuaValue.FALSE;}
 		LuaTable table = new LuaTable();
 		table.set("name", stack.getDisplayName()==null?LuaValue.NIL:LuaValue.valueOf(codedFromTextComponent(stack.getDisplayName()).a) );
 		table.set("id", stack.getItem().getRegistryName().toString());
@@ -568,7 +568,7 @@ public class Utils {
 		}catch (NullPointerException e) {
 			try {
 				CompoundNBT ret = new CompoundNBT();
-				ret = entity.getEntityData();//writeToNBT(ret);
+				ret = entity.serializeNBT();// TODO check me //getEntityData();//writeToNBT(ret);
 				t.set("nbt", NBTUtils.fromCompound(ret));
 			
 			}catch(Exception ex) {
@@ -1468,7 +1468,9 @@ public class Utils {
 		int t = AdvancedMacros.forgeEventHandler.getSTick();
 		while(t==AdvancedMacros.forgeEventHandler.getSTick()){
 			try {
-				Thread.sleep(5); //tick should be 20, lil bit faster this way
+				synchronized (AdvancedMacros.forgeEventHandler.getTickLock()) {
+					AdvancedMacros.forgeEventHandler.getTickLock().wait();
+				}
 			} catch (InterruptedException e) {} 
 		}
 	}

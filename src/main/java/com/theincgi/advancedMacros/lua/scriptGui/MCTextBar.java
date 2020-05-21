@@ -210,7 +210,7 @@ public class MCTextBar extends ScriptGuiElement{
 		if(!textField.isFocused() || !visible)
 			return false;
 		textField.keyPressed(keyCode, scanCode, modifiers);
-		if(onCharTyped!=null)
+		if(onKeyPressed!=null)
 			Utils.pcall(onKeyPressed, valueOf(HIDUtils.Keyboard.nameOf(keyCode)), valueOf(scanCode), HIDUtils.Keyboard.modifiersToLuaTable(modifiers));
 		return true;
 	}

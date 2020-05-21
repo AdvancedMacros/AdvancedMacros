@@ -54,7 +54,7 @@ public class GetNBT {
 				return NBTUtils.fromCompound(player.serializeNBT());
 			}catch (NullPointerException e) {
 				try {
-					CompoundNBT ret = player.getEntityData();
+					CompoundNBT ret = player.serializeNBT();//TODO check me //getEntityData();
 					return NBTUtils.fromCompound(ret);
 				}catch(Exception ex) {
 					ex.printStackTrace();
@@ -76,7 +76,7 @@ public class GetNBT {
 				return NBTUtils.fromCompound(e.serializeNBT());
 			}catch (NullPointerException npe) {
 				try {
-					CompoundNBT ret = e.getEntityData();
+					CompoundNBT ret = e.serializeNBT();//TODO CHECK ME// getEntityData();
 					return NBTUtils.fromCompound(ret);
 				}catch(Exception ex) {
 					ex.printStackTrace();

@@ -12,6 +12,7 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.misc.HIDUtils.Keyboard;
 
 import net.minecraft.client.MainWindow;
 
@@ -86,7 +87,15 @@ public class HIDUtils {
 			out.set("super", (modifiers & GLFW.GLFW_MOD_SUPER) > 0);
 			return out;
 		}
-		
+		public static boolean isAlt() {
+			return Keyboard.isDown(GLFW.GLFW_KEY_LEFT_ALT) || Keyboard.isDown(GLFW.GLFW_KEY_RIGHT_ALT);
+		}
+		public static boolean isCTRLDown(){
+			return Keyboard.isDown(GLFW.GLFW_KEY_LEFT_CONTROL) || Keyboard.isDown(GLFW.GLFW_KEY_RIGHT_CONTROL);
+		}
+		public static boolean isShiftDown(){
+			return Keyboard.isDown(GLFW.GLFW_KEY_LEFT_SHIFT) || Keyboard.isDown(GLFW.GLFW_KEY_RIGHT_SHIFT); 
+		}
 	}
 	
 	public static class Mouse {

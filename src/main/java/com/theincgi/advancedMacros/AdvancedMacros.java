@@ -68,6 +68,7 @@ import com.theincgi.advancedMacros.lua.functions.OpenInventory;
 import com.theincgi.advancedMacros.lua.functions.PCall;
 import com.theincgi.advancedMacros.lua.functions.PlaySound;
 import com.theincgi.advancedMacros.lua.functions.RayTrace;
+import com.theincgi.advancedMacros.lua.functions.RunOnMC;
 import com.theincgi.advancedMacros.lua.functions.RunThread;
 import com.theincgi.advancedMacros.lua.functions.SetProfile;
 import com.theincgi.advancedMacros.lua.functions.SkinCustomizer;
@@ -116,7 +117,8 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "9.1.0"; // ??
+	public static final String VERSION = "9.2.0"; // ??
+	public static final String GAME_VERSION = "1.14.4";
 
 	public static final File macrosRootFolder = getRootFolder();
 	public static final File macrosFolder = new File(macrosRootFolder, "macros");
@@ -142,6 +144,7 @@ public class AdvancedMacros {
 	private static Minecraft mc;
 	private static ModContainer advMacrosModContainer;
 	public static final boolean COLOR_SPACE_IS_255 = false;
+	public static LuaValue repl;
 
 
 	public AdvancedMacros() {
@@ -236,7 +239,7 @@ public class AdvancedMacros {
 		globals.load(debug);
 		debugTable = globals.get("debug").checktable();
 		globals.set("_MOD_VERSION", VERSION);
-		globals.set("__GAME_VERSION", getMinecraft().getVersion());
+		globals.set("__GAME_VERSION", GAME_VERSION);
 		
 		//globals.set("_S", new _S());
 		
@@ -248,6 +251,7 @@ public class AdvancedMacros {
 		editor.set("jumpToLine", new EditorControls.JumpToLine());
 
 		globals.set("run", new Call());
+		globals.set("runOnMC", new RunOnMC());
 		globals.set("pRun", new PCall());
 		globals.set("runThread", new RunThread());
 		LuaTable thread = new LuaTable();
@@ -443,6 +447,13 @@ public class AdvancedMacros {
 		try {
 			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/morefunc.lua")).getInputStream();
 			globals.load(in, "moreFunctions", "t", globals).call();
+			in.close();
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		try {
+			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/repl.lua")).getInputStream();
+			repl = globals.load(in, "REPL", "t", globals);
 			in.close();
 		} catch (Throwable e) {
 			e.printStackTrace();

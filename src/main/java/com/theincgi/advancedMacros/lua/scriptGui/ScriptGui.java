@@ -423,7 +423,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 
 
 	
-	public class TheGui extends Gui implements InputSubscriber{
+	public class TheGui extends Gui{
 		@Override
 		public void onClose() {
 			super.onClose();
@@ -469,7 +469,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 			return pausesGame;
 		}
 		@Override
-		public boolean onMouseClick(Gui gui, double mouseX, double mouseY, int mouseButton) {
+		public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
 			if(super.mouseClicked(mouseX, mouseY, mouseButton)) return true;
 			if(ScriptGui.this.onMouseClick(this, mouseX, mouseY, mouseButton)) return true;
 			if (parentGui != null)
@@ -477,7 +477,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 			return false;
 		}
 		@Override
-		public boolean onMouseClickMove(Gui gui, double mouseX, double mouseY, int buttonNum, double q, double r) {
+		public boolean mouseDragged(double mouseX, double mouseY, int buttonNum, double q, double r) {
 			if(super.mouseDragged(mouseX, mouseY, buttonNum, q, r)) return true;
 			if(ScriptGui.this.onMouseClickMove(this, mouseX, mouseY, buttonNum, q, r)) return true;
 			if (parentGui != null)
@@ -485,7 +485,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 			return false;
 		}
 		@Override
-		public boolean onMouseRelease(Gui gui, double mouseX, double mouseY, int state) {
+		public boolean mouseReleased(double mouseX, double mouseY, int state) {
 			if(super.mouseReleased(mouseX, mouseY, state)) return true;
 			if(ScriptGui.this.onMouseRelease(this, mouseX, mouseY, state)) return true;
 			if (parentGui != null)
@@ -494,33 +494,32 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 		}
 		
 		@Override
-		public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
+		public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 			return super.keyPressed(keyCode, scanCode, modifiers) ||
 					ScriptGui.this.onKeyPressed(this, keyCode, scanCode, modifiers) ||
 					(parentGui!=null && parentGui.onKeyPressed(this, keyCode, scanCode, modifiers));
 		}
 		@Override
-		public boolean onCharTyped(Gui gui, char typedChar, int mods) {
+		public boolean charTyped(char typedChar, int mods) {
 			return super.charTyped(typedChar, mods) ||
 					ScriptGui.this.onCharTyped(gui, typedChar, mods) ||
 					(parentGui!=null && parentGui.onCharTyped(gui, typedChar, mods));
 		}
+//		
+//		@Override
+//		public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
+//			return super.onKeyRepeated(gui, keyCode, scanCode, modifiers, n) ||
+//					ScriptGui.this.onKeyRepeat(gui, keyCode, scanCode, modifiers, n) ||
+//					(parentGui!=null && parentGui.onKeyRepeat(parentGui.gui, keyCode, scanCode, modifiers, n));
+//		}
 		@Override
-		public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
-			return super.onKeyRepeated(gui, keyCode, scanCode, modifiers, n) ||
-					ScriptGui.this.onKeyRepeat(gui, keyCode, scanCode, modifiers, n) ||
-					(parentGui!=null && parentGui.onKeyRepeat(parentGui.gui, keyCode, scanCode, modifiers, n));
-		}
-		
-		@Override
-		public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
+		public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
 			return super.onKeyRelease(gui, keyCode, scanCode, modifiers)||
 					ScriptGui.this.onKeyRelease(this, keyCode, scanCode, modifiers) ||
 					(parentGui!=null && parentGui.onKeyRelease(parentGui.gui, keyCode, scanCode, modifiers));
 		}
-		
 		@Override
-		public boolean onScroll(Gui gui, double i) {
+		public boolean mouseScrolled(double x, double y, double i) {
 			return super.onScroll(gui, i) ||
 					ScriptGui.this.onScroll(this, i) ||
 					(parentGui!=null && parentGui.onScroll(parentGui.gui, i));

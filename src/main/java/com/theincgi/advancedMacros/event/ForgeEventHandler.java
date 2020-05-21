@@ -35,9 +35,11 @@ import com.theincgi.advancedMacros.gui.elements.ColorTextArea;
 import com.theincgi.advancedMacros.hud.hud2D.Hud2DItem;
 import com.theincgi.advancedMacros.hud.hud3D.WorldHudItem;
 import com.theincgi.advancedMacros.lua.LuaDebug.JavaThread;
+import com.theincgi.advancedMacros.lua.LuaDebug.LuaThread;
 import com.theincgi.advancedMacros.lua.LuaDebug.OnScriptFinish;
 import com.theincgi.advancedMacros.lua.OpenChangeLog;
 import com.theincgi.advancedMacros.lua.functions.GuiControls;
+import com.theincgi.advancedMacros.misc.HIDUtils;
 import com.theincgi.advancedMacros.misc.HIDUtils.Keyboard;
 import com.theincgi.advancedMacros.misc.HIDUtils.Mouse;
 import com.theincgi.advancedMacros.misc.Pair;
@@ -119,6 +121,7 @@ public class ForgeEventHandler {
 	public WeakHashMap<Entity, RenderFlags> entityRenderFlags = new WeakHashMap<>();
 	private boolean wasOnFire = false;
 	private HashMap<Integer, Integer> repeatingKeys = new HashMap<>();
+	private Object tickLock = new Object();
 
 	//private Queue<List<ItemStack>> receivedInventories = new LinkedList<>();
 	public ForgeEventHandler() {
@@ -198,6 +201,9 @@ public class ForgeEventHandler {
 				}
 			}else if(ColorTextArea.isShiftDown()){
 				showMenu(AdvancedMacros.scriptBrowser2, AdvancedMacros.macroMenuGui.getGui());
+			}else if(HIDUtils.Keyboard.isAlt()) {
+				LuaThread thread = new LuaThread(AdvancedMacros.repl, "REPL");
+				thread.start();
 			}else{
 				if(AdvancedMacros.lastGui!=null){
 					TaskDispatcher.delayTask(()->{
@@ -274,6 +280,9 @@ public class ForgeEventHandler {
 		}
 		synchronized (sTickSync) {
 			sTick++;
+			synchronized (tickLock) {
+				tickLock.notifyAll();
+			}
 		}
 		if(look!=null){
 			look.look();
@@ -1406,6 +1415,9 @@ public class ForgeEventHandler {
 		synchronized (sTickSync) {
 			return sTick;
 		}
+	}
+	public Object getTickLock() {
+		return tickLock;
 	}
 
 	private Look look;

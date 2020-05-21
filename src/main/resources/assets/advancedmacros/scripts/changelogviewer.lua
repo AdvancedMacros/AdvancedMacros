@@ -17,6 +17,30 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+   "&bFeatures:",
+   " - Added built in &eREPL&f. Press &eALT&f + &eMOD KEY&f to see it.",
+   " - Added &brunOnMC&f(&7func, ...&f) to run code on the minecraft thread.",
+   "&aBug Fixes:",
+   " - &e__GAME_VERSION&f is now consistent.",
+   " - HTTP request now returns &afalse&f when calling &breadChar&f() at end of stream.",
+   " - Fixed an issue where keyPressed event for MC text field wouldn't work without onCharTyped being set.",
+   " - Fixed script gui's not receiving events for callbacks (keyPressed, mouseClicked, scroll, etc..)",
+   " - Removed a console spam on gui elements when unremoving an item.",
+   " - Gui text is now clickable, previously the width and height used was incorrect.",
+   " - That bug where an item disapears when there was only one of them and you placed it in creative",
+   "   is fixed!",
+   " - Fixed an issue with this change log where scrolling didn't work.",
+   "&eAdditional Notes:",
+   " - &bwaitTick&f() no longer uses small sleep increments and is now more precise.",
+   " - Profiles in the bindings menu now show more options before needing to scroll.",
+   " - &bwaitTick&f will not do anything on the MC thread",
+   " - Minecraft thread does not have thread controls.",
+   " - &cDo not sleep on the Minecraft thread.",
+   " - Added resource images &aglobe.png&f and &asandbox.png&f.",
+   
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 9.1.0",
   "&bFeatures:",
   " - This update &dbuffs&f the &aluajava&f library so you can target methods and",
   "   fields more easily.",
@@ -1301,6 +1325,11 @@ s.setOnMouseDrag( function(...)
   group.setPos(0, pos*-12)
 end )
 s.setOnScroll( function (amount)
+  s.scroll(amount )
+  local pos = s.getScrollPos()
+  group.setPos(0, pos*-12)
+end )
+g.setOnScroll( function (amount)
   s.scroll(amount )
   local pos = s.getScrollPos()
   group.setPos(0, pos*-12)
