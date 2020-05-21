@@ -8,7 +8,7 @@ import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.CullFace;
+//import com.mojang.blaze3d.platform.GlStateManager.CullFace;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
 import com.theincgi.advancedMacros.misc.Utils;
 
@@ -96,7 +96,7 @@ public class Hud3DElement extends WorldHudItem{
 				GlStateManager.disableCull();
 			}else {
 				GlStateManager.enableCull();
-				GlStateManager.cullFace( CullFace.valueOf(cullMode.checkjstring().replace(' ', '_').toUpperCase()));
+				//GlStateManager.cullFace( CullFace.valueOf(cullMode.checkjstring().replace(' ', '_').toUpperCase()));
 			}
 			
 			if(data.get("lighting").checkboolean())
@@ -207,7 +207,7 @@ public class Hud3DElement extends WorldHudItem{
 							uCoord = uv.get(1).optdouble(0);
 							vCoord = uv.get(2).optdouble(0);
 
-							buffer.tex(uCoord, vCoord);
+							buffer.tex((float)uCoord, (float)vCoord);
 						}
 						buffer.endVertex();
 					}

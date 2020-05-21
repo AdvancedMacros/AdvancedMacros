@@ -77,7 +77,7 @@ public class Hud2D_Image extends Hud2D_Rectangle {
 		}
 		
 		
-		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA.param, DestFactor.ONE_MINUS_SRC_ALPHA.param);
 		
 		//GlStateManager.enableColorMaterial();
 		

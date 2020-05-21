@@ -38,10 +38,10 @@ public class Hud2D extends LuaTable{
 			case getSize:
 				LuaTable temp = new LuaTable();
 				Minecraft mc = AdvancedMacros.getMinecraft();
-				temp.set(1, LuaValue.valueOf(mc.mainWindow.getScaledWidth()));
-				temp.set(2, LuaValue.valueOf(mc.mainWindow.getScaledHeight()));
-				temp.set(3, valueOf(mc.mainWindow.getFramebufferWidth()));
-				temp.set(4, valueOf(mc.mainWindow.getFramebufferHeight()));
+				temp.set(1, LuaValue.valueOf(mc.getMainWindow().getScaledWidth()));
+				temp.set(2, LuaValue.valueOf(mc.getMainWindow().getScaledHeight()));
+				temp.set(3, valueOf(mc.getMainWindow().getFramebufferWidth()));
+				temp.set(4, valueOf(mc.getMainWindow().getFramebufferHeight()));
 				return temp.unpack();
 			case newBox:
 				Hud2D_Box box = new Hud2D_Box();

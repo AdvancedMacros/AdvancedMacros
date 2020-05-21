@@ -150,7 +150,7 @@ public class Gui extends Screen implements INestedGuiEventHandler {
 	@Override
 	public void render(int mouseX, int mouseY, float partialTicks) {
 		if(mainWindow == null)
-			mainWindow = AdvancedMacros.getMinecraft().mainWindow;
+			mainWindow = AdvancedMacros.getMinecraft().getMainWindow();
 		if(mainWindow.getScaledWidth()!=lastResWidth || mainWindow.getScaledHeight()!=lastResHeight) {
 			lastResWidth = mainWindow.getScaledWidth();
 			lastResHeight = mainWindow.getScaledHeight();
@@ -408,10 +408,10 @@ public class Gui extends Screen implements INestedGuiEventHandler {
 		//System.out.println("FOCUS: >> "+focusItem);
 	}
 	public int getUnscaledWindowWidth(){
-		return AdvancedMacros.getMinecraft().mainWindow.getWidth();
+		return AdvancedMacros.getMinecraft().getMainWindow().getWidth();
 	}
 	public int getUnscaledWindowHeight(){
-		return AdvancedMacros.getMinecraft().mainWindow.getHeight();
+		return AdvancedMacros.getMinecraft().getMainWindow().getHeight();
 	}
 
 	public void setDrawDefaultBackground(boolean drawDefaultBackground) {

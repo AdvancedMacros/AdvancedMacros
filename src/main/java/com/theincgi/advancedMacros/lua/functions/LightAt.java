@@ -29,7 +29,7 @@ public class LightAt{
 			Chunk c = AdvancedMacros.getMinecraft().player.getEntityWorld().getChunkProvider().getChunk((int)Math.floor(pos.getX()/16),(int)Math.floor(pos.getZ()/16), false);
 			//TESTME new chunk grabbing method, math needs checking just to be sure
 			
-			int overall = c.getLightSubtracted(pos, 0);
+			int overall = AdvancedMacros.getMinecraft().world.getChunkProvider().getLightManager().getLightSubtracted(pos, 0); //CHECKME
 			int block = LightAt.getBlockLight(c, pos);
 			int sky = LightAt.getSkyLight(c, pos);
 			LuaTable t = new LuaTable();

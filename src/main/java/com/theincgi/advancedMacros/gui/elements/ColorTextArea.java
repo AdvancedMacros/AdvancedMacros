@@ -974,7 +974,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 							end = ((sl==selectionEnd.getY())?selectionEnd.getX():lines.get(sl).length());
 							toClipboard+=lines.get(sl).substring(start, end) + (sl!=selectionEnd.getY()?"\n":"");
 						}
-						GLFW.glfwSetClipboardString(AdvancedMacros.getMinecraft().mainWindow.getHandle(), toClipboard);
+						GLFW.glfwSetClipboardString(AdvancedMacros.getMinecraft().getMainWindow().getHandle(), toClipboard);
 						System.out.println("Copied: '"+toClipboard+"'");
 					}catch (Exception e) {
 						e.printStackTrace();
@@ -1007,7 +1007,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 						//selectionStart.setCursorTo();
 						selectionStart=null;
 						selectionEnd=null;
-						GLFW.glfwSetClipboardString(AdvancedMacros.getMinecraft().mainWindow.getHandle(), toClipboard);
+						GLFW.glfwSetClipboardString(AdvancedMacros.getMinecraft().getMainWindow().getHandle(), toClipboard);
 					}catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -1016,7 +1016,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 					if(!isEditable){return false;}
 					//System.out.println("paste");
 					try {
-						String data = GLFW.glfwGetClipboardString(AdvancedMacros.getMinecraft().mainWindow.getHandle());
+						String data = GLFW.glfwGetClipboardString(AdvancedMacros.getMinecraft().getMainWindow().getHandle());
 						Scanner s = new Scanner(data);
 						boolean multiline = false;
 						String lineStart = lines.get(cursor.getY()).substring(0, cursor.getX()), lineEnd = lines.get(cursor.getY()).substring(cursor.getX());
@@ -1188,7 +1188,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		resize(x, i);
 	}
 	public void resize(int newWid, int newHei){
-		if(newWid==0 || newHei==0 || g.width==0 || g.height==0 || AdvancedMacros.getMinecraft().mainWindow.getWidth()==0 || AdvancedMacros.getMinecraft().mainWindow.getHeight()==0)return;
+		if(newWid==0 || newHei==0 || g.width==0 || g.height==0 || AdvancedMacros.getMinecraft().getMainWindow().getWidth()==0 || AdvancedMacros.getMinecraft().getMainWindow().getHeight()==0)return;
 		if(wid!=newWid || hei!=newHei){ //something changed
 			////			if(texture!=null){
 			////				texture.deleteGlTexture();

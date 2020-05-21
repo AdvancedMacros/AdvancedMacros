@@ -302,7 +302,7 @@ public class InputGUI extends Gui{
 			if(!isVisible) {return;}
 			g.drawBoxedRectangle(x, y, width, 20, BGColor, FILLColor);
 			RenderHelper.disableStandardItemLighting();
-			RenderHelper.enableGUIStandardItemLighting();
+			RenderHelper.enableStandardItemLighting();
 			AdvancedMacros.getMinecraft().getItemRenderer().renderItemAndEffectIntoGUI(stack, x+3, y+2);
 			
 			if(GuiRect.isInBounds(mouseX, mouseY, this.x, this.y, width, 20)) {

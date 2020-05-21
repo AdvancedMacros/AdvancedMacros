@@ -67,13 +67,13 @@ public class MinecraftSettings extends LuaTable {
 			case getVolume:
 				return valueOf(mc.gameSettings.getSoundLevel(SoundCategory.valueOf(args.checkjstring(1).toUpperCase())));
 			case isFullscreen:
-				return valueOf(mc.mainWindow.isFullscreen());
+				return valueOf(mc.getMainWindow().isFullscreen());
 			case setFov:
 				mc.gameSettings.fov = (float) args.checkdouble(1);
 				return NONE;
-			case setFullscreen:
-				if(mc.mainWindow.isFullscreen() != args.optboolean(1, true))
-					mc.mainWindow.toggleFullscreen();
+			case setFullscreen: //CHECKME
+				if(mc.getMainWindow().isFullscreen() != args.optboolean(1, true))
+					mc.getMainWindow().toggleFullscreen();
 				return NONE;
 			case setRenderDistance:
 				mc.gameSettings.renderDistanceChunks = Math.max(2, Math.min(args.checkint(1), 32));

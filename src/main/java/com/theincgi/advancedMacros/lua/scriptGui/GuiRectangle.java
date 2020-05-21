@@ -67,7 +67,7 @@ public class GuiRectangle extends ScriptGuiElement{
 		GlStateManager.disableBlend();
 		GlStateManager.enableBlend();
 	    //GlStateManager.disableTexture2D();
-	    GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+	    GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.param, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.param, GlStateManager.SourceFactor.ONE.param, GlStateManager.DestFactor.ZERO.param);
 	    GlStateManager.disableAlphaTest();
 		GlStateManager.enableAlphaTest();
 		buffer.begin(7, DefaultVertexFormats.POSITION); //7 is GL_QUADS btw

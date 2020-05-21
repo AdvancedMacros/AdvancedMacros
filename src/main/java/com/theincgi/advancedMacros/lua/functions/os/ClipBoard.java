@@ -27,11 +27,11 @@ public class ClipBoard {
 	}
 	
 	public static void setClipboard(String toClipboard) {
-		GLFW.glfwSetClipboardString(AdvancedMacros.getMinecraft().mainWindow.getHandle(), toClipboard);
+		GLFW.glfwSetClipboardString(AdvancedMacros.getMinecraft().getMainWindow().getHandle(), toClipboard);
 	}
 	public static String getClipboard() {
 		try {
-			return GLFW.glfwGetClipboardString(AdvancedMacros.getMinecraft().mainWindow.getHandle());
+			return GLFW.glfwGetClipboardString(AdvancedMacros.getMinecraft().getMainWindow().getHandle());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

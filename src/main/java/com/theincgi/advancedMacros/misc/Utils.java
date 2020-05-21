@@ -496,9 +496,9 @@ public class Utils {
 		//t.set("inventory", Utils.inventoryToTable(entity.inventory, !(entity instanceof EntityPlayerSP)));
 		{
 			LuaTable pos = new LuaTable();
-			pos.set(1, LuaValue.valueOf(entity.posX));
-			pos.set(2, LuaValue.valueOf(entity.posY));
-			pos.set(3, LuaValue.valueOf(entity.posZ));
+			pos.set(1, LuaValue.valueOf(entity.getPosX()));
+			pos.set(2, LuaValue.valueOf(entity.getPosY()));
+			pos.set(3, LuaValue.valueOf(entity.getPosZ()));
 			t.set("pos", pos);
 		}
 		t.set("dimension", toTable(entity.dimension));
@@ -578,7 +578,7 @@ public class Utils {
 		}
 		t.set("uuid", LuaValue.valueOf(entity.getUniqueID().toString()));
 		{
-			RayTraceResult rtr = entity.func_213324_a(8, AdvancedMacros.getMinecraft().getRenderPartialTicks(), false);
+			RayTraceResult rtr = entity.pick(8, AdvancedMacros.getMinecraft().getRenderPartialTicks(), false);
 			if(rtr!=null && rtr instanceof BlockRayTraceResult) {
 				BlockRayTraceResult brtr = (BlockRayTraceResult) rtr;
 				BlockPos lookingAt = brtr.getPos();

@@ -187,9 +187,9 @@ public class Action {
 			double y = args.arg(2).checkdouble();
 			double z = args.arg(3).checkdouble();
 			ClientPlayerEntity player = minecraft.player;
-			double dx = x-player.posX;
-			double dy = y-player.posY-player.getEyeHeight();
-			double dz = z-player.posZ;
+			double dx = x-player.getPosX();
+			double dy = y-player.getPosY()-player.getEyeHeight();
+			double dz = z-player.getPosZ();
 			double toYaw = Math.toDegrees(Math.atan2(dz, dx))-90; //dz might need to be negative cause the whole z is backwards thing
 			if(toYaw<=-180){toYaw+=360;}
 			double h = Math.sqrt(dx*dx+dz*dz);

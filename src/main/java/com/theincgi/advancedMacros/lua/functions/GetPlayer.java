@@ -62,9 +62,9 @@ public class GetPlayer extends OneArgFunction {
 		t.set("inventory", Utils.inventoryToTable(player.inventory, !(player instanceof ClientPlayerEntity)));
 		{
 			LuaTable pos = new LuaTable();
-			pos.set(1, LuaValue.valueOf(player.posX));
-			pos.set(2, LuaValue.valueOf(player.posY));
-			pos.set(3, LuaValue.valueOf(player.posZ));
+			pos.set(1, LuaValue.valueOf(player.getPosX()));
+			pos.set(2, LuaValue.valueOf(player.getPosY()));
+			pos.set(3, LuaValue.valueOf(player.getPosZ()));
 			t.set("pos", pos);
 		}
 		t.set("mainHand", Utils.itemStackToLuatable(player.getHeldItemMainhand()));
@@ -136,7 +136,7 @@ public class GetPlayer extends OneArgFunction {
 		t.set("isInvisible", LuaValue.valueOf(player.isInvisible()));
 		t.set("uuid", LuaValue.valueOf(player.getUniqueID().toString()));
 		{
-			RayTraceResult rtr = player.func_213324_a(8, 0, false);
+			RayTraceResult rtr = player.pick(8, 0, false); //CHECKME
 			if(rtr!=null) {
 				BlockPos lookingAt = ((BlockRayTraceResult)rtr).getPos();
 				if(lookingAt!=null) {

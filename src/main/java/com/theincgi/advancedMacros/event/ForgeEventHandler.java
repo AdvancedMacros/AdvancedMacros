@@ -25,7 +25,6 @@ import org.lwjgl.opengl.GL11;
 import org.objectweb.asm.Type;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.CullFace;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.theincgi.advancedMacros.AdvancedMacros;
@@ -1137,7 +1136,7 @@ public class ForgeEventHandler {
 	@SubscribeEvent 
 	public void onItemPickup(EntityItemPickupEvent ipe){ //check net.minecraftforge.event.ForgeEventFactory onItemPickup
 		LuaTable e = createEvent(EventName.ItemPickup);
-		e.set(3, Utils.codedFromTextComponent(ipe.getEntityPlayer().getName()).a);
+		e.set(3, Utils.codedFromTextComponent(ipe.getPlayer().getName()).a);
 		e.set(4, Utils.itemStackToLuatable(ipe.getItem().getItem()));
 		fireEvent(EventName.ItemPickup, e);
 	}
@@ -1236,12 +1235,12 @@ public class ForgeEventHandler {
 
 		GlStateManager.pushTextureAttributes();
 		GlStateManager.enableCull();
-		GlStateManager.cullFace(CullFace.BACK);
+		//GlStateManager.cullFace(CullFace.BACK);
 		GlStateManager.enableBlend();
 
 
 		//src color -> src color?
-		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA.param, DestFactor.ONE_MINUS_SRC_ALPHA.param);
 		GlStateManager.pushMatrix();
 
 		//GlStateManager.enableLighting();
@@ -1275,7 +1274,7 @@ public class ForgeEventHandler {
 		GlStateManager.disableBlend();
 		GlStateManager.enableBlend();
 		//GL11.glEnable(GL11.GL_BLEND);
-		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA.param, DestFactor.ONE_MINUS_SRC_ALPHA.param);
 		//GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
 		//GlStateManager.enableBlend();
@@ -1299,7 +1298,7 @@ public class ForgeEventHandler {
 		//GlStateManager.disableBlend();
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		
-		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.param, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.param, GlStateManager.SourceFactor.ONE.param, GlStateManager.DestFactor.ZERO.param);
 		GlStateManager.disableAlphaTest();
 		GlStateManager.enableAlphaTest();
 		GlStateManager.disableBlend();
@@ -1309,13 +1308,13 @@ public class ForgeEventHandler {
 	}
 
 	public static double accuPlayerX(float pTick, Entity e){
-		return e.posX*pTick + e.lastTickPosX*(1-pTick);
+		return e.getPosX()*pTick + e.lastTickPosX*(1-pTick);
 	}
 	public static double accuPlayerY(float pTick, Entity e){
-		return e.posY*pTick + e.lastTickPosY*(1-pTick);
+		return e.getPosY()*pTick + e.lastTickPosY*(1-pTick);
 	}
 	public static double accuPlayerZ(float pTick, Entity e){
-		return e.posZ*pTick + e.lastTickPosZ*(1-pTick);
+		return e.getPosZ()*pTick + e.lastTickPosZ*(1-pTick);
 	}
 
 

@@ -18,7 +18,7 @@ import net.minecraft.client.MainWindow;
 
 public class HIDUtils {
 	
-	private static final long MC_WINDOW = AdvancedMacros.getMinecraft().mainWindow.getHandle();
+	private static final long MC_WINDOW = AdvancedMacros.getMinecraft().getMainWindow().getHandle();
 	
 	
 	public static class Keyboard {
@@ -146,7 +146,7 @@ public class HIDUtils {
 		public static void setCursorPosition(int x, int y) {
 			try {
 				Robot r = new Robot();
-				MainWindow m = AdvancedMacros.getMinecraft().mainWindow;
+				MainWindow m = AdvancedMacros.getMinecraft().getMainWindow();
 				//TESTME Add difference from width vs framebuffer?
 				r.mouseMove(m.getWindowX()+x, m.getWindowY()+y);
 			} catch (AWTException e) {

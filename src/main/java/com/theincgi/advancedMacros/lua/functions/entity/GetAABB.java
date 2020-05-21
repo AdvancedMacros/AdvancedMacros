@@ -181,7 +181,7 @@ public class GetAABB {
 						//				            if (entity1 != this.shootingEntity || this.ticksInAir >= 5)
 						//				            {
 						AxisAlignedBB axisalignedbb = entity1.getBoundingBox().grow(0.30000001192092896D);
-						EntityRayTraceResult entityRayTraceResult = ProjectileHelper.func_221269_a(world, entity, start, end, aabb, Predicates.alwaysTrue(), Double.MAX_VALUE);
+						EntityRayTraceResult entityRayTraceResult = ProjectileHelper.rayTraceEntities(world, entity, start, end, aabb, Predicates.alwaysTrue(), Double.MAX_VALUE);
 
 						if (entityRayTraceResult != null)
 						{

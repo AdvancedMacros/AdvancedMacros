@@ -171,16 +171,16 @@ public class GuiControls {
 			switch (op) {
 			case getTrades:{
 				LuaTable trades = new LuaTable();
-				MerchantOffers offers = gm.getContainer().func_217051_h();
+				MerchantOffers offers = gm.getContainer().getOffers();
 				for(int i = 0; i<offers.size(); i++) {
 					MerchantOffer mr = offers.get(i);
 					LuaTable t = new LuaTable();
 					LuaTable inputs = new LuaTable();
 					t.set("input", inputs);
-					inputs.set(1,   Utils.itemStackToLuatable(mr.func_222218_a()       	)); //first stack
-					inputs.set(2,   Utils.itemStackToLuatable(mr.func_222202_c() 		)); //second stack
-					t.set("output", Utils.itemStackToLuatable(mr.func_222200_d()      	)); //item sold
-					t.set("uses", mr.func_222213_g() 									 ); //uses remaining
+					inputs.set(1,   Utils.itemStackToLuatable(mr.getBuyingStackFirst() 	)); //first stack
+					inputs.set(2,   Utils.itemStackToLuatable(mr.getBuyingStackSecond() )); //second stack
+					t.set("output", Utils.itemStackToLuatable(mr.getSellingStack()     	)); //item sold
+					t.set("uses", mr.getUses() 									 ); //uses remaining
 					trades.set(i+1, t);
 				}
 				return trades;

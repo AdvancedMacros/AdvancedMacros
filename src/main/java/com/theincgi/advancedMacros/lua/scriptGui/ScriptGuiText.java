@@ -68,7 +68,7 @@ public class ScriptGuiText extends ScriptGuiElement{
 		
 		GlStateManager.bindTexture(0);
 		GlStateManager.enableBlend();
-		GlStateManager.color3f(1, 1, 1);
+		GlStateManager.color4f(1, 1, 1, 1);
 		GlStateManager.enableAlphaTest();
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		//FontRenderer fr = AdvancedMacros.getMinecraft().fontRenderer;

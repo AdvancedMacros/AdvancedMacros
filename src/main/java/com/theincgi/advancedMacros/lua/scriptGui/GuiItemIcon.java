@@ -74,7 +74,7 @@ public class GuiItemIcon extends ScriptGuiElement{
 	public void onDraw(Gui g, int mouseX, int mouseY, float partialTicks) {
 		super.onDraw(g, mouseX, mouseY, partialTicks);
 		RenderHelper.disableStandardItemLighting();
-		RenderHelper.enableGUIStandardItemLighting();
+		RenderHelper.enableStandardItemLighting();
 		itemRender.zLevel = z;
 
 		itemRender.renderItemIntoGUI(itemStack, (int)x, (int)y);

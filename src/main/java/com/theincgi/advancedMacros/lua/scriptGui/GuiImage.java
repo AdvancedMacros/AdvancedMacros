@@ -64,7 +64,7 @@ public class GuiImage extends ScriptGuiElement{
 		float dx = x, dy = y, dw = wid, dh = hei;
 		
 		
-		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA.param, DestFactor.ONE_MINUS_SRC_ALPHA.param);
 		//GlStateManager.tryBlendFuncSeparate(SourceFactor.SRC_COLOR, DestFactor.SRC_COLOR, SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 		
 //		GlStateManager.disableAlpha();

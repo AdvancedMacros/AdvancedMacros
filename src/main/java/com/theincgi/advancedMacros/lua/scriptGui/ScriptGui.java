@@ -78,10 +78,10 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 				LuaTable temp = new LuaTable();
 				Minecraft mc = AdvancedMacros.getMinecraft();
 				
-				temp.set(1, LuaValue.valueOf(mc.mainWindow.getScaledWidth()));
-				temp.set(2, LuaValue.valueOf(mc.mainWindow.getScaledHeight()));
-				temp.set(3, valueOf(mc.mainWindow.getFramebufferWidth()));
-				temp.set(4, valueOf(mc.mainWindow.getFramebufferHeight()));
+				temp.set(1, LuaValue.valueOf(mc.getMainWindow().getScaledWidth()));
+				temp.set(2, LuaValue.valueOf(mc.getMainWindow().getScaledHeight()));
+				temp.set(3, valueOf(mc.getMainWindow().getFramebufferWidth()));
+				temp.set(4, valueOf(mc.getMainWindow().getFramebufferHeight()));
 				return temp.unpack();
 			}
 			case newBox:
@@ -159,8 +159,8 @@ public class ScriptGui extends LuaTable implements InputSubscriber{
 					my = args.checkint(2);
 					Minecraft mc = AdvancedMacros.getMinecraft();
 					//ScaledResolution scaled = new ScaledResolution(mc);
-					mx = mx*(mc.mainWindow.getFramebufferWidth()/mc.mainWindow.getScaledWidth());
-					my = mc.mainWindow.getFramebufferHeight() - my*(mc.mainWindow.getFramebufferHeight()/mc.mainWindow.getScaledHeight());
+					mx = mx*(mc.getMainWindow().getFramebufferWidth()/mc.getMainWindow().getScaledWidth());
+					my = mc.getMainWindow().getFramebufferHeight() - my*(mc.getMainWindow().getFramebufferHeight()/mc.getMainWindow().getScaledHeight());
 				}
 				final Integer fmx = mx, fmy = my;
 				TaskDispatcher.addTask(()->{

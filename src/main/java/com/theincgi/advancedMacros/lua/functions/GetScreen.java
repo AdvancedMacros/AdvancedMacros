@@ -28,7 +28,7 @@ public class GetScreen extends ZeroArgFunction{
 		ListenableFuture<BufferedImage> futureImage = TaskDispatcher.addTask(new Callable<BufferedImage>() {
 			@Override
 			public BufferedImage call() throws Exception {
-				NativeImage ni = ScreenShotHelper.createScreenshot(mc.mainWindow.getFramebufferWidth(), mc.mainWindow.getFramebufferHeight(), mc.getFramebuffer());
+				NativeImage ni = ScreenShotHelper.createScreenshot(mc.getMainWindow().getFramebufferWidth(), mc.getMainWindow().getFramebufferHeight(), mc.getFramebuffer());
 				
 				return Utils.nativeImageToBufferedImage(ni);
 			}

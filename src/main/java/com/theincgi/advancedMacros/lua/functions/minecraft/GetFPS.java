@@ -3,6 +3,7 @@ package com.theincgi.advancedMacros.lua.functions.minecraft;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.CallableTable;
 
 import net.minecraft.client.Minecraft;
@@ -16,7 +17,7 @@ public class GetFPS extends CallableTable {
 	private static class Op extends ZeroArgFunction {
 		@Override
 		public LuaValue call() {
-			return valueOf(Minecraft.getDebugFPS());
+			return valueOf(-1);//AdvancedMacros.getMinecraft().getDebugFPS());
 		}
 	}
 }
