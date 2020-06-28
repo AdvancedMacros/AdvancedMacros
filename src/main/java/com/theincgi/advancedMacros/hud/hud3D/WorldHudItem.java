@@ -6,12 +6,15 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.hud.Destroyable;
 import com.theincgi.advancedMacros.hud.hud3D.HoloBlock.DrawType;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Utils;
+
+import net.minecraft.client.renderer.Matrix4f;
 
 public abstract class WorldHudItem implements Destroyable {
 	protected DrawType drawType = DrawType.NO_XRAY;
@@ -96,7 +99,7 @@ public abstract class WorldHudItem implements Destroyable {
 		setPitch(pitch);
 		setRoll(roll);
 	}
-	public abstract void render(double playerX, double playerY, double playerZ);
+	public abstract void render(MatrixStack ms, Matrix4f projection, float playerX, float playerY, float playerZ, float yaw, float pitch);
 	public float getOpacity() {
 		return color.getAFloat();
 	}

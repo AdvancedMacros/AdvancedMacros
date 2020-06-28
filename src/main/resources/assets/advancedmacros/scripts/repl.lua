@@ -97,7 +97,7 @@ function R.setup()
           end
         end
       end)
-  elseif __GAME_VERSION=="1.14.4" then
+  elseif __GAME_VERSION=="1.14.4" or __GAME_VERSION=="1.15.2" then
     REPL.elements.input.setOnKeyPressed( function(keyName, keyCode, mods)
       if keyName=="ENTER" then
         local expr = REPL.elements.input.getText()
@@ -289,9 +289,10 @@ function R.setup()
   function REPL.evaluate(expr)
     local mutex = newMutex"REPL.evaluate"
     if REPL.activeEval and (
+       REPL.activeEval.status() and(
        REPL.activeEval.status() == "STOPPED" or --pcall should stop this from being needed
        REPL.activeEval.status() == "CRASH" or 
-       REPL.activeEval.status() == "DONE") then
+       REPL.activeEval.status() == "DONE")) then
       REPL.activeEval = nil
     end
     if not mutex.tryLock() or REPL.activeEval then

@@ -4,10 +4,12 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.CallableTable;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Matrix4f;
 
 public class HudText extends WorldHudItem{
 	Minecraft mc = AdvancedMacros.getMinecraft();
@@ -19,7 +21,7 @@ public class HudText extends WorldHudItem{
 	}
 	
 	@Override
-	public void render(double playerX, double playerY, double playerZ) {
+	public void render(MatrixStack ms, Matrix4f projection, float playerX, float playerY, float playerZ,float playerYaw, float playerPitch) {
 		//if(is3D)
 			AdvancedMacros.customFontRenderer.renderText(playerX, playerY, playerZ, x, y, z, yaw, pitch, roll, text, color.getAFloat());
 		//else

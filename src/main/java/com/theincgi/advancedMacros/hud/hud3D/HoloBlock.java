@@ -8,6 +8,7 @@ import org.luaj.vm2_v3_0_1.lib.ThreeArgFunction;
 import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
@@ -19,7 +20,10 @@ import com.theincgi.advancedMacros.misc.Utils;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.advancements.AdvancementState;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.Vector3f;
+import net.minecraft.client.renderer.Vector4f;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
@@ -69,24 +73,32 @@ public class HoloBlock extends WorldHudItem{
 	}
 
 	@Override
-	public void render(double playerX, double playerY, double playerZ) {
+	public void render(MatrixStack ms, Matrix4f projection, float playerX, float playerY, float playerZ, float playerYaw, float playerPitch) {
 		//TODO dont render if player is facing other way
 		if(texture!=null){
 			texture.bindTexture();
 			//GlStateManager.pushAttrib();
 			
-			GlStateManager.pushMatrix(); //TODO include obj rotation in another push pop matrix about here
+//			GlStateManager.pushMatrix(); //TODO include obj rotation in another push pop matrix about here
 			
-			GlStateManager.translated(-playerX, -playerY, -playerZ);
-			GlStateManager.translated(x, y, z);
+//			GlStateManager.rotatef((float)20, 1, 0, 0);
+//			
+//			GlStateManager.rotatef(180+(float)playerYaw, 0, 1, 0);
+			//GlStateManager.rotatef((float)playerPitch, 1, 0, 0);
 			
-			GlStateManager.rotatef(roll, 0, 0, 1);
-			GlStateManager.rotatef(pitch, 1, 0, 0);
-			GlStateManager.rotatef(yaw, 0, 1, 0);
+			Matrix4f t = ms.getLast().getMatrix();
+			
+			t.translate(new Vector3f(-playerX,  -playerY,  -playerZ));
+			t.translate(new Vector3f(x, y, z));
 			
 			
-			GlStateManager.translated(-x, -y, -z);
-			GlStateManager.translated(playerX, playerY, playerZ);
+			t.mul(Vector3f.ZP.rotationDegrees(roll));
+			t.mul(Vector3f.XP.rotationDegrees(pitch));
+			t.mul(Vector3f.YP.rotationDegrees(yaw));
+			
+			
+			t.translate(new Vector3f(-x,-y,-z));
+			t.translate(new Vector3f(playerX, playerY, playerZ));
 			
 			
 		
@@ -95,31 +107,31 @@ public class HoloBlock extends WorldHudItem{
 
 			if(texture!=null || textureNorth!=null) {
 				bindOrBind(textureNorth, texture);
-				drawSideFace(playerX,   playerY, playerZ  ,  width, width,  0); //draw front
+				drawSideFace(t, playerX,   playerY, playerZ  ,  width, width,  0); //draw front
 			}
 			if(texture!=null || textureEast!=null) {
 				bindOrBind(textureEast, texture);
-				drawSideFace(playerX-width, playerY, playerZ  ,  0, width,  width); //draw front
+				drawSideFace(t, playerX-width, playerY, playerZ  ,  0, width,  width); //draw front
 			}
 			if(texture!=null || textureSouth!=null) {
 				bindOrBind(textureSouth, texture);
-				drawSideFace(playerX-width, playerY, playerZ-width, -width, width,  0);
+				drawSideFace(t, playerX-width, playerY, playerZ-width, -width, width,  0);
 			}
 			if(texture!=null || textureWest!=null) {
 				bindOrBind(textureWest, texture);
-				drawSideFace(playerX  , playerY, playerZ-width,  0, width, -width);
+				drawSideFace(t, playerX  , playerY, playerZ-width,  0, width, -width);
 			}
 			if(texture!=null || textureUp!=null) {
 				bindOrBind(textureUp, texture);
-				drawTopFace(playerX, playerY-width, playerZ, width, width);
+				drawTopFace(t, playerX, playerY-width, playerZ, width, width);
 			}
 			if(texture!=null || textureDown!=null) {
 				bindOrBind(textureDown, texture);
-				drawBottomFace(playerX, playerY, playerZ, width, width);
+				drawBottomFace(t, playerX, playerY, playerZ, width, width);
 			}
 
 
-			GlStateManager.popMatrix();//protection for not messing up matrix
+//			GlStateManager.popMatrix();//protection for not messing up matrix
 			//GlStateManager.popAttrib();
 		}
 	}
@@ -138,10 +150,10 @@ public class HoloBlock extends WorldHudItem{
 	}
 
 	//north face
-	private void drawSideFace(double px, double py, double pz, double xWid, double yHei, double zWid){
-		double x = this.x - px;
-		double y = this.y - py;
-		double z = this.z - pz;
+	private void drawSideFace(Matrix4f trf, float px, float py, float pz, float xWid, float yHei, float zWid){
+		float x = (float) (this.x - px);
+		float y = (float) (this.y - py);
+		float z = (float) (this.z - pz);
 		//		double x = px - this.x;
 		//		double y = py - this.y ;
 		//		double z = pz - this.z;
@@ -159,36 +171,36 @@ public class HoloBlock extends WorldHudItem{
 		//		}
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
-		buffer.pos(x     , y     , z     ).tex(uMax, vMax).endVertex();
-		buffer.pos(x     , y+yHei, z     ).tex(uMax, vMin).endVertex();
-		buffer.pos(x+xWid, y+yHei, z+zWid) .tex(uMin, vMin).endVertex();
-		buffer.pos(x+xWid, y     , z+zWid).tex(uMin, vMax).endVertex();
+		buffer.pos(trf, x     , y     , z     ).tex(uMax, vMax).endVertex();
+		buffer.pos(trf, x     , y+yHei, z     ).tex(uMax, vMin).endVertex();
+		buffer.pos(trf, x+xWid, y+yHei, z+zWid) .tex(uMin, vMin).endVertex();
+		buffer.pos(trf, x+xWid, y     , z+zWid).tex(uMin, vMax).endVertex();
 		Tessellator.getInstance().draw();
 	}
-	private void drawTopFace(double px, double py, double pz, double wid, double len){
-		double x = this.x - px;
-		double y = this.y - py;
-		double z = this.z - pz;
+	private void drawTopFace(Matrix4f trf, float px, float py, float pz, float wid, float len){
+		float x = this.x - px;
+		float y = this.y - py;
+		float z = this.z - pz;
 
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
-		buffer.pos(x    , y, z    ).tex(uMin, vMin).endVertex();
-		buffer.pos(x    , y, z+len).tex(uMin, vMax).endVertex();
-		buffer.pos(x+wid, y, z+len).tex(uMax, vMax).endVertex();
-		buffer.pos(x+wid, y, z    ).tex(uMax, vMin).endVertex();
+		buffer.pos(trf, x    , y, z    ).tex(uMin, vMin).endVertex();
+		buffer.pos(trf, x    , y, z+len).tex(uMin, vMax).endVertex();
+		buffer.pos(trf, x+wid, y, z+len).tex(uMax, vMax).endVertex();
+		buffer.pos(trf, x+wid, y, z    ).tex(uMax, vMin).endVertex();
 		Tessellator.getInstance().draw();
 	}
-	private void drawBottomFace(double px, double py, double pz, double wid, double len){
-		double x = this.x - px;
-		double y = this.y - py;
-		double z = this.z - pz;
+	private void drawBottomFace(Matrix4f trf, float px, float py, float pz, float wid, float len){
+		float x = this.x - px;
+		float y = this.y - py;
+		float z = this.z - pz;
 
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
-		buffer.pos(x+wid, y, z    ).tex(uMin, vMin).endVertex();
-		buffer.pos(x+wid, y, z+len).tex(uMin, vMax).endVertex();
-		buffer.pos(x    , y, z+len).tex(uMax, vMax).endVertex();
-		buffer.pos(x    , y, z    ).tex(uMax, vMin).endVertex();
+		buffer.pos(trf, x+wid, y, z    ).tex(uMin, vMin).endVertex();
+		buffer.pos(trf, x+wid, y, z+len).tex(uMin, vMax).endVertex();
+		buffer.pos(trf, x    , y, z+len).tex(uMax, vMax).endVertex();
+		buffer.pos(trf, x    , y, z    ).tex(uMax, vMin).endVertex();
 		Tessellator.getInstance().draw();
 	}
 

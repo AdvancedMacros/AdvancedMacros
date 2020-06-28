@@ -6,12 +6,15 @@ import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
+import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.event.TaskDispatcher;
 import com.theincgi.advancedMacros.misc.HIDUtils.Keyboard;
 
 import net.minecraft.client.MainWindow;

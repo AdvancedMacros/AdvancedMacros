@@ -24,6 +24,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.objectweb.asm.Type;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
@@ -50,11 +51,13 @@ import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.ISoundEventListener;
 import net.minecraft.client.audio.SoundEventAccessor;
 import net.minecraft.client.gui.IngameGui;
+import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.MainMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.network.play.NetworkPlayerInfo;
+import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -1225,40 +1228,36 @@ public class ForgeEventHandler {
 	//public static LuaTable worldHud = new LuaTable();
 	@SubscribeEvent 
 	public void onLastWorldRender(RenderWorldLastEvent rwle){
-		//		GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, AdvancedMacros.modelView3d);
-		//		GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, AdvancedMacros.projView3d);
-
-
+		MatrixStack ms = rwle.getMatrixStack();
+		Matrix4f projection = rwle.getProjectionMatrix();
+		
 		//double x,y,z,uMin,vMin,uMax,vMax, wid, hei;
 		float p = AdvancedMacros.getMinecraft().getRenderPartialTicks();
 		Entity player = AdvancedMacros.getMinecraft().player;
 
 		GlStateManager.pushTextureAttributes();
 		GlStateManager.enableCull();
-		//GlStateManager.cullFace(CullFace.BACK);
 		GlStateManager.enableBlend();
 
 
 		//src color -> src color?
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA.param, DestFactor.ONE_MINUS_SRC_ALPHA.param);
-		GlStateManager.pushMatrix();
+		ms.push();//GlStateManager.pushMatrix();
 
-		//GlStateManager.enableLighting();
 		
 		GlStateManager.translated(0, -(player.getEyeHeight()), 0);
 		synchronized (worldHudItems) {
 			for (WorldHudItem worldHudItem : worldHudItems) {
-				//System.out.println(worldHudItem);
 				if(worldHudItem.getDrawType().isXRAY()){
 					GlStateManager.disableDepthTest();
 				}else{
 					GlStateManager.enableDepthTest();
 				}
 				GlStateManager.color4f(1, 1, 1, worldHudItem.getOpacity());
-				worldHudItem.render(accuPlayerX(p, player), accuPlayerY(p, player), accuPlayerZ(p, player));
+				worldHudItem.render(ms, projection, accuPlayerX(p, player), accuPlayerY(p, player), accuPlayerZ(p, player), (float)accuPlayerYaw(p, player), (float)accuPlayerPitch(p, player));
 			}
 		}
-		GlStateManager.popMatrix();
+		ms.pop();//GlStateManager.popMatrix();
 		GlStateManager.disableBlend();//F1 is black otherwise
 		GlStateManager.popAttributes();
 	}
@@ -1307,14 +1306,20 @@ public class ForgeEventHandler {
 		//	GlStateManager.disableTexture2D();
 	}
 
-	public static double accuPlayerX(float pTick, Entity e){
-		return e.getPosX()*pTick + e.lastTickPosX*(1-pTick);
+	public static float accuPlayerX(float pTick, Entity e){
+		return (float) (e.getPosX()*pTick + e.lastTickPosX*(1-pTick));
 	}
-	public static double accuPlayerY(float pTick, Entity e){
-		return e.getPosY()*pTick + e.lastTickPosY*(1-pTick);
+	public static float accuPlayerY(float pTick, Entity e){
+		return (float) (e.getPosY()*pTick + e.lastTickPosY*(1-pTick));
 	}
-	public static double accuPlayerZ(float pTick, Entity e){
-		return e.getPosZ()*pTick + e.lastTickPosZ*(1-pTick);
+	public static float accuPlayerZ(float pTick, Entity e){
+		return (float) (e.getPosZ()*pTick + e.lastTickPosZ*(1-pTick));
+	}
+	public static double accuPlayerYaw(float pTick, Entity e){
+		return e.rotationYaw*pTick + e.prevRotationYaw*(1-pTick);
+	}
+	public static double accuPlayerPitch(float pTick, Entity e){
+		return e.rotationPitch*pTick + e.prevRotationPitch*(1-pTick);
 	}
 
 

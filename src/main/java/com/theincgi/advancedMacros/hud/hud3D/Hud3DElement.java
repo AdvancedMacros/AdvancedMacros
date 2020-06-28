@@ -7,12 +7,14 @@ import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.lwjgl.opengl.GL11;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 //import com.mojang.blaze3d.platform.GlStateManager.CullFace;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
@@ -70,7 +72,7 @@ public class Hud3DElement extends WorldHudItem{
 	}
 
 	@Override
-	public void render(double playerX, double playerY, double playerZ) {
+	public void render(MatrixStack ms, Matrix4f projection, float playerX, float playerY, float playerZ, float playerYaw, float playerPitch) {
 		try {
 			GlStateManager.pushMatrix();
 			//GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
