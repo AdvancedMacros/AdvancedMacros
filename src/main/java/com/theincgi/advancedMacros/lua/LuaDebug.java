@@ -62,6 +62,7 @@ public class LuaDebug extends DebugLib{
 				return;
 			}
 			case STOPPED:
+			case CRASH:
 				synchronized (threads) {
 					threads.remove(Thread.currentThread());
 				}
@@ -170,6 +171,9 @@ public class LuaDebug extends DebugLib{
 								notifyStatusListeners(thread, Status.CRASH);
 								e.printStackTrace();
 								Utils.logError(e);
+								synchronized (threads) {
+									threads.remove(Thread.currentThread());
+								}
 							}
 							LuaMutex.cleanup();
 						}
@@ -227,6 +231,9 @@ public class LuaDebug extends DebugLib{
 							notifyStatusListeners(thread, Status.CRASH);
 							e.printStackTrace();
 							Utils.logError(e);
+							synchronized (threads) {
+								threads.remove(Thread.currentThread());
+							}
 						}
 					}
 				});

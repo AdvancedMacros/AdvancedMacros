@@ -22,14 +22,14 @@ public class RunOnMC extends VarArgFunction{
 		final LuaValue arg1 = args.arg1();
 		final Varargs fArgs = args.subargs(2);
 		if(arg1.isstring()) {
-			
+			//TODO file support
 		}else if(!arg1.isfunction()) {
 			
 		}
 		final LuaFunction theFunction = arg1.checkfunction();
 		ListenableFuture<Varargs> f = TaskDispatcher.addTask(()->{
 			try {
-				return Utils.pcall(theFunction, fArgs);
+				return Utils.pcallVarArgs(theFunction, fArgs);
 			}catch (Throwable e) {
 				Utils.logError(e);
 				return NONE;

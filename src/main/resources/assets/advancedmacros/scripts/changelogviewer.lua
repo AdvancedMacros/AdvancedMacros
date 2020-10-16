@@ -17,6 +17,17 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  "&aBug Fixes:",
+  " - Fixed an issue where the REPL wasn't useable",
+  " - Fixed an issue where thread data wasn't being cleared for crashed scripts",
+  " - Fixed an issue where sounds played via &bplaySound&f or &bgetSound&f didn't close audio resources.",
+  " - Fixed &brunOnMC&f not returning multiple values",
+  
+  
+   
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 10.0.0a",
   " - Updated to 1.15.2",
   " - New graphical bugs",
   " - Hud3D elements render in incorrect locations and orientations",

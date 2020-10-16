@@ -942,6 +942,19 @@ public class Utils {
 			return LuaValue.NIL;
 		}
 	}
+	public static Varargs pcallVarArgs(LuaFunction func, Varargs luaValues) {
+		try {
+			
+			if(AdvancedMacros.globals.getCurrentLuaThread()==null) {
+				org.luaj.vm2_v3_0_1.LuaThread luaThread = new org.luaj.vm2_v3_0_1.LuaThread(AdvancedMacros.globals, func);
+				AdvancedMacros.globals.setCurrentLuaThread(luaThread);
+			}
+			return func.invoke(luaValues);
+		}catch (Throwable e) {
+			logError(toLuaError(e));
+			return LuaValue.NIL;
+		}
+	}
 	public static LuaValue toTable(Set<String> keySet) {
 		LuaTable t = new LuaTable();
 		for(String s : keySet)
