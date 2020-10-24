@@ -63,7 +63,7 @@ public class CallableTable extends LuaTable{
 					m.set(LUA_DOC,     getJsonLuaDoc());
 					m.set(ARG_TYPES,   getJsonArgTypes());
 				}catch (Exception e) {
-					e.printStackTrace();
+					//e.printStackTrace(); //TODO fix spam
 				}
 				return m;
 			});
