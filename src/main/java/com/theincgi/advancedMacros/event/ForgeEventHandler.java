@@ -963,8 +963,12 @@ public class ForgeEventHandler {
 						Thread.currentThread().setName("ChatFilter - " + script);
 						LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
 						Varargs ret = function.invoke(e2.unpack());
-						if(!ret.toboolean(1)) 
+						if(!ret.toboolean(1)){
+							synchronized (messageCounterLock) { // WD was here
+								nextMessageToAddToChat = Math.max(thisMessageIndex+1, nextMessageToAddToChat);
+							}
 							return;
+						}
 						e2 = createEvent(EventName.ChatFilter);
 						for(int i = 1; i<= ret.narg(); i++)
 							e2.set(2+i, ret.arg(i));
