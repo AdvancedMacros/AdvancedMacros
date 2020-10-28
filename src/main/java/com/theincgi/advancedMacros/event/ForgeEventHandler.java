@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarFile;
+import java.util.Collection;
 
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
@@ -27,6 +28,8 @@ import org.luaj.vm2_v3_0_1.lib.jse.LuajavaLib;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
+
+import com.mojang.authlib.GameProfile;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Gui;
@@ -1470,22 +1473,18 @@ public class ForgeEventHandler {
 
 	private void populatePlayerList(ConcurrentHashMap<String, Boolean> map) {
 		Minecraft mc = AdvancedMacros.getMinecraft();
-		Iterator<NetworkPlayerInfo> iter = mc.getConnection().getPlayerInfoMap().iterator();
-		while(iter.hasNext()) {
-			NetworkPlayerInfo playerInfo = iter.next();
-			String name = mc.ingameGUI.getTabList().getPlayerName(playerInfo);
-			String formated   = name
-					.replaceAll("&", "&&")
-					.replaceAll("\u00A7", "&")
-					.replaceAll("&k", "&O") //Obfuscated
-					.replaceAll("&l", "&B") //Bold
-					.replaceAll("&m", "&S") //Strikethru
-					.replaceAll("&o", "&I") //Italics
-					.replaceAll("&r", "&f")   //reset (to white in this case)
-					;
-			if(name!=null)
-				map.put(formated.replaceAll("&[^&]", "").replaceAll("&&", "&"), true);
-		}
+		Collection<NetworkPlayerInfo> coll = mc.getConnection().getPlayerInfoMap();
+		coll.forEach( (NetworkPlayerInfo playerInfo) -> { // WD
+			//ITextComponent disp = playerInfo.getDisplayName();
+			//if( disp != null ) {
+				//String name = disp.getUnformattedText();
+				GameProfile player = playerInfo.getGameProfile();
+				if( player.getId().version() != 2 ) // exclude bots
+					//if( !Character.isWhitespace(name.charAt(0)) )
+					if( player.getName().charAt(0) != '!' )
+						map.put( player.getName(), true);
+			//}
+		});
 	}
 
 	//private LinkedList<HeldKeybinds> heldKeybinds = new LinkedList<>();
