@@ -154,6 +154,7 @@ public class AdvancedMacros {
 			if(event.getSide().isServer()){return;}
 			minecraftThread = Thread.currentThread();
 			globals.setLuaThread(minecraftThread, new LuaThread(globals));
+			globals.setDefaultLuaThread(new LuaThread(globals));
 			macrosRootFolder.mkdirs();
 			macrosFolder.mkdirs();
 			macroSoundsFolder.mkdirs();
