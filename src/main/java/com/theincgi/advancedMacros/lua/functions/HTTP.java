@@ -6,7 +6,10 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Scanner;
+
+import org.apache.commons.io.IOUtils;
 
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
@@ -167,6 +170,15 @@ public class HTTP extends OneArgFunction{
 					scanner.close();
 					try {
 						in.close();
+					} catch (IOException e) {}
+					return LuaValue.NONE;
+				}
+			});
+			this.set("getContent", new ZeroArgFunction() {
+				@Override
+				public LuaValue call() {
+					try {
+						return LuaValue.valueOf(IOUtils.toString(in,Charset.forName("UTF-8")));
 					} catch (IOException e) {}
 					return LuaValue.NONE;
 				}
