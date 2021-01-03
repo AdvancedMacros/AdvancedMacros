@@ -178,7 +178,8 @@ public class HTTP extends OneArgFunction{
 				@Override
 				public LuaValue call() {
 					try {
-						return LuaValue.valueOf(IOUtils.toString(in,Charset.forName("UTF-8")));
+						// return LuaValue.valueOf(IOUtils.toString(in,Charset.forName(charset.optjstring("UTF-8"))));
+						return LuaValue.valueOf(IOUtils.toByteArray(in));
 					} catch (IOException e) {}
 					return LuaValue.NONE;
 				}
