@@ -81,9 +81,24 @@ public class OpenInventory extends ZeroArgFunction{
 					int slotA = args.arg1().checkint();
 					int mouseButton = args.optint(2, 0);
 					ClickType type = ClickType.PICKUP;
+					if(mouseButton==2) type = ClickType.CLONE;
 					ctrl.windowClick(wID, slotA-1, mouseButton, type, mc.player);
 				});
 				
+				return NONE;
+			}
+			case dragClick:{
+				Utils.runOnMCAndWait(()->{
+					LuaValue slots = args.arg1().checktable();
+					int mouseButton = args.optint(2, 0) == 0 ? 1 : 5;
+					ctrl.windowClick(wID, -999, mouseButton-1, ClickType.QUICK_CRAFT, mc.player);
+					for (int i = 1; i <= slots.length(); i++) {
+						int slot = slots.get(i).checkint();
+						ctrl.windowClick(wID, slot-1, mouseButton, ClickType.QUICK_CRAFT, mc.player);
+					}
+					ctrl.windowClick(wID, -999, mouseButton+1, ClickType.QUICK_CRAFT, mc.player);
+				});
+				Utils.waitTick();
 				return NONE;
 			}
 			case closeAndDrop:
@@ -152,8 +167,8 @@ public class OpenInventory extends ZeroArgFunction{
 			case grabAll:{
 				Utils.runOnMCAndWait(()->{
 					int slotA = args.checkint(1);
-					ctrl.windowClick(wID, slotA-1, 1, ClickType.PICKUP, mc.player);
-					ctrl.windowClick(wID, slotA-1, 1, ClickType.PICKUP_ALL, mc.player);
+					ctrl.windowClick(wID, slotA-1, 0, ClickType.PICKUP, mc.player);
+					ctrl.windowClick(wID, slotA-1, 0, ClickType.PICKUP_ALL, mc.player);
 				});
 				
 				return NONE;
@@ -216,6 +231,7 @@ public class OpenInventory extends ZeroArgFunction{
 		getType,
 		getTotalSlots,
 		click,
+		dragClick,
 		getMap;
 
 		public String[] getDocLocation() {

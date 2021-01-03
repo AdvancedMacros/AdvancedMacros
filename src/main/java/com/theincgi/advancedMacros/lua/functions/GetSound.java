@@ -6,8 +6,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine;
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineListener;
@@ -30,10 +32,12 @@ public class GetSound extends OneArgFunction{
 	}
 	
 	
-	public static LuaTable play(File f) {
+	public static LuaTable play(File f) { //rename
 		try {
+			final AudioInputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(f)));
+			DataLine.Info info = new DataLine.Info(Clip.class, ais.getFormat());
 			final Clip clip = AudioSystem.getClip();
-			clip.open(AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(f))));
+			clip.open( ais );
 			
 			final Cntrls cntrls = new Cntrls(clip);
 			
@@ -42,6 +46,10 @@ public class GetSound extends OneArgFunction{
 				public void update(LineEvent event) {
 					if(event.getType().equals(LineEvent.Type.STOP) && !cntrls.paused) {
 						clip.close();
+						try {
+							ais.close();
+						} catch (IOException e) {
+						}
 					}
 				}
 			});
@@ -93,7 +101,7 @@ public class GetSound extends OneArgFunction{
 			@Override
 			public LuaValue call() {
 				c.start();
-				paused = false;
+				paused = false; //TODO  If desired, the retained data can bediscarded by invoking the flush method.When audio capture or playback stops, a STOP event is generated.
 				return LuaValue.NONE;
 			}
 		}

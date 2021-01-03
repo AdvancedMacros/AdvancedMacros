@@ -229,7 +229,7 @@ public class GetPlayer extends OneArgFunction {
 				t.set("bedLocation", pos);
 			}
 		}
-		t.set("team", player.getTeam()==null?"none":player.getTeam().getName());
+		t.set("team", player.getTeam()==null?FALSE:valueOf(player.getTeam().getName()));
 		t.set("luck", player.getLuck());
 		t.set("health", MathHelper.ceil(player.getHealth()));
 		t.set("hunger", MathHelper.ceil(player.getFoodStats().getFoodLevel()));
@@ -278,7 +278,7 @@ public class GetPlayer extends OneArgFunction {
 			}
 		}
 		t.set("entityID", valueOf(player.getEntityId()));
-		t.set("gamemode", player.isSpectator()?"spectator":player.isCreative()?"creative":"survival");
+		t.set("gamemode", player.isSpectator()?"spectator":player.isCreative()?"creative":"survival"); //FIXME ... adventure?
 		try{
 			t.set("nbt", NBTUtils.fromCompound(player.serializeNBT()));
 		}catch (NullPointerException e) {

@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.event.ForgeEventHandler;
@@ -576,6 +577,21 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber, IBinding
 		}else{
 			if(Keyboard.getKeyIndex(tojstring)!=Keyboard.KEY_NONE)
 				eventSelector.dispText = tojstring;
+			else{
+				try{
+					String id;
+					switch(tojstring)
+					{
+						case "LMB": id = "0"; break;
+						case "RMB": id = "1"; break;
+						case "MMB": id = "2"; break;
+						default: // "MOUSE:"
+							id = tojstring.substring(6); 
+					}
+					if(Mouse.getButtonIndex("BUTTON"+id)!=-1)
+						eventSelector.dispText = tojstring;
+				}catch(Exception ex){}
+			}
 		}
 	}
 
