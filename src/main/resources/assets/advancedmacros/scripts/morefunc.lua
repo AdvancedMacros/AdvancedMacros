@@ -1,3 +1,7 @@
+local AdvancedMacros = luajava.bindClass "com.theincgi.advancedMacros.AdvancedMacros"
+function getMinecraft() return AdvancedMacros:getMinecraft() end
+function _env() return AdvancedMacros:_env() end
+
 --sign( num )
 --returns -1, 0 or 1
 function math.sign(num)
