@@ -40,6 +40,7 @@ import com.theincgi.advancedMacros.lua.functions.Action;
 import com.theincgi.advancedMacros.lua.functions.Call;
 import com.theincgi.advancedMacros.lua.functions.Connect;
 import com.theincgi.advancedMacros.lua.functions.Disconnect;
+import com.theincgi.advancedMacros.lua.functions.entity.GetNBT;
 import com.theincgi.advancedMacros.lua.functions.FileSystem;
 import com.theincgi.advancedMacros.lua.functions.GetBiome;
 import com.theincgi.advancedMacros.lua.functions.GetBlock;
@@ -97,6 +98,7 @@ import com.theincgi.advancedMacros.publicInterfaces.LuaPlugin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -301,6 +303,7 @@ public class AdvancedMacros {
 		globals.set("getLoadedPlayers", new GetLoadedPlayers()); //your loaded chunks
 		globals.set("getPlayerPos", new GetPlayerPos());
 		globals.set("getPlayerBlockPos", new GetPlayerBlockPos());
+		globals.set("getPlayerNBT", new GetNBT());
 
 		//globals.set("minecraft", new MinecraftFunctions());
 		globals.set("getRecipes", new GetRecipe());
@@ -309,6 +312,7 @@ public class AdvancedMacros {
 		
 		globals.set("getEntityList", new GetEntityList());
 		globals.set("getEntity", new GetEntityData());
+		globals.set("getEntityNBT", new GetNBT());
 		globals.set("getBoundingBox", new GetAABB().getFunc()); 
 		globals.set("highlightEntity", new CallableTable(new String[] {"highlightEntity"}, new HighlightEntity()));
 		
@@ -331,6 +335,7 @@ public class AdvancedMacros {
 		globals.set("getBlockLight", new LightAt.BlockLight());
 		globals.set("getSkyLight", new LightAt.SkyLight());
 		globals.set("getBiome", new GetBiome());
+		globals.set("getNBT", new GetNBT());
 
 		globals.set("playSound", new PlaySound.FromFile());
 		globals.set("getSound", new GetSound());

@@ -21,7 +21,9 @@ public class RunOnMC extends VarArgFunction{
 		final LuaValue arg1 = args.arg1();
 		final Varargs fArgs = args.subargs(2);
 		if(arg1.isstring()) {
-			
+			//TODO file support
+		}else if(arg1.istable()) {
+			//TODO metatable supoprt
 		}else if(!arg1.isfunction()) {
 			
 		}

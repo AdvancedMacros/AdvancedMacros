@@ -124,7 +124,7 @@ public class ForgeEventHandler {
 	private LinkedList<WorldHudItem> worldHudItems = new LinkedList<>();
 	private LinkedList<Hud2DItem> hud2DItems = new LinkedList<>();
 	private int sTick = 0; private Object sTickSync = new Object();
-	private ConcurrentHashMap<String, Boolean> lastPlayerList;
+	private ConcurrentHashMap<String, Boolean> lastPlayerList = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<String, Boolean> nowPlayerList = new ConcurrentHashMap<>();
 	public WeakHashMap<Entity, RenderFlags> entityRenderFlags = new WeakHashMap<>();
 	private boolean wasOnFire = false;
@@ -1228,7 +1228,7 @@ public class ForgeEventHandler {
 
 		//src color -> src color?
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-
+		GlStateManager.pushMatrix();
 
 		//GlStateManager.enableLighting();
 
@@ -1244,6 +1244,7 @@ public class ForgeEventHandler {
 				worldHudItem.render(accuPlayerX(p, player), accuPlayerY(p, player), accuPlayerZ(p, player));
 			}
 		}
+		GlStateManager.popMatrix();
 		GlStateManager.disableBlend();//F1 is black otherwise
 		GlStateManager.popAttrib();
 	}

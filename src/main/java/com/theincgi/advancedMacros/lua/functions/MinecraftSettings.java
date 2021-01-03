@@ -232,7 +232,7 @@ public class MinecraftSettings extends LuaTable {
 				}
 				return NONE;
 			case setHeldItemTooltips:
-				mc.gameSettings.advancedItemTooltips = args.checkboolean(1);
+				mc.gameSettings.heldItemTooltips = args.checkboolean(1);
 				return NONE;
 			case setInvertMouse:
 				mc.gameSettings.invertMouse = args.checkboolean(1);

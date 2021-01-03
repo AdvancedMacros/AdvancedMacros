@@ -265,7 +265,7 @@ public class GuiControls {
 					AdvancedMacros.getMinecraft().displayGuiScreen(null);
 					return NONE;
 				case setLine:
-					ts.signText[args.checkint(1)] = new TextComponentString(args.optjstring(2, ""));
+					ts.signText[args.checkint(1)-1] = new TextComponentString(args.optjstring(2, ""));
 					return NONE;
 					//				case setFormatedLine:
 					//					ts.signText[args.checkint(1)] = new TextComponentString(Utils.toMinecraftColorCodes(args.checkjstring(2)));
@@ -634,9 +634,9 @@ public class GuiControls {
 			try {
 				switch (op) {
 				case getLowerLabel: //Yes this is intentionally backwards, 'lower chest' is the top in the gui... idk why
-					return valueOf(	((IInventory)upperChest.get(gc)).getDisplayName().getUnformattedText() );
+					return valueOf( Utils.fromMinecraftColorCodes(((IInventory)upperChest.get(gc)).getDisplayName().getFormattedText()) );
 				case getUpperLabel:
-					return valueOf(	((IInventory)lowerChest.get(gc)).getDisplayName().getUnformattedText() );
+					return valueOf(	Utils.fromMinecraftColorCodes(((IInventory)lowerChest.get(gc)).getDisplayName().getFormattedText()) );
 				}
 			}catch (Exception e) {
 				e.printStackTrace();
