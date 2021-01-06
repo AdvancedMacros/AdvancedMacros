@@ -18,8 +18,10 @@ import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaNumber;
 import org.luaj.vm2_v3_0_1.LuaTable;
+import org.luaj.vm2_v3_0_1.LuaUserdata;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
+import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.google.common.util.concurrent.ListenableFuture;
@@ -1459,5 +1461,11 @@ public class Utils {
 	}
 	public static Varargs varargs(LuaValue...args) {
 		return LuaValue.varargsOf(args);
+	}
+	public static class WrapAsUserdata extends VarArgFunction{
+		@Override
+		public LuaValue invoke(Varargs args) {
+			return userdataOf(args);
+		}
 	}
 }
