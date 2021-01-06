@@ -276,6 +276,7 @@ public class AdvancedMacros {
 		globals.get("os").set("getClipboard", new ClipBoard.GetClipboard());
 		globals.get("os").set("setClipboard", new ClipBoard.SetClipboard());
 		globals.get("string").set("trim", new StringTrim());
+		globals.get("luajava").set("wrap", new Utils.WrapAsUserdata());
 		
 		LuaTable imgTools = new LuaTable();
 		imgTools.set("new", new BufferedImageControls.CreateImg());
