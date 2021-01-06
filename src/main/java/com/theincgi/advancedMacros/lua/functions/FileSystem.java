@@ -171,7 +171,7 @@ public class FileSystem extends LuaTable{
 					int avail=fis.available();
 					byte[] b = new byte[avail];
 					fis.read(b);
-					return LuaValue.valueOf(new String(b));
+					return LuaValue.valueOf(b);
 				} catch (IOException e) {
 					throw new LuaError("IOExeception: ("+e.getMessage()+")");
 				}
