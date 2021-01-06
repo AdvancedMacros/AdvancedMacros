@@ -252,7 +252,7 @@ public class HTTP extends OneArgFunction{
 				@Override
 				public LuaValue call(LuaValue arg) {
 					try {
-						out.write(arg.checkjstring().getBytes());
+						out.write(arg.checkstring().m_bytes);
 					} catch (IOException e) {
 						throw new LuaError("IOException occurred");
 					}
@@ -263,7 +263,8 @@ public class HTTP extends OneArgFunction{
 				@Override
 				public LuaValue call(LuaValue arg) {
 					try {
-						out.write((arg.checkjstring()+"\n").getBytes());
+						out.write(arg.checkstring().m_bytes);
+						out.write('\n');
 					} catch (IOException e) {
 						throw new LuaError("IOException occurred");
 					}
