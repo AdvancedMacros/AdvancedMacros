@@ -221,6 +221,7 @@ public class AdvancedMacros {
 
 
 	public static LuaFunctions.Log logFunc;
+	public static LuaFunctions.LogDel logdelFunc;
 	public static LuaFunctions.Say sayFunc;
 	public static LuaFunctions.Sleep sleepFunc;
 	public static LuaFunctions.Debug debugFunc;
@@ -262,6 +263,7 @@ public class AdvancedMacros {
 		}
 		globals.set("getBlockList", new GetBlockList());
 		globals.set("log", logFunc = new LuaFunctions.Log());
+		globals.set("logdel", logdelFunc = new LuaFunctions.LogDel());
 		globals.set("say", sayFunc = new LuaFunctions.Say());
 		globals.set("toast", new Toast.ToastNotification());
 		globals.set("narrate", new Narrate());

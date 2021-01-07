@@ -143,7 +143,53 @@ public class LuaFunctions {
 		}
 	}
 	
-	
+	public static class LogDel extends Log {
+		static int msgId = 1337;
+
+		@Override
+		public Varargs invoke(Varargs arg0) {
+			if (arg0.narg() == 1) {
+				if (arg0.arg1().istable()) {
+					LuaTable todel = arg0.arg1().checktable();
+					if (tableContainsKeys(todel)) {
+						int idx = 1;
+						LuaValue v = todel.rawget(idx++);
+						while (!v.isnil()) {
+							int chatLineId = v.checkint();
+							AdvancedMacros.getMinecraft().ingameGUI.getChatGUI().deleteChatLine(chatLineId);
+							v = todel.rawget(idx++);
+						}
+					}
+					return LuaValue.NONE;
+				} else if (arg0.arg1().isint()) {
+					int chatLineId = arg0.arg1().checkint();
+					AdvancedMacros.getMinecraft().ingameGUI.getChatGUI().deleteChatLine(chatLineId);
+					return LuaValue.NONE;
+				}
+			}
+
+			int unid = 0;
+			if (arg0.arg1().isint()) {
+				unid = arg0.arg1().checkint();
+				arg0 = arg0.subargs(2); // shift by 1
+			} else if (arg0.arg1().isnil()) {
+				unid = msgId++;
+				if (arg0.narg() != 1)
+					arg0 = arg0.subargs(2); // shift by 1
+			} else
+				unid = msgId++;
+
+			try {
+				AdvancedMacros.getMinecraft().ingameGUI.getChatGUI()
+						.printChatMessageWithOptionalDeletion(formatString(arg0), unid);
+				return valueOf(unid);
+			} catch (Throwable e) {
+				// prob tried to log without chat
+				e.printStackTrace();
+			}
+			return LuaValue.NONE;
+		}
+	}
 	
 	public static String formatTableForLog(LuaTable t){
 		LinkedList<LuaTable> l = new LinkedList<>();
