@@ -84,6 +84,7 @@ public class GetSound extends OneArgFunction{
 			t.set("pause", new Pause());
 			t.set("play", new Start());
 			t.set("setVolume", new SetVolume());
+			t.set("getClip", new GetRaw());
 			return t;
 		}
 		public class SetVolume extends OneArgFunction{
@@ -136,6 +137,12 @@ public class GetSound extends OneArgFunction{
 			@Override
 			public LuaValue call() {
 				return LuaValue.valueOf(c.isRunning());
+			}
+		}
+		private class GetRaw extends ZeroArgFunction{	
+			@Override
+			public LuaValue call() {
+				return LuaValue.userdataOf(c);
 			}
 		}
 	}
