@@ -114,9 +114,33 @@ public class OpenInventory extends ZeroArgFunction{
 				return NONE;
 			case quick:{
 				Utils.runOnMCAndWait(()->{
-					int slotA = args.arg1().checkint();
 					ClickType type = ClickType.QUICK_MOVE;
-					ctrl.windowClick(wID, slotA-1, 0, type, mc.player);
+					if (args.arg1().istable()) {
+						LuaTable tomove = args.arg1().checktable();
+						if (!tomove.next(LuaValue.NIL).arg1().isnil()) {
+							int idx = 1;
+							int limit = 1 + args.arg(2).optint(container.inventorySlots.inventorySlots.size());
+							LuaValue v = tomove.rawget(idx++);
+							while (!v.isnil() && idx <= limit) {
+								int slotA = v.checkint();
+								if (!container.inventorySlots.getSlot(slotA-1).getStack().isEmpty()){
+									ctrl.windowClick(wID, slotA-1, 0, type, mc.player);
+									if (!container.inventorySlots.getSlot(slotA-1).getStack().isEmpty())
+										break; // container filled up, could not move
+								}
+								v = tomove.rawget(idx++);
+							}
+						}
+					} else {
+						for (int i = 1; i <= args.narg(); i++) {
+							int slotA = args.arg(i).checkint();
+							if (!container.inventorySlots.getSlot(slotA-1).getStack().isEmpty()){
+								ctrl.windowClick(wID, slotA-1, 0, type, mc.player);
+								if (!container.inventorySlots.getSlot(slotA-1).getStack().isEmpty())
+									break; // container filled up, could not move
+							}
+						}
+					}
 				});
 				Utils.waitTick();
 				return NONE;
