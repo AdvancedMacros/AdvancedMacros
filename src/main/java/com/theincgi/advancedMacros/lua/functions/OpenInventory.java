@@ -166,6 +166,16 @@ public class OpenInventory extends ZeroArgFunction{
 				int slotA = args.arg1().checkint();
 				return Utils.itemStackToLuatable( container.inventorySlots.getSlot(slotA-1).getStack() );
 			}
+			case drop:{
+				Utils.runOnMCAndWait(()->{
+					int slotA = args.arg1().checkint();
+					int mouseButton = args.optint(2, 0);
+					ClickType type = ClickType.THROW;
+					ctrl.windowClick(wID, slotA-1, mouseButton, type, mc.player);
+				});
+				Utils.waitTick();
+				return NONE;
+			}
 			case swap:{
 				Utils.runOnMCAndWait((Runnable)()->{
 					ItemStack held = mc.player.inventory.getItemStack();
@@ -184,6 +194,16 @@ public class OpenInventory extends ZeroArgFunction{
 					held = mc.player.inventory.getItemStack();
 					if(held.isEmpty()) return;
 					ctrl.windowClick(wID, slotA-1, 0, type, mc.player);
+				});
+				Utils.waitTick();
+				return NONE;
+			}
+			case hotSwap:{ //TODO add swap for currently held
+				Utils.runOnMCAndWait(()->{
+					int slotA = args.arg1().checkint();
+					int hotbarSlot = args.arg(2).checkint();
+					ClickType type = ClickType.SWAP;
+					ctrl.windowClick(wID, slotA-1, hotbarSlot-1, type, mc.player);
 				});
 				Utils.waitTick();
 				return NONE;
@@ -246,7 +266,9 @@ public class OpenInventory extends ZeroArgFunction{
 	private static enum OpCode {
 		close,
 		closeAndDrop,
+		drop,
 		swap,
+		hotSwap,
 		split,
 		getHeld,
 		getSlot,
