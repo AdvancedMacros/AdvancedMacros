@@ -32,21 +32,25 @@ public class GetPlayerList extends ZeroArgFunction {
 //				}
 				
 				Minecraft mc = AdvancedMacros.getMinecraft();
-				Iterator<NetworkPlayerInfo> iter = mc.getConnection().getPlayerInfoMap().iterator();
-				while(iter.hasNext()) {
-					NetworkPlayerInfo playerInfo = iter.next();
-					/*ITextComponent disp = playerInfo.getDisplayName();
-					if( disp != null ) {
-						String name = disp.getUnformattedText();
-						if( !name.isEmpty() ) // should it use String.trim() ?
-							if( !Character.isWhitespace(name.charAt(0)) )
-								//
-					}*/
-					
-					GameProfile player = playerInfo.getGameProfile();
-					if( player.getId().version() != 2 )
-						if( player.getName().charAt(0) != '!' )
-							table.set(i++, player.getName());
+				try {
+					Iterator<NetworkPlayerInfo> iter = mc.getConnection().getPlayerInfoMap().iterator();
+					while (iter.hasNext()) {
+						NetworkPlayerInfo playerInfo = iter.next();
+						/*ITextComponent disp = playerInfo.getDisplayName();
+						if( disp != null ) {
+							String name = disp.getUnformattedText();
+							if( !name.isEmpty() ) // should it use String.trim() ?
+								if( !Character.isWhitespace(name.charAt(0)) )
+									//
+						}*/
+
+						GameProfile player = playerInfo.getGameProfile();
+						if (player.getId().version() != 2)
+							if (player.getName().charAt(0) != '!')
+								table.set(i++, player.getName());
+					}
+				} catch (Throwable t) {
+					t.printStackTrace();
 				}
 			}
 		});
