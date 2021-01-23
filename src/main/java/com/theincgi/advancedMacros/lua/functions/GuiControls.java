@@ -29,6 +29,7 @@ import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.gui.inventory.GuiEditSign;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.inventory.ContainerEnchantment;
+import net.minecraft.inventory.ContainerMerchant;
 import net.minecraft.inventory.ContainerRepair;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -175,12 +176,63 @@ public class GuiControls {
 					inputs.set(1,   Utils.itemStackToLuatable(mr.getItemToBuy()       ));
 					inputs.set(2,   Utils.itemStackToLuatable(mr.getSecondItemToBuy() ));
 					t.set("output", Utils.itemStackToLuatable(mr.getItemToSell()      ));
-					t.set("isEnabled", !mr.isRecipeDisabled());
+					t.set("isEnabled", !mr.isRecipeDisabled()); // uses >= maxUses
+					t.set("maxUses",mr.getMaxTradeUses());
+					t.set("uses",mr.getToolUses());
 					trades.set(i+1, t);
 				}
 				return trades;
 			}
-			case getType:
+			case selectedTrade:{
+				MerchantRecipeList mrl = gm.getMerchant().getRecipes(AdvancedMacros.getMinecraft().player);
+				Field smr = ReflectionHelper.findField(GuiMerchant.class, "selectedMerchantRecipe", "field_147041_z", "A");
+				smr.setAccessible(true);
+
+				int curr;
+				try {
+					return valueOf((int) smr.get(gm) + 1);
+				} catch (Throwable t) {
+					return NIL;
+				}
+			}
+			case checkTrade:{
+				MerchantRecipeList mrl = gm.getMerchant().getRecipes(AdvancedMacros.getMinecraft().player);
+				Field smr = ReflectionHelper.findField(GuiMerchant.class, "selectedMerchantRecipe", "field_147041_z", "A");
+				smr.setAccessible(true);
+
+				int curr;
+				try {
+					curr = args.arg1().optint((int) smr.get(gm) + 1) - 1;
+				} catch (Throwable t) {
+					return NIL;
+				}
+
+				MerchantRecipe mr = mrl.get(curr);
+				int used = mr.getToolUses();
+				int uses = mr.getMaxTradeUses();
+				int avail = uses-used;
+				return varargsOf(valueOf(avail),valueOf(used),valueOf(uses));
+			}
+			case setTrade:{
+				MerchantRecipeList mrl = gm.getMerchant().getRecipes(AdvancedMacros.getMinecraft().player);
+				Field smr = ReflectionHelper.findField(GuiMerchant.class, "selectedMerchantRecipe", "field_147041_z", "A");
+				smr.setAccessible(true);
+
+				int idx = args.arg1().optint(1) - 1;
+				if (idx >= mrl.size()) idx = mrl.size()-1;
+				if (idx < 0) idx = 0;
+
+				final int cri = idx;
+				Utils.runOnMCAndWait(()->{
+					try { smr.set(gm, cri); } catch (Throwable t) {} // so gui stays in sync
+					((ContainerMerchant)gm.inventorySlots).setCurrentRecipeIndex(cri);
+					PacketBuffer packetbuffer = new PacketBuffer(Unpooled.buffer());
+					packetbuffer.writeInt(cri);
+					AdvancedMacros.getMinecraft().getConnection().sendPacket(new CPacketCustomPayload("MC|TrSel", packetbuffer));
+				});
+				return NONE;
+			}
+			case getType: // FIXME returns name tag instead of type
 				return valueOf(gm.getMerchant().getDisplayName().getUnformattedText());
 			default:
 				throw new LuaError("Unimplemented function '"+op.name()+"'");
@@ -655,6 +707,9 @@ public class GuiControls {
 	}
 	private static enum TradeOp {
 		getTrades,
+		selectedTrade,
+		checkTrade,
+		setTrade,
 		getType;
 		public String[] getDocLocation() {
 			return new String[] {"guiEvent#villager", name()};
