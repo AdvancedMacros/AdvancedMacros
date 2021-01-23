@@ -169,9 +169,9 @@ public class OpenInventory extends ZeroArgFunction{
 			case drop:{
 				Utils.runOnMCAndWait(()->{
 					int slotA = args.arg1().checkint();
-					int mouseButton = args.optint(2, 0);
+					boolean stack = args.optboolean(2, false);
 					ClickType type = ClickType.THROW;
-					ctrl.windowClick(wID, slotA-1, mouseButton, type, mc.player);
+					ctrl.windowClick(wID, slotA-1, stack?1:0, type, mc.player);
 				});
 				Utils.waitTick();
 				return NONE;
