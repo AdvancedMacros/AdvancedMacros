@@ -721,10 +721,11 @@ public class Utils {
 				thisTag = LuaValue.valueOf(((NBTTagDouble) tag).getDouble());
 			}else if(tag instanceof NBTTagByteArray){
 				byte[] bytes = ((NBTTagByteArray) tag).getByteArray();
-				thisTag = new LuaTable();
-				for(int j = 0; j<bytes.length; j++){
-					thisTag.set(j+1, LuaValue.valueOf(bytes[j]));
-				}
+				thisTag = LuaValue.valueOf(bytes);
+				//thisTag = new LuaTable();
+				//for(int j = 0; j<bytes.length; j++){
+				//	thisTag.set(j+1, LuaValue.valueOf(bytes[j]));
+				//}
 			}else if(tag instanceof NBTTagString){
 				thisTag = LuaValue.valueOf(((NBTTagString) tag).getString());
 			}else if(tag instanceof NBTTagList){
