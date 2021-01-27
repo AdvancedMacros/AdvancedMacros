@@ -115,6 +115,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import paulscode.sound.SoundSystemConfig;
+import paulscode.sound.SoundSystemException;
+import paulscode.sound.codecs.CodecIBXM;
+import paulscode.sound.codecs.CodecWav;
 
 @Mod(modid = AdvancedMacros.MODID, version = AdvancedMacros.VERSION)
 public class AdvancedMacros {
@@ -187,6 +191,19 @@ public class AdvancedMacros {
 			}
 			
 			// LuaNil.s_metatable = LuaValue.tableOf(new LuaValue[] { LuaValue.INDEX, new ZeroArgFunction() {public LuaValue call() {return NIL;}}});
+			
+			try
+			{
+				// These add available sound codecs that weren't used
+				SoundSystemConfig.setCodec("wav", CodecWav.class);
+				SoundSystemConfig.setCodec("mod", CodecIBXM.class);
+				SoundSystemConfig.setCodec("s3m", CodecIBXM.class);
+				SoundSystemConfig.setCodec("xm", CodecIBXM.class);
+			}
+			catch (SoundSystemException soundsystemexception)
+			{
+				soundsystemexception.printStackTrace();
+			}
 			
 			loadFunctions();
 			loadLibJars();
