@@ -15,6 +15,7 @@ import java.util.jar.JarFile;
 import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
+import org.luaj.vm2_v3_0_1.LuaNil;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaThread;
 import org.luaj.vm2_v3_0_1.LuaValue;
@@ -185,6 +186,7 @@ public class AdvancedMacros {
 				e.printStackTrace();
 			}
 			
+			// LuaNil.s_metatable = LuaValue.tableOf(new LuaValue[] { LuaValue.INDEX, new ZeroArgFunction() {public LuaValue call() {return NIL;}}});
 			
 			loadFunctions();
 			loadLibJars();
