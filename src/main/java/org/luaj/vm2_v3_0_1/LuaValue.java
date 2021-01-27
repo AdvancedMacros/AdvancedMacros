@@ -3322,6 +3322,7 @@ public class LuaValue extends Varargs {
 	 */
 	/** get value from metatable operations, or NIL if not defined by metatables */
 	protected static LuaValue gettable(LuaValue t, LuaValue key) {
+		if (t.isnil()) return NIL; // indexing nil returns nil // WD edit
 		LuaValue tm;
 		int loop = 0;
 		do { 
