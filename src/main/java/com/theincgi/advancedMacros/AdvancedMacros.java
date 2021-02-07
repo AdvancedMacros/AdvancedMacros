@@ -117,8 +117,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import paulscode.sound.SoundSystemConfig;
 import paulscode.sound.SoundSystemException;
-import paulscode.sound.codecs.CodecIBXM;
 import paulscode.sound.codecs.CodecWav;
+
+//import paulscode.sound.codecs.CodecIBXM;
+// Caused by: java.lang.SecurityException: class "paulscode.sound.codecs.CodecIBXM"'s 
+// signer information does not match signer information of other classes in the same package
+import com.theincgi.advancedMacros.misc.CodecIBXM; // imported into AM package
 
 @Mod(modid = AdvancedMacros.MODID, version = AdvancedMacros.VERSION)
 public class AdvancedMacros {
