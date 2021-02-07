@@ -318,7 +318,7 @@ public class FileSystem extends LuaTable{
 		public LuaValue call(LuaValue arg0) {
 			synchronized(syncLock) {
 				try {
-					fos.write(arg0.tojstring().getBytes());
+					fos.write(arg0.checkstring().m_bytes);
 				} catch (IOException e) {
 					throw new LuaError("IOExeception: ("+e.getMessage()+")");
 				}
@@ -340,7 +340,8 @@ public class FileSystem extends LuaTable{
 		public LuaValue call(LuaValue arg0) {
 			synchronized(syncLock) {
 				try {
-					fos.write((arg0.tojstring()+"\n").getBytes());
+					fos.write(arg0.checkstring().m_bytes);
+					fos.write('\n'); // should it be \r\n instead ?
 				} catch (IOException e) {
 					throw new LuaError("IOExeception: ("+e.getMessage()+")");
 				}
