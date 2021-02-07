@@ -31,6 +31,8 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.ContainerPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.IRecipe;
 
 public class OpenInventory extends ZeroArgFunction{
 	private static LuaValue mapping = LuaValue.FALSE;
@@ -217,6 +219,17 @@ public class OpenInventory extends ZeroArgFunction{
 				Utils.waitTick();
 				return NONE;
 			}
+			case setRecipe:{
+				Utils.runOnMCAndWait(()->{
+					int id = args.checkint(1);
+					boolean makeAll = args.optboolean(2, false);
+					IRecipe r = CraftingManager.getRecipeById(id);
+					// TODO sanity check if recipe fits crafting grid
+					ctrl.func_194338_a(wID, r, makeAll, mc.player);
+				});
+				Utils.waitTick();
+				return NONE;
+			}
 			case getType:
 				return containerTypeName(container);
 			case getTotalSlots: { //as suggested by swadicalrag
@@ -274,6 +287,7 @@ public class OpenInventory extends ZeroArgFunction{
 		getSlot,
 		quick,
 		grabAll,
+		setRecipe,
 		getType,
 		getTotalSlots,
 		click,
