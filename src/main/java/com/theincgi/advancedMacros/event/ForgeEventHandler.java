@@ -844,8 +844,12 @@ public class ForgeEventHandler {
 			args.set(3, controls);
 			args.set(4, name);
 
-
-			fireEvent(EventName.GUIOpened, args);
+			try {
+				fireEvent(EventName.GUIOpened, args);
+			} catch (Throwable e) {
+				// prevents crashes from pointing to AM
+				e.printStackTrace();
+			}
 
 		}
 	}
