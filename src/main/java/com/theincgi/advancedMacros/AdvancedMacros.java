@@ -1,10 +1,14 @@
 package com.theincgi.advancedMacros;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
@@ -499,10 +503,18 @@ public class AdvancedMacros {
 		LuaTable args = new LuaTable();
 		args.set(1, "manual");
 		try {
-			FileReader fr = new FileReader(f);
-			LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
-			LuaDebug.LuaThread t = new LuaDebug.LuaThread(function, args.unpack(), scriptName);
-			t.start();
+			try{
+				//FileReader fr = new FileReader(f);
+				BufferedReader fr = new BufferedReader(
+					new InputStreamReader( new FileInputStream(f), "UTF8")
+				);
+				LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
+				LuaDebug.LuaThread t = new LuaDebug.LuaThread(function, args.unpack(), scriptName);
+				t.start();
+			} catch (UnsupportedEncodingException e){
+				e.printStackTrace();
+				throw new LuaError("Unable to read UTF-8 in: "+scriptName);
+			}
 		} catch (FileNotFoundException e) {
 			Utils.logError(new LuaError("Could not find script '"+scriptName+"'"));
 			AdvancedMacros.logFunc.call(LuaValue.valueOf("&c"+"Could not find script '"+scriptName+"'"));

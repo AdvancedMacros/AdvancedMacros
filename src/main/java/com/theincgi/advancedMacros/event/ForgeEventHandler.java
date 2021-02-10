@@ -1,10 +1,15 @@
 package com.theincgi.advancedMacros.event;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -966,19 +971,27 @@ public class ForgeEventHandler {
 				File f = new File(AdvancedMacros.macrosFolder, script);
 				if(f.exists() && f.isFile()) {
 					try {
-						FileReader fr = new FileReader(f);
-						Thread.currentThread().setName("ChatFilter - " + script);
-						LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
-						Varargs ret = function.invoke(e2.unpack());
-						if(!ret.toboolean(1)){
-							synchronized (messageCounterLock) { // WD was here
-								nextMessageToAddToChat = Math.max(thisMessageIndex+1, nextMessageToAddToChat);
+						try{
+							//FileReader fr = new FileReader(f);
+							BufferedReader fr = new BufferedReader(
+								new InputStreamReader( new FileInputStream(f), "UTF8")
+							);
+							Thread.currentThread().setName("ChatFilter - " + script);
+							LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
+							Varargs ret = function.invoke(e2.unpack());
+							if(!ret.toboolean(1)){
+								synchronized (messageCounterLock) { // WD was here
+									nextMessageToAddToChat = Math.max(thisMessageIndex+1, nextMessageToAddToChat);
+								}
+								return;
 							}
-							return;
+							e2 = createEvent(EventName.ChatFilter);
+							for(int i = 1; i<= ret.narg(); i++)
+								e2.set(2+i, ret.arg(i));
+						} catch (UnsupportedEncodingException ex){
+							ex.printStackTrace();
+							throw new LuaError("Unable to read UTF-8 in: "+script);
 						}
-						e2 = createEvent(EventName.ChatFilter);
-						for(int i = 1; i<= ret.narg(); i++)
-							e2.set(2+i, ret.arg(i));
 					} catch (FileNotFoundException ex) {
 						ex.printStackTrace();
 					}catch (LuaError le){
@@ -1043,15 +1056,23 @@ public class ForgeEventHandler {
 				File f = new File(AdvancedMacros.macrosFolder, script);
 				if(f.exists() && f.isFile()) {
 					try {
-						FileReader fr = new FileReader(f);
-						Thread.currentThread().setName("ChatSendFilter - " + script);
-						LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
-						Varargs ret = function.invoke(e.unpack());
-						if(!ret.toboolean(1)) 
-							return;
-						e = createEvent(EventName.ChatSendFilter);
-						for(int i = 1; i<= ret.narg(); i++)
-							e.set(2+i, ret.arg(i));
+						try{
+							//FileReader fr = new FileReader(f);
+							BufferedReader fr = new BufferedReader(
+								new InputStreamReader( new FileInputStream(f), "UTF8")
+							);
+							Thread.currentThread().setName("ChatSendFilter - " + script);
+							LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
+							Varargs ret = function.invoke(e.unpack());
+							if(!ret.toboolean(1)) 
+								return;
+							e = createEvent(EventName.ChatSendFilter);
+							for(int i = 1; i<= ret.narg(); i++)
+								e.set(2+i, ret.arg(i));
+						} catch (UnsupportedEncodingException ex){
+							ex.printStackTrace();
+							throw new LuaError("Unable to read UTF-8 in: "+script);
+						}
 					} catch (FileNotFoundException ex) {
 						ex.printStackTrace();
 					}catch (LuaError le){
