@@ -69,7 +69,9 @@ import com.theincgi.advancedMacros.lua.functions.PCall;
 import com.theincgi.advancedMacros.lua.functions.PlaySound;
 import com.theincgi.advancedMacros.lua.functions.RayTrace;
 import com.theincgi.advancedMacros.lua.functions.RunOnMC;
+import com.theincgi.advancedMacros.lua.functions.RunPythonScript;
 import com.theincgi.advancedMacros.lua.functions.RunThread;
+import com.theincgi.advancedMacros.lua.functions.SOCKET;
 import com.theincgi.advancedMacros.lua.functions.SetProfile;
 import com.theincgi.advancedMacros.lua.functions.SkinCustomizer;
 import com.theincgi.advancedMacros.lua.functions.StopAllScripts;
@@ -310,6 +312,11 @@ public class AdvancedMacros {
 
 		globals.set("connect", new Connect());
 		globals.set("disconnect", new Disconnect());
+		
+		//@samima567
+		globals.set("SOCKET", new SOCKET());
+		globals.set("runPythonScript", new RunPythonScript());
+		
 		globals.set("httpRequest", new HTTP());
 		globals.set("getWorld", new GetWorld());
 		globals.set("getBlock", new GetBlock());
