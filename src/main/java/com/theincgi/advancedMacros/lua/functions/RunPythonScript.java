@@ -2,13 +2,13 @@ package com.theincgi.advancedMacros.lua.functions;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.concurrent.Executors;
-import java.util.function.Consumer;
+import java.util.ArrayList;
 
 import org.luaj.vm2_v3_0_1.LuaValue;
-import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
+import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
+
+
 
 
 
@@ -25,45 +25,72 @@ import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
  * https://www.baeldung.com/java-working-with-python
  */
 
-public class RunPythonScript extends OneArgFunction {
+public class RunPythonScript extends TwoArgFunction {
 	
 	static String homeDirectory = System.getProperty("user.home");
 	static Process process;
 
-	
-	public static void runPythonScript(String pythonPath) throws IOException {
-	
-          //String pythonExe = "C:/Users/AppData/Local/Continuum/Anaconda/python.exe";
-          ProcessBuilder pb = new ProcessBuilder("python", pythonPath);
-          Process p = pb.start();
-          
-          BufferedReader bfr = new BufferedReader(new InputStreamReader(p.getInputStream()));
-          String line = "";
-          System.out.println("Running Python starts: " + line);
-          line = bfr.readLine();
-          System.out.println("First Line: " + line);
-          while ((line = bfr.readLine()) != null) {
-              System.out.println("Python Output: " + line);
-          }
+	public static String[] runPythonScript(String pythonPath, LuaValue arguments) throws IOException {
+		
+		
+		  //convert our parameters to a single list of arguments
+		  String[] args = new String[arguments.length()+2];
+		  
+		  args[0] = "python";
+		  args[1] = pythonPath;
+		  
+		  for (int i = 2; i < args.length; i++) {
+			  args[i] = arguments.tojstring(i-2);
+		  }
+		  
+		 
+		  return runPythonScript(args); //run the script with our args
+	}
+		  
+	public static String[] runPythonScript(String[] args) throws IOException {
+		  //create the processbuilder with our arguments
+        ProcessBuilder pb = new ProcessBuilder(args);
+        Process p = pb.start();
+        
+        ArrayList<String> output = new ArrayList<String>();
+        
+        //read the output
+        BufferedReader bfr = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line = "";
+        System.out.println("Running Python starts: " + line);
+        line = bfr.readLine();
+        output.add(line);
+        System.out.println("First Line: " + line);
+        while ((line = bfr.readLine()) != null) {
+            System.out.println("Python Output: " + line);
+            output.add(line);
+        }
+        return output.toArray(new String[0]);
 	}
 	
 	/**
 	 * {@summary runs a python script at the home directory + the passed filePath}
 	 */
 	@Override
-	public LuaValue call(LuaValue valueL) {
+	public LuaValue call(LuaValue filePath, LuaValue args) {
 	
 		System.out.println("running pyScript");
 		//runPythonScript(homeDirectory + "\\\\AppData\\\\Roaming\\\\.minecraft\\\\mods\\\\shock.py");
 		
+		String[] output = {};
 		try {
-			runPythonScript(homeDirectory + valueL.tojstring());
+			output = runPythonScript(homeDirectory + filePath.tojstring(), args);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	
 		
-		return valueL;
+		LuaValue luaOut = LuaValue.valueOf("");
+		for (String s : output) {
+			luaOut.add(LuaValue.valueOf(s));
+			
+		}
+		
+		return luaOut;
 	}
 	
 	
