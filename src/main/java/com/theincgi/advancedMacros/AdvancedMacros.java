@@ -463,6 +463,13 @@ public class AdvancedMacros {
 			e.printStackTrace();
 		}
 		try {
+			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/httpquick.lua")).getInputStream();
+			globals.load(in, "httpQuick", "t", globals).call();
+			in.close();
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		try {
 			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/repl.lua")).getInputStream();
 			repl = globals.load(in, "REPL", "t", globals);
 			in.close();
