@@ -61,6 +61,7 @@ import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.GlStateManager.CullFace;
@@ -95,6 +96,7 @@ import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.SaveToFile;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.ASMEventHandler;
 import net.minecraftforge.fml.common.eventhandler.Event;
@@ -124,6 +126,7 @@ public class ForgeEventHandler {
 	int[] lastArmourDurability = new int[4];
 	int lastXP, lastXPLevel;
 	int lastDim;
+	boolean worldChanged = false; // sameDim
 	boolean wasRaining, wasThundering;
 	/**Keeping this syncronized!*/
 	private LinkedList<WorldHudItem> worldHudItems = new LinkedList<>();
@@ -311,12 +314,13 @@ public class ForgeEventHandler {
 			playerWasNull=false;
 		}
 
-		if(player.dimension != lastDim) {
+		if(worldChanged || player.dimension != lastDim) {
 			LuaTable e = createEvent(EventName.DimensionChanged);
 			e.set(3, LuaValue.valueOf(player.dimension));
 			e.set(4, LuaValue.valueOf(lastDim));
 			fireEvent(EventName.DimensionChanged, e);
 			lastDim = player.dimension;
+			worldChanged = false;
 		}
 		if(player.isPlayerSleeping() != lastSleepingState) {
 			if(player.isPlayerSleeping())
@@ -622,13 +626,39 @@ public class ForgeEventHandler {
 		e.set(3, Utils.itemStackToLuatable(event.getStack()));
 		fireEvent(EventName.ItemPickup, e);
 	}
+	//@SubscribeEvent @SideOnly(Side.CLIENT)
+	//public void onDimChange(PlayerEvent.PlayerChangedDimensionEvent event) { //DEAD //FIXME
+		//if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
+		//LuaTable e = createEvent(EventName.DimensionChanged);
+		//e.set(3, LuaValue.valueOf(event.toDim));
+		//e.set(4, LuaValue.valueOf(event.fromDim));
+		//fireEvent(EventName.DimensionChanged, e);
+	//}
 	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onDimChange(PlayerEvent.PlayerChangedDimensionEvent event) { //DEAD //FIXME
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
-		LuaTable e = createEvent(EventName.DimensionChanged);
-		e.set(3, LuaValue.valueOf(event.toDim));
-		e.set(4, LuaValue.valueOf(event.fromDim));
-		fireEvent(EventName.DimensionChanged, e);
+	public void worldChangedUnload(WorldEvent.Unload event) { 
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return;
+		//WorldClient newWorld = AdvancedMacros.getMinecraft().world;
+		//worldChanged = newWorld != null && event.getWorld() != null;
+		//System.out.println("UNLOADED_"+event.getWorld().toString());
+		//System.out.println("UNLOADED_"+from.toString());
+		//System.out.println("worldChanged "+worldChanged);
+		/*if (worldChanged){
+			EntityPlayerSP player = AdvancedMacros.getMinecraft().player;
+			if(player != null) {
+				lastDim = player.dimension;
+			}
+		}*/
+		worldChanged = true;
+	}
+	@SubscribeEvent @SideOnly(Side.CLIENT)
+	public void worldChangedLoad(WorldEvent.Load event) { 
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return;
+		if (!worldChanged){
+			EntityPlayerSP player = AdvancedMacros.getMinecraft().player;
+			if(player != null) {
+				lastDim = player.dimension;
+			}
+		}
 	}
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onCraft(PlayerEvent.ItemCraftedEvent event) { //CONFIRMED MP
@@ -684,6 +714,9 @@ public class ForgeEventHandler {
 		//			} catch (IOException e) {e.printStackTrace();}
 		//		});
 		//		t.start();
+
+		lastDim = 0;
+		worldChanged = false; // suppreses triggering from past servers
 
 		LuaTable e = createEvent(EventName.JoinWorld);
 		e.set(3, event.getConnectionType()); //yeilded modded
