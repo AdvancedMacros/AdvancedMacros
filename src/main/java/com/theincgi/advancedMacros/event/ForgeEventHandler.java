@@ -273,7 +273,7 @@ public class ForgeEventHandler {
 	}
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onPlayerTick(TickEvent.PlayerTickEvent event){
+	public void onPlayerTick(TickEvent.ClientTickEvent event){
 		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) 
 			return; //lik srsly
 		if(event.phase.equals(TickEvent.Phase.START)) return; //only do on the second half of tick after all stuff happens
