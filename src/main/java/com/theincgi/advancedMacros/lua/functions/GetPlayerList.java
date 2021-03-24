@@ -45,9 +45,11 @@ public class GetPlayerList extends ZeroArgFunction {
 						}*/
 
 						GameProfile player = playerInfo.getGameProfile();
-						if (player.getId().version() != 2)
-							if (player.getName().charAt(0) != '!')
-								table.set(i++, player.getName());
+						if (player.getId().version() != 2){
+							String s = player.getName();
+							if( !s.isEmpty() && s.charAt(0) != '!' )
+								table.set(i++, s);
+						}
 					}
 				} catch (Throwable t) {
 					t.printStackTrace();

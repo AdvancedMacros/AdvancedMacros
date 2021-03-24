@@ -1541,10 +1541,12 @@ public class ForgeEventHandler {
 			//if( disp != null ) {
 				//String name = disp.getUnformattedText();
 				GameProfile player = playerInfo.getGameProfile();
-				if( player.getId().version() != 2 ) // exclude bots
+				if( player.getId().version() != 2 ){ // exclude bots
 					//if( !Character.isWhitespace(name.charAt(0)) )
-					if( player.getName().charAt(0) != '!' )
-						map.put( player.getName(), true);
+					String s = player.getName();
+					if( !s.isEmpty() && s.charAt(0) != '!' )
+						map.put( s, true);
+				}
 			//}
 		});
 	}
