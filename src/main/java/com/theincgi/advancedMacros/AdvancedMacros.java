@@ -498,18 +498,19 @@ public class AdvancedMacros {
 		LuaTable args = new LuaTable();
 		args.set(1, "manual");
 		try {
-			try{
+			//try{
 				//FileReader fr = new FileReader(f);
-				BufferedReader fr = new BufferedReader(
-					new InputStreamReader( new FileInputStream(f), "UTF8")
-				);
-				LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
+				//BufferedReader fr = new BufferedReader(
+				//	new InputStreamReader( new FileInputStream(f), "UTF8")
+				//);
+				Globals g = AdvancedMacros.globals;
+				LuaValue function = g.load(new FileInputStream(f), f.getAbsolutePath(), "bt", g);
 				LuaDebug.LuaThread t = new LuaDebug.LuaThread(function, args.unpack(), scriptName);
 				t.start();
-			} catch (UnsupportedEncodingException e){
-				e.printStackTrace();
-				throw new LuaError("Unable to read UTF-8 in: "+scriptName);
-			}
+			//} catch (UnsupportedEncodingException e){
+			//	e.printStackTrace();
+			//	throw new LuaError("Unable to read UTF-8 in: "+scriptName);
+			//}
 		} catch (FileNotFoundException e) {
 			Utils.logError(new LuaError("Could not find script '"+scriptName+"'"));
 			AdvancedMacros.logFunc.call(LuaValue.valueOf("&c"+"Could not find script '"+scriptName+"'"));

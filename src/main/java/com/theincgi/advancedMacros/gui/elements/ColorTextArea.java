@@ -4,6 +4,7 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,6 +15,7 @@ import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.lwjgl.input.Keyboard;
@@ -1076,16 +1078,19 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	}
 
 	public void save() {
-		System.out.println("Saving...");
-		try {
-			PrintWriter pw = new PrintWriter(getScriptFile());
-			for (String string : lines) {
-				pw.println(string);
+		if (isEditable)
+		{
+			System.out.println("Saving...");
+			try {
+				PrintWriter pw = new PrintWriter(getScriptFile());
+				for (String string : lines) {
+					pw.println(string);
+				}
+				pw.close();
+				System.out.println("Saved");
+			} catch (IOException e) {
+				e.printStackTrace(); //TODO warn user
 			}
-			pw.close();
-			System.out.println("Saved");
-		} catch (IOException e) {
-			e.printStackTrace(); //TODO warn user
 		}
 		setNeedsSaveFlag(false);
 	}
@@ -1298,22 +1303,54 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	}
 
 	private String scriptName;
+	public boolean isBytecode;
+	public static final byte[] LUA_SIGNATURE	= { '\033', 'L', 'u', 'a' };
 
 	public void openScript(String scriptName) {
 		this.scriptName = scriptName;
 		lines.clear();
+		isBytecode = false;
 		File sScript = new File(AdvancedMacros.macrosFolder, scriptName);
 		if(sScript.exists()){
 			try {
-				Scanner s = new Scanner(sScript);
-				while(s.hasNextLine()){
-					lines.add(s.nextLine());
+				FileInputStream is = new FileInputStream(sScript);
+				//if (!is.markSupported())
+				//	is = new BufferedStream(is);
+				try{
+					is.mark(4);
+					if ( is.read() == LUA_SIGNATURE[0] 
+						|| is.read() == LUA_SIGNATURE[1]
+						|| is.read() == LUA_SIGNATURE[2]
+						|| is.read() == LUA_SIGNATURE[3] ){
+							isBytecode = true;
+							setEditable(false);
+					}
+					is.reset();
+					is.close();
+				} catch (IOException e) {
+					e.getStackTrace();
+					try {
+						is.reset();
+						is.close();
+					} catch (IOException f) {
+						f.getStackTrace();
+					}
 				}
-				s.close();
+				
+				if(!isBytecode)
+				{
+					Scanner s = new Scanner(sScript);
+					while(s.hasNextLine()){
+						lines.add(s.nextLine());
+					}
+					s.close();
+				}
 			} catch (FileNotFoundException e) {
 				lines.add("");
 			}
-			if(lines.size()==0){
+			if (isBytecode){
+				lines.add("File contains bytecode!");
+			} else if(lines.size()==0){
 				lines.add("");
 			}
 		}else{

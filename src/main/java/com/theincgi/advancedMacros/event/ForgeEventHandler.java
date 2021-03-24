@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarFile;
 import java.util.Collection;
 
+import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaTable;
@@ -1003,13 +1004,14 @@ public class ForgeEventHandler {
 				File f = new File(AdvancedMacros.macrosFolder, script);
 				if(f.exists() && f.isFile()) {
 					try {
-						try{
+						// try{
 							//FileReader fr = new FileReader(f);
-							BufferedReader fr = new BufferedReader(
-								new InputStreamReader( new FileInputStream(f), "UTF8")
-							);
+							//BufferedReader fr = new BufferedReader(
+							//	new InputStreamReader( new FileInputStream(f), "UTF8")
+							//);
 							Thread.currentThread().setName("ChatFilter - " + script);
-							LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
+							Globals g = AdvancedMacros.globals;
+							LuaValue function = g.load(new FileInputStream(f), f.getAbsolutePath(), "bt", g);
 							Varargs ret = function.invoke(e2.unpack());
 							if(!ret.toboolean(1)){
 								synchronized (messageCounterLock) { // WD was here
@@ -1020,10 +1022,10 @@ public class ForgeEventHandler {
 							e2 = createEvent(EventName.ChatFilter);
 							for(int i = 1; i<= ret.narg(); i++)
 								e2.set(2+i, ret.arg(i));
-						} catch (UnsupportedEncodingException ex){
-							ex.printStackTrace();
-							throw new LuaError("Unable to read UTF-8 in: "+script);
-						}
+						//} catch (UnsupportedEncodingException ex){
+						//	ex.printStackTrace();
+						//	throw new LuaError("Unable to read UTF-8 in: "+script);
+						//}
 					} catch (FileNotFoundException ex) {
 						ex.printStackTrace();
 					}catch (LuaError le){
@@ -1099,23 +1101,24 @@ public class ForgeEventHandler {
 				File f = new File(AdvancedMacros.macrosFolder, script);
 				if(f.exists() && f.isFile()) {
 					try {
-						try{
+						//try{
 							//FileReader fr = new FileReader(f);
-							BufferedReader fr = new BufferedReader(
-								new InputStreamReader( new FileInputStream(f), "UTF8")
-							);
+							//BufferedReader fr = new BufferedReader(
+							//	new InputStreamReader( new FileInputStream(f), "UTF8")
+							//);
 							Thread.currentThread().setName("ChatSendFilter - " + script);
-							LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
+							Globals g = AdvancedMacros.globals;
+							LuaValue function = g.load(new FileInputStream(f), f.getAbsolutePath(), "bt", g);
 							Varargs ret = function.invoke(e.unpack());
 							if(!ret.toboolean(1)) 
 								return;
 							e = createEvent(EventName.ChatSendFilter);
 							for(int i = 1; i<= ret.narg(); i++)
 								e.set(2+i, ret.arg(i));
-						} catch (UnsupportedEncodingException ex){
-							ex.printStackTrace();
-							throw new LuaError("Unable to read UTF-8 in: "+script);
-						}
+						//} catch (UnsupportedEncodingException ex){
+						//	ex.printStackTrace();
+						//	throw new LuaError("Unable to read UTF-8 in: "+script);
+						//}
 					} catch (FileNotFoundException ex) {
 						ex.printStackTrace();
 					}catch (LuaError le){
