@@ -1319,9 +1319,9 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 				try{
 					is.mark(4);
 					if ( is.read() == LUA_SIGNATURE[0] 
-						|| is.read() == LUA_SIGNATURE[1]
-						|| is.read() == LUA_SIGNATURE[2]
-						|| is.read() == LUA_SIGNATURE[3] ){
+						&& is.read() == LUA_SIGNATURE[1]
+						&& is.read() == LUA_SIGNATURE[2]
+						&& is.read() == LUA_SIGNATURE[3] ){
 							isBytecode = true;
 							setEditable(false);
 					}
