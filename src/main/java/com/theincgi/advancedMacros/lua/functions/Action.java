@@ -81,7 +81,7 @@ public class Action {
 		final Method m = ObfuscationReflectionHelper.findMethod(Minecraft.class, "func_147116_af"); //clickMouse()
 		@Override
 		public LuaValue call(LuaValue arg) {
-			if(arg.isnil() || (arg.islong()&&arg.checklong()==0)){
+			if(arg.isnil()){
 				Class c = minecraft.getClass();
 				m.setAccessible(true);
 				TaskDispatcher.addTask(()-> {
@@ -111,7 +111,7 @@ public class Action {
 		Method m = ObfuscationReflectionHelper.findMethod(Minecraft.class, "func_147121_ag");//"rightClickMouse", 
 		@Override
 		public LuaValue call(LuaValue arg) {
-			if(arg.isnil() || (arg.islong() && arg.checklong()==0)){
+			if(arg.isnil()){
 				Class c = minecraft.getClass();
 				//try {
 
