@@ -15,6 +15,7 @@ import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.Vector3f;
 
 public abstract class WorldHudItem implements Destroyable {
 	protected DrawType drawType = DrawType.NO_XRAY;
@@ -103,6 +104,21 @@ public abstract class WorldHudItem implements Destroyable {
 	public float getOpacity() {
 		return color.getAFloat();
 	}
+	
+	public void apply3dRotation(MatrixStack ms, double playerX, double playerY, double playerZ) {
+		ms.translate(-playerX, -playerY, -playerZ);
+
+		ms.translate(x, y, z);
+		
+		ms.rotate(Vector3f.ZP.rotationDegrees(roll));
+		ms.rotate(Vector3f.XP.rotationDegrees(pitch));
+		ms.rotate(Vector3f.YP.rotationDegrees(yaw));
+		
+		
+		ms.translate(-x,-y,-z);
+		ms.translate(playerX, playerY, playerZ);
+	}
+	
 	public void setOpacity(float opacity) {
 		this.color.setA(opacity);
 	}

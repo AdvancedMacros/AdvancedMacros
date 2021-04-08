@@ -51,13 +51,14 @@ import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.ISoundEventListener;
 import net.minecraft.client.audio.SoundEventAccessor;
 import net.minecraft.client.gui.IngameGui;
-import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.MainMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.network.play.NetworkPlayerInfo;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -66,6 +67,7 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.client.event.ClientChatEvent;
@@ -80,7 +82,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
@@ -1228,8 +1229,17 @@ public class ForgeEventHandler {
 	//public static LuaTable worldHud = new LuaTable();
 	@SubscribeEvent 
 	public void onLastWorldRender(RenderWorldLastEvent rwle){
+		
+		ActiveRenderInfo renderInfo = AdvancedMacros.getMinecraft().gameRenderer.getActiveRenderInfo();
+		Vec3d projectedView = renderInfo.getProjectedView();
+		
 		MatrixStack ms = rwle.getMatrixStack();
 		Matrix4f projection = rwle.getProjectionMatrix();
+		ms.push();
+//		ms.rotate(Vector3f.XP.rotationDegrees(renderInfo.getPitch()));
+//		ms.rotate(Vector3f.YP.rotationDegrees(renderInfo.getYaw()));
+//		ms.translate(-projectedView.x, -projectedView.y, -projectedView.z);
+//		ms.rotate(Vector3f.XP.rotationDegrees(renderInfo.getPitch()));
 		
 		//double x,y,z,uMin,vMin,uMax,vMax, wid, hei;
 		float p = AdvancedMacros.getMinecraft().getRenderPartialTicks();
@@ -1242,19 +1252,26 @@ public class ForgeEventHandler {
 
 		//src color -> src color?
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA.param, DestFactor.ONE_MINUS_SRC_ALPHA.param);
-		ms.push();//GlStateManager.pushMatrix();
-
 		
-		GlStateManager.translated(0, -(player.getEyeHeight()), 0);
+
+		ms.translate(0, -(projectedView.y-accuPlayerY(p, player)), 0); //using the projected accounts for crouching motion
+		
 		synchronized (worldHudItems) {
 			for (WorldHudItem worldHudItem : worldHudItems) {
+				ms.push();
 				if(worldHudItem.getDrawType().isXRAY()){
 					GlStateManager.disableDepthTest();
 				}else{
 					GlStateManager.enableDepthTest();
 				}
+				float  acuX = accuPlayerX(p, player), 
+					   acuY = accuPlayerY(p, player), 
+					   acuZ = accuPlayerZ(p, player);
+				worldHudItem.apply3dRotation(ms, acuX, acuY, acuZ);
 				GlStateManager.color4f(1, 1, 1, worldHudItem.getOpacity());
-				worldHudItem.render(ms, projection, accuPlayerX(p, player), accuPlayerY(p, player), accuPlayerZ(p, player), (float)accuPlayerYaw(p, player), (float)accuPlayerPitch(p, player));
+				worldHudItem.render(ms, projection, acuX, acuY, acuZ, (float)accuPlayerYaw(p, player), (float)accuPlayerPitch(p, player));
+				ms.pop();
+				
 			}
 		}
 		ms.pop();//GlStateManager.popMatrix();
@@ -1264,7 +1281,6 @@ public class ForgeEventHandler {
 
 	@SubscribeEvent
 	public void afterOverlay(RenderGameOverlayEvent.Post event) {
-
 		float p = AdvancedMacros.getMinecraft().getRenderPartialTicks();
 		//Entity player = AdvancedMacros.getMinecraft().player;
 

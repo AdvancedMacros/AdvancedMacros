@@ -20,6 +20,7 @@ import com.theincgi.advancedMacros.misc.Utils;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.advancements.AdvancementState;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.Vector3f;
@@ -77,32 +78,8 @@ public class HoloBlock extends WorldHudItem{
 		//TODO dont render if player is facing other way
 		if(texture!=null){
 			texture.bindTexture();
-			//GlStateManager.pushAttrib();
-			
-//			GlStateManager.pushMatrix(); //TODO include obj rotation in another push pop matrix about here
-			
-//			GlStateManager.rotatef((float)20, 1, 0, 0);
-//			
-//			GlStateManager.rotatef(180+(float)playerYaw, 0, 1, 0);
-			//GlStateManager.rotatef((float)playerPitch, 1, 0, 0);
 			
 			Matrix4f t = ms.getLast().getMatrix();
-			
-			t.translate(new Vector3f(-playerX,  -playerY,  -playerZ));
-			t.translate(new Vector3f(x, y, z));
-			
-			
-			t.mul(Vector3f.ZP.rotationDegrees(roll));
-			t.mul(Vector3f.XP.rotationDegrees(pitch));
-			t.mul(Vector3f.YP.rotationDegrees(yaw));
-			
-			
-			t.translate(new Vector3f(-x,-y,-z));
-			t.translate(new Vector3f(playerX, playerY, playerZ));
-			
-			
-		
-		
 			color.apply();
 
 			if(texture!=null || textureNorth!=null) {

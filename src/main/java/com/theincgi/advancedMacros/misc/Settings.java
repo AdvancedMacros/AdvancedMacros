@@ -25,11 +25,11 @@ import com.theincgi.advancedMacros.lua.ProtectedLuaTable;
 import com.theincgi.advancedMacros.lua.functions.MinecraftSettings;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.renderer.texture.Texture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -151,13 +151,18 @@ public class Settings {
 				r = new ResourceLocation(file.substring(0, file.indexOf(":")), file.substring(file.indexOf(":")+1));
 			else
 				r = new ResourceLocation(file);
-			//TextureAtlasSprite sprite = 
+			
+			TextureAtlasSprite sprite = AdvancedMacros.getMinecraft().getAtlasSpriteGetter(PlayerContainer.LOCATION_BLOCKS_TEXTURE).apply(r);
 			Texture texture = AdvancedMacros.getMinecraft().getTextureManager().getTexture(r);//getTextureMap().getSprite(r);
 			LuaValTexture tex;
 			val = tex = new LuaValTexture("game:"+file, r);
 			tex.setBlockResource();
-			tex.setUV(0, 0, 1, 1);//CHECKME
-			//tex.setUV(texture.sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV());
+//			tex.setUV(0, 0, 1, 1);//CHECKME
+			
+//			RenderType t = RenderTypeLookup.getRenderType(...);
+//			t.setupRenderState();
+			
+			tex.setUV(sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV());
 
 		}else{
 			val = loadTex(file);
