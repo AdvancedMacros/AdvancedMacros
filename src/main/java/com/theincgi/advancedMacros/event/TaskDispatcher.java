@@ -142,6 +142,7 @@ public class TaskDispatcher {
 
 			@Override
 			public U get() throws InterruptedException, ExecutionException {
+				while(!isDone && err==null) Thread.sleep(1);
 				if(err!=null) throw new ExecutionException(err);
 				return result;
 			}

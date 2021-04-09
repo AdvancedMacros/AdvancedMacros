@@ -169,7 +169,7 @@ public class CallableTable extends LuaTable{
 	}
 	public LuaValue getJsonDefinition() {
 		JsonObject jObj = getObjectFromJson(docName);
-		if(jObj.has("definition")) {
+		if(jObj!=null && jObj.has("definition")) {
 			JsonElement je = jObj.get("definition");
 			if(je.isJsonPrimitive()) {
 				return LuaString.valueOf( je.getAsString() );

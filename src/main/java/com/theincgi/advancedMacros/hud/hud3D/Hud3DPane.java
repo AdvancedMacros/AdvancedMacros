@@ -36,21 +36,21 @@ public class Hud3DPane extends WorldHudItem{
 	private void setFace(String face) {
 		face = face.toUpperCase();
 		switch (face) {
-		case "XZ+":
+		case "XZ+": case "Y+":
 			axisFace = AxisFace.XZP; break;
-		case "XZ-":
+		case "XZ-": case "Y-":
 			axisFace = AxisFace.XZM; break;
-		case "XY+":
+		case "XY+": case "Z+":
 			axisFace = AxisFace.XYP; break;
-		case "XY-":
+		case "XY-": case "Z-":
 			axisFace = AxisFace.XYM; break;
-		case "YZ+":
+		case "YZ+": case "X+":
 			axisFace = AxisFace.YZP; break;
-		case "YZ-":
+		case "YZ-": case "X-":
 			axisFace = AxisFace.YZM; break;
-		case "XZ": axisFace = AxisFace.XZ; break;
-		case "XY": axisFace = AxisFace.XY; break;
-		case "YZ": axisFace = AxisFace.YZ; break;
+		case "XZ": case "Y": axisFace = AxisFace.XZ; break;
+		case "XY": case "Z": axisFace = AxisFace.XY; break;
+		case "YZ": case "X": axisFace = AxisFace.YZ; break;
 		default: throw new LuaError("invalid face");
 		}
 	}
@@ -58,17 +58,18 @@ public class Hud3DPane extends WorldHudItem{
 	public void render(MatrixStack ms, Matrix4f projection, float playerX, float playerY, float playerZ, float playerYaw, float playerPitch) {
 		if(texture!=null)
 			texture.bindTexture();
-		GlStateManager.pushMatrix();
-		GlStateManager.translated(-playerX, -playerY, -playerZ);
-		GlStateManager.translatef(x, y, z);
+//		GlStateManager.pushMatrix();
+//		GlStateManager.translated(-playerX, -playerY, -playerZ);
+//		GlStateManager.translatef(x, y, z);
+//		
+//		GlStateManager.rotatef(roll, 0, 0, 1);
+//		GlStateManager.rotatef(pitch, 1, 0, 0);
+//		GlStateManager.rotatef(yaw, 0, 1, 0);
+//		
+//		
+//		GlStateManager.translatef(-x, -y, -z);
+//		GlStateManager.translated(playerX, playerY, playerZ);
 		
-		GlStateManager.rotatef(roll, 0, 0, 1);
-		GlStateManager.rotatef(pitch, 1, 0, 0);
-		GlStateManager.rotatef(yaw, 0, 1, 0);
-		
-		
-		GlStateManager.translatef(-x, -y, -z);
-		GlStateManager.translated(playerX, playerY, playerZ);
 		
 		color.apply();
 		switch (axisFace) {
@@ -109,7 +110,7 @@ public class Hud3DPane extends WorldHudItem{
 		default:
 			break;
 		}
-		GlStateManager.popMatrix();
+		//GlStateManager.popMatrix();
 	}
 	
 	private static enum AxisFace {

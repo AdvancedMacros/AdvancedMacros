@@ -18,12 +18,15 @@ import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.event.TaskDispatcher;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
+import com.theincgi.advancedMacros.lua.functions.HTTP;
 import com.theincgi.advancedMacros.misc.Utils;
 
+import io.netty.handler.codec.http.HttpRequest;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.NativeImage;
 
@@ -44,11 +47,19 @@ public class BufferedImageControls extends LuaTable{
 	public static class LoadImg extends OneArgFunction {
 		@Override
 		public LuaValue call(LuaValue arg) {
-			File f = Utils.parseFileLocation(arg);//new File(AdvancedMacros.macrosRootFolder, arg.checkjstring());
-			try {
-				return new BufferedImageControls(ImageIO.read(f));
-			} catch (IOException e) {
-				throw new LuaError("IOException occurred, "+e.getMessage());
+			if(arg instanceof HTTP.LuaInputStream) {
+				try {
+					return new BufferedImageControls(ImageIO.read(((HTTP.LuaInputStream)arg).getInputStream()));
+				} catch (IOException e) {
+					throw new LuaError("IOException occurred, "+e.getMessage());
+				}
+			}else {
+				File f = Utils.parseFileLocation(arg);//new File(AdvancedMacros.macrosRootFolder, arg.checkjstring());
+				try {
+					return new BufferedImageControls(ImageIO.read(f));
+				} catch (IOException e) {
+					throw new LuaError("IOException occurred, "+e.getMessage());
+				}
 			}
 		}
 	}
@@ -147,14 +158,13 @@ public class BufferedImageControls extends LuaTable{
 			public LuaValue call() {
 				if (dynamicTexture != null) { 
 					TaskDispatcher.addTask(()->{ //changed to non blocking to prevent possible thread locks
-						GlStateManager.bindTexture(0);
+						RenderSystem.bindTexture(0);
 						dynamicTexture.bindTexture();
 						Utils.updateNativeImage(img, dynamicTexture.getTextureData()); //TODO see if this can be moved outside the TaskDispatcher's call
 						dynamicTexture.updateDynamicTexture();
 					});
 				}
 				return NONE;
-				//throw new LuaError("Dynamic texture not created yet");
 			}
 		});
 
@@ -164,17 +174,17 @@ public class BufferedImageControls extends LuaTable{
 
 	public void updateTexture() {
 		//TaskDispatcher.addTask(()->{
-			//tex.bindTexture();
-			
-			NativeImage ni = dynamicTexture.getTextureData();
-			Utils.updateNativeImage(img, ni);
-//			for(int y=0; y<img.getHeight(); y++) {
-//				for(int x=0; x<img.getHeight(); x++) {
-//					int c = img.getRGB(x, y);
-//					ni.setPixelRGBA(x, y, c);
-//				}
-//			}
-			dynamicTexture.updateDynamicTexture();
+		//tex.bindTexture();
+
+		NativeImage ni = dynamicTexture.getTextureData();
+		Utils.updateNativeImage(img, ni);
+		//			for(int y=0; y<img.getHeight(); y++) {
+		//				for(int x=0; x<img.getHeight(); x++) {
+		//					int c = img.getRGB(x, y);
+		//					ni.setPixelRGBA(x, y, c);
+		//				}
+		//			}
+		dynamicTexture.updateDynamicTexture();
 		//});
 	}
 
@@ -189,15 +199,13 @@ public class BufferedImageControls extends LuaTable{
 					dynamicTexture = new DynamicTexture(img.getWidth(), img.getHeight(), true);
 					tex = new LuaValTexture(dynamicTexture);
 					updateTexture();
-					
+
 				}
 			}
 		}));
 	}
 	public DynamicTexture getDynamicTexture() {
 		if (dynamicTexture == null) {
-			//throw new LuaError("Dynamic texture not created yet");
-			//dynamicTexture = new DynamicTexture(img);
 			createTexture();
 		}
 		return dynamicTexture;

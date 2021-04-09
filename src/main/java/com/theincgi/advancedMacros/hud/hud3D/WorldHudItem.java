@@ -106,6 +106,8 @@ public abstract class WorldHudItem implements Destroyable {
 	}
 	
 	public void apply3dRotation(MatrixStack ms, double playerX, double playerY, double playerZ) {
+		
+		
 		ms.translate(-playerX, -playerY, -playerZ);
 
 		ms.translate(x, y, z);
@@ -114,9 +116,13 @@ public abstract class WorldHudItem implements Destroyable {
 		ms.rotate(Vector3f.XP.rotationDegrees(pitch));
 		ms.rotate(Vector3f.YP.rotationDegrees(yaw));
 		
+		ms.translate(-playerX, -playerY, -playerZ);
 		
 		ms.translate(-x,-y,-z);
 		ms.translate(playerX, playerY, playerZ);
+		
+		
+		
 	}
 	
 	public void setOpacity(float opacity) {

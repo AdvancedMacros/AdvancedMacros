@@ -24,6 +24,7 @@ import com.theincgi.advancedMacros.lua.LuaValTexture;
 import com.theincgi.advancedMacros.lua.ProtectedLuaTable;
 import com.theincgi.advancedMacros.lua.functions.MinecraftSettings;
 
+import io.netty.handler.codec.http.HttpRequest;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.NativeImage;
@@ -135,9 +136,7 @@ public class Settings {
 			return textures.get(file);
 		}
 
-		if(file.startsWith("web:")){
-			//feature not included yet.. might want security check or something, maybe just ends with .png/.jpg?
-		}else if(file.startsWith("resource:")){
+		if(file.startsWith("resource:")){
 			file = file.substring("resource:".length());
 			//System.out.println("Resource is \""+file+"\"");
 			ResourceLocation r = new ResourceLocation(AdvancedMacros.MODID, file);

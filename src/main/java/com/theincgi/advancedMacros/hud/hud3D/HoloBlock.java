@@ -81,7 +81,11 @@ public class HoloBlock extends WorldHudItem{
 			
 			Matrix4f t = ms.getLast().getMatrix();
 			color.apply();
-
+			
+			playerX = 0;
+			playerY = 0;//TODO Remove player pos args
+			playerZ = 0;
+			
 			if(texture!=null || textureNorth!=null) {
 				bindOrBind(textureNorth, texture);
 				drawSideFace(t, playerX,   playerY, playerZ  ,  width, width,  0); //draw front

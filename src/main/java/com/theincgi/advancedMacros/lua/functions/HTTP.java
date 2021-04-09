@@ -45,6 +45,7 @@ public class HTTP extends OneArgFunction{
 			} catch (MalformedURLException e) {
 				throw new LuaError("MalformedURLException occurred");
 			} catch (IOException e) {
+				e.printStackTrace();
 				throw new LuaError("IOException occurred");
 			}
 		}
@@ -172,7 +173,9 @@ public class HTTP extends OneArgFunction{
 				}
 			});
 		}
-		
+		public InputStream getInputStream() {
+			return in;
+		}
 	}
 	
 	public static class LuaOutputStream extends LuaTable{
