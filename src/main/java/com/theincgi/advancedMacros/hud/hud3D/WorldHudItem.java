@@ -100,7 +100,7 @@ public abstract class WorldHudItem implements Destroyable {
 		setPitch(pitch);
 		setRoll(roll);
 	}
-	public abstract void render(MatrixStack ms, Matrix4f projection, float playerX, float playerY, float playerZ, float yaw, float pitch);
+	public abstract void render(MatrixStack ms, Matrix4f projection);
 	public float getOpacity() {
 		return color.getAFloat();
 	}
@@ -116,10 +116,10 @@ public abstract class WorldHudItem implements Destroyable {
 		ms.rotate(Vector3f.XP.rotationDegrees(pitch));
 		ms.rotate(Vector3f.YP.rotationDegrees(yaw));
 		
-		ms.translate(-playerX, -playerY, -playerZ);
+		//ms.translate(-playerX, -playerY, -playerZ);
 		
 		ms.translate(-x,-y,-z);
-		ms.translate(playerX, playerY, playerZ);
+		//ms.translate(playerX, playerY, playerZ);
 		
 		
 		

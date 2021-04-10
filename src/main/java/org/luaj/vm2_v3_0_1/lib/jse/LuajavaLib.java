@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.StringJoiner;
 
 import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LuaError;
@@ -42,6 +43,9 @@ import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.compiler.LuaC;
 import org.luaj.vm2_v3_0_1.lib.LibFunction;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
+import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
+
+import com.theincgi.advancedMacros.AdvancedMacros;
 
 /** 
  * Subclass of {@link LibFunction} which implements the features of the luajava package. 
@@ -159,7 +163,18 @@ public class LuajavaLib extends VarArgFunction {
 				final int niface = args.narg()-1;
 				if ( niface <= 0 )
 					throw new LuaError("no interfaces");
-				final LuaValue lobj = args.checktable(niface+1);
+				final LuaTable lobj = args.checktable(niface+1);
+				
+				if(lobj.get("toString").isnil()) {
+					lobj.set("toString", new ZeroArgFunction() {
+						@Override public LuaValue call() {
+							StringJoiner j = new StringJoiner(", ", "Proxy [", "]");
+							for(int i = 1; i<=niface; i++)
+								j.add(args.checkjstring(i));
+							return LuaValue.valueOf(j.toString());
+						}
+					});
+				}
 				
 				// get the interfaces
 				final Class[] ifaces = new Class[niface];
@@ -168,12 +183,11 @@ public class LuajavaLib extends VarArgFunction {
 				
 				// create the invocation handler
 				InvocationHandler handler = new ProxyInvocationHandler(lobj);
-				
+				//System.out.println(getClass().getClassLoader()==null? ClassLoader.getSystemClassLoader() : getClass().getClassLoader());
 				// create the proxy object
-				Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), ifaces, handler);
-				
+				Object proxy = Proxy.newProxyInstance(getClass().getClassLoader()==null? ClassLoader.getSystemClassLoader() : getClass().getClassLoader() , ifaces, handler);
 				// return the proxy
-				return LuaValue.userdataOf( proxy );
+				return proxy==null? LuaValue.FALSE : CoerceJavaToLua.coerce( proxy ); //LuaValue.userdataOf( proxy );
 			}
 			case LOADLIB: {
 				// get constructor
@@ -417,7 +431,8 @@ public class LuajavaLib extends VarArgFunction {
 		private ProxyInvocationHandler(LuaValue lobj) {
 			this.lobj = lobj;
 		}
-
+		
+		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			String name = method.getName();
 			LuaValue func = lobj.get(name);

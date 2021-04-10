@@ -32,7 +32,7 @@ public class Hud3DPane extends WorldHudItem{
 		setFace(face);
 		this.texture = Utils.checkTexture(Settings.getTextureID(texture));
 	}
-	
+
 	private void setFace(String face) {
 		face = face.toUpperCase();
 		switch (face) {
@@ -55,108 +55,100 @@ public class Hud3DPane extends WorldHudItem{
 		}
 	}
 	@Override
-	public void render(MatrixStack ms, Matrix4f projection, float playerX, float playerY, float playerZ, float playerYaw, float playerPitch) {
-		if(texture!=null)
+	public void render(MatrixStack ms, Matrix4f projection) {
+		if(texture!=null) {
 			texture.bindTexture();
-//		GlStateManager.pushMatrix();
-//		GlStateManager.translated(-playerX, -playerY, -playerZ);
-//		GlStateManager.translatef(x, y, z);
-//		
-//		GlStateManager.rotatef(roll, 0, 0, 1);
-//		GlStateManager.rotatef(pitch, 1, 0, 0);
-//		GlStateManager.rotatef(yaw, 0, 1, 0);
-//		
-//		
-//		GlStateManager.translatef(-x, -y, -z);
-//		GlStateManager.translated(playerX, playerY, playerZ);
-		
-		
-		color.apply();
-		switch (axisFace) {
-		case XYM:
-			drawSideFace(playerX, playerY, playerZ, width, length, 0);
-			break;
-		case XYP:
-			drawSideFace(playerX-width, playerY, playerZ, -width, length, 0);
-			break;
-		case XZM:
-			drawBottomFace(playerX, playerY, playerZ, width, length);
-			break;
-		case XZP:
-			drawBottomFace(playerX-width, playerY, playerZ, -width, length);
-			break;
-		case YZP:
-			drawSideFace(playerX, playerY, playerZ, 0, length, width);
-			break;
-		case YZM:
-			drawSideFace(playerX, playerY, playerZ-width, 0, length, -width);
-			break;
-		
-		case XY:
-			GlStateManager.disableCull();
-			drawSideFace(playerX, playerY, playerZ, width, length, 0);
-			GlStateManager.enableCull();
-			break;
-		case XZ:
-			GlStateManager.disableCull();
-			drawBottomFace(playerX, playerY, playerZ, width, length);
-			GlStateManager.enableCull();
-			break;
-		case YZ:
-			GlStateManager.disableCull();
-			drawSideFace(playerX, playerY, playerZ, 0, length, width);
-			GlStateManager.enableCull();
-			break;
-		default:
-			break;
+
+			Matrix4f t = ms.getLast().getMatrix();
+			color.apply();
+
+			color.apply();
+			switch (axisFace) {
+			case XYM:
+				drawSideFace(t, 0, 0, 0, width, length, 0);
+				break;
+			case XYP:
+				drawSideFace(t, -width, 0, 0, -width, length, 0);
+				break;
+			case XZM:
+				drawBottomFace(t, 0, 0, 0, width, length);
+				break;
+			case XZP:
+				drawBottomFace(t, -width, 0, 0, -width, length);
+				break;
+			case YZP:
+				drawSideFace(t, 0, 0, 0, 0, length, width);
+				break;
+			case YZM:
+				drawSideFace(t, 0, 0, -width, 0, length, -width);
+				break;
+
+			case XY:
+				GlStateManager.disableCull();
+				drawSideFace(t, 0, 0, 0, width, length, 0);
+				GlStateManager.enableCull();
+				break;
+			case XZ:
+				GlStateManager.disableCull();
+				drawBottomFace(t, 0, 0, 0, width, length);
+				GlStateManager.enableCull();
+				break;
+			case YZ:
+				GlStateManager.disableCull();
+				drawSideFace(t, 0, 0, 0, 0, length, width);
+				GlStateManager.enableCull();
+				break;
+			default:
+				break;
+			}
+			//GlStateManager.popMatrix();
 		}
-		//GlStateManager.popMatrix();
 	}
-	
+
 	private static enum AxisFace {
 		XZP, XZM, XZ,
 		XYP, XYM, XY,
 		YZP, YZM, YZ; 
 	}
-	private void drawSideFace(double px, double py, double pz, double xWid, double yHei, double zWid){
-		double x = this.x - px;
-		double y = this.y - py;
-		double z = this.z - pz;
+	private void drawSideFace(Matrix4f transform, float px, float py, float pz, float xWid, float yHei, float zWid){
+		float x = this.x - px;
+		float y = this.y - py;
+		float z = this.z - pz;
 
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
-		buffer.pos(x     , y     , z     ).tex(uMax, vMax).endVertex();
-		buffer.pos(x     , y+yHei, z     ).tex(uMax, vMin).endVertex();
-		buffer.pos(x+xWid, y+yHei, z+zWid) .tex(uMin, vMin).endVertex();
-		buffer.pos(x+xWid, y     , z+zWid).tex(uMin, vMax).endVertex();
+		buffer.pos(transform, x     , y     , z     ).tex(uMax, vMax).endVertex();
+		buffer.pos(transform, x     , y+yHei, z     ).tex(uMax, vMin).endVertex();
+		buffer.pos(transform, x+xWid, y+yHei, z+zWid).tex(uMin, vMin).endVertex();
+		buffer.pos(transform, x+xWid, y     , z+zWid).tex(uMin, vMax).endVertex();
 		Tessellator.getInstance().draw();
 	}
-	private void drawBottomFace(double px, double py, double pz, double wid, double len){
-		double x = this.x - px;
-		double y = this.y - py;
-		double z = this.z - pz;
+	private void drawBottomFace(Matrix4f transform, float px, float py, float pz, float wid, float len){
+		float x = this.x - px;
+		float y = this.y - py;
+		float z = this.z - pz;
 
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
-		buffer.pos(x+wid, y, z    ).tex(uMin, vMin).endVertex();
-		buffer.pos(x+wid, y, z+len).tex(uMin, vMax).endVertex();
-		buffer.pos(x    , y, z+len).tex(uMax, vMax).endVertex();
-		buffer.pos(x    , y, z    ).tex(uMax, vMin).endVertex();
+		buffer.pos(transform, x+wid, y, z    ).tex(uMin, vMin).endVertex();
+		buffer.pos(transform, x+wid, y, z+len).tex(uMin, vMax).endVertex();
+		buffer.pos(transform, x    , y, z+len).tex(uMax, vMax).endVertex();
+		buffer.pos(transform, x    , y, z    ).tex(uMax, vMin).endVertex();
 		Tessellator.getInstance().draw();
 	}
-	
+
 	@Override
 	public void loadControls(LuaValue t) {
 		super.loadControls(t);
 		t.set("setWidth",      new CallableTable(new String[]{"hud3D","newPane()","setWidth"}     , new SetWidth()     ));
-		t.set("setLength",      new CallableTable(new String[]{"hud3D","newPane()","setWidth"}     , new SetWidth()     ));
+		t.set("setLength",      new CallableTable(new String[]{"hud3D","newPane()","setWidth"}     , new setLength()     ));
 		t.set("changeTexture", new CallableTable(new String[]{"hud3D","newPane()","changeTexture"}, new ChangeTexture()));
 		t.set("setUV",         new CallableTable(new String[]{"hud3D","newPane()","setUV"}        , new SetUV()        ));
 		t.set("setColor",      new CallableTable(new String[]{"hud3D","newPane()","setColor"}     , new SetColor() ));
 		t.set("getColor",      new CallableTable(new String[]{"hud3D","newPane()","getColor"}     , new GetColor() ));
 		t.set("setSize",       new CallableTable(new String[]{"hud3D","newPane()", "setSize"},    new setSize()  ));
 	}
-	
+
 	public void setWidth(float width){
 		this.width = width;
 	}
@@ -170,7 +162,7 @@ public class Hud3DPane extends WorldHudItem{
 		this.vMin = vMin;
 		this.vMax = vMax;
 	}
-	
+
 	private class SetWidth extends OneArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg) {

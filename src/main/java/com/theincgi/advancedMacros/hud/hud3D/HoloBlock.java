@@ -9,7 +9,6 @@ import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
@@ -17,17 +16,10 @@ import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.Settings;
 import com.theincgi.advancedMacros.misc.Utils;
 
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.gui.advancements.AdvancementState;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.Vector3f;
-import net.minecraft.client.renderer.Vector4f;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Vec3d;
 
 public class HoloBlock extends WorldHudItem{
 	LuaValTexture texture;
@@ -44,7 +36,6 @@ public class HoloBlock extends WorldHudItem{
 	float uMin, uMax, vMin,vMax, width;
 
 
-	private double scale;
 	public HoloBlock(){
 		this("resource:holoblock.png");
 	}
@@ -74,45 +65,42 @@ public class HoloBlock extends WorldHudItem{
 	}
 
 	@Override
-	public void render(MatrixStack ms, Matrix4f projection, float playerX, float playerY, float playerZ, float playerYaw, float playerPitch) {
+	public void render(MatrixStack ms, Matrix4f projection) {
 		//TODO dont render if player is facing other way
 		if(texture!=null){
 			texture.bindTexture();
-			
+
 			Matrix4f t = ms.getLast().getMatrix();
 			color.apply();
-			
-			playerX = 0;
-			playerY = 0;//TODO Remove player pos args
-			playerZ = 0;
-			
+
+
 			if(texture!=null || textureNorth!=null) {
 				bindOrBind(textureNorth, texture);
-				drawSideFace(t, playerX,   playerY, playerZ  ,  width, width,  0); //draw front
+				drawSideFace(t, 0, 0, 0, width, width,  0); //draw front
 			}
 			if(texture!=null || textureEast!=null) {
 				bindOrBind(textureEast, texture);
-				drawSideFace(t, playerX-width, playerY, playerZ  ,  0, width,  width); //draw front
+				drawSideFace(t, -width, 0, 0  ,  0, width,  width); //draw front
 			}
 			if(texture!=null || textureSouth!=null) {
 				bindOrBind(textureSouth, texture);
-				drawSideFace(t, playerX-width, playerY, playerZ-width, -width, width,  0);
+				drawSideFace(t, -width, 0, -width, -width, width,  0);
 			}
 			if(texture!=null || textureWest!=null) {
 				bindOrBind(textureWest, texture);
-				drawSideFace(t, playerX  , playerY, playerZ-width,  0, width, -width);
+				drawSideFace(t, 0  , 0, -width,  0, width, -width);
 			}
 			if(texture!=null || textureUp!=null) {
 				bindOrBind(textureUp, texture);
-				drawTopFace(t, playerX, playerY-width, playerZ, width, width);
+				drawTopFace(t, 0, -width, 0, width, width);
 			}
 			if(texture!=null || textureDown!=null) {
 				bindOrBind(textureDown, texture);
-				drawBottomFace(t, playerX, playerY, playerZ, width, width);
+				drawBottomFace(t, 0, 0, 0, width, width);
 			}
 
 
-//			GlStateManager.popMatrix();//protection for not messing up matrix
+			//			GlStateManager.popMatrix();//protection for not messing up matrix
 			//GlStateManager.popAttrib();
 		}
 	}
@@ -131,10 +119,10 @@ public class HoloBlock extends WorldHudItem{
 	}
 
 	//north face
-	private void drawSideFace(Matrix4f trf, float px, float py, float pz, float xWid, float yHei, float zWid){
-		float x = (float) (this.x - px);
-		float y = (float) (this.y - py);
-		float z = (float) (this.z - pz);
+	private void drawSideFace(Matrix4f trf, float dx, float dy, float dz, float xWid, float yHei, float zWid){
+		float x = this.x - dx;
+		float y = this.y - dy;
+		float z = this.z - dz;
 		//		double x = px - this.x;
 		//		double y = py - this.y ;
 		//		double z = pz - this.z;
@@ -158,10 +146,10 @@ public class HoloBlock extends WorldHudItem{
 		buffer.pos(trf, x+xWid, y     , z+zWid).tex(uMin, vMax).endVertex();
 		Tessellator.getInstance().draw();
 	}
-	private void drawTopFace(Matrix4f trf, float px, float py, float pz, float wid, float len){
-		float x = this.x - px;
-		float y = this.y - py;
-		float z = this.z - pz;
+	private void drawTopFace(Matrix4f trf, float dx, float dy, float dz, float wid, float len){
+		float x = this.x - dx;
+		float y = this.y - dy;
+		float z = this.z - dz;
 
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
@@ -171,17 +159,17 @@ public class HoloBlock extends WorldHudItem{
 		buffer.pos(trf, x+wid, y, z    ).tex(uMax, vMin).endVertex();
 		Tessellator.getInstance().draw();
 	}
-	private void drawBottomFace(Matrix4f trf, float px, float py, float pz, float wid, float len){
-		float x = this.x - px;
-		float y = this.y - py;
-		float z = this.z - pz;
+	private void drawBottomFace(Matrix4f transform, float dx, float dy, float dz, float wid, float len){
+		float x = this.x - dx;
+		float y = this.y - dy;
+		float z = this.z - dz;
 
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
-		buffer.pos(trf, x+wid, y, z    ).tex(uMin, vMin).endVertex();
-		buffer.pos(trf, x+wid, y, z+len).tex(uMin, vMax).endVertex();
-		buffer.pos(trf, x    , y, z+len).tex(uMax, vMax).endVertex();
-		buffer.pos(trf, x    , y, z    ).tex(uMax, vMin).endVertex();
+		buffer.pos(transform, x+wid, y, z    ).tex(uMin, vMin).endVertex();
+		buffer.pos(transform, x+wid, y, z+len).tex(uMin, vMax).endVertex();
+		buffer.pos(transform, x    , y, z+len).tex(uMax, vMax).endVertex();
+		buffer.pos(transform, x    , y, z    ).tex(uMax, vMin).endVertex();
 		Tessellator.getInstance().draw();
 	}
 
@@ -191,13 +179,6 @@ public class HoloBlock extends WorldHudItem{
 	public void setTexture(LuaValTexture v){
 		texture = v;
 	}
-
-
-	/**Doesnt do much unless you are set to custom scale mode*/
-	public void setScale(double scale) {
-		this.scale = scale;
-	}
-
 
 	/**do not give null type*/
 	@Override
@@ -334,7 +315,7 @@ public class HoloBlock extends WorldHudItem{
 			//				setTexture(tex = Utils.checkTexture(arg));
 			//			else
 			//				setTexture(tex = Utils.checkTexture(Settings.getTextureID(arg.checkjstring())));
-			
+
 			return LuaValue.NONE;
 		}
 	}

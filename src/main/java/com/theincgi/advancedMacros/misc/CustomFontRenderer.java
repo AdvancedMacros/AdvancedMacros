@@ -1,13 +1,14 @@
 package com.theincgi.advancedMacros.misc;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
-import com.theincgi.advancedMacros.misc.Matrix.Axis;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
@@ -29,39 +30,17 @@ public class CustomFontRenderer {
 	public float textSize3d = .25f; //.25 of a block as the height
 	public float textSize2d = 12; //12 pixels tall
 	/**Call during the 3d drawing, angles are in degrees*/
-	public void renderText(double playerX, double playerY, double playerZ, double x, double y, double z, float yaw, float pitch, float roll, String text, float opacity) {
+	public void renderText(Matrix4f transform, double x, double y, double z, float yaw, float pitch, float roll, String text, float opacity) {
 		boolean bold = false, italics = false;
-		double tx = x - playerX;
-		double ty = y - playerY;
-		double tz = z - playerZ;
+		float tx = (float) (x);
+		float ty = (float) (y);
+		float tz = (float) (z);
 		float ratio = charWid/(float)charHei;
 		Matrix upVect = Matrix.vector(0, textSize3d, 0);
 		Matrix rightVect = Matrix.vector(textSize3d*ratio, 0 , 0);
-		Matrix offset = Matrix.vector(0, 0, 0);
-		//yaw pitch roll y, x, z
-		//reverse order
+		//Matrix offset = Matrix.vector(0, 0, 0);
 		
-		//pitch
-		{
-			float p = (float) Math.toRadians(pitch);
-
-			rightVect = rightVect.rotate(Axis.X, p);
-			upVect = upVect.rotate(Axis.X, p);
-		}
-		//roll
-
-				{
-					float r = (float) Math.toRadians(roll);
-					rightVect = rightVect.rotate(Axis.Z, r);
-					upVect = upVect.rotate(Axis.Z, r);
-				}
-		//yaw
-		{
-			float ya = (float) Math.toRadians(yaw);
-			rightVect = rightVect.rotate(Axis.Y, ya);
-			upVect = upVect.rotate(Axis.Y, ya);
-		}
-		double dx=tx,dy=ty,dz=tz;
+		float dx=tx,dy=ty,dz=tz;
 		int lineNum = 0;
 		mc.getTextureManager().bindTexture(consolas.getResourceLocation());
 		//System.out.printf("TX: %5.2f TY: %5.2f TZ: %5.2f   UP: %s RIGHT: %s\n",tx,ty,tz,upVect,rightVect);
@@ -180,7 +159,7 @@ public class CustomFontRenderer {
 				}
 				i++;
 			}else {
-				drawChar3D(dx,dy,dz , upVect, rightVect, c);
+				drawChar3D(transform, dx,dy,dz , upVect, rightVect, c);
 				dx-=rightVect.vectorX();
 				dy-=rightVect.vectorY();
 				dz-=rightVect.vectorZ();
@@ -188,7 +167,7 @@ public class CustomFontRenderer {
 		}
 	}
 	private void setColor(Color color, float opaicty) {
-		GlStateManager.color4f(color.getR()/255f, color.getG()/255f, color.getB()/255f, opaicty);
+		RenderSystem.color4f(color.getR()/255f, color.getG()/255f, color.getB()/255f, opaicty);
 	}
 	public void renderText(double x, double y, float z, String text, float opacity, float textSize2d) {
 		boolean bold = false, italics = false;
@@ -198,7 +177,7 @@ public class CustomFontRenderer {
 		float ratio = charWid/(float)charHei;
 		Matrix upVect = Matrix.vector(0, -textSize2d, 0);
 		Matrix rightVect = Matrix.vector(-textSize2d*ratio, 0 , 0);
-		Matrix offset = Matrix.vector(0, 0, 0);
+		//Matrix offset = Matrix.vector(0, 0, 0);
 		
 		double dx=tx,dy=ty;
 		int lineNum = 0;
@@ -315,20 +294,20 @@ public class CustomFontRenderer {
 					italics=true;
 					break;
 				case '&':
-					drawChar2D(dx, dy, z, c, textSize2d*ratio, textSize2d);
+					drawChar2D((float)dx, (float)dy, z, c, textSize2d*ratio, textSize2d);
 					dx-=rightVect.vectorX();
 					dy-=rightVect.vectorY();
 					break;
 				}
 				i++;
 			}else {
-				drawChar2D(dx, dy, z, c, textSize2d*ratio, textSize2d);
+				drawChar2D((float)dx, (float)dy, z, c, textSize2d*ratio, textSize2d);
 				dx-=rightVect.vectorX();
 				dy-=rightVect.vectorY();
 			}
 		}
 	}
-	private void drawChar2D(double x, double y, float z, char c, float wide, float tall) {
+	private void drawChar2D(float x, float y, float z, char c, float wide, float tall) {
 		loadUV(c, uvPair);
 		
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
@@ -340,21 +319,21 @@ public class CustomFontRenderer {
 		Tessellator.getInstance().draw();
 	}
 
-	private void drawChar3D(double x, double y, double z, Matrix upVect, Matrix rightVect, char c) {
+	private void drawChar3D(Matrix4f transform, float x, float y, float z, Matrix upVect, Matrix rightVect, char c) {
 
 		loadUV(c, uvPair);
-		double 	   ux = upVect.vectorX(),
-				uy = upVect.vectorY(),
-				uz = upVect.vectorZ(),
-				rx = rightVect.vectorX(),
-				ry = rightVect.vectorY(),
-				rz = rightVect.vectorZ();
+		float 	   ux = (float) upVect.vectorX(),
+				   uy = (float) upVect.vectorY(),
+				   uz = (float) upVect.vectorZ(),
+				   rx = (float) rightVect.vectorX(),
+				   ry = (float) rightVect.vectorY(),
+				   rz = (float) rightVect.vectorZ();
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
-		buffer.pos(x    	, y     	, z     	).tex(uvPair.umax, uvPair.vmax).endVertex(); //bottom left
-		buffer.pos(x+ux     , y+uy		, z+uz 		).tex(uvPair.umax, uvPair.vmin).endVertex(); //top left
-		buffer.pos(x+ux+rx	, y+uy+ry	, z+uz+rz	).tex(uvPair.umin, uvPair.vmin).endVertex(); //top right
-		buffer.pos(x+rx		, y+ry     	, z+rz		).tex(uvPair.umin, uvPair.vmax).endVertex(); //bottom right
+		buffer.pos(transform, x    	, y     	, z     	).tex(uvPair.umax, uvPair.vmax).endVertex(); //bottom left
+		buffer.pos(transform, x+ux     , y+uy		, z+uz 		).tex(uvPair.umax, uvPair.vmin).endVertex(); //top left
+		buffer.pos(transform, x+ux+rx	, y+uy+ry	, z+uz+rz	).tex(uvPair.umin, uvPair.vmin).endVertex(); //top right
+		buffer.pos(transform, x+rx		, y+ry     	, z+rz		).tex(uvPair.umin, uvPair.vmax).endVertex(); //bottom right
 		Tessellator.getInstance().draw();
 	}
 

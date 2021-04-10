@@ -46,6 +46,7 @@ class JavaInstance extends LuaUserdata {
 		super(instance);
 	}
 
+	@Override
 	public LuaValue get(LuaValue key) {
 		if ( jclass == null )
 			jclass = JavaClass.forClass(m_instance.getClass());
@@ -64,7 +65,8 @@ class JavaInstance extends LuaUserdata {
 			return JavaClass.forClass(c);
 		return super.get(key);
 	}
-
+	
+	@Override
 	public void set(LuaValue key, LuaValue value) {
 		if ( jclass == null )
 			jclass = JavaClass.forClass(m_instance.getClass());

@@ -1269,7 +1269,7 @@ public class ForgeEventHandler {
 					   acuZ = accuPlayerZ(p, player);
 				worldHudItem.apply3dRotation(ms, acuX, acuY, acuZ);
 				GlStateManager.color4f(1, 1, 1, worldHudItem.getOpacity());
-				worldHudItem.render(ms, projection, acuX, acuY, acuZ, (float)accuPlayerYaw(p, player), (float)accuPlayerPitch(p, player));
+				worldHudItem.render(ms, projection);
 				ms.pop();
 				
 			}

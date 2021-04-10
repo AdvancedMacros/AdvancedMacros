@@ -5,6 +5,7 @@ import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.CallableTable;
 
@@ -21,9 +22,12 @@ public class HudText extends WorldHudItem{
 	}
 	
 	@Override
-	public void render(MatrixStack ms, Matrix4f projection, float playerX, float playerY, float playerZ,float playerYaw, float playerPitch) {
+	public void render(MatrixStack ms, Matrix4f projection) {
 		//if(is3D)
-			AdvancedMacros.customFontRenderer.renderText(playerX, playerY, playerZ, x, y, z, yaw, pitch, roll, text, color.getAFloat());
+		
+		RenderSystem.color4f(1, 1, 1, color.getAFloat());
+			AdvancedMacros.customFontRenderer.renderText(ms.getLast().getMatrix(), x, y, z, yaw, pitch, roll, text, color.getAFloat());
+			
 		//else
 		//	AdvancedMacros.customFontRenderer.renderText(x, y, text);
 	}

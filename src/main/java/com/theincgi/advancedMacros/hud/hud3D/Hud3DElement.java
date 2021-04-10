@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 //import com.mojang.blaze3d.platform.GlStateManager.CullFace;
 import com.theincgi.advancedMacros.lua.LuaValTexture;
 import com.theincgi.advancedMacros.misc.Utils;
@@ -72,26 +73,13 @@ public class Hud3DElement extends WorldHudItem{
 	}
 
 	@Override
-	public void render(MatrixStack ms, Matrix4f projection, float playerX, float playerY, float playerZ, float playerYaw, float playerPitch) {
+	public void render(MatrixStack ms, Matrix4f projection) {
 		try {
-			GlStateManager.pushMatrix();
-			//GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
-			GlStateManager.translated(-playerX, -playerY, -playerZ);
-			GlStateManager.translatef(x, y, z);
-
-			GlStateManager.rotatef(roll, 0, 0, 1);
-			GlStateManager.rotatef(pitch, 1, 0, 0);
-			GlStateManager.rotatef(yaw, 0, 1, 0);
-
-
-			GlStateManager.translatef(-x, -y, -z);
-			GlStateManager.translated(playerX, playerY, playerZ);
-
 			LuaTable data = getControls().get("data").checktable();
 
-			GlStateManager.enableBlend();
-			GlStateManager.enableAlphaTest();
-			GlStateManager.enableDepthTest();
+			RenderSystem.enableBlend();
+			RenderSystem.enableAlphaTest();
+			RenderSystem.enableDepthTest();
 
 			LuaValue cullMode = data.get("cullFace");
 			if(cullMode.isnil() || cullMode.isboolean() && !cullMode.checkboolean()) {
@@ -102,18 +90,17 @@ public class Hud3DElement extends WorldHudItem{
 			}
 			
 			if(data.get("lighting").checkboolean())
-			GlStateManager.enableLighting();
+				RenderSystem.enableLighting();
 			//			GlStateManager.enableCull();
 			//			GlStateManager.cullFace(CullFace.BACK);
 			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
 
 
-			render(data, playerX, playerY, playerZ);
-			GlStateManager.enableCull();
-			GlStateManager.disableLighting();
-			//GL11.glPopAttrib();
-			GlStateManager.popMatrix();
+			render(data, ms.getLast().getMatrix());
+			RenderSystem.enableCull();
+			RenderSystem.disableLighting();
+			RenderSystem.popMatrix();
 		}catch (Throwable e) {
 			Utils.logError(e);
 			disableDraw();
@@ -122,7 +109,7 @@ public class Hud3DElement extends WorldHudItem{
 
 
 	/**xyz is players acurate location for partial tick*/
-	private void render(LuaTable t, double playerX, double playerY, double playerZ){
+	private void render(LuaTable t, Matrix4f transform){
 		//		if(t.get("lighting").checkboolean()){
 		//			GlStateManager.enableLighting();
 		//		}else{
@@ -150,13 +137,13 @@ public class Hud3DElement extends WorldHudItem{
 		//		}
 		String mode = t.get("mode").checkjstring();
 		//drawSideFace(playerX, playerY, playerZ, 1, 1, 0);
-		doGeomotryRender(t, playerX, playerY, playerZ, mode);
+		doGeomotryRender(t, transform, mode);
 
 	}
 
 
 
-	private void doGeomotryRender(LuaTable t, double playerX, double playerY, double playerZ, String mode){
+	private void doGeomotryRender(LuaTable t, Matrix4f transform, String mode){
 		try {
 			//drawSideFace(playerX, playerY, playerZ, 1, 1, 0);
 			LuaValue verts = t.get("verts").checktable();
@@ -191,18 +178,18 @@ public class Hud3DElement extends WorldHudItem{
 					color.apply();
 					BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 					buffer.begin(gLMode, type);
-					double x = this.x - playerX;
-					double y = this.y - playerY;
-					double z = this.z - playerZ;
+					float x = this.x;
+					float y = this.y;
+					float z = this.z;
 
 					int vertsLength = verts.length();
 					for(int i = 1; i<=vertsLength; i++) {
-						double vx, vy, vz;
+						float vx, vy, vz;
 						LuaValue v = verts.get(i);
-						vx = v.get(1).checkdouble() + x;
-						vy = v.get(2).checkdouble() + y;
-						vz = v.get(3).checkdouble() + z;
-						buffer.pos(vx, vy, vz);
+						vx = (float) (v.get(1).checkdouble() + x);
+						vy = (float) (v.get(2).checkdouble() + y);
+						vz = (float) (v.get(3).checkdouble() + z);
+						buffer.pos(transform, vx, vy, vz);
 						if(useTexture) {
 							LuaTable uv = uvs.get(i).checktable();
 							double uCoord, vCoord;
