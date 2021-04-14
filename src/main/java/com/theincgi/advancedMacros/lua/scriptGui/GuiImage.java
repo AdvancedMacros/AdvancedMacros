@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.theincgi.advancedMacros.gui.Color;
 import com.theincgi.advancedMacros.gui.Gui;
 import com.theincgi.advancedMacros.gui.elements.GuiRect;
@@ -59,23 +60,23 @@ public class GuiImage extends ScriptGuiElement{
 		super.onDraw(g, mouseX, mouseY, partialTicks);
 		if(!visible) return;
 		
-		GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
-		GlStateManager.pushTextureAttributes();
+		//GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+		RenderSystem.pushTextureAttributes();
 		float dx = x, dy = y, dw = wid, dh = hei;
 		
 		
-		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA.param, DestFactor.ONE_MINUS_SRC_ALPHA.param);
+		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA.param, DestFactor.ONE_MINUS_SRC_ALPHA.param);
 		//GlStateManager.tryBlendFuncSeparate(SourceFactor.SRC_COLOR, DestFactor.SRC_COLOR, SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 		
 //		GlStateManager.disableAlpha();
 //		GlStateManager.enableAlpha();
 ////////		
-		GlStateManager.disableBlend();
-		GlStateManager.enableBlend();
+		RenderSystem.disableBlend();
+		RenderSystem.enableBlend();
 //////		
 ////		GlStateManager.disableTexture2D();
 //		GlStateManager.enableTexture2D();
-		GlStateManager.color4f(color.getR()/255f, color.getG()/255f, color.getB()/255f, color.getA()/255f);
+		RenderSystem.color4f(color.getR()/255f, color.getG()/255f, color.getB()/255f, color.getA()/255f);
 		//GlStateManager.color(1,0,0);
 		
 		
@@ -95,9 +96,9 @@ public class GuiImage extends ScriptGuiElement{
 		buffer.pos(dx+dw	, dy     , z).tex(uMax, vMin).endVertex();
 		Tessellator.getInstance().draw();
 		//GlStateManager.disableBlend();
-		GlStateManager.clearCurrentColor();
-		GlStateManager.popAttributes();
-		GL11.glPopAttrib();
+		RenderSystem.clearCurrentColor();
+		RenderSystem.popAttributes();
+//		GL11.glPopAttrib();
 		
 		if(getHoverTint()!=null && GuiRect.isInBounds(mouseX, mouseY, (int)x, (int)y, (int)wid, (int)hei)) {
 			GuiRectangle.drawRectangle(x, y, wid, hei, getHoverTint(), z);

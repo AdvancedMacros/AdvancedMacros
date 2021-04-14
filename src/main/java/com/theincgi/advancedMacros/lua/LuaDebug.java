@@ -290,10 +290,10 @@ public class LuaDebug extends DebugLib{
 		LuaThread t;
 
 		public static ThreadControls getControls(LuaThread t) {
-			if(Thread.currentThread() == AdvancedMacros.getMinecraftThread()) {
+			if(t==null) throw new NullPointerException("LuaThread is null");
+			if(t.thread == AdvancedMacros.getMinecraftThread()) {
 				throw new LuaError("Minecraft thread does not have controls!");
 			}
-			if(t==null) throw new NullPointerException("LuaThread is null");
 			return controlLookup.computeIfAbsent(t, (key)->{
 				return new ThreadControls(t);
 			});

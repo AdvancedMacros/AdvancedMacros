@@ -109,7 +109,7 @@ public class CallableTable extends LuaTable{
 	}
 	public LuaValue getJsonTooltip() {
 		JsonElement jObj = getObjectFromJson(docName);
-		if(jObj.isJsonObject() && jObj.getAsJsonObject().has("tooltip")) {
+		if(jObj!=null && jObj.isJsonObject() && jObj.getAsJsonObject().has("tooltip")) {
 			jObj = jObj.getAsJsonObject().get("tooltip");
 			if(jObj.isJsonArray()) {
 				JsonArray jArr = jObj.getAsJsonArray();

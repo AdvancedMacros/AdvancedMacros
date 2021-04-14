@@ -140,9 +140,15 @@ public class HIDUtils {
 			}
 			return out;
 		}
+		
+		@SuppressWarnings("resource")
 		public static void setGrabbed(boolean b) {
-			GLFW.glfwSetInputMode(MC_WINDOW, GLFW.GLFW_CURSOR_DISABLED, b? GLFW.GLFW_TRUE : GLFW.GLFW_FALSE);
+			if(b)
+				AdvancedMacros.getMinecraft().mouseHelper.grabMouse();
+			if(b)
+				AdvancedMacros.getMinecraft().mouseHelper.ungrabMouse();
 		}
+		
 		public static int getButtonCount() {
 			return 8;
 		}
