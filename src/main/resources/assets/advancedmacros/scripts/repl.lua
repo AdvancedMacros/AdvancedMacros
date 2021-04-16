@@ -289,10 +289,10 @@ function R.setup()
   function REPL.evaluate(expr)
     local mutex = newMutex"REPL.evaluate"
     if REPL.activeEval and (
-       REPL.activeEval.status() and(
-       REPL.activeEval.status() == "STOPPED" or --pcall should stop this from being needed
-       REPL.activeEval.status() == "CRASH" or 
-       REPL.activeEval.status() == "DONE")) then
+       REPL.activeEval.getStatus() and(
+       REPL.activeEval.getStatus() == "STOPPED" or --pcall should stop this from being needed
+       REPL.activeEval.getStatus() == "CRASH" or 
+       REPL.activeEval.getStatus() == "DONE")) then
       REPL.activeEval = nil
     end
     if not mutex.tryLock() or REPL.activeEval then
@@ -424,7 +424,7 @@ function R.setup()
   REPL.setOnClose( REPL.stopVarTimer )
   REPL.setOnResize( REPL.onResize )
   REPL.setName"REPL"
-  REPL.echo("&7REPL Version 1.0\n&7Type &bhelp()&7 for tips!")
+  REPL.echo("&7REPL Version 1.1\n&7Type &bhelp()&7 for tips!")
 end
 
 --

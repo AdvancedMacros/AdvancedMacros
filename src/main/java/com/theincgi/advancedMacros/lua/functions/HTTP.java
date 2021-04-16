@@ -116,10 +116,10 @@ public class HTTP extends OneArgFunction{
 	
 	public static class LuaInputStream extends LuaTable{
 		InputStream in;
-		Scanner scanner;
+		//Scanner scanner;
 		public LuaInputStream(InputStream in) {
 			this.in = in;
-			scanner = new Scanner(in);
+			//scanner = new Scanner(in);
 			
 			this.set("readByte", new ZeroArgFunction() {
 				@Override
@@ -157,15 +157,31 @@ public class HTTP extends OneArgFunction{
 			this.set("readLine", new ZeroArgFunction() {
 				@Override
 				public LuaValue call() {
-					if(scanner.hasNextLine())
-						return LuaValue.valueOf(scanner.nextLine());
-					return LuaValue.NIL;
+					StringBuilder b = new StringBuilder();
+					try {
+						while(in.available()>0) {
+							int read;
+							
+							read = in.read();
+							
+							if(read==-1) break;
+							if(read=='\n')break;
+							b.append((char)read);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+						throw new LuaError(e);
+					}
+					return LuaValue.valueOf(b.toString());
+					//if(scanner.hasNextLine())
+					//	return LuaValue.valueOf(scanner.nextLine());
+//					return LuaValue.NIL;
 				}
 			});
 			this.set("close", new ZeroArgFunction() {
 				@Override
 				public LuaValue call() {
-					scanner.close();
+					//scanner.close();
 					try {
 						in.close();
 					} catch (IOException e) {}
