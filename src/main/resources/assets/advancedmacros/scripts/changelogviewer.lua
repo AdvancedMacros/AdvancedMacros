@@ -19,7 +19,7 @@ local changeLog = {
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
   "&aBug fixes:",
   " - Command blocks don't crash you anymore :)",
-  " - Fixed a bug with REPL when stoping an execution",
+  " - Fixed a bug with REPL when stopping an execution",
   " - HTTP requests read lines better now",
    
   "&7"..DIVIDER,
