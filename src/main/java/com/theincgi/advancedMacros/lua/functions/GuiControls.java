@@ -3,6 +3,7 @@ package com.theincgi.advancedMacros.lua.functions;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
@@ -516,7 +517,7 @@ public class GuiControls {
 		Field automatic   = ObfuscationReflectionHelper.findField(CommandBlockScreen.class, "field_184085_z");
 		Field mode        = ObfuscationReflectionHelper.findField(CommandBlockScreen.class, "field_184082_w");
 		Field output      = ObfuscationReflectionHelper.findField(AbstractCommandBlockScreen.class, "field_195239_f");
-		Field track       = ObfuscationReflectionHelper.findField(CommandBlockScreen.class, "field_195242_i"); //FIXME 
+		Field track       = ObfuscationReflectionHelper.findField(AbstractCommandBlockScreen.class, "field_195242_i");
 		
 		Method sendUpdatePacket;
 
@@ -539,24 +540,26 @@ public class GuiControls {
 			mode.setAccessible(true);
 			output.setAccessible(true);
 			track.setAccessible(true);
-			sendUpdatePacket = ObfuscationReflectionHelper.findMethod(CommandBlockScreen.class, "func_195235_a");
+
+			sendUpdatePacket = ObfuscationReflectionHelper.findMethod(CommandBlockScreen.class, "func_195235_a", CommandBlockLogic.class);
 			sendUpdatePacket.setAccessible(true);
-			//cb.initGui(); //TESTME command blocks
-			cb.updateGui();
-			try {
-				long timeout = System.currentTimeMillis()+400;
-				while(text==null) {
-					text = (TextFieldWidget) tf.get(cb);
-					try {
-						Thread.sleep(20);
-					} catch (InterruptedException e) {break;}
-					if(timeout < System.currentTimeMillis())
-						break;
-				}
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				throw new LuaError( e );
-			}
-			//cb.updateGui();
+//			cb.init(); //TESTME command blocks
+//			cb.updateGui();
+//			try {
+//				long timeout = System.currentTimeMillis()+400;
+//				while(text==null) {
+//					text = (TextFieldWidget) tf.get(cb);
+//					if(text!=null) break;
+//					try {
+//						Thread.sleep(20);
+//					} catch (InterruptedException e) {break;}
+//					if(timeout < System.currentTimeMillis())
+//						break;
+//				}
+//			} catch (IllegalArgumentException | IllegalAccessException e) {
+//				throw new LuaError( e );
+//			}
+//			cb.updateGui();
 		}
 		@Override
 		public Varargs invoke(Varargs args) {

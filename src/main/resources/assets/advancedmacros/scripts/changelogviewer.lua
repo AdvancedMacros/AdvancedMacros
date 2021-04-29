@@ -17,6 +17,14 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  "&aBug fixes:",
+  " - Command blocks don't crash you anymore :)",
+  " - Fixed a bug with REPL when stoping an execution",
+  " - HTTP requests read lines better now",
+   
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 10.1.0a",
   "&bFeatures:",
   " - Added built in version comparision",
   "   - &badvancedMacros.isBeforeVersion&f( &6String:version &7[, String:modVersion]&f)",
