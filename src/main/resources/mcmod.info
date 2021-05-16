@@ -9,7 +9,7 @@
   "updateUrl": "",
   "authorList": ["TheIncgi"],
   "credits": "TheIncgi - Code, Emex - Icons and The Forge and FML guys",
-  "logoFile": "/assets/advancedmacros/logo.png",
+  "logoFile": "assets/advancedmacros/logo.png",
   "screenshots": [],
   "dependencies": []
 }
