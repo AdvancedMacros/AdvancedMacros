@@ -5,8 +5,10 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1047,7 +1049,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 					System.out.println("Autocomplete");
 				}
 			}
-			if(32<=typedChar && typedChar<=126){
+			if(!Character.isISOControl(typedChar)){
 				if(!isEditable){return false;}
 				lines.set(cursor.getY(), lines.get(cursor.getY()).substring(0, cursor.getX())+typedChar+lines.get(cursor.getY()).substring(cursor.getX()));
 				cursor.addX(1);
@@ -1082,7 +1084,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		{
 			System.out.println("Saving...");
 			try {
-				PrintWriter pw = new PrintWriter(getScriptFile());
+				PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(getScriptFile()), "UTF-8"));
 				for (String string : lines) {
 					pw.println(string);
 				}
@@ -1339,7 +1341,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 				
 				if(!isBytecode)
 				{
-					Scanner s = new Scanner(sScript);
+					Scanner s = new Scanner(sScript, "utf-8");
 					while(s.hasNextLine()){
 						lines.add(s.nextLine());
 					}
