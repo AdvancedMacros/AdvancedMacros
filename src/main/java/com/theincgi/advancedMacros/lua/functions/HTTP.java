@@ -80,7 +80,11 @@ public class HTTP extends OneArgFunction{
 			this.set("getContentType", new ZeroArgFunction() {
 				@Override
 				public LuaValue call() {
-					return LuaValue.valueOf(conn.getContentType());
+					try {
+						return LuaValue.valueOf(conn.getContentType());
+					} catch(Exception e) {
+						return LuaValue.valueOf("none");
+					}
 				}
 			});
 			this.set("getContentEncoding", new ZeroArgFunction() {
