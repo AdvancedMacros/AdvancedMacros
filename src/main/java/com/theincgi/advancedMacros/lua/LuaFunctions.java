@@ -55,8 +55,10 @@ public class LuaFunctions {
 	public static class Say extends OneArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg) {
-			AdvancedMacros.getMinecraft().player.sendChatMessage(arg.tojstring());
-			AdvancedMacros.getMinecraft().ingameGUI.getChatGUI().addToSentMessages(arg.tojstring());
+			AdvancedMacros.getMinecraft().addScheduledTask(() -> {
+				AdvancedMacros.getMinecraft().player.sendChatMessage(arg.tojstring());
+				AdvancedMacros.getMinecraft().ingameGUI.getChatGUI().addToSentMessages(arg.tojstring());
+			});
 			return LuaValue.NONE;
 		}
 	}
