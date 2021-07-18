@@ -1174,7 +1174,7 @@ public class ForgeEventHandler {
 	private void forceSendMsg(String msg, boolean addToChat) {
 		Minecraft mc = AdvancedMacros.getMinecraft();
 		if (msg.isEmpty()) return;
-		Utils.runOnMCAndWait(()->{
+		AdvancedMacros.getMinecraft().addScheduledTask(() -> {
 			if (addToChat) mc.ingameGUI.getChatGUI().addToSentMessages(msg);
 			if (net.minecraftforge.client.ClientCommandHandler.instance.executeCommand(mc.player, msg) != 0) return;
 			mc.player.sendChatMessage(msg);
