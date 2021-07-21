@@ -1111,6 +1111,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 				lines.add("");
 			setNeedsSaveFlag(true);
 		}
+		textChanged = true;
 	}
 	public String getText() {
 		StringJoiner out = new StringJoiner("\n");
