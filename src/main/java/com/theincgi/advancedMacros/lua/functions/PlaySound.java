@@ -21,6 +21,7 @@ import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
+import org.luaj.vm2_v3_0_1.lib.jse.CoerceJavaToLua;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 
@@ -140,7 +141,7 @@ public class PlaySound {
 			private class GetRaw extends ZeroArgFunction{	
 				@Override
 				public LuaValue call() {
-					return LuaValue.userdataOf(c);
+					return CoerceJavaToLua.coerce(c);
 				}
 			}
 		}
