@@ -6,6 +6,7 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
+import org.luaj.vm2_v3_0_1.lib.jse.CoerceJavaToLua;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.CallableTable;
@@ -161,12 +162,21 @@ public class OpenInventory extends ZeroArgFunction{
 				return NONE;
 			}
 			case getHeld:{
+				LuaValue opt = args.arg(2);
 				ItemStack held = mc.player.inventory.getItemStack();
-				return Utils.itemStackToLuatable(held);
+				if(opt.isnil() || (opt.isboolean() && opt.checkboolean() == false))
+					return Utils.itemStackToLuatable(held);
+				else
+					return CoerceJavaToLua.coerce(held);
 			}
 			case getSlot:{
+				LuaValue opt = args.arg(2);
 				int slotA = args.arg1().checkint();
-				return Utils.itemStackToLuatable( container.inventorySlots.getSlot(slotA-1).getStack() );
+				ItemStack item = container.inventorySlots.getSlot(slotA-1).getStack();
+				if(opt.isnil() || (opt.isboolean() && opt.checkboolean() == false))
+					return Utils.itemStackToLuatable(item);
+				else
+					return CoerceJavaToLua.coerce(item);
 			}
 			case drop:{
 				Utils.runOnMCAndWait(()->{
