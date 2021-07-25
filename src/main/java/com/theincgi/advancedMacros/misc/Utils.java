@@ -480,6 +480,7 @@ public class Utils {
 		if(entity==null) return LuaValue.FALSE;
 		LuaTable t = new LuaTable();
 		t.set("name", entity.getName());
+		t.set("id", entity.getEntityId());
 		t.set("class", entity.getClass().getName());
 		//t.set("inventory", Utils.inventoryToTable(entity.inventory, !(entity instanceof EntityPlayerSP)));
 		{
