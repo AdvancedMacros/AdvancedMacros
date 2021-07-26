@@ -151,6 +151,9 @@ class JavaClass extends JavaInstance implements CoerceJavaToLua.Coercion {
 			Map map = new HashMap<>();
 			Constructor[] c = ((Class)m_instance).getConstructors();
 			List list = new ArrayList();
+			for ( int j=0; j<c.length; j++ ) 
+				if (!c[j].isAccessible())
+					c[j].setAccessible(true);
 			for ( int i=0; i<c.length; i++ ) 
 				if ( Modifier.isPublic(c[i].getModifiers()) )
 					list.add( JavaConstructor.forConstructor(c[i]) );
