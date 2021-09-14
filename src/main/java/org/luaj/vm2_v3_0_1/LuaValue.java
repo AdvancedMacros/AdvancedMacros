@@ -2021,6 +2021,15 @@ public class LuaValue extends Varargs {
 	public Varargs invokemethod(LuaValue name, LuaValue[] args) { return get(name).invoke(varargsOf(this,varargsOf(args))); }
 	
 	/**
+	 * @author TheIncgi
+	 * Check if a lua value is safe to call/invoke
+	 * */
+	public boolean isCallable() {
+		return isfunction() || metatag(CALL).isfunction();
+	}
+	
+	
+	/**
 	 * Get the metatag value for the {@link #CALL} metatag, if it exists.
 	 * @return {@link LuaValue} value if metatag is defined
 	 * @throws LuaError if {@link #CALL} metatag is not defined. 

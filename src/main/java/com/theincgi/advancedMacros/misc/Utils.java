@@ -1190,6 +1190,8 @@ public class Utils {
 							else
 								hText = "URL: &b&U"+cText;
 							argNum++;
+							if(!cText.matches("^https?://"))
+								cText = "https://" + cText;
 							clickEvent = new ClickEvent(Action.OPEN_URL, cText);
 							hoverEvent = new HoverEvent(net.minecraft.util.text.event.HoverEvent.Action.SHOW_TEXT, toTextComponent(hText, null, false, false).a);
 						}else if(next == 'N') {

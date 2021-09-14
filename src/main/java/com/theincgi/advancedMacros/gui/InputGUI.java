@@ -62,6 +62,53 @@ public class InputGUI extends Gui{
 		}
 		addInputSubscriber(listItemPicker);
 		addInputSubscriber(choices);
+		addInputSubscriber(new InputSubscriber() {
+			@Override
+			public boolean onScroll(Gui gui, double i) {
+				return false;
+			}
+			
+			@Override
+			public boolean onMouseRelease(Gui gui, double x, double y, int state) {
+				return false;
+			}
+			
+			@Override
+			public boolean onMouseClickMove(Gui gui, double x, double y, int buttonNum, double q, double r) {
+				return false;
+			}
+			
+			@Override
+			public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
+				return false;
+			}
+			
+			@Override
+			public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
+				return (inputType==InputType.TEXT) && (n%2==0 && textInput.keyPressed(keyCode, scanCode, modifiers));
+			}
+			
+			@Override
+			public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
+				return false;
+			}
+			
+			@Override
+			public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
+				if(inputType==InputType.TEXT) {
+					return textInput.keyPressed(keyCode, scanCode, modifiers);
+				}
+				return false;
+			}
+			
+			@Override
+			public boolean onCharTyped(Gui gui, char typedChar, int mods) {
+				if(inputType==InputType.TEXT) {
+					return textInput.charTyped(typedChar, mods);
+				}
+				return false;
+			}
+		});
 		listItemPicker.setScrollSpeed(10);
 		choices.setScrollSpeed(10);
 		choices.setSpacing(3);
@@ -136,9 +183,7 @@ public class InputGUI extends Gui{
 	
 	@Override
 	public boolean charTyped(char typedChar, int mods) {
-		if(inputType==InputType.TEXT) {
-			return textInput.charTyped(typedChar, mods);
-		}
+		
 		
 		return super.charTyped(typedChar, mods);
 	}
@@ -151,14 +196,12 @@ public class InputGUI extends Gui{
 			close(LuaValue.valueOf(textInput.getText()));
 			return true;
 		}
-		if(inputType==InputType.TEXT) {
-			return textInput.keyPressed(keyCode, scanCode, modifiers);
-		}
+		
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 	@Override
 	public boolean onKeyRepeated(Gui gui, int keyCode, int scanCode, int mods, int n) {
-		return super.onKeyRepeated(gui, keyCode, scanCode, mods, n) || (n%2==0 && textInput.keyPressed(keyCode, scanCode, mods));
+		return super.onKeyRepeated(gui, keyCode, scanCode, mods, n);
 	}
 //	@Override
 //	public boolean keyRepeated(char typedChar, int keyCode, int mod) {

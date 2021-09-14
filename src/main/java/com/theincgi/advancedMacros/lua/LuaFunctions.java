@@ -4,6 +4,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.LinkedList;
 
+import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
@@ -107,6 +108,8 @@ public class LuaFunctions {
 		public Varargs invoke(Varargs arg0) {
 			try {
 				AdvancedMacros.getMinecraft().ingameGUI.getChatGUI().printChatMessage(formatString(arg0));
+			}catch(LuaError err) {
+				throw err;
 			}catch (Throwable e) {
 				//prob tried to log without chat
 				e.printStackTrace();

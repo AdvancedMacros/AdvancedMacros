@@ -17,6 +17,20 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  "&aBugFixes:",
+  " - &bprompt&f control keys don't double fire anymore",
+  " - &blog&f with &6&&L&f now adds '&6https://&f' if it does not have",
+  "   '&6https://&f' or '&6http://&f' at the start of the url",
+  " - &berror&f with no args does not cause &cNullPointerException&f anymore",
+  " - &bgetPlayer&f() now runs on the &eMinecraft thread&f by default",
+  "   all parts of &bgetPlayer&f's result table are now available as separate functions",
+  "   in &aplayerDetails&f. Of those, only &bplayerDetails.getInventory&f and",
+  "   &b playerDetails.getPotionEffects&f run on the &eMinecraft Thread",
+  " - passing an incorrect value into &blog&f for '&6&&F&f' will give you an error instead of crashing",
+  
+  "&7"..DIVIDER,
+  
+  "&b&BChange Log: &7version 10.1.1a",
   "&aBug fixes:",
   " - Command blocks don't crash you anymore :)",
   " - Fixed a bug with REPL when stopping an execution",

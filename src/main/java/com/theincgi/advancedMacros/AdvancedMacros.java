@@ -117,7 +117,7 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "10.1.1a"; // ??
+	public static final String VERSION = "10.1.2a"; // ??
 	public static final String GAME_VERSION = "1.15.2";
 
 	public static final File macrosRootFolder = getRootFolder();
@@ -314,6 +314,7 @@ public class AdvancedMacros {
 		globals.set("getWorld", new GetWorld());
 		globals.set("getBlock", new GetBlock());
 		globals.set("getPlayer", new GetPlayer());
+		globals.set("playerDetails", GetPlayer.playerFunctions);
 		globals.set("getPlayerList", new GetPlayerList()); //everywhere
 		globals.set("getLoadedPlayers", new GetLoadedPlayers()); //your loaded chunks
 		globals.set("getPlayerPos", new GetPlayerPos());

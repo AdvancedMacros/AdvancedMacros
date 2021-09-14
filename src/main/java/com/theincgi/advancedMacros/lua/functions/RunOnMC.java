@@ -29,10 +29,9 @@ public class RunOnMC extends VarArgFunction{
 		final LuaFunction theFunction = arg1.checkfunction();
 		ListenableFuture<Varargs> f = TaskDispatcher.addTask(()->{
 			try {
-				return Utils.pcallVarArgs(theFunction, fArgs);
+				return theFunction.invoke(fArgs);
 			}catch (Throwable e) {
-				Utils.logError(e);
-				return NONE;
+				throw new LuaError(e);
 			}
 		});
 		try {
