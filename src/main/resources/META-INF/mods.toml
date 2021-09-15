@@ -22,7 +22,7 @@ modId="advancedmacros" #mandatory
 # VERSION #
 ###########
 # The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
-version="10.1.1a" #mandatory
+version="10.1.2a" #mandatory
 
  # A display name for the mod
 displayName="Advanced Macros" #mandatory
