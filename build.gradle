@@ -34,7 +34,7 @@ compileJava {
 }
 
 mixin {
-       add sourceSets.main, "advancedmacros.refmap.json"
+    add sourceSets.main, "mixins.advancedmacros.refmap.json"
 }
 
 minecraft {
@@ -78,11 +78,17 @@ repositories {
     maven { url = 'https://repo.spongepowered.org/maven' }
 }
 
+configurations {
+    embed
+    compile.extendsFrom(embed)
+}
+
+
 dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2855'
+    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2859'
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
@@ -102,8 +108,17 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    compile 'org.spongepowered:mixin:0.8.3-SNAPSHOT'
-    annotationProcessor 'org.spongepowered:mixin:0.8:processor'
+//    compile 'org.spongepowered:mixin:0.8.3'
+//    annotationProcessor 'org.spongepowered:mixin:0.8:processor'
+
+    embed('org.spongepowered:mixin:0.8.3') {
+        // Mixin includes a lot of dependencies that are too up-to-date
+        exclude module: 'launchwrapper'
+        exclude module: 'guava'
+        exclude module: 'gson'
+        exclude module: 'commons-io'
+        exclude module: 'log4j-core'
+    }
 
 }
 
@@ -121,6 +136,13 @@ processResources {
 }
 
 jar {
+
+    from {
+        configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }
+    } {
+        exclude "LICENSE.txt", "META-INF/MANIFSET.MF", "META-INF/maven/**", "META-INF/*.RSA", "META-INF/*.SF"
+    }
+
     manifest {
         attributes([
             "Specification-Title": "advancedmacros",

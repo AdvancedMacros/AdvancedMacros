@@ -35,7 +35,7 @@ public class MixinLuaComponentClick {
         locals = LocalCapture.CAPTURE_FAILHARD
     )
     public void handleComponentClick(ITextComponent component, CallbackInfoReturnable<Boolean> ci, ClickEvent clickevent) {
-        LOGGER.info("Attempting to handle {}", (Object) clickevent.getClass().toString());
+        //LOGGER.info("Attempting to handle {}", (Object) clickevent.getClass().toString());
         if (isLuaTextComponent(clickevent)) {
             clickLuaTextComponent(clickevent);
         } else {
