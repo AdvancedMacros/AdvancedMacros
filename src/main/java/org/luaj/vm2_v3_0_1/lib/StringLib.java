@@ -83,6 +83,7 @@ public class StringLib extends TwoArgFunction {
 	 * @param modname the module name supplied if this is loaded via 'require'.
 	 * @param env the environment to load into, typically a Globals instance.
 	 */
+	@Override
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		LuaTable string = new LuaTable();
 		string.set("byte", new byte_());
@@ -126,6 +127,7 @@ public class StringLib extends TwoArgFunction {
 	 * @param args the calling args
 	 */
 	static final class byte_ extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			LuaString s = args.checkstring(1);
 			int l = s.m_length;
@@ -157,6 +159,7 @@ public class StringLib extends TwoArgFunction {
 	 * @param args the calling VM
 	 */
 	static final class char_ extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			int n = args.narg();
 			byte[] bytes = new byte[n];
@@ -179,6 +182,7 @@ public class StringLib extends TwoArgFunction {
 	 * TODO: port dumping code as optional add-on
 	 */
 	static final class dump extends OneArgFunction {
+		@Override
 		public LuaValue call(LuaValue arg) {
 			LuaValue f = arg.checkfunction();
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -208,6 +212,7 @@ public class StringLib extends TwoArgFunction {
 	 * are also returned, after the two indices.
 	 */
 	static final class find extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			return str_find_aux( args, true );
 		}
@@ -237,6 +242,7 @@ public class StringLib extends TwoArgFunction {
 	 * except as arguments to the q option. 
 	 */
 	static final class format extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			LuaString fmt = args.checkstring( 1 );
 			final int n = fmt.length();
@@ -516,6 +522,7 @@ public class StringLib extends TwoArgFunction {
 	 * as this would prevent the iteration.
 	 */
 	static final class gmatch extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			LuaString src = args.checkstring( 1 );
 			LuaString pat = args.checkstring( 2 );
@@ -532,6 +539,7 @@ public class StringLib extends TwoArgFunction {
 			this.ms = new MatchState(args, src, pat);
 			this.soffset = 0;
 		}
+		@Override
 		public Varargs invoke(Varargs args) {
 			for ( ; soffset<srclen; soffset++ ) {
 				ms.reset();
@@ -593,6 +601,7 @@ public class StringLib extends TwoArgFunction {
 	 *	     --> x="lua-5.1.tar.gz"
 	 */
 	static final class gsub extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			LuaString src = args.checkstring( 1 );
 			final int srclen = src.length();
@@ -634,6 +643,7 @@ public class StringLib extends TwoArgFunction {
 	 * Embedded zeros are counted, so "a\000bc\000" has length 5. 
 	 */
 	static final class len extends OneArgFunction {
+		@Override
 		public LuaValue call(LuaValue arg) {
 			return arg.checkstring().len();
 		}
@@ -647,6 +657,7 @@ public class StringLib extends TwoArgFunction {
 	 * The definition of what an uppercase letter is depends on the current locale.
 	 */
 	static final class lower extends OneArgFunction {
+		@Override
 		public LuaValue call(LuaValue arg) {
 			return valueOf( arg.checkjstring().toLowerCase() );
 		}
@@ -662,6 +673,7 @@ public class StringLib extends TwoArgFunction {
 	 * search; its default value is 1 and may be negative.
 	 */
 	static final class match extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			return str_find_aux( args, false );
 		}
@@ -673,6 +685,7 @@ public class StringLib extends TwoArgFunction {
 	 * Returns a string that is the concatenation of n copies of the string s. 
 	 */
 	static final class rep extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			LuaString s = args.checkstring( 1 );
 			int n = args.checkint( 2 );
@@ -691,6 +704,7 @@ public class StringLib extends TwoArgFunction {
 	 * Returns a string that is the string s reversed. 
 	 */
 	static final class reverse extends OneArgFunction {
+		@Override
 		public LuaValue call(LuaValue arg) {
 			LuaString s = arg.checkstring();
 			int n = s.length();
@@ -713,6 +727,7 @@ public class StringLib extends TwoArgFunction {
 	 * returns a suffix of s with length i.
 	 */
 	static final class sub extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			final LuaString s = args.checkstring( 1 );
 			final int l = s.length();
@@ -741,6 +756,7 @@ public class StringLib extends TwoArgFunction {
 	 * The definition of what a lowercase letter is depends on the current locale.	
 	 */
 	static final class upper extends OneArgFunction {
+		@Override
 		public LuaValue call(LuaValue arg) {
 			return valueOf(arg.checkjstring().toUpperCase());
 		}

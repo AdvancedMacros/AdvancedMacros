@@ -73,18 +73,22 @@ import com.theincgi.advancedMacros.misc.Utils;
  */
 public class JseIoLib extends IoLib {
 
+	@Override
 	protected File wrapStdin() throws IOException {
 		return new StdinFile();
 	}
 	
+	@Override
 	protected File wrapStdout() throws IOException {
 		return new StdoutFile(FTYPE_STDOUT);
 	}
 	
+	@Override
 	protected File wrapStderr() throws IOException {
 		return new StdoutFile(FTYPE_STDERR);
 	}
 	
+	@Override
 	protected File openFile( String filename, boolean readMode, boolean appendMode, boolean updateMode, boolean binaryMode ) throws IOException {
 		//TheIncgi's Edit
 		filename = Utils.parseFileLocation(filename, 1).toString();
@@ -99,6 +103,7 @@ public class JseIoLib extends IoLib {
 		return new FileImpl( f );
 	}
 	
+	@Override
 	protected File openProgram(String prog, String mode) throws IOException {
 		final Process p = Runtime.getRuntime().exec(prog);
 		return "w".equals(mode)? 
@@ -106,6 +111,7 @@ public class JseIoLib extends IoLib {
 				new FileImpl( p.getInputStream() ); 
 	}
 
+	@Override
 	protected File tmpFile() throws IOException {
 		java.io.File f = java.io.File.createTempFile(".luaj","bin");
 		f.deleteOnExit();
@@ -137,22 +143,27 @@ public class JseIoLib extends IoLib {
 		private FileImpl( OutputStream o ) {
 			this( null, null, o );
 		}
+		@Override
 		public String tojstring() {
 			return "file ("+this.hashCode()+")";
 		}
+		@Override
 		public boolean isstdfile() {
 			return file == null;
 		}
+		@Override
 		public void close() throws IOException  {
 			closed = true;
 			if ( file != null ) {
 				file.close();
 			}
 		}
+		@Override
 		public void flush() throws IOException {
 			if ( os != null )
 				os.flush();
 		}
+		@Override
 		public void write(LuaString s) throws IOException {
 			if ( os != null )
 				os.write( s.m_bytes, s.m_offset, s.m_length );
@@ -163,9 +174,11 @@ public class JseIoLib extends IoLib {
 			if ( nobuffer )
 				flush();
 		}
+		@Override
 		public boolean isclosed() {
 			return closed;
 		}
+		@Override
 		public int seek(String option, int pos) throws IOException {
 			if ( file != null ) {
 				if ( "set".equals(option) ) {
@@ -180,16 +193,19 @@ public class JseIoLib extends IoLib {
 			notimplemented();
 			return 0;
 		}
+		@Override
 		public void setvbuf(String mode, int size) {
 			nobuffer = "no".equals(mode);
 		}
 
 		// get length remaining to read
+		@Override
 		public int remaining() throws IOException {
 			return file!=null? (int) (file.length()-file.getFilePointer()): -1;
 		}
 		
 		// peek ahead one character
+		@Override
 		public int peek() throws IOException {
 			if ( is != null ) {
 				is.mark(1);
@@ -207,6 +223,7 @@ public class JseIoLib extends IoLib {
 		}		
 		
 		// return char if read, -1 if eof, throw IOException on other exception 
+		@Override
 		public int read() throws IOException {
 			if ( is != null ) 
 				return is.read();
@@ -218,6 +235,7 @@ public class JseIoLib extends IoLib {
 		}
 
 		// return number of bytes read if positive, -1 if eof, throws IOException
+		@Override
 		public int read(byte[] bytes, int offset, int length) throws IOException {
 			if (file!=null) {
 				return file.read(bytes, offset, length);
@@ -237,6 +255,7 @@ public class JseIoLib extends IoLib {
 			this.file_type = file_type;
 		}
 
+		@Override
 		public String tojstring() {
 			return "file ("+this.hashCode()+")";
 		}
@@ -247,45 +266,56 @@ public class JseIoLib extends IoLib {
 					globals.STDOUT;
 		}
 
+		@Override
 		public void write(LuaString string) throws IOException {
 			getPrintStream().write(string.m_bytes, string.m_offset, string.m_length);
 		}
 
+		@Override
 		public void flush() throws IOException {
 			getPrintStream().flush();
 		}
 
+		@Override
 		public boolean isstdfile() {
 			return true;
 		}
 
+		@Override
 		public void close() throws IOException {
 			// do not close std files.
 		}
 
+		@Override
 		public boolean isclosed() {
 			return false;
 		}
 
+		@Override
 		public int seek(String option, int bytecount) throws IOException {
 			return 0;
 		}
 
+		@Override
 		public void setvbuf(String mode, int size) {
 		}
 
+		@Override
 		public int remaining() throws IOException {
 			return 0;
 		}
 
+		@Override
 		public int peek() throws IOException, EOFException {
 			return 0;
 		}
 
+		@Override
 		public int read() throws IOException, EOFException {
 			return 0;
 		}
 
+		@Override
 		public int read(byte[] bytes, int offset, int length)
 				throws IOException {
 			return 0;
@@ -296,39 +326,49 @@ public class JseIoLib extends IoLib {
 		private StdinFile() {
 		}
 
+		@Override
 		public String tojstring() {
 			return "file ("+this.hashCode()+")";
 		}
 
+		@Override
 		public void write(LuaString string) throws IOException {
 		}
 
+		@Override
 		public void flush() throws IOException {
 		}
 
+		@Override
 		public boolean isstdfile() {
 			return true;
 		}
 
+		@Override
 		public void close() throws IOException {
 			// do not close std files.
 		}
 
+		@Override
 		public boolean isclosed() {
 			return false;
 		}
 
+		@Override
 		public int seek(String option, int bytecount) throws IOException {
 			return 0;
 		}
 
+		@Override
 		public void setvbuf(String mode, int size) {
 		}
 
+		@Override
 		public int remaining() throws IOException {
 			return 0;
 		}
 
+		@Override
 		public int peek() throws IOException, EOFException {
 			globals.STDIN.mark(1);
 			int c = globals.STDIN.read();
@@ -336,10 +376,12 @@ public class JseIoLib extends IoLib {
 			return c;
 		}
 
+		@Override
 		public int read() throws IOException, EOFException {
 			return globals.STDIN.read();
 		}
 
+		@Override
 		public int read(byte[] bytes, int offset, int length)
 				throws IOException {
 			return globals.STDIN.read(bytes, offset, length);

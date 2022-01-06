@@ -126,6 +126,7 @@ public class OsLib extends TwoArgFunction {
 	 * @param modname the module name supplied if this is loaded via 'require'.
 	 * @param env the environment to load into, typically a Globals instance.
 	 */
+	@Override
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		globals = env.checkglobals();
 		LuaTable os = new LuaTable();
@@ -141,6 +142,7 @@ public class OsLib extends TwoArgFunction {
 			this.opcode = opcode;
 			this.name = name;
 		}
+		@Override
 		public Varargs invoke(Varargs args) {
 			try {
 				switch ( opcode ) {

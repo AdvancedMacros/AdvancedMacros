@@ -138,6 +138,7 @@ abstract public class LibFunction extends LuaFunction {
 	protected LibFunction() {		
 	}
 	
+	@Override
 	public String tojstring() {
 		return name != null? name: super.tojstring();
 	}
@@ -195,21 +196,26 @@ abstract public class LibFunction extends LuaFunction {
 		return new LuaValue[] { v };
 	}
 
+	@Override
 	public LuaValue call() {
 		return argerror(1,"value");
 	}
+	@Override
 	public LuaValue call(LuaValue a) {
 		return call();
 	}
+	@Override
 	public LuaValue call(LuaValue a, LuaValue b) {
 		return call(a);
 	}
+	@Override
 	public LuaValue call(LuaValue a, LuaValue b, LuaValue c) {
 		return call(a,b);
 	}
 	public LuaValue call(LuaValue a, LuaValue b, LuaValue c, LuaValue d) {
 		return call(a,b,c);
 	}
+	@Override
 	public Varargs invoke(Varargs args) {
 		switch(args.narg()) {
 		case 0: return call();

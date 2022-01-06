@@ -62,6 +62,7 @@ public class Bit32Lib extends TwoArgFunction {
 	 * @param modname the module name supplied if this is loaded via 'require'.
 	 * @param env the environment to load into, which must be a Globals instance.
 	 */
+	@Override
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		LuaTable t = new LuaTable();
 		bind(t, Bit32LibV.class, new String[] {
@@ -76,6 +77,7 @@ public class Bit32Lib extends TwoArgFunction {
 	}
 
 	static final class Bit32LibV extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			switch ( opcode ) {
 			case 0: return Bit32Lib.band( args );
@@ -95,6 +97,7 @@ public class Bit32Lib extends TwoArgFunction {
 
 	static final class Bit32Lib2 extends TwoArgFunction {
 
+		@Override
 		public LuaValue call(LuaValue arg1, LuaValue arg2) {
 			switch ( opcode ) {
 			case 0: return Bit32Lib.arshift(arg1.checkint(), arg2.checkint());

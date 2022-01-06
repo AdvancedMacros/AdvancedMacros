@@ -32,6 +32,7 @@ public class HudText extends WorldHudItem{
 	public void setText(String checkjstring) {
 		text = checkjstring;
 	}
+	@Override
 	public void setRotation(float yaw, float pitch, float roll) {
 		setYaw(yaw);
 		setPitch(pitch);

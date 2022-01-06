@@ -18,6 +18,7 @@ public class BasicBlock {
 		this.pc0 = this.pc1 = pc0;
 	}
 	
+	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer();		
 		sb.append( (pc0+1)+"-"+(pc1+1)
@@ -85,6 +86,7 @@ public class BasicBlock {
 			this.blocks = blocks;
 		}
 
+		@Override
 		public void visitBranch(int pc0, int pc1) {
 			if ( blocks[pc0].next == null ) blocks[pc0].next = new BasicBlock[nnext[pc0]];
 			if ( blocks[pc1].prev == null ) blocks[pc1].prev = new BasicBlock[nprev[pc1]];
@@ -103,6 +105,7 @@ public class BasicBlock {
 			this.nprev = nprev;
 		}
 
+		@Override
 		public void visitBranch(int pc0, int pc1) {
 			nnext[pc0]++;
 			nprev[pc1]++;
@@ -117,11 +120,13 @@ public class BasicBlock {
 			this.isend = isend;
 		}
 
+		@Override
 		public void visitBranch(int pc0, int pc1) {
 			isend[pc0] = true;
 			isbeg[pc1] = true;
 		}
 
+		@Override
 		public void visitReturn(int pc) {
 			isend[pc] = true;
 		}

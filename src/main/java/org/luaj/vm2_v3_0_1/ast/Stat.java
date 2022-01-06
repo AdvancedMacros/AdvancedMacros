@@ -92,6 +92,7 @@ public class Stat extends SyntaxElement {
 		public Goto(String name) {
 			this.name = name;
 		}
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit(this);
 		}
@@ -102,6 +103,7 @@ public class Stat extends SyntaxElement {
 		public Label(String name) {
 			this.name = name;
 		}
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit(this);
 		}
@@ -116,6 +118,7 @@ public class Stat extends SyntaxElement {
 			this.exps = exps;
 		}
 
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit(this);
 		}
@@ -129,6 +132,7 @@ public class Stat extends SyntaxElement {
 			this.exp = exp;
 			this.block = block;
 		}
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit( this );
 		}
@@ -141,12 +145,14 @@ public class Stat extends SyntaxElement {
 			this.block = block;
 			this.exp = exp;
 		}
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit( this );
 		}
 	}
 
 	public static class Break extends Stat {
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit( this );
 		}
@@ -158,6 +164,7 @@ public class Stat extends SyntaxElement {
 			this.values = values;
 		}
 
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit( this );
 		}
@@ -176,6 +183,7 @@ public class Stat extends SyntaxElement {
 			this.funccall = funccall;
 		}
 
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit( this );
 		}
@@ -189,6 +197,7 @@ public class Stat extends SyntaxElement {
 			this.body = body;
 		}
 
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit( this );
 		}
@@ -202,6 +211,7 @@ public class Stat extends SyntaxElement {
 			this.body = body;
 		}
 
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit( this );
 		}
@@ -218,6 +228,7 @@ public class Stat extends SyntaxElement {
 			this.block = block;
 		}
 
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit( this );
 		}
@@ -236,6 +247,7 @@ public class Stat extends SyntaxElement {
 			this.block = block;
 		}
 
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit( this );
 		}
@@ -249,6 +261,7 @@ public class Stat extends SyntaxElement {
 			this.values = values;
 		}
 
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit( this );
 		}
@@ -269,6 +282,7 @@ public class Stat extends SyntaxElement {
 			this.elseblock = elseblock;
 		}
 
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit( this );
 		}

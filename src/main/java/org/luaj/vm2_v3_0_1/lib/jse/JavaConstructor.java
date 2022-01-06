@@ -66,6 +66,7 @@ class JavaConstructor extends JavaMember {
 		this.constructor = c;
 	}
 	
+	@Override
 	public Varargs invoke(Varargs args) {
 		Object[] a = convertArgs(args);
 		try {
@@ -92,6 +93,7 @@ class JavaConstructor extends JavaMember {
 			this.constructors = c;
 		}
 
+		@Override
 		public Varargs invoke(Varargs args) {
 			JavaConstructor best = null;
 			int score = CoerceLuaToJava.SCORE_UNCOERCIBLE;

@@ -70,22 +70,27 @@ class JavaMethod extends JavaMember {
 		}
 	}
 
+	@Override
 	public LuaValue call() {
 		return error("method cannot be called without instance");
 	}
 
+	@Override
 	public LuaValue call(LuaValue arg) {
 		return invokeMethod(arg.checkuserdata(), LuaValue.NONE);
 	}
 
+	@Override
 	public LuaValue call(LuaValue arg1, LuaValue arg2) {
 		return invokeMethod(arg1.checkuserdata(), arg2);
 	}
 	
+	@Override
 	public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
 		return invokeMethod(arg1.checkuserdata(), LuaValue.varargsOf(arg2, arg3));
 	}
 	
+	@Override
 	public Varargs invoke(Varargs args) {
 		return invokeMethod(args.checkuserdata(1), args.subargs(2));
 	}
@@ -118,22 +123,27 @@ class JavaMethod extends JavaMember {
 			this.methods = methods;
 		}
 
+		@Override
 		public LuaValue call() {
 			return error("method cannot be called without instance");
 		}
 
+		@Override
 		public LuaValue call(LuaValue arg) {
 			return invokeBestMethod(arg.checkuserdata(), LuaValue.NONE);
 		}
 
+		@Override
 		public LuaValue call(LuaValue arg1, LuaValue arg2) {
 			return invokeBestMethod(arg1.checkuserdata(), arg2);
 		}
 		
+		@Override
 		public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
 			return invokeBestMethod(arg1.checkuserdata(), LuaValue.varargsOf(arg2, arg3));
 		}
 		
+		@Override
 		public Varargs invoke(Varargs args) {
 			return invokeBestMethod(args.checkuserdata(1), args.subargs(2));
 		}

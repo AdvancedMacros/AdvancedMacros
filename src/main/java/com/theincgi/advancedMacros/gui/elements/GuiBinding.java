@@ -482,6 +482,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber, IBinding
 	public boolean isEnabled(){
 		return enable;
 	}
+	@Override
 	public boolean isDisabled() {
 		return !enable;
 	}
