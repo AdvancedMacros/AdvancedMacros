@@ -55,7 +55,7 @@ public class Hud2D_Text extends Hud2DItem {
 		getControls().set("getWidth", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return LuaValue.valueOf(AdvancedMacros.getMinecraft().fontRenderer.getStringWidth(widestLine(text)));
+				return LuaValue.valueOf(AdvancedMacros.getMinecraft().fontRenderer.getStringWidth(widestLine(text)) * (size/7.99f));
 			}
 		});
 		getControls().set("getHeight", new ZeroArgFunction() {
@@ -121,8 +121,10 @@ public class Hud2D_Text extends Hud2DItem {
 			//fr.FONT_HEIGHT = (int)size;
 			GlStateManager.pushMatrix();
 			GlStateManager.translatef(0, 0, z);	//TESTME hud2d Z translate
+			float sc = size / 7.99f;
+			GlStateManager.scalef(sc, sc, 1);
 			for(int i = 0; s.hasNextLine(); i+=size)
-				fr.drawString(s.nextLine(), dx, dy+i, color.toInt());//(text, (int)x, (int)y, color.toInt());
+				fr.drawString(s.nextLine(), dx, dy+i/sc, color.toInt());//(text, (int)x, (int)y, color.toInt());
 			GlStateManager.popMatrix();
 			s.close();
 			//GlStateManager.disableAlpha();

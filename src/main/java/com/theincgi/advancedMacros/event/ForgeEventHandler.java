@@ -1243,7 +1243,7 @@ public class ForgeEventHandler {
 		
 		//double x,y,z,uMin,vMin,uMax,vMax, wid, hei;
 		float p = AdvancedMacros.getMinecraft().getRenderPartialTicks();
-		Entity player = AdvancedMacros.getMinecraft().player;
+		Entity player = AdvancedMacros.getMinecraft().getRenderViewEntity();//.player;
 
 		GlStateManager.pushTextureAttributes();
 		GlStateManager.enableCull();
@@ -1254,7 +1254,8 @@ public class ForgeEventHandler {
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA.param, DestFactor.ONE_MINUS_SRC_ALPHA.param);
 		
 
-		ms.translate(0, -(projectedView.y-accuPlayerY(p, player)), 0); //using the projected accounts for crouching motion
+		//ms.translate(0, -(projectedView.y-accuPlayerY(p, player)), 0); //using the projected accounts for crouching motion
+		
 		
 		synchronized (worldHudItems) {
 			for (WorldHudItem worldHudItem : worldHudItems) {
@@ -1264,9 +1265,9 @@ public class ForgeEventHandler {
 				}else{
 					GlStateManager.enableDepthTest();
 				}
-				float  acuX = accuPlayerX(p, player), 
-					   acuY = accuPlayerY(p, player), 
-					   acuZ = accuPlayerZ(p, player);
+				float  acuX = (float) projectedView.x,//accuPlayerX(p, player), 
+					   acuY = (float) projectedView.y, //accuPlayerY(p, player), 
+					   acuZ = (float) projectedView.z;//accuPlayerZ(p, player);
 				worldHudItem.apply3dRotation(ms, acuX, acuY, acuZ);
 				GlStateManager.color4f(1, 1, 1, worldHudItem.getOpacity());
 				worldHudItem.render(ms, projection);
