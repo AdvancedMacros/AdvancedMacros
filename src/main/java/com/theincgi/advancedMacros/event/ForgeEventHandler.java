@@ -56,6 +56,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.network.play.NetworkPlayerInfo;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -64,6 +65,7 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.client.event.ClientChatEvent;
@@ -1228,7 +1230,9 @@ public class ForgeEventHandler {
 	public void onLastWorldRender(RenderWorldLastEvent rwle){
 		//		GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, AdvancedMacros.modelView3d);
 		//		GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, AdvancedMacros.projView3d);
-
+		ActiveRenderInfo renderInfo = AdvancedMacros.getMinecraft().gameRenderer.getActiveRenderInfo();
+		Vec3d projectedView = renderInfo.getProjectedView();
+		
 
 		//double x,y,z,uMin,vMin,uMax,vMax, wid, hei;
 		float p = AdvancedMacros.getMinecraft().getRenderPartialTicks();
@@ -1246,7 +1250,7 @@ public class ForgeEventHandler {
 
 		//GlStateManager.enableLighting();
 		
-		GlStateManager.translated(0, -(player.getEyeHeight()), 0);
+		//GlStateManager.translated(0, -(player.getEyeHeight()), 0);
 		synchronized (worldHudItems) {
 			for (WorldHudItem worldHudItem : worldHudItems) {
 				//System.out.println(worldHudItem);
@@ -1256,7 +1260,7 @@ public class ForgeEventHandler {
 					GlStateManager.enableDepthTest();
 				}
 				GlStateManager.color4f(1, 1, 1, worldHudItem.getOpacity());
-				worldHudItem.render(accuPlayerX(p, player), accuPlayerY(p, player), accuPlayerZ(p, player));
+				worldHudItem.render(projectedView.x, projectedView.y, projectedView.z);
 			}
 		}
 		GlStateManager.popMatrix();

@@ -12,6 +12,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.theincgi.advancedMacros.AdvancedMacros;
+import com.theincgi.advancedMacros.misc.CustomFontRenderer;
 import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.gui.FontRenderer;
@@ -55,7 +56,7 @@ public class Hud2D_Text extends Hud2DItem {
 		getControls().set("getWidth", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return LuaValue.valueOf(AdvancedMacros.getMinecraft().fontRenderer.getStringWidth(widestLine(text)));
+				return LuaValue.valueOf(AdvancedMacros.getMinecraft().fontRenderer.getStringWidth(widestLine(text)) * (size/7.99f) );
 			}
 		});
 		getControls().set("getHeight", new ZeroArgFunction() {
@@ -115,14 +116,15 @@ public class Hud2D_Text extends Hud2DItem {
 			//GlStateManager.enableAlpha();
 			GlStateManager.disableAlphaTest();
 			//GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-			FontRenderer fr = AdvancedMacros.getMinecraft().fontRenderer;//AdvancedMacros.otherCustomFontRenderer;
-			
+			FontRenderer fr = AdvancedMacros.getMinecraft().fontRenderer;//AdvancedMacros.customFontRenderer;
 			//float old = fr.FONT_HEIGHT;
 			//fr.FONT_HEIGHT = (int)size;
 			GlStateManager.pushMatrix();
 			GlStateManager.translatef(0, 0, z);	//TESTME hud2d Z translate
+			float sc = size / 7.99f;
+			GlStateManager.scalef(sc, sc, 1);
 			for(int i = 0; s.hasNextLine(); i+=size)
-				fr.drawString(s.nextLine(), dx, dy+i, color.toInt());//(text, (int)x, (int)y, color.toInt());
+				fr.drawString(s.nextLine(), dx, dy+i/sc, color.toInt());//(text, (int)x, (int)y, color.toInt());
 			GlStateManager.popMatrix();
 			s.close();
 			//GlStateManager.disableAlpha();
