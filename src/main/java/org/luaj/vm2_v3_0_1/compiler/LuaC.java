@@ -95,10 +95,12 @@ public class LuaC extends Constants implements Globals.Compiler, Globals.Loader 
 	 * @return Prototype representing the lua chunk for this source.
 	 * @throws IOException
 	 */
+	@Override
 	public Prototype compile(InputStream stream, String chunkname) throws IOException {
 		return (new CompileState()).luaY_parser(stream, chunkname);
 	}
 
+	@Override
 	public LuaFunction load(Prototype prototype, String chunkname, LuaValue env) throws IOException {
 		return new LuaClosure(prototype, env);
 	}

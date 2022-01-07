@@ -436,6 +436,7 @@ public class LoadState {
 	}
 	
 	private static final class GlobalsUndumper implements Globals.Undumper {
+		@Override
 		public Prototype undump(InputStream stream, String chunkname)
 				throws IOException {
 			return LoadState.undump(stream,  chunkname);

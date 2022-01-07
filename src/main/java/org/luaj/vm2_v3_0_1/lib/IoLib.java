@@ -96,19 +96,23 @@ public class IoLib extends TwoArgFunction {
 		abstract public int read(byte[] bytes, int offset, int length) throws IOException;
 		
 		// delegate method access to file methods table
+		@Override
 		public LuaValue get( LuaValue key ) {
 			return filemethods.get(key);
 		}
 
 		// essentially a userdata instance
+		@Override
 		public int type() {
 			return LuaValue.TUSERDATA;
 		}
+		@Override
 		public String typename() {
 			return "userdata";
 		}
 		
 		// displays as "file" type
+		@Override
 		public String tojstring() {
 			return "file: " + Integer.toHexString(hashCode());
 		}
@@ -233,6 +237,7 @@ public class IoLib extends TwoArgFunction {
 	
 	protected Globals globals;
 	
+	@Override
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		globals = env.checkglobals();
 		
@@ -279,6 +284,7 @@ public class IoLib extends TwoArgFunction {
 			this.iolib = iolib;
 		}
 
+		@Override
 		public Varargs invoke(Varargs args) {
 			try {
 				switch ( opcode ) {

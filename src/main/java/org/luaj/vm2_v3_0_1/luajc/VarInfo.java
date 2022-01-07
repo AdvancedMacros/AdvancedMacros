@@ -37,6 +37,7 @@ public class VarInfo {
 		this.pc = pc;
 	}
 
+	@Override
 	public String toString() {
 		return slot < 0 ? "x.x" : (slot + "." + pc);
 	}
@@ -64,6 +65,7 @@ public class VarInfo {
 			super(slot, pc);
 		}
 
+		@Override
 		public String toString() {
 			return slot + ".p";
 		}
@@ -74,6 +76,7 @@ public class VarInfo {
 			super(slot, pc);
 		}
 
+		@Override
 		public String toString() {
 			return "nil";
 		}
@@ -88,10 +91,12 @@ public class VarInfo {
 			this.pi = pi;
 		}
 
+		@Override
 		public boolean isPhiVar() {
 			return true;
 		}
 
+		@Override
 		public String toString() {
 			StringBuffer sb = new StringBuffer();
 			sb.append( super.toString() );
@@ -105,6 +110,7 @@ public class VarInfo {
 			return sb.toString();
 		}
 
+		@Override
 		public VarInfo resolvePhiVariableValues() {
 			Set visitedBlocks = new HashSet();
 			Set vars = new HashSet();
@@ -126,6 +132,7 @@ public class VarInfo {
 			return null;
 		}
 
+		@Override
 		protected void collectUniqueValues(Set visitedBlocks, Set vars) {
 			BasicBlock b = pi.blocks[pc];
 			if ( pc == 0 )

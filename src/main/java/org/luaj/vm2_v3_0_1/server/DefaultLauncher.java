@@ -53,16 +53,19 @@ public class DefaultLauncher implements Launcher {
 	}
 	
 	/** Launches the script with chunk name 'main' */
+	@Override
 	public Object[] launch(String script, Object[] arg) {
 		return launchChunk(g.load(script, "main"), arg);
 	}
 
 	/** Launches the script with chunk name 'main' and loading using modes 'bt' */
+	@Override
 	public Object[] launch(InputStream script, Object[] arg) {
 		return launchChunk(g.load(script, "main", "bt", g), arg);
 	}
 
 	/** Launches the script with chunk name 'main' */
+	@Override
 	public Object[] launch(Reader script, Object[] arg) {
 		return launchChunk(g.load(script, "main"), arg);
 	}

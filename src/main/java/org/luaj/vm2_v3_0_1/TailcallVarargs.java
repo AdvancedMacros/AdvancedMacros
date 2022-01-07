@@ -56,10 +56,12 @@ public class TailcallVarargs extends Varargs {
 		this.args = LuaValue.varargsOf(object, args);
 	}
 	
+	@Override
 	public boolean isTailcall() {
 		return true;
 	}
 	
+	@Override
 	public Varargs eval() {
 		while ( result == null ) {
 			Varargs r = func.onInvoke(args);
@@ -77,24 +79,28 @@ public class TailcallVarargs extends Varargs {
 		return result;
 	}
 	
+	@Override
 	public LuaValue arg( int i ) {
 		if ( result == null )
 			eval();
 		return result.arg(i);
 	}
 	
+	@Override
 	public LuaValue arg1() {
 		if (result == null)
 			eval();
 		return result.arg1();
 	}
 	
+	@Override
 	public int narg() {
 		if (result == null)
 			eval();
 		return result.narg();
 	}
 
+	@Override
 	public Varargs subargs(int start) {
 		if (result == null)
 			eval();

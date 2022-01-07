@@ -1342,6 +1342,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 		this.isEditable = isEditable;
 	}
 
+	@Override
 	public void setFocused(boolean b) {
 		gui.setFocusItem( b ? this : null );
 	}

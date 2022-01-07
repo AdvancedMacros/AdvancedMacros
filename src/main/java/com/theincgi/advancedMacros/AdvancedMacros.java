@@ -372,7 +372,7 @@ public class AdvancedMacros {
 
 		LuaTable searchers = globals.get("package").get("searchers").checktable();
 		searchers.set(searchers.length() + 1, jarLibSearcher = new JarLibSearcher());
-		globals.set("getJarLibLoaders", new ZeroArgFunction() {public LuaValue call() {return jarLibSearcher.loaders;}});
+		globals.set("getJarLibLoaders", new ZeroArgFunction() {@Override public LuaValue call() {return jarLibSearcher.loaders;}});
 	}
 
 	private void loadLibJars() {

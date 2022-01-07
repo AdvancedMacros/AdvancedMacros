@@ -27,6 +27,7 @@ public abstract class WorldHudItem implements Destroyable {
 	protected float x,y,z,yaw,pitch,roll;
 	protected boolean isDrawing;
 	/**should call to {@link #disableDraw()} and to make all functions un-usable as it is no longer in use*/
+	@Override
 	public void destroy() {
 			disableDraw();
 	}

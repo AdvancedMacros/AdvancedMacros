@@ -35,6 +35,7 @@ public class Block extends Stat {
 		stats.add(s);
 	}
 
+	@Override
 	public void accept(Visitor visitor) {
 		visitor.visit(this);
 	}

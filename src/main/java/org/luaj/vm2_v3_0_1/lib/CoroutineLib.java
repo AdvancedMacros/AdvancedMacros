@@ -72,6 +72,7 @@ public class CoroutineLib extends TwoArgFunction {
 	 * @param modname the module name supplied if this is loaded via 'require'.
 	 * @param env the environment to load into, which must be a Globals instance.
 	 */
+	@Override
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		globals = env.checkglobals();
 		LuaTable coroutine = new LuaTable();
@@ -87,12 +88,14 @@ public class CoroutineLib extends TwoArgFunction {
 	}
 
 	final class create extends LibFunction {
+		@Override
 		public LuaValue call(LuaValue f) {
 			return new LuaThread(globals, f.checkfunction());
 		}
 	}
 
 	final class resume extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			final LuaThread t = args.checkthread(1);
 			return t.resume( args.subargs(2) );
@@ -100,6 +103,7 @@ public class CoroutineLib extends TwoArgFunction {
 	}
 
 	final class running extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			final LuaThread r = globals.getCurrentLuaThread();
 			return varargsOf(r, valueOf(r.isMainThread()));
@@ -107,6 +111,7 @@ public class CoroutineLib extends TwoArgFunction {
 	}
 
 	static final class status extends LibFunction {
+		@Override
 		public LuaValue call(LuaValue t) {
 			LuaThread lt = t.checkthread();
 			return valueOf( lt.getStatus() );
@@ -114,12 +119,14 @@ public class CoroutineLib extends TwoArgFunction {
 	}
 	
 	final class yield extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			return globals.yield( args );
 		}
 	}
 
 	final class wrap extends LibFunction {
+		@Override
 		public LuaValue call(LuaValue f) {
 			final LuaValue func = f.checkfunction();
 			final LuaThread thread = new LuaThread(globals, func);
@@ -132,6 +139,7 @@ public class CoroutineLib extends TwoArgFunction {
 		wrapper(LuaThread luathread) {
 			this.luathread = luathread;
 		}
+		@Override
 		public Varargs invoke(Varargs args) {
 			final Varargs result = luathread.resume(args);
 			if ( result.arg1().toboolean() ) {

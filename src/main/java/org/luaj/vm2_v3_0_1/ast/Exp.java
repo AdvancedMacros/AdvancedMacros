@@ -145,15 +145,18 @@ public class Exp extends SyntaxElement {
 	}
 	
 	abstract public static class PrimaryExp extends Exp {
+		@Override
 		public boolean isvarexp() {
 			return false;
 		}
+		@Override
 		public boolean isfunccall() {
 			return false;
 		}
 	}
 
 	abstract public static class VarExp extends PrimaryExp {
+		@Override
 		public boolean isvarexp() {
 			return true;
 		}
@@ -166,9 +169,11 @@ public class Exp extends SyntaxElement {
 		public NameExp(String name) {
 			this.name = new Name(name);
 		}
+		@Override
 		public void markHasAssignment() {
 			name.variable.hasassignments = true;
 		}
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit(this);
 		}
@@ -180,6 +185,7 @@ public class Exp extends SyntaxElement {
 			this.exp = exp;
 		}
 		
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit(this);
 		}
@@ -193,6 +199,7 @@ public class Exp extends SyntaxElement {
 			this.name = new Name(name);
 		}
 		
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit(this);
 		}
@@ -206,6 +213,7 @@ public class Exp extends SyntaxElement {
 			this.exp = exp;
 		}
 		
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit(this);
 		}
@@ -220,14 +228,17 @@ public class Exp extends SyntaxElement {
 			this.args = args;
 		}
 
+		@Override
 		public boolean isfunccall() {
 			return true;
 		}
 		
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit(this);
 		}
 		
+		@Override
 		public boolean isvarargexp() {
 			return true;
 		}
@@ -241,10 +252,12 @@ public class Exp extends SyntaxElement {
 			this.name = new String(name);
 		}
 
+		@Override
 		public boolean isfunccall() {
 			return true;
 		}
 		
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit(this);
 		}
@@ -256,6 +269,7 @@ public class Exp extends SyntaxElement {
 			this.value = value;
 		}
 
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit(this);
 		}		
@@ -263,10 +277,12 @@ public class Exp extends SyntaxElement {
 
 	public static class VarargsExp extends Exp {
 		
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit(this);
 		}
 		
+		@Override
 		public boolean isvarargexp() {
 			return true;
 		}
@@ -280,6 +296,7 @@ public class Exp extends SyntaxElement {
 			this.rhs = rhs;
 		}
 
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit(this);
 		}		
@@ -294,6 +311,7 @@ public class Exp extends SyntaxElement {
 			this.rhs = rhs;
 		}
 
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit(this);
 		}		
@@ -305,6 +323,7 @@ public class Exp extends SyntaxElement {
 			this.body = funcbody;
 		}
 
+		@Override
 		public void accept(Visitor visitor) {
 			visitor.visit(this);
 		}		
