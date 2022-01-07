@@ -29,9 +29,11 @@ public class NameResolver extends Visitor {
 		scope = scope.outerScope;
 	}
 	
+	@Override
 	public void visit(NameScope scope) {
 	}	
 
+	@Override
 	public void visit(Block block) {
 		pushScope();
 		block.scope = scope;
@@ -39,6 +41,7 @@ public class NameResolver extends Visitor {
 		popScope();
 	}
 	
+	@Override
 	public void visit(FuncBody body) {
 		pushScope();
 		scope.functionNestingCount++;
@@ -47,11 +50,13 @@ public class NameResolver extends Visitor {
 		popScope();
 	}
 	
+	@Override
 	public void visit(LocalFuncDef stat) {
 		defineLocalVar(stat.name);
 		super.visit(stat);
 	}
 
+	@Override
 	public void visit(NumericFor stat) {
 		pushScope();
 		stat.scope = scope;
@@ -60,6 +65,7 @@ public class NameResolver extends Visitor {
 		popScope();
 	}
 
+	@Override
 	public void visit(GenericFor stat) {
 		pushScope();
 		stat.scope = scope;
@@ -68,17 +74,20 @@ public class NameResolver extends Visitor {
 		popScope();
 	}
 
+	@Override
 	public void visit(NameExp exp) {
 		exp.name.variable = resolveNameReference(exp.name);
 		super.visit(exp);
 	}
 	
+	@Override
 	public void visit(FuncDef stat) {
 		stat.name.name.variable = resolveNameReference(stat.name.name);
 		stat.name.name.variable.hasassignments = true;
 		super.visit(stat);
 	}
 	
+	@Override
 	public void visit(Assign stat) {
 		super.visit(stat);
 		for ( int i=0, n=stat.vars.size(); i<n; i++ ) {
@@ -87,6 +96,7 @@ public class NameResolver extends Visitor {
 		}
 	}
 
+	@Override
 	public void visit(LocalAssign stat) {
 		visitExps(stat.values);
 		defineLocalVars( stat.names );
@@ -101,6 +111,7 @@ public class NameResolver extends Visitor {
 				((Name)stat.names.get(i)).variable.initialValue = LuaValue.NIL;
 	}
 
+	@Override
 	public void visit(ParList pars) {
 		if ( pars.names != null )
 			defineLocalVars(pars.names);

@@ -100,6 +100,7 @@ public class MathLib extends TwoArgFunction {
 	 * @param modname the module name supplied if this is loaded via 'require'.
 	 * @param env the environment to load into, typically a Globals instance.
 	 */
+	@Override
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		LuaTable math = new LuaTable(0,30);
 		math.set("abs", new abs());
@@ -130,6 +131,7 @@ public class MathLib extends TwoArgFunction {
 	}
 	
 	abstract protected static class UnaryOp extends OneArgFunction {
+		@Override
 		public LuaValue call(LuaValue arg) {
 			return valueOf(call(arg.checkdouble()));
 		}
@@ -137,51 +139,57 @@ public class MathLib extends TwoArgFunction {
 	}
 
 	abstract protected static class BinaryOp extends TwoArgFunction {
+		@Override
 		public LuaValue call(LuaValue x, LuaValue y) {
 			return valueOf(call(x.checkdouble(), y.checkdouble()));
 		}
 		abstract protected double call(double x, double y);
 	}
 
-	static final class abs extends UnaryOp { protected double call(double d) { return Math.abs(d); } }
-	static final class ceil extends UnaryOp { protected double call(double d) { return Math.ceil(d); } }
-	static final class cos extends UnaryOp { protected double call(double d) { return Math.cos(d); } }
-	static final class deg extends UnaryOp { protected double call(double d) { return Math.toDegrees(d); } }
-	static final class floor extends UnaryOp { protected double call(double d) { return Math.floor(d); } }
-	static final class rad extends UnaryOp { protected double call(double d) { return Math.toRadians(d); } }
-	static final class sin extends UnaryOp { protected double call(double d) { return Math.sin(d); } }
-	static final class sqrt extends UnaryOp { protected double call(double d) { return Math.sqrt(d); } }
-	static final class tan extends UnaryOp { protected double call(double d) { return Math.tan(d); } }
+	static final class   abs extends UnaryOp { @Override protected double call(double d) { return Math.abs(d); } }
+	static final class  ceil extends UnaryOp { @Override protected double call(double d) { return Math.ceil(d); } }
+	static final class   cos extends UnaryOp { @Override protected double call(double d) { return Math.cos(d); } }
+	static final class   deg extends UnaryOp { @Override protected double call(double d) { return Math.toDegrees(d); } }
+	static final class floor extends UnaryOp { @Override protected double call(double d) { return Math.floor(d); } }
+	static final class   rad extends UnaryOp { @Override protected double call(double d) { return Math.toRadians(d); } }
+	static final class   sin extends UnaryOp { @Override protected double call(double d) { return Math.sin(d); } }
+	static final class  sqrt extends UnaryOp { @Override protected double call(double d) { return Math.sqrt(d); } }
+	static final class   tan extends UnaryOp { @Override protected double call(double d) { return Math.tan(d); } }
 
 	static final class exp extends UnaryOp {
 		final MathLib mathlib;
 		exp(MathLib mathlib) {
 			this.mathlib = mathlib;
 		}
+		@Override
 		protected double call(double d) { 
 			return mathlib.dpow_lib(Math.E,d); 
 		} 
 	}
 	
 	static final class fmod extends BinaryOp {
+		@Override
 		protected double call(double x, double y) {
 			double q = x/y;
 			return x - y * (q>=0? Math.floor(q): Math.ceil(q));
 		}
 	}
 	static final class ldexp extends BinaryOp {
+		@Override
 		protected double call(double x, double y) {
 			// This is the behavior on os-x, windows differs in rounding behavior.
 			return x * Double.longBitsToDouble((((long) y) + 1023) << 52);
 		}
 	}
 	static final class pow extends BinaryOp {
+		@Override
 		protected double call(double x, double y) {
 			return MathLib.dpow_default(x, y);
 		}
 	}
 
 	static class frexp extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			double x = args.checkdouble(1);
 			if ( x == 0 ) return varargsOf(ZERO,ZERO);
@@ -193,6 +201,7 @@ public class MathLib extends TwoArgFunction {
 	}
 
 	static class max extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			double m = args.checkdouble(1);
 			for ( int i=2,n=args.narg(); i<=n; ++i )
@@ -202,6 +211,7 @@ public class MathLib extends TwoArgFunction {
 	}
 	
 	static class min extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			double m = args.checkdouble(1);
 			for ( int i=2,n=args.narg(); i<=n; ++i )
@@ -211,6 +221,7 @@ public class MathLib extends TwoArgFunction {
 	}
 	
 	static class modf extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			double x = args.checkdouble(1);
 			double intPart = ( x > 0 ) ? Math.floor( x ) : Math.ceil( x );
@@ -221,14 +232,17 @@ public class MathLib extends TwoArgFunction {
 	
 	static class random extends LibFunction {
 		Random random = new Random();
+		@Override
 		public LuaValue call() {
 			return valueOf( random.nextDouble() );
 		}
+		@Override
 		public LuaValue call(LuaValue a) {
 			int m = a.checkint();
 			if (m<1) argerror(1, "interval is empty");
 			return valueOf( 1 + random.nextInt(m) );
 		}
+		@Override
 		public LuaValue call(LuaValue a, LuaValue b) {
 			int m = a.checkint();
 			int n = b.checkint();
@@ -243,6 +257,7 @@ public class MathLib extends TwoArgFunction {
 		randomseed(random random) {
 			this.random = random;
 		}
+		@Override
 		public LuaValue call(LuaValue arg) {
 			long seed = arg.checklong();
 			random.random = new Random(seed);

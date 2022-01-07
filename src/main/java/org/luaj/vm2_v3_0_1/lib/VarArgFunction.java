@@ -50,18 +50,22 @@ abstract public class VarArgFunction extends LibFunction {
 	public VarArgFunction() {
 	}
 	
+	@Override
 	public LuaValue call() {
 		return invoke(NONE).arg1();
 	}
 
+	@Override
 	public LuaValue call(LuaValue arg) {
 		return invoke(arg).arg1();
 	}
 
+	@Override
 	public LuaValue call(LuaValue arg1, LuaValue arg2) {
 		return invoke(varargsOf(arg1,arg2)).arg1();
 	}
 
+	@Override
 	public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
 		return invoke(varargsOf(arg1,arg2,arg3)).arg1();
 	}
@@ -73,10 +77,12 @@ abstract public class VarArgFunction extends LibFunction {
 	 * - function has a possibility of returning a TailcallVarargs
 	 * @param args the arguments to the function call.
 	 */
+	@Override
 	public Varargs invoke(Varargs args) {
 		return onInvoke(args).eval();
 	}
 	
+	@Override
 	public Varargs onInvoke(Varargs args) {
 		return invoke(args);
 	}

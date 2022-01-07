@@ -210,6 +210,7 @@ public class Hud3DPane extends WorldHudItem{
 		}
 	}
 	private class setSize extends TwoArgFunction {
+		@Override
 		public LuaValue call(LuaValue w, LuaValue l) {
 			Hud3DPane.this.width = (float) w.checkdouble();
 			Hud3DPane.this.length = (float) l.checkdouble();

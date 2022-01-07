@@ -134,6 +134,7 @@ public class LuajavaLib extends VarArgFunction {
 	public LuajavaLib() {
 	}
 
+	@Override
 	public Varargs invoke(Varargs args) {
 		try {
 			switch ( opcode ) {

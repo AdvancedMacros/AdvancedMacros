@@ -71,6 +71,7 @@ public class JseMathLib extends org.luaj.vm2_v3_0_1.lib.MathLib {
 	 * @param modname the module name supplied if this is loaded via 'require'.
 	 * @param env the environment to load into, which must be a Globals instance.
 	 */
+	@Override
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		super.call(modname, env);
 		LuaValue math = env.get("math");
@@ -87,18 +88,19 @@ public class JseMathLib extends org.luaj.vm2_v3_0_1.lib.MathLib {
 		return math;
 	}
 
-	static final class acos extends UnaryOp { protected double call(double d) { return Math.acos(d); } }
-	static final class asin extends UnaryOp { protected double call(double d) { return Math.asin(d); } }
-	static final class atan extends UnaryOp { protected double call(double d) { return Math.atan(d); } }
-	static final class atan2 extends BinaryOp { protected double call(double y, double x) { return Math.atan2(y, x); } }
-	static final class cosh extends UnaryOp { protected double call(double d) { return Math.cosh(d); } }
-	static final class exp extends UnaryOp { protected double call(double d) { return Math.exp(d); } }
-	static final class log extends UnaryOp { protected double call(double d) { return Math.log(d); } }
-	static final class pow extends BinaryOp { protected double call(double x, double y) { return Math.pow(x, y); } }
-	static final class sinh extends UnaryOp { protected double call(double d) { return Math.sinh(d); } }
-	static final class tanh extends UnaryOp { protected double call(double d) { return Math.tanh(d); } }
+	static final class  acos extends UnaryOp  { @Override protected double call(double d) { return Math.acos(d); } }
+	static final class  asin extends UnaryOp  { @Override protected double call(double d) { return Math.asin(d); } }
+	static final class  atan extends UnaryOp  { @Override protected double call(double d) { return Math.atan(d); } }
+	static final class atan2 extends BinaryOp { @Override protected double call(double y, double x) { return Math.atan2(y, x); } }
+	static final class  cosh extends UnaryOp  { @Override protected double call(double d) { return Math.cosh(d); } }
+	static final class   exp extends UnaryOp  { @Override protected double call(double d) { return Math.exp(d); } }
+	static final class   log extends UnaryOp  { @Override protected double call(double d) { return Math.log(d); } }
+	static final class   pow extends BinaryOp { @Override protected double call(double x, double y) { return Math.pow(x, y); } }
+	static final class  sinh extends UnaryOp  { @Override protected double call(double d) { return Math.sinh(d); } }
+	static final class  tanh extends UnaryOp  { @Override protected double call(double d) { return Math.tanh(d); } }
 
 	/** Faster, better version of pow() used by arithmetic operator ^ */
+	@Override
 	public double dpow_lib(double a, double b) {
 		return Math.pow(a, b);
 	}

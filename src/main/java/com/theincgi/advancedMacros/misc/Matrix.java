@@ -67,6 +67,7 @@ public class Matrix {
 		}
 		return out;
 	}
+	@Override
 	public Matrix clone() {
 		Matrix cloned = new Matrix(ROWS, COLS);
 		for(int r = 0; r<ROWS; r++) {

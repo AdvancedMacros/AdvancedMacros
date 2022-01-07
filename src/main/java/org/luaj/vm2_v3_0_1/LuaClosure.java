@@ -106,26 +106,32 @@ public class LuaClosure extends LuaFunction {
 		globals = env instanceof Globals? (Globals) env: null;	
 	}
 	
+	@Override
 	public boolean isclosure() {
 		return true;
 	}
 	
+	@Override
 	public LuaClosure optclosure(LuaClosure defval) {
 		return this;
 	}
 
+	@Override
 	public LuaClosure checkclosure() {
 		return this;
 	}
 	
+	@Override
 	public LuaValue getmetatable() { 
 		return s_metatable; 
 	}
 	
+	@Override
 	public String tojstring() {
 		return "function: " + p.toString();
 	}
 	
+	@Override
 	public final LuaValue call() {
 		LuaValue[] stack = new LuaValue[p.maxstacksize];
 		for (int i = 0; i < p.numparams; ++i )
@@ -133,6 +139,7 @@ public class LuaClosure extends LuaFunction {
 		return execute(stack,NONE).arg1();
 	}
 
+	@Override
 	public final LuaValue call(LuaValue arg) {
 		LuaValue[] stack = new LuaValue[p.maxstacksize];
 		System.arraycopy(NILS, 0, stack, 0, p.maxstacksize);
@@ -144,6 +151,7 @@ public class LuaClosure extends LuaFunction {
 		}
 	}
 	
+	@Override
 	public final LuaValue call(LuaValue arg1, LuaValue arg2) {
 		LuaValue[] stack = new LuaValue[p.maxstacksize];
 		for (int i = 2; i < p.numparams; ++i )
@@ -155,6 +163,7 @@ public class LuaClosure extends LuaFunction {
 		}
 	}
 
+	@Override
 	public final LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
 		LuaValue[] stack = new LuaValue[p.maxstacksize];
 		for (int i = 3; i < p.numparams; ++i )
@@ -167,10 +176,12 @@ public class LuaClosure extends LuaFunction {
 		}
 	}
 
+	@Override
 	public final Varargs invoke(Varargs varargs) {
 		return onInvoke(varargs).eval();
 	}
 	
+	@Override
 	public final Varargs onInvoke(Varargs varargs) {
 		LuaValue[] stack = new LuaValue[p.maxstacksize];
 		for ( int i=0; i<p.numparams; i++ )
@@ -562,6 +573,7 @@ public class LuaClosure extends LuaFunction {
 		upValues[i].setValue(v);
 	}
 
+	@Override
 	public String name() {
 		return "<"+p.shortsource()+":"+p.linedefined+">";
 	}

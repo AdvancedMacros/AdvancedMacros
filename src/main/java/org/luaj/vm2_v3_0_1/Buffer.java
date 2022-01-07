@@ -124,6 +124,7 @@ public final class Buffer {
 	 * Convert the buffer to a Java String
 	 * @return the value as a Java String
 	 */
+	@Override
 	public String toString() {
 		return tojstring();
 	}

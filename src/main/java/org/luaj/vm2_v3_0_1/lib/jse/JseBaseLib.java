@@ -80,6 +80,7 @@ public class JseBaseLib extends org.luaj.vm2_v3_0_1.lib.BaseLib {
 	 * @param modname the module name supplied if this is loaded via 'require'.
 	 * @param env the environment to load into, which must be a Globals instance.
 	 */
+	@Override
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		super.call(modname, env);
 		env.checkglobals().STDIN = System.in;
@@ -101,6 +102,7 @@ public class JseBaseLib extends org.luaj.vm2_v3_0_1.lib.BaseLib {
 	 * @param filename
 	 * @return InputStream, or null if not found. 
 	 */
+	@Override
 	public InputStream findResource(String filename) {
 		File f = new File(filename);
 		if ( ! f.exists() )

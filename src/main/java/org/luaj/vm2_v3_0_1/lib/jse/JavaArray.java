@@ -42,6 +42,7 @@ import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 class JavaArray extends LuaUserdata {
 
 	private static final class LenFunction extends OneArgFunction {
+		@Override
 		public LuaValue call(LuaValue u) {
 			return LuaValue.valueOf(Array.getLength(((LuaUserdata)u).m_instance));
 		}
@@ -60,6 +61,7 @@ class JavaArray extends LuaUserdata {
 		setmetatable(array_metatable);
 	}
 	
+	@Override
 	public LuaValue get(LuaValue key) {
 		if ( key.equals(LENGTH) )
 			return valueOf(Array.getLength(m_instance));
@@ -72,6 +74,7 @@ class JavaArray extends LuaUserdata {
 		return super.get(key);
 	}
 
+	@Override
 	public void set(LuaValue key, LuaValue value) {
 		if ( key.isint() ) {
 			int i = key.toint() - 1;

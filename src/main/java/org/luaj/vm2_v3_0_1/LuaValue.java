@@ -529,6 +529,7 @@ public class LuaValue extends Varargs {
 	 * @see #isstring()
 	 * @see #TSTRING
 	 */
+	@Override
 	public String  tojstring()           { return typename() + ": " + Integer.toHexString(hashCode()); }
 	
 	/** Convert to userdata instance, or null.
@@ -559,6 +560,7 @@ public class LuaValue extends Varargs {
 	 * @see #checkstring()
 	 * @see #toString() 
 	 */
+	@Override
 	public String toString() { return tojstring(); }
 	
 	/** Conditionally convert to lua number without throwing errors.
@@ -1396,8 +1398,11 @@ public class LuaValue extends Varargs {
 	public LuaValue load(LuaValue library) { return library.call(EMPTYSTRING, this); }
 
 	// varargs references
+	@Override
 	public LuaValue arg(int index) { return index==1? this: NIL; }
+	@Override
 	public int narg() { return 1; };
+	@Override
 	public LuaValue arg1() { return this; }
 	
 	/** 
@@ -2072,6 +2077,7 @@ public class LuaValue extends Varargs {
 	public int rawlen() { typerror("table or string"); return 0; }
 	
 	// object equality, used for key comparison
+	@Override
 	public boolean equals(Object obj)         { return this == obj; } 
 	
 	/** Equals: Perform equality comparison with another value 
@@ -3604,11 +3610,17 @@ public class LuaValue extends Varargs {
 	 */
 	private static final class None extends LuaNil {
 		static None _NONE = new None();
+		@Override
 		public LuaValue arg(int i) { return NIL; }
+		@Override
 		public int narg() { return 0; }
+		@Override
 		public LuaValue arg1() { return NIL; }
+		@Override
 		public String tojstring() { return "none"; }
+		@Override
 		public Varargs subargs(final int start) { return start > 0? this: argerror(1, "start must be > 0"); }
+		@Override
 		void copyto(LuaValue[] dest, int offset, int length) { for(;length>0; length--) dest[offset++] = NIL; }
 	}
 	
@@ -3617,6 +3629,7 @@ public class LuaValue extends Varargs {
 	 * @param start the index from which to include arguments, where 1 is the first argument.
 	 * @return Varargs containing argument { start, start+1,  ... , narg-start-1 }
 	 */
+	@Override
 	public Varargs subargs(final int start) {
 		if (start == 1)
 			return this;

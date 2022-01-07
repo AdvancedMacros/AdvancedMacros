@@ -16,6 +16,7 @@ import com.theincgi.advancedMacros.misc.Utils;
 
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Vector3f;
+import net.minecraft.entity.Entity;
 
 public abstract class WorldHudItem implements Destroyable {
 	protected DrawType drawType = DrawType.NO_XRAY;
@@ -31,6 +32,7 @@ public abstract class WorldHudItem implements Destroyable {
 	protected float x,y,z,yaw,pitch,roll;
 	protected boolean isDrawing;
 	/**should call to {@link #disableDraw()} and to make all functions un-usable as it is no longer in use*/
+	@Override
 	public void destroy() {
 			disableDraw();
 	}
@@ -106,8 +108,6 @@ public abstract class WorldHudItem implements Destroyable {
 	}
 	
 	public void apply3dRotation(MatrixStack ms, double playerX, double playerY, double playerZ) {
-		
-		
 		ms.translate(-playerX, -playerY, -playerZ);
 
 		ms.translate(x, y, z);

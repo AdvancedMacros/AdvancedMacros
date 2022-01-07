@@ -86,11 +86,13 @@ public class JseOsLib extends org.luaj.vm2_v3_0_1.lib.OsLib {
 	public JseOsLib() {
 	}
 
+	@Override
 	protected String getenv(String varname) {
 		String s = System.getenv(varname);
 		return s != null? s : System.getProperty(varname);
 	}
 
+	@Override
 	protected Varargs execute(String command) {
 		int exitValue;
 		try {
@@ -107,6 +109,7 @@ public class JseOsLib extends org.luaj.vm2_v3_0_1.lib.OsLib {
 		return varargsOf(NIL, valueOf("signal"), valueOf(exitValue));
 	}
 
+	@Override
 	protected void remove(String filename) throws IOException {
 		File f = new File(filename);
 		if ( ! f.exists() )
@@ -115,6 +118,7 @@ public class JseOsLib extends org.luaj.vm2_v3_0_1.lib.OsLib {
 			throw new IOException("Failed to delete");
 	}
 
+	@Override
 	protected void rename(String oldname, String newname) throws IOException {
 		File f = new File(oldname);
 		if ( ! f.exists() )
@@ -123,6 +127,7 @@ public class JseOsLib extends org.luaj.vm2_v3_0_1.lib.OsLib {
 			throw new IOException("Failed to delete");
 	}
 
+	@Override
 	protected String tmpname() {
 		try {
 			java.io.File f = java.io.File.createTempFile(TMP_PREFIX ,TMP_SUFFIX);

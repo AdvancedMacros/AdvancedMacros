@@ -182,6 +182,7 @@ public abstract class Hud2DItem implements Destroyable{
 		//GlStateManager.translate(-x, -y, 0);
 	}
 	
+	@Override
 	public void destroy() {
 		disableDraw();
 	}

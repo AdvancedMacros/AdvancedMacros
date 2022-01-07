@@ -40,34 +40,42 @@ public class LuaFunction extends LuaValue {
 	/** Shared static metatable for all functions and closures. */
 	public static LuaValue s_metatable;
 
+	@Override
 	public int type() {
 		return TFUNCTION;
 	}
 	
+	@Override
 	public String typename() {
 		return "function";
 	}
 	
+	@Override
 	public boolean isfunction() {
 		return true;
 	}
 
+	@Override
 	public LuaFunction checkfunction()  {
 		return this;
 	}
 	
+	@Override
 	public LuaFunction optfunction(LuaFunction defval) {
 		return this; 
 	}
 
+	@Override
 	public LuaValue getmetatable() { 
 		return s_metatable; 
 	}
 
+	@Override
 	public String tojstring() {
 		return "function: " + classnamestub();
 	}
 
+	@Override
 	public LuaString strvalue() {
 		return valueOf(tojstring());
 	}

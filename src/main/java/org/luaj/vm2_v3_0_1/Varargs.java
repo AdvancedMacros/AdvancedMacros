@@ -495,6 +495,7 @@ public abstract class Varargs {
 	 * @return String value in human readable form. 
 	 * @see Varargs#tojstring()
 	 */
+	@Override
 	public String toString() { return tojstring(); }
 
 	/**
@@ -517,16 +518,20 @@ public abstract class Varargs {
 			this.start = start;
 			this.end = end;
 		}
+		@Override
 		public LuaValue arg(int i) {
 			i += start-1;
 			return i>=start && i<=end? v.arg(i): LuaValue.NIL;
 		}
+		@Override
 		public LuaValue arg1() {
 			return v.arg(start);
 		}
+		@Override
 		public int narg() {
 			return end+1-start;
 		}
+		@Override
 		public Varargs subargs(final int start) {
 			if (start == 1)
 				return this;
@@ -565,15 +570,19 @@ public abstract class Varargs {
 			this.v1 = v1;
 			this.v2 = v2;
 		}
+		@Override
 		public LuaValue arg(int i) {
 			return i==1? v1: v2.arg(i-1);
 		}
+		@Override
 		public int narg() {
 			return 1+v2.narg();
 		}
+		@Override
 		public LuaValue arg1() { 
 			return v1; 
 		}
+		@Override
 		public Varargs subargs(final int start) {
 			if (start == 1)
 				return this;
@@ -608,13 +617,17 @@ public abstract class Varargs {
 			this.v = v;
 			this.r = r ;
 		}
+		@Override
 		public LuaValue arg(int i) {
 			return i < 1 ? LuaValue.NIL: i <= v.length? v[i - 1]: r.arg(i-v.length);
 		}
+		@Override
 		public int narg() {
 			return v.length+r.narg();
 		}
+		@Override
 		public LuaValue arg1() { return v.length>0? v[0]: r.arg1(); }
+		@Override
 		public Varargs subargs(int start) {
 			if (start <= 0)
 				LuaValue.argerror(1, "start must be > 0");
@@ -624,6 +637,7 @@ public abstract class Varargs {
 				return r.subargs(start - v.length);
 			return LuaValue.varargsOf(v, start - 1, v.length - (start - 1), r);
 		}
+		@Override
 		void copyto(LuaValue[] dest, int offset, int length) {
 			int n = Math.min(v.length, length);
 			System.arraycopy(v, 0, dest, offset, n);
@@ -670,15 +684,19 @@ public abstract class Varargs {
 			this.length = length;
 			this.more = more;
 		}
+		@Override
 		public LuaValue arg(final int i) {
 			return i < 1? LuaValue.NIL: i <= length? v[offset+i-1]: more.arg(i-length);
 		}
+		@Override
 		public int narg() {
 			return length + more.narg();
 		}
+		@Override
 		public LuaValue arg1() { 
 			return length>0? v[offset]: more.arg1(); 
 		}
+		@Override
 		public Varargs subargs(int start) {
 			if (start <= 0)
 				LuaValue.argerror(1, "start must be > 0");
@@ -688,6 +706,7 @@ public abstract class Varargs {
 				return more.subargs(start - length);
 			return LuaValue.varargsOf(v, offset + start - 1, length - (start - 1), more);
 		}
+		@Override
 		void copyto(LuaValue[] dest, int offset, int length) {
 			int n = Math.min(this.length, length);
 			System.arraycopy(this.v, this.offset, dest, offset, n);

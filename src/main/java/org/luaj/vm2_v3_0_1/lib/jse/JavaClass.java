@@ -70,6 +70,7 @@ class JavaClass extends JavaInstance implements CoerceJavaToLua.Coercion {
 		this.jclass = this;
 	}
 
+	@Override
 	public LuaValue coerce(Object javaValue) {
 		return this;
 	}

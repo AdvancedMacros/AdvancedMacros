@@ -85,6 +85,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 	 * @param modname the module name supplied if this is loaded via 'require'.
 	 * @param env the environment to load into, which must be a Globals instance.
 	 */
+	@Override
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		globals = env.checkglobals();
 		globals.finder = this;
@@ -123,6 +124,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 	 * 
 	 * Tries to open the file as a resource, which can work for JSE and JME. 
 	 */
+	@Override
 	public InputStream findResource(String filename) {
 		return getClass().getResourceAsStream(filename.startsWith("/")? filename: "/"+filename);
 	}
@@ -130,6 +132,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 	
 	// "assert", // ( v [,message] ) -> v, message | ERR
 	static final class _assert extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			if ( !args.arg1().toboolean() ) 
 				error( args.narg()>1? args.optjstring(2,"assertion failed!"): "assertion failed!" );
@@ -139,6 +142,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 
 	// "collectgarbage", // ( opt [,arg] ) -> value
 	static final class collectgarbage extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			String s = args.optjstring(1, "collect");
 			if ( "collect".equals(s) ) {
@@ -160,6 +164,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 
 	// "dofile", // ( filename ) -> result1, ...
 	final class dofile extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			args.argcheck(args.isstring(1) || args.isnil(1), 1, "filename must be string or nil");
 			String filename = args.isstring(1)? args.tojstring(1): null;
@@ -172,6 +177,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 
 	// "error", // ( message [,level] ) -> ERR
 	static final class error extends TwoArgFunction {
+		@Override
 		public LuaValue call(LuaValue arg1, LuaValue arg2) {
 			throw arg1.isnil()? new LuaError("", arg2.optint(1)): 
 				arg1.isstring()? new LuaError(arg1.tojstring(), arg2.optint(1)): 
@@ -181,9 +187,11 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 
 	// "getmetatable", // ( object ) -> table 
 	static final class getmetatable extends LibFunction {
+		@Override
 		public LuaValue call() {
 			return argerror(1, "value");
 		}
+		@Override
 		public LuaValue call(LuaValue arg) {
 			LuaValue mt = arg.getmetatable();
 			return mt!=null? mt.rawget(METATABLE).optvalue(mt): NIL;
@@ -191,6 +199,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 	}
 	// "load", // ( ld [, source [, mode [, env]]] ) -> chunk | nil, msg
 	final class load extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			LuaValue ld = args.arg1();
 			args.argcheck(ld.isstring() || ld.isfunction(), 1, "ld must be string or function");
@@ -204,6 +213,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 
 	// "loadfile", // ( [filename [, mode [, env]]] ) -> chunk | nil, msg
 	final class loadfile extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			args.argcheck(args.isstring(1) || args.isnil(1), 1, "filename must be string or nil");
 			String filename = args.isstring(1)? args.tojstring(1): null;
@@ -217,6 +227,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 		
 	// "pcall", // (f, arg1, ...) -> status, result1, ...
 	final class pcall extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			LuaValue func = args.checkvalue(1);
 			if (globals != null && globals.debuglib != null)
@@ -242,6 +253,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 		print(BaseLib baselib) {
 			this.baselib = baselib;
 		}
+		@Override
 		public Varargs invoke(Varargs args) {
 			LuaValue tostring = globals.get("tostring"); 
 			for ( int i=1, n=args.narg(); i<=n; i++ ) {
@@ -257,12 +269,15 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 
 	// "rawequal", // (v1, v2) -> boolean
 	static final class rawequal extends LibFunction {
+		@Override
 		public LuaValue call() {
 			return argerror(1, "value");
 		}
+		@Override
 		public LuaValue call(LuaValue arg) {
 			return argerror(2, "value");
 		}
+		@Override
 		public LuaValue call(LuaValue arg1, LuaValue arg2) {
 			return valueOf(arg1.raweq(arg2));
 		}
@@ -270,12 +285,15 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 
 	// "rawget", // (table, index) -> value
 	static final class rawget extends LibFunction {
+		@Override
 		public LuaValue call() {
 			return argerror(1, "value");
 		}
+		@Override
 		public LuaValue call(LuaValue arg) {
 			return argerror(2, "value");
 		}
+		@Override
 		public LuaValue call(LuaValue arg1, LuaValue arg2) {
 			return arg1.checktable().rawget(arg2);
 		}
@@ -284,6 +302,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 	
 	// "rawlen", // (v) -> value
 	static final class rawlen extends LibFunction {
+		@Override
 		public LuaValue call(LuaValue arg) {
 			return valueOf(arg.rawlen());
 		}
@@ -291,12 +310,15 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 
 	// "rawset", // (table, index, value) -> table
 	static final class rawset extends LibFunction {
+		@Override
 		public LuaValue call(LuaValue table) {
 			return argerror(2,"value");
 		}
+		@Override
 		public LuaValue call(LuaValue table, LuaValue index) {
 			return argerror(3,"value");
 		}
+		@Override
 		public LuaValue call(LuaValue table, LuaValue index, LuaValue value) {
 			LuaTable t = table.checktable();
 			t.rawset(index.checknotnil(), value);
@@ -306,6 +328,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 	
 	// "select", // (f, ...) -> value1, ...
 	static final class select extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			int n = args.narg()-1; 				
 			if ( args.arg1().equals(valueOf("#")) )
@@ -319,9 +342,11 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 	
 	// "setmetatable", // (table, metatable) -> table
 	static final class setmetatable extends LibFunction {
+		@Override
 		public LuaValue call(LuaValue table) {
 			return argerror(2,"value");
 		}
+		@Override
 		public LuaValue call(LuaValue table, LuaValue metatable) {
 			final LuaValue mt0 = table.checktable().getmetatable();
 			if ( mt0!=null && !mt0.rawget(METATABLE).isnil() )
@@ -332,9 +357,11 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 	
 	// "tonumber", // (e [,base]) -> value
 	static final class tonumber extends LibFunction {
+		@Override
 		public LuaValue call(LuaValue e) {
 			return e.tonumber();
 		}
+		@Override
 		public LuaValue call(LuaValue e, LuaValue base) {
 			if (base.isnil())
 				return e.tonumber();
@@ -347,6 +374,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 	
 	// "tostring", // (e) -> value
 	static final class tostring extends LibFunction {
+		@Override
 		public LuaValue call(LuaValue arg) {
 			LuaValue h = arg.metatag(TOSTRING);
 			if ( ! h.isnil() ) 
@@ -360,6 +388,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 
 	// "type",  // (v) -> value
 	static final class type extends LibFunction {
+		@Override
 		public LuaValue call(LuaValue arg) {
 			return valueOf(arg.typename());
 		}
@@ -367,6 +396,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 
 	// "xpcall", // (f, err) -> result1, ...				
 	final class xpcall extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			final LuaThread t = globals.getCurrentLuaThread();
 			final LuaValue preverror = t.errorfunc;
@@ -398,6 +428,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 		pairs(next next) {
 			this.next = next;
 		}
+		@Override
 		public Varargs invoke(Varargs args) {
 			LuaValue meta = args.checktable(1).getmetatable();
 			LuaValue __pairs;
@@ -410,6 +441,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 	// // "ipairs", // (t) -> iter-func, t, 0
 	static final class ipairs extends VarArgFunction {
 		inext inext = new inext();
+		@Override
 		public Varargs invoke(Varargs args) {
 			LuaValue meta = args.checktable(1).getmetatable();
 			LuaValue __ipairs;
@@ -421,6 +453,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 	
 	// "next"  ( table, [index] ) -> next-index, next-value
 	static final class next extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			return args.checktable(1).next(args.arg(2));
 		}
@@ -428,6 +461,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 	
 	// "inext" ( table, [int-index] ) -> next-index, next-value
 	static final class inext extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			return args.checktable(1).inext(args.arg(2));
 		}
@@ -472,6 +506,7 @@ public class BaseLib extends TwoArgFunction implements ResourceFinder {
 		StringInputStream(LuaValue func) {
 			this.func = func;
 		}
+		@Override
 		public int read() throws IOException {
 			if ( remaining <= 0 ) {
 				LuaValue s = func.call();
