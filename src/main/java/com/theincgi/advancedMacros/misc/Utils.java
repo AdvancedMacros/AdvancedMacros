@@ -1177,7 +1177,7 @@ public class Utils {
 							else
 								hText = "URL: &b&U"+cText;
 							argNum++;
-							clickEvent = new ClickEvent(Action.OPEN_URL, cText);
+							clickEvent = new ClickEvent(Action.OPEN_URL, cText.startsWith("https://")||cText.startsWith("http://") ? cText : "https://"+cText);
 							hoverEvent = new HoverEvent(net.minecraft.util.text.event.HoverEvent.Action.SHOW_TEXT, toTextComponent(hText, null, false, false).a);
 						}else if(next == 'N') {
 							String hText;
