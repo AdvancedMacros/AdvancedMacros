@@ -942,7 +942,7 @@ public class ForgeEventHandler {
 		}
 
 		
-
+		final LinkedList<String> toRun = AdvancedMacros.macroMenuGui.getMatchingScripts(false, EventName.ChatFilter.name(), false);
 		JavaThread t = new JavaThread(()->{
 
 			LuaTable e = createEvent(EventName.Chat);
@@ -964,7 +964,6 @@ public class ForgeEventHandler {
 			e.set(5, actions);
 			e2.set(5, actions);
 
-			LinkedList<String> toRun = AdvancedMacros.macroMenuGui.getMatchingScripts(false, EventName.ChatFilter.name(), false);
 			for (String script : toRun) {
 				if(script==null) continue;
 				File f = new File(AdvancedMacros.macrosFolder, script);
@@ -1023,21 +1022,10 @@ public class ForgeEventHandler {
 				nextMessageToAddToChat = Math.max(thisMessageIndex+1, nextMessageToAddToChat);
 			}
 		});
-		t.start(); 
-
-		//		event.setCanceled(event.isCancelable() && eventExists(EventName.ChatFilter));
-		//		//		OnScriptFinish afterFormating = new OnScriptFinish() {
-		//		//			@Override
-		//		//			public void onFinish(Varargs v) {
-		//		//				if(v.narg()>0){
-		//		//					event.setMessage(advancedMacros.logFunc.formatString(v));
-		//		//				}
-		//		//			}
-		//		//		};
-		//		fireEvent(EventName.Chat, e);
-		//		if(event.isCanceled())
-		//			fireEvent(EventName.ChatFilter, e2);
-		sEvent.setCanceled(true);
+		if(toRun.size() > 0) {
+			t.start();
+			sEvent.setCanceled(true);
+		}
 	}
 	@SubscribeEvent 
 	public void sendingChat(final ClientChatEvent event) {
