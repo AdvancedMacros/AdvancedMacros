@@ -1147,7 +1147,7 @@ public class Utils {
 							else
 								hText = "URL: &b&U"+cText;
 							argNum++;
-							clickEvent = new ClickEvent(Action.OPEN_URL, cText);
+							clickEvent = new ClickEvent(Action.OPEN_URL, cText.startsWith("https://")||cText.startsWith("http://") ? cText : "https://"+cText);
 							hoverEvent = new HoverEvent(net.minecraft.util.text.event.HoverEvent.Action.SHOW_TEXT, toTextComponent(hText, null, false, false).a);
 						}else if(next == 'N') {
 							String hText;
@@ -1159,6 +1159,21 @@ public class Utils {
 							argNum++;
 
 							hoverEvent = new HoverEvent(net.minecraft.util.text.event.HoverEvent.Action.SHOW_TEXT, toTextComponent(hText, null, false, false).a);
+						}else if(next == '*') {
+							String file, tooltip;
+							if(args.arg(argNum).istable()) {
+								LuaTable table = args.arg(argNum).checktable();
+								file = table.get("click").tojstring();
+								tooltip = table.get("hover").isnil()? null : table.get("hover").tojstring();
+							}else {
+								file = args.arg(argNum).tojstring();
+								tooltip = (new File(file).exists()?"&a":"&c") + file;
+							}
+							argNum++;
+							
+							clickEvent = new ClickEvent(Action.OPEN_FILE, file);
+							if(tooltip != null)
+								hoverEvent = new HoverEvent(net.minecraft.util.text.event.HoverEvent.Action.SHOW_TEXT, toTextComponent(tooltip, null, false, false).a);
 						}
 					}
 				}
@@ -1221,6 +1236,9 @@ public class Utils {
 				case SUGGEST_COMMAND:
 					formating += "&T";
 					break;
+				case OPEN_FILE:
+					formating += "&*";
+					break;
 				default:
 					action = null;
 				}
@@ -1244,7 +1262,7 @@ public class Utils {
 		return new Pair<String, LuaTable>(out.toString(), actions);
 	}
 	private static boolean isSpecialCode(char c) {
-		return "FRTLN".indexOf(c) >= 0; //Function, Execute, Type, Url
+		return "FRTLN*".indexOf(c) >= 0; //Function, Execute, Type, Url
 	}
 	private static TextFormatting getTextFormatingColor(char c) {
 		//		 BLACK("BLACK", '0', 0),

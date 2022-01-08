@@ -1,5 +1,6 @@
 package com.theincgi.advancedMacros.lua.functions;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import org.luaj.vm2_v3_0_1.LuaError;
@@ -26,20 +27,20 @@ public class RunOnMC extends VarArgFunction{
 			
 		}
 		final LuaFunction theFunction = arg1.checkfunction();
+		
 		ListenableFuture<Varargs> f = AdvancedMacros.getMinecraft().addScheduledTask(()->{
-			try {
-				return Utils.pcall(theFunction, fArgs);
-			}catch (Throwable e) {
-				Utils.logError(e);
-				return NONE;
-			}
+			return theFunction.invoke( fArgs );
 		});
 		try {
+			while((!f.isDone()) && (!f.isCancelled())) {
+				Thread.sleep(1);
+			}
 			return f.get();
 		} catch (InterruptedException e) {
 			return NONE;
 		} catch (ExecutionException e) {
-			throw new LuaError(e);
+			throw new LuaError(e.getCause());
 		}
 	}
+	
 }
