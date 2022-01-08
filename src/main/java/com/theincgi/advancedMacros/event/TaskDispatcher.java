@@ -190,11 +190,14 @@ public class TaskDispatcher {
 		}
 		
 		protected void call() {
-			try {
-				future.markDone( c.call() );
-			} catch (Exception e) {
-				err = e;
-				future.markDone(null);
+			synchronized (future) {
+				try {
+					future.markDone( c.call() );
+				} catch (Exception e) {
+					err = e;
+					future.markDone(null);
+				}
+				future.notify();
 			}
 		}
 	}
@@ -277,12 +280,15 @@ public class TaskDispatcher {
 			future = new LF();
 		}
 		protected void call() {
-			try {
-				r.run();
-			} catch (Exception e) {
-				err = e;
-			}finally{
-				future.markDone();
+			synchronized (future) {
+				try {
+					r.run();
+				} catch (Exception e) {
+					err = e;
+				}finally{
+					future.markDone();
+					future.notify();
+			}
 			}
 		}
 	}

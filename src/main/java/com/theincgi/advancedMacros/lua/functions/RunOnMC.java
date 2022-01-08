@@ -28,19 +28,18 @@ public class RunOnMC extends VarArgFunction{
 		}
 		final LuaFunction theFunction = arg1.checkfunction();
 		ListenableFuture<Varargs> f = TaskDispatcher.addTask(()->{
-			try {
-				return Utils.pcall(theFunction, fArgs);
-			}catch (Throwable e) {
-				Utils.logError(e);
-				return NONE;
-			}
+			return theFunction.invoke( fArgs);
 		});
 		try {
-			return f.get();
+			synchronized (f) {
+				if(!f.isDone())
+					f.wait();
+			}
+			return f.get(); //javadoc says it waits if needed, it doesn't...
 		} catch (InterruptedException e) {
 			return NONE;
 		} catch (ExecutionException e) {
-			throw new LuaError(e);
+			throw new LuaError(e.getCause());
 		}
 	}
 }
