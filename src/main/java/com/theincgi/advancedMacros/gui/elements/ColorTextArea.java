@@ -1122,7 +1122,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
 	}
 
 	public static boolean isCTRLDown(){
-		return Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
+		return Keyboard.isKeyDown(Keyboard.KEY_RCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) && !Keyboard.isKeyDown(Keyboard.KEY_RMENU);
 	}
 	public static boolean isShiftDown(){
 		return Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT); 
