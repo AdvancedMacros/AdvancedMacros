@@ -282,6 +282,7 @@ public class ForgeEventHandler {
 		if(look!=null){
 			look.look();
 		}
+		AdvancedMacros.actions.checkBlockBreakStatus();
 		LinkedList<Integer> toRemove = new LinkedList<>();
 		for(Integer i : keyBindReleaseMap.keySet()) {
 			HeldKeybinds hk = keyBindReleaseMap.get(i);

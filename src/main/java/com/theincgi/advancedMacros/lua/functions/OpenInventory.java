@@ -83,7 +83,7 @@ public class OpenInventory extends ZeroArgFunction{
 					ClickType type = ClickType.PICKUP;
 					ctrl.windowClick(wID, slotA-1, mouseButton, type, mc.player);
 				});
-				Utils.waitTick();
+				
 				return NONE;
 			}
 			case closeAndDrop:
@@ -92,7 +92,7 @@ public class OpenInventory extends ZeroArgFunction{
 					if(!held.isEmpty())
 						ctrl.windowClick(wID, -999, 0, ClickType.PICKUP, mc.player);
 				});
-				Utils.waitTick();
+				
 				return NONE;
 			case close:
 				mc.player.closeScreen();
@@ -103,7 +103,7 @@ public class OpenInventory extends ZeroArgFunction{
 					ClickType type = ClickType.QUICK_MOVE;
 					ctrl.windowClick(wID, slotA-1, 0, type, mc.player);
 				});
-				Utils.waitTick();
+				
 				return NONE;
 			}
 			case split:{
@@ -116,7 +116,7 @@ public class OpenInventory extends ZeroArgFunction{
 					ctrl.windowClick(wID, slotA-1, 1, type, mc.player);
 					ctrl.windowClick(wID, slotB-1, 0, type, mc.player);
 				});
-				Utils.waitTick();
+				
 				return NONE;
 			}
 			case getHeld:{
@@ -132,21 +132,21 @@ public class OpenInventory extends ZeroArgFunction{
 					ItemStack held = mc.player.inventory.getItemStack();
 					int slotA = args.checkint(1);
 					int slotB = args.checkint(2);
-					ItemStack is1 = container.inventorySlots.getSlot(slotA).getStack();
-					ItemStack is2 = container.inventorySlots.getSlot(slotB).getStack();
+					ItemStack is1 = container.inventorySlots.getSlot(slotA-1).getStack();
+					ItemStack is2 = container.inventorySlots.getSlot(slotB-1).getStack();
 					if(is1.isEmpty() && is2.isEmpty()) return;
 
 					ClickType type = ClickType.PICKUP;
 					if(!is1.isEmpty()) 
-						ctrl.windowClick(wID, slotA-1, 1, type, mc.player);
+						ctrl.windowClick(wID, slotA-1, 0, type, mc.player);
 					held = mc.player.inventory.getItemStack();
 					if((!is2.isEmpty()) || (!held.isEmpty()))
 						ctrl.windowClick(wID, slotB-1, 0, type, mc.player);
 					held = mc.player.inventory.getItemStack();
 					if(held.isEmpty()) return;
-					ctrl.windowClick(wID, slotA-1, 1, type, mc.player);
+					ctrl.windowClick(wID, slotA-1, 0, type, mc.player);
 				});
-				Utils.waitTick();
+				
 				return NONE;
 			}
 			case grabAll:{
@@ -155,7 +155,7 @@ public class OpenInventory extends ZeroArgFunction{
 					ctrl.windowClick(wID, slotA-1, 1, ClickType.PICKUP, mc.player);
 					ctrl.windowClick(wID, slotA-1, 1, ClickType.PICKUP_ALL, mc.player);
 				});
-				Utils.waitTick();
+				
 				return NONE;
 			}
 			case getType:
