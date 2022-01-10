@@ -71,8 +71,21 @@ function R.setup()
   REPL.elements.input.enableBackground(false)
   REPL.elements.input.setFocused(true)
   REPL.elements.input.setMaxLength(1000)
-  REPL.setOnKeyPressed( function()
+  REPL.setOnKeyPressed( function(...)
+    if REPL.elements.input.isFocused() then return end
     REPL.elements.input.setFocused(true)
+    local char = ''
+    if __GAME_VERSION == "1.12.2" then
+      local charTyped, keycode = ...
+      char = charTyped
+    elseif __GAME_VERSION=="1.14.4" or __GAME_VERSION=="1.15.2" then
+      local keyName, scanCode, modifiers = ...
+      char = keyName
+    else
+      toast("REPL","Unsupported version")
+    end
+    if string.byte( char ) < string.byte' ' then return end --ignore control chars
+    REPL.elements.input.setText( REPL.elements.input.getText()..char )
   end)
   if __GAME_VERSION == "1.12.2" then
     REPL.elements.input.setOnKeyPressed(
@@ -97,7 +110,7 @@ function R.setup()
           end
         end
       end)
-  elseif __GAME_VERSION=="1.14.4" then
+  elseif __GAME_VERSION=="1.14.4" or __GAME_VERSION=="1.15.2" then
     REPL.elements.input.setOnKeyPressed( function(keyName, keyCode, mods)
       if keyName=="ENTER" then
         local expr = REPL.elements.input.getText()
@@ -289,9 +302,10 @@ function R.setup()
   function REPL.evaluate(expr)
     local mutex = newMutex"REPL.evaluate"
     if REPL.activeEval and (
-       REPL.activeEval.status() == "STOPPED" or --pcall should stop this from being needed
-       REPL.activeEval.status() == "CRASH" or 
-       REPL.activeEval.status() == "DONE") then
+       REPL.activeEval.getStatus() and(
+       REPL.activeEval.getStatus() == "STOPPED" or --pcall should stop this from being needed
+       REPL.activeEval.getStatus() == "CRASH" or 
+       REPL.activeEval.getStatus() == "DONE")) then
       REPL.activeEval = nil
     end
     if not mutex.tryLock() or REPL.activeEval then
@@ -423,7 +437,7 @@ function R.setup()
   REPL.setOnClose( REPL.stopVarTimer )
   REPL.setOnResize( REPL.onResize )
   REPL.setName"REPL"
-  REPL.echo("&7REPL Version 1.0\n&7Type &bhelp()&7 for tips!")
+  REPL.echo("&7REPL Version 1.2\n&7Type &bhelp()&7 for tips!")
 end
 
 --

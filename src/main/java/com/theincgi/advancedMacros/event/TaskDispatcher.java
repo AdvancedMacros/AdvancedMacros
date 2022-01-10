@@ -100,10 +100,13 @@ public class TaskDispatcher {
 	}
 	
 	public static ListenableFuture<?> waitFor(ListenableFuture<?> f){
-		while(!f.isDone()) {
+		synchronized (f) {
+			if(f.isDone()) return f;
 			try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {throw new LuaError(e);}
+				f.wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 		return f;
 	}
@@ -142,6 +145,7 @@ public class TaskDispatcher {
 
 			@Override
 			public U get() throws InterruptedException, ExecutionException {
+				waitFor(future);
 				if(err!=null) throw new ExecutionException(err);
 				return result;
 			}
@@ -179,6 +183,9 @@ public class TaskDispatcher {
 					while(!listeners.isEmpty()) {
 						executors.removeFirst().execute(listeners.removeFirst());
 					}
+				}
+				synchronized (future) {
+					future.notifyAll();
 				}
 			}
 			
@@ -235,6 +242,7 @@ public class TaskDispatcher {
 
 			@Override
 			public Void get() throws InterruptedException, ExecutionException {
+				waitFor(future);
 				if(err!=null) throw new ExecutionException(err);
 				return null;
 			}
@@ -271,6 +279,9 @@ public class TaskDispatcher {
 					while(!listeners.isEmpty()) {
 						executors.removeFirst().execute(listeners.removeFirst());
 					}
+				}
+				synchronized (future) {
+					future.notifyAll();
 				}
 			}
 		}

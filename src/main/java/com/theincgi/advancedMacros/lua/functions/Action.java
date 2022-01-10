@@ -17,14 +17,20 @@ import com.theincgi.advancedMacros.event.TaskDispatcher;
 import com.theincgi.advancedMacros.misc.HIDUtils.Keyboard;
 import com.theincgi.advancedMacros.misc.Utils;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings.Input;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.play.client.CPlayerDiggingPacket;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.chunk.IChunk;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class Action {
@@ -77,10 +83,53 @@ public class Action {
 			return LuaValue.NONE;
 		}
 	}
+	
+	private BlockPos attackTarget = null;
+	private class WaitForBreak extends ZeroArgFunction {
+		@Override
+		public LuaValue call() {
+			while( attackTarget!=null ) {
+				Utils.waitTick();
+			}
+			return NONE;
+		}
+		
+	} WaitForBreak waitForBreak = new WaitForBreak();
+	
+	private boolean attackTargetIsBlock() {
+		synchronized (waitForBreak) {
+			IChunk chunk = minecraft.world.getChunk(attackTarget);
+			BlockState state = chunk.getBlockState(attackTarget);
+			Block block = state.getBlock();
+			if(!block.isAir(state, minecraft.world, attackTarget)) return true;
+			return false;
+		}
+	}
+	
+	public void checkBlockBreakStatus() {
+		synchronized (waitForBreak) {
+			if(attackTarget == null) return;
+			if(attackTargetIsBlock()) return;
+			holdKeybind(sets.keyBindAttack, 0);
+			attackTarget = null;
+		}
+	}
+	
 	class Attack extends OneArgFunction{
 		final Method m = ObfuscationReflectionHelper.findMethod(Minecraft.class, "func_147116_af"); //clickMouse()
 		@Override
 		public LuaValue call(LuaValue arg) {
+			if(arg.isstring() && arg.tojstring().equals("break")) {
+				RayTraceResult rtr = minecraft.player.func_213324_a(PlayerEntity.REACH_DISTANCE.getDefaultValue(), 0, false); //raytrace
+				if(rtr==null)
+					return waitForBreak;
+				BlockPos lookingAt = ((BlockRayTraceResult)rtr).getPos();
+				synchronized (waitForBreak) {
+					attackTarget = lookingAt;
+				}
+				holdKeybind(sets.keyBindAttack, -1);
+				return waitForBreak;
+			}
 			if(arg.isnil() || (arg.islong()&&arg.checklong()==0)){
 				Class c = minecraft.getClass();
 				m.setAccessible(true);
@@ -220,8 +269,7 @@ public class Action {
 	class WaitTick extends ZeroArgFunction{
 		@Override
 		public LuaValue call() {
-			if(Thread.currentThread()!=AdvancedMacros.getMinecraftThread())
-				Utils.waitTick();
+			Utils.waitTick();
 			return LuaValue.NONE;
 		}
 	}

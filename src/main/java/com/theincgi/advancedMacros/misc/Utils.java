@@ -1483,6 +1483,8 @@ public class Utils {
 //	}
 	
 	public static void waitTick() {
+		if(AdvancedMacros.getMinecraftThread().equals(Thread.currentThread()))
+			return;
 		int t = AdvancedMacros.forgeEventHandler.getSTick();
 		while(t==AdvancedMacros.forgeEventHandler.getSTick()){
 			try {
