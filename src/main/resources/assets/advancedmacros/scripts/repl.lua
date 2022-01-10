@@ -437,7 +437,7 @@ function R.setup()
   REPL.setOnClose( REPL.stopVarTimer )
   REPL.setOnResize( REPL.onResize )
   REPL.setName"REPL"
-  REPL.echo("&7REPL Version 1.1\n&7Type &bhelp()&7 for tips!")
+  REPL.echo("&7REPL Version 1.2\n&7Type &bhelp()&7 for tips!")
 end
 
 --
