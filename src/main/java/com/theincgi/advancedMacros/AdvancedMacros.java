@@ -60,6 +60,7 @@ import com.theincgi.advancedMacros.lua.functions.HTTP;
 import com.theincgi.advancedMacros.lua.functions.IsKeyHeld;
 import com.theincgi.advancedMacros.lua.functions.LightAt;
 import com.theincgi.advancedMacros.lua.functions.MathPlus;
+import com.theincgi.advancedMacros.lua.functions.Narrate;
 import com.theincgi.advancedMacros.lua.functions.NewThread;
 import com.theincgi.advancedMacros.lua.functions.OpenInventory;
 import com.theincgi.advancedMacros.lua.functions.PCall;
@@ -260,6 +261,7 @@ public class AdvancedMacros {
 		globals.set("log", logFunc = new LuaFunctions.Log());
 		globals.set("say", sayFunc = new LuaFunctions.Say());
 		globals.set("toast", new Toast.ToastNotification());
+		globals.set("narrate", new Narrate());
 		
 		globals.set("sleep", sleepFunc = new LuaFunctions.Sleep());
 		globals.set("print", new LuaFunctions.Debug());
