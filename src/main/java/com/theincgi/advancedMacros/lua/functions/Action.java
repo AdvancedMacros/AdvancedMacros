@@ -130,7 +130,7 @@ public class Action {
 				holdKeybind(sets.keyBindAttack, -1);
 				return waitForBreak;
 			}
-			if(arg.isnil() || (arg.islong()&&arg.checklong()==0)){
+			if(arg.isnil()){
 				Class c = minecraft.getClass();
 				m.setAccessible(true);
 				TaskDispatcher.addTask(()-> {
