@@ -290,6 +290,7 @@ public class ForgeEventHandler {
 		if(look!=null){
 			look.look();
 		}
+		AdvancedMacros.actions.checkBlockBreakStatus();
 		LinkedList<net.minecraft.client.util.InputMappings.Input> toRemove = new LinkedList<>();
 		for(net.minecraft.client.util.InputMappings.Input i : keyBindReleaseMap.keySet()) { 
 			HeldKeybinds hk = keyBindReleaseMap.get(i);

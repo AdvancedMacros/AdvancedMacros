@@ -140,6 +140,8 @@ public class AdvancedMacros {
 	//public static FontRendererOverride otherCustomFontRenderer;
 	private static final DocumentationManager documentationManager = new DocumentationManager();
 	private JarLibSearcher jarLibSearcher;
+
+	public static Action actions;
 	private static Thread minecraftThread;
 	private static Minecraft mc;
 	private static ModContainer advMacrosModContainer;
@@ -343,7 +345,7 @@ public class AdvancedMacros {
 
 		globals.set("rayTrace", RayTrace.getFunc());
 
-		new Action().getKeybindFuncts(globals);
+		(actions = new Action()).getKeybindFuncts(globals);
 		globals.set("getInventory", new GetInventory());
 		globals.set("openInventory", openInventory = new OpenInventory());
 

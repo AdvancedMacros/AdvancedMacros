@@ -17,14 +17,20 @@ import com.theincgi.advancedMacros.event.TaskDispatcher;
 import com.theincgi.advancedMacros.misc.HIDUtils.Keyboard;
 import com.theincgi.advancedMacros.misc.Utils;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings.Input;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.play.client.CPlayerDiggingPacket;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.chunk.IChunk;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class Action {
@@ -63,8 +69,8 @@ public class Action {
 		@Override
 		public LuaValue call(LuaValue arg) {
 			//do not document forced jumps unless they are discovered...maybe
-			if(AdvancedMacros.getMinecraft().player.onGround || arg.isstring()&&arg.tojstring().equals("forced")) {
-				AdvancedMacros.getMinecraft().player.jump();
+			if(minecraft.player.onGround || arg.isstring()&&arg.tojstring().equals("forced")) {
+				minecraft.player.jump();
 			}
 			//holdKeybind(sets.keyBindJump, arg.optlong(0));
 			return LuaValue.NONE;
@@ -77,10 +83,53 @@ public class Action {
 			return LuaValue.NONE;
 		}
 	}
+	
+	private BlockPos attackTarget = null;
+	private class WaitForBreak extends ZeroArgFunction {
+		@Override
+		public LuaValue call() {
+			while( attackTarget!=null ) {
+				Utils.waitTick();
+			}
+			return NONE;
+		}
+		
+	} WaitForBreak waitForBreak = new WaitForBreak();
+	
+	private boolean attackTargetIsBlock() {
+		synchronized (waitForBreak) {
+			IChunk chunk = minecraft.world.getChunk(attackTarget);
+			BlockState state = chunk.getBlockState(attackTarget);
+			Block block = state.getBlock();
+			if(!block.isAir(state, minecraft.world, attackTarget)) return true;
+			return false;
+		}
+	}
+	
+	public void checkBlockBreakStatus() {
+		synchronized (waitForBreak) {
+			if(attackTarget == null) return;
+			if(attackTargetIsBlock()) return;
+			holdKeybind(sets.keyBindAttack, 0);
+			attackTarget = null;
+		}
+	}
+	
 	class Attack extends OneArgFunction{
 		final Method m = ObfuscationReflectionHelper.findMethod(Minecraft.class, "func_147116_af"); //clickMouse()
 		@Override
 		public LuaValue call(LuaValue arg) {
+			if(arg.isstring() && arg.tojstring().equals("break")) {
+				RayTraceResult rtr = minecraft.player.pick(PlayerEntity.REACH_DISTANCE.getDefaultValue(), 0, false); //raytrace
+				if(rtr==null)
+					return waitForBreak;
+				BlockPos lookingAt = ((BlockRayTraceResult)rtr).getPos();
+				synchronized (waitForBreak) {
+					attackTarget = lookingAt;
+				}
+				holdKeybind(sets.keyBindAttack, -1);
+				return waitForBreak;
+			}
 			if(arg.isnil()){
 				Class c = minecraft.getClass();
 				m.setAccessible(true);
@@ -104,7 +153,7 @@ public class Action {
 	class GetHotbar extends ZeroArgFunction{
 		@Override
 		public LuaValue call() {
-			return LuaValue.valueOf(AdvancedMacros.getMinecraft().player.inventory.currentItem+1);
+			return LuaValue.valueOf(minecraft.player.inventory.currentItem+1);
 		}
 	}
 	class Use extends OneArgFunction{
@@ -137,7 +186,7 @@ public class Action {
 	class Drop extends OneArgFunction{
 		@Override
 		public LuaValue call(LuaValue arg) {
-			AdvancedMacros.getMinecraft().player.drop(arg.optboolean(false));
+			minecraft.player.drop(arg.optboolean(false));
 			//tapKeybind(sets.keyBindDrop);
 			return LuaValue.NONE;
 		}
@@ -145,8 +194,8 @@ public class Action {
 	class SwapHand extends ZeroArgFunction{
 		@Override
 		public LuaValue call() {
-			if (!AdvancedMacros.getMinecraft().player.isSpectator()) {
-			    AdvancedMacros.getMinecraft().getConnection().sendPacket(new CPlayerDiggingPacket(CPlayerDiggingPacket.Action.SWAP_HELD_ITEMS, BlockPos.ZERO, Direction.DOWN));
+			if (!minecraft.player.isSpectator()) {
+			    minecraft.getConnection().sendPacket(new CPlayerDiggingPacket(CPlayerDiggingPacket.Action.SWAP_HELD_ITEMS, BlockPos.ZERO, Direction.DOWN));
 			}
 			//tapKeybind(sets.keyBindSwapHands);
 			
@@ -154,7 +203,7 @@ public class Action {
 		}
 	}
 	class PickBlock extends ZeroArgFunction{
-		Minecraft mc = AdvancedMacros.getMinecraft();
+		Minecraft mc = minecraft;
 		@Override
 		public LuaValue call() {
 			net.minecraftforge.common.ForgeHooks.onPickBlock(mc.objectMouseOver, mc.player, mc.world);
@@ -164,7 +213,7 @@ public class Action {
 	class Sprint extends OneArgFunction{
 		@Override
 		public LuaValue call(LuaValue v) {
-			AdvancedMacros.getMinecraft().player.setSprinting(v.optboolean(true));
+			minecraft.player.setSprinting(v.optboolean(true));
 			return LuaValue.NONE;
 		}
 	}
@@ -220,8 +269,7 @@ public class Action {
 	class WaitTick extends ZeroArgFunction{
 		@Override
 		public LuaValue call() {
-			if(Thread.currentThread()!=AdvancedMacros.getMinecraftThread())
-				Utils.waitTick();
+			Utils.waitTick();
 			return LuaValue.NONE;
 		}
 	}
@@ -234,7 +282,7 @@ public class Action {
 				if(time>0){
 					AdvancedMacros.forgeEventHandler.lookTo((float)args.arg(1).todouble(), (float)args.arg(2).todouble(), time);
 				}else{
-					ClientPlayerEntity player = AdvancedMacros.getMinecraft().player;
+					ClientPlayerEntity player = minecraft.player;
 					player.rotationPitch = (float) args.arg(2).todouble();
 					player.rotationYaw = (float) args.arg(1).todouble();
 					System.out.println(player.rotationYaw);
@@ -273,7 +321,6 @@ public class Action {
 		tapKeybind(kb.getKey());
 	}
 	private void tapKeybind(Input keyCode){
-		Minecraft minecraft = AdvancedMacros.getMinecraft();
 		GameSettings sets = minecraft.gameSettings;
 		KeyBinding.setKeyBindState(keyCode, true);
 		int t = AdvancedMacros.forgeEventHandler.getSTick()+1;
