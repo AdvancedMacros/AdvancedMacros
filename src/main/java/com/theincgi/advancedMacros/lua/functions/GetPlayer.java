@@ -154,15 +154,18 @@ public class GetPlayer extends OneArgFunction {
 	
 	@Override
 	public LuaValue call(LuaValue playerName) {
-		if(playerName.isnil()) {
-			return entityPlayerToTable(AdvancedMacros.getMinecraft().player);
-		}else{
-			try {
-			return entityPlayerToTable(AdvancedMacros.getMinecraft().world.getPlayerEntityByName(playerName.checkjstring()));
-			}catch(NullPointerException npe) {
-				return LuaValue.FALSE;
+		LuaValue future =  Utils.runOnMCAndWait(()->{
+			if(playerName.isnil()) {
+				return entityPlayerToTable(AdvancedMacros.getMinecraft().player);
+			}else{
+				try {
+				return entityPlayerToTable(AdvancedMacros.getMinecraft().world.getPlayerEntityByName(playerName.checkjstring()));
+				}catch(NullPointerException npe) {
+					return LuaValue.FALSE;
+				}
 			}
-		}
+		});
+		return future;
 	}
 
 	public static LuaValue entityPlayerToTable(EntityPlayer player) {
