@@ -147,18 +147,26 @@ public class GetPlayer extends OneArgFunction {
 	
 	@Override
 	public LuaValue call(LuaValue playerName) {
-		if(playerName.isnil()) {
-			return entityPlayerToTable(AdvancedMacros.getMinecraft().player);
-		}else{
-			try {
-				String toFind = playerName.checkjstring();
-				AbstractClientPlayerEntity acpe = Utils.findPlayerByName(AdvancedMacros.getMinecraft().world, toFind);
-				if(acpe!=null)
-					return entityPlayerToTable(acpe);
-				return FALSE;
-			}catch(NullPointerException npe) {
-				return LuaValue.FALSE;
+		ListenableFuture<LuaValue> future = TaskDispatcher.addTask(()->{
+			if(playerName.isnil()) {
+				return entityPlayerToTable(AdvancedMacros.getMinecraft().player);
+			}else{
+				try {
+					String toFind = playerName.checkjstring();
+					AbstractClientPlayerEntity acpe = Utils.findPlayerByName(AdvancedMacros.getMinecraft().world, toFind);
+					if(acpe!=null)
+						return entityPlayerToTable(acpe);
+					return FALSE;
+				}catch(NullPointerException npe) {
+					return LuaValue.FALSE;
+				}
 			}
+		});
+		try {
+			return future.get();
+		}catch(Exception ex) {
+			Utils.logError(ex);
+			return FALSE;
 		}
 	}
 

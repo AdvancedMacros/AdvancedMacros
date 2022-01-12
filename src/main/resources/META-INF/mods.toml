@@ -22,7 +22,7 @@ modId="advancedmacros" #mandatory
 # VERSION #
 ###########
 # The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
-version="9.2.0" #mandatory
+version="9.3.0" #mandatory
 
  # A display name for the mod
 displayName="Advanced Macros" #mandatory
@@ -37,7 +37,7 @@ displayURL="https://www.curseforge.com/minecraft/mc-mods/advanced-macros" #optio
 logoFile="logo.png" #optional
 
 # A text field displayed in the mod UI
-credits="TheIncgi [Dev], Emex [Icons], Special thanks to The Minecraft Forge team, bspkrs for the MCP Mapping Viewer, MattSturgeon who updated it for 1.13+, and everyone else who made this possible" #optional
+credits="TheIncgi [Dev], Emex [Icons], Special thanks to the entire Advanced Macros discord community, The Minecraft Forge team, bspkrs for the MCP Mapping Viewer, MattSturgeon who updated it for 1.13+, and everyone else who made this possible" #optional
 
 # A text field displayed in the mod UI
 authors="TheIncgi" #optional
