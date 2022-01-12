@@ -117,7 +117,7 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "10.1.2a"; // ??
+	public static final String VERSION = "10.2.0"; // ??
 	public static final String GAME_VERSION = "1.15.2";
 
 	public static final File macrosRootFolder = getRootFolder();
@@ -450,6 +450,13 @@ public class AdvancedMacros {
 		try {
 			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/morefunc.lua")).getInputStream();
 			globals.load(in, "moreFunctions", "t", globals).call();
+			in.close();
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		try {
+			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/easings.lua")).getInputStream();
+			globals.load(in, "easings", "t", globals).call();
 			in.close();
 		} catch (Throwable e) {
 			e.printStackTrace();
