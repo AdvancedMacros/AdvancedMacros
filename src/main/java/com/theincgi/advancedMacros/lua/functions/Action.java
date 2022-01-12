@@ -95,7 +95,7 @@ public class Action {
 	
 	private boolean attackTargetIsBlock() {
 		synchronized (waitForBreak) {
-			Chunk chunk = minecraft.world.getChunk(attackTarget);
+			Chunk chunk = minecraft.world.getChunkFromBlockCoords(attackTarget);
 			IBlockState state = chunk.getBlockState(attackTarget);
 			Block block = state.getBlock();
 			if(!block.isAir(state, minecraft.world, attackTarget)) return true;

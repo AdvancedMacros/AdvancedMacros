@@ -66,6 +66,7 @@ local changeLog = {
   " - &dREPL&f is now version 1.2",
   " - &b&BgetPlayer&f&B() now runs on the &e&BMC thread.",
   " - You can launch &bmath.easings.demo.show&f() from &dREPL",
+  " - Updated ForgeGradle, may have introduced some bugs? a couple of minor changes around the code",
   
      
   "&7"..DIVIDER,

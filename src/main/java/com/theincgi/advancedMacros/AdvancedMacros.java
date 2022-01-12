@@ -482,8 +482,8 @@ public class AdvancedMacros {
 		}
 	}
 	private static File getRootFolder() {
-		File defaultRoot = new File(AdvancedMacros.getMinecraft().gameDir,"mods/advancedMacros");
-		File f = new File(AdvancedMacros.getMinecraft().gameDir,"config/advancedMacros.cfg");
+		File defaultRoot = new File(AdvancedMacros.getMinecraft().mcDataDir,"mods/advancedMacros");
+		File f = new File(AdvancedMacros.getMinecraft().mcDataDir,"config/advancedMacros.cfg");
 		if(!f.exists()) {
 			try (PrintWriter pw = new PrintWriter(f)){
 				pw.write("advancedMacrosRootFolder=" +defaultRoot.toString()+"\n");
