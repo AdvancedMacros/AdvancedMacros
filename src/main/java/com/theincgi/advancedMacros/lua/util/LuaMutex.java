@@ -27,7 +27,11 @@ public class LuaMutex extends CallableTable{
 	}
 
 	private static void sleep() {
-		try {Thread.sleep(10);}catch (Exception e) {}
+		try {
+			synchronized (mutex) {
+				mutex.wait();
+			}
+		}catch (Exception e) {}
 	}
 	
 	private static void register(String key) {
@@ -40,6 +44,7 @@ public class LuaMutex extends CallableTable{
 		LinkedList<String> held = reverse.get(Thread.currentThread().getId());
 		if (held != null)
 			held.remove(key);
+		mutex.notifyAll();
 	}
 	
 	public static void cleanup() {
