@@ -57,6 +57,7 @@ public class ProtoInfo {
 		findUpvalues();
 	}
 
+	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		

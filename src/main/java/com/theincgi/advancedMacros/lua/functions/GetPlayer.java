@@ -1,37 +1,171 @@
 package com.theincgi.advancedMacros.lua.functions;
 
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
+
+import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
+import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ThreeArgFunction;
+import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.Utils;
 import com.theincgi.advancedMacros.misc.Utils.NBTUtils;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.DimensionType;
 public class GetPlayer extends OneArgFunction {
+	
+	public static final LuaTable playerFunctions = new LuaTable();
+	static {
+		playerFunctions.set("getInventory", new PlayerValueFunction("getInventory", player->{
+			return Utils.inventoryToTable(player.inventory, !(player instanceof EntityPlayerSP));
+		}).threadSensitive());
+		
+		playerFunctions.set("getMainHand",  	 new PlayerValueFunction("getMainHand",       player-> {return Utils.itemStackToLuatable(player.getHeldItemMainhand());}));
+		playerFunctions.set("getOffHand",   	 new PlayerValueFunction("getOffHand",        player-> {return Utils.itemStackToLuatable(player.getHeldItemOffhand());}));
+		playerFunctions.set("getDimension", 	 new PlayerValueFunction("getDimension" ,     player-> {
+			DimensionType t;
+			try {
+				t = DimensionType.getById(player.dimension);
+			}catch(IllegalArgumentException iae) {
+				t = null;
+			}
+			LuaTable out = new LuaTable();
+			out.set("id", player.dimension);
+			out.set("isVanilla", t!=null);
+			out.set("name", t==null?LuaValue.FALSE: valueOf(t.getName()));
+			return out;
+		}));
+		playerFunctions.set("getPitch",     	 new PlayerValueFunction("getPitch",     	  player-> {return valueOf(MathHelper.wrapDegrees(player.rotationPitch));}));
+		playerFunctions.set("getYaw",      		 new PlayerValueFunction("getYaw",      	  player-> {return valueOf(MathHelper.wrapDegrees(player.rotationYaw));}));
+		playerFunctions.set("getExp",       	 new PlayerValueFunction("getExp",       	  player-> {return valueOf(player.experience);}));
+		playerFunctions.set("getExpLevel",  	 new PlayerValueFunction("getExpLevel",  	  player-> {return valueOf(player.experienceLevel);}));
+		playerFunctions.set("getExpTotal",  	 new PlayerValueFunction("getExpTotal",  	  player-> {return valueOf(player.experienceTotal);}));
+		playerFunctions.set("getEyeHeight",    	 new PlayerValueFunction("getEyeHeight",      player-> {return valueOf(player.getEyeHeight());}));
+		playerFunctions.set("getFallDist",     	 new PlayerValueFunction("getFallDist",       player-> {return valueOf(player.fallDistance);}));
+		playerFunctions.set("getHeight", 		 new PlayerValueFunction("getHeight", 		  player-> {return valueOf(player.height);}));
+		playerFunctions.set("getWidth", 		 new PlayerValueFunction("getWidth", 		  player-> {return valueOf(player.width);}));
+		playerFunctions.set("getHurtResTime", 	 new PlayerValueFunction("getHurtResTime", 	  player-> {return valueOf(player.hurtResistantTime);}));
+		playerFunctions.set("isAirborne", 		 new PlayerValueFunction("isAirborne", 		  player-> {return valueOf(player.isAirBorne);}));
+		playerFunctions.set("isCollidedHorz", 	 new PlayerValueFunction("isCollidedHorz", 	  player-> {return valueOf(player.collidedHorizontally);}));
+		playerFunctions.set("isCollidedVert", 	 new PlayerValueFunction("isCollidedVert", 	  player-> {return valueOf(player.collidedVertically);}));
+		playerFunctions.set("getSwingProgress",  new PlayerValueFunction("getSwingProgress",  player-> {return valueOf(player.swingProgress);}));
+		playerFunctions.set("isSwingInProgress", new PlayerValueFunction("isSwingInProgress", player-> {return valueOf(player.isSwingInProgress);}));
+		playerFunctions.set("getMaxHurtResTime", new PlayerValueFunction("getMaxHurtResTime", player-> {return valueOf(player.maxHurtResistantTime);}));
+		playerFunctions.set("isNoClip", 		 new PlayerValueFunction("isNoClip", 		  player-> {return valueOf(player.noClip);}));
+		playerFunctions.set("isOnGround", 		 new PlayerValueFunction("isOnGround", 		  player-> {return valueOf(player.onGround);}));
+		playerFunctions.set("isInvulnerable", 	 new PlayerValueFunction("isInvulnerable", 	  player-> {return valueOf(player.getIsInvulnerable());}));
+		playerFunctions.set("getBedLocation", 	 new PlayerValueFunction("getBedLocation", 	  player-> {
+			LuaTable pos = new LuaTable();
+			BlockPos p = player.getBedLocation(DimensionType.OVERWORLD.getId());
+			if(p!=null) {
+				pos.set(1, LuaValue.valueOf(p.getX()));
+				pos.set(2, LuaValue.valueOf(p.getY()));
+				pos.set(3, LuaValue.valueOf(p.getZ()));
+				return pos.unpack();
+			}
+			return FALSE;
+		}));
+		playerFunctions.set("getTeam", 			new PlayerValueFunction("getTeam", 			player-> {return player.getTeam()==null?FALSE:valueOf(player.getTeam().getName());}));
+		playerFunctions.set("getLuck", 			new PlayerValueFunction("getLuck", 			player-> {return valueOf(player.getLuck());}));
+		playerFunctions.set("getHealth", 		new PlayerValueFunction("getHealth", 		player-> {return valueOf(player.getHealth());}));
+		playerFunctions.set("getHunger", 		new PlayerValueFunction("getHunger", 		player-> {return valueOf(MathHelper.ceil(player.getFoodStats().getFoodLevel()));}));
+		playerFunctions.set("getHungerExact", 	new PlayerValueFunction("getHungerExact", 	player-> {return valueOf(player.getFoodStats().getFoodLevel());}));
+		playerFunctions.set("getAir", 			new PlayerValueFunction("getAir", 			player-> {return valueOf(player.getAir());}));
+		playerFunctions.set("hasNoGravity", 	new PlayerValueFunction("hasNoGravity", 	player-> {return valueOf(player.hasNoGravity());}));
+		playerFunctions.set("getVelocity", 		new PlayerValueFunction("getVelocity", 		player-> {
+			Entity e = player.getLowestRidingEntity();
+			return Utils.toTable(e.motionX, e.motionY, e.motionZ);
+		}));
+		playerFunctions.set("isSneaking", 			new PlayerValueFunction("isSneaking", 			player-> {return valueOf(player.isSneaking());}));
+		playerFunctions.set("isOnLadder", 			new PlayerValueFunction("isOnLadder", 			player-> {return valueOf(player.isOnLadder());}));
+		playerFunctions.set("isInWater", 			new PlayerValueFunction("isInWater", 			player-> {return valueOf(player.isInWater());}));
+		playerFunctions.set("isInLava", 			new PlayerValueFunction("isInLava", 			player-> {return valueOf(player.isInLava());}));
+		playerFunctions.set("isImmuneToFire", 		new PlayerValueFunction("isImmuneToFire", 		player-> {return valueOf(player.isImmuneToFire());}));
+		playerFunctions.set("isImmuneToExplosion", 	new PlayerValueFunction("isImmuneToExplosion", 	player-> {return valueOf(player.isImmuneToExplosions());}));
+		playerFunctions.set("isEyltraFlying", 		new PlayerValueFunction("isEyltraFlying", 		player-> {return valueOf(player.isElytraFlying());}));
+		playerFunctions.set("isOnFire", 			new PlayerValueFunction("isOnFire", 			player-> {return valueOf(player.isBurning());}));
+		playerFunctions.set("isSprinting", 			new PlayerValueFunction("isSprinting", 			player-> {return valueOf(player.isSprinting());}));
+		playerFunctions.set("getPotionEffects", 	new PlayerValueFunction("getPotionEffects", 	player-> {
+			LuaTable effects = new LuaTable();
+			int i = 1;
+			for(Object pe : player.getActivePotionEffects().toArray()) {
+				if(pe instanceof PotionEffect)
+					effects.set(i++, Utils.effectToTable((PotionEffect) pe));
+			}
+			return effects;
+		}).threadSensitive());
+		playerFunctions.set("getRidingEntity", 	new PlayerValueFunction("getRidingEntity", 	player-> {return Utils.entityToTable(player.getRidingEntity());}));
+		playerFunctions.set("isSleeping", 		new PlayerValueFunction("isSleeping", 		player-> {return valueOf(player.isPlayerSleeping());}));
+		playerFunctions.set("isInvisible", 		new PlayerValueFunction("isInvisible", 		player-> {return valueOf(player.isInvisible());}));
+		playerFunctions.set("getUUID", 			new PlayerValueFunction("getUUID", 			player-> {return valueOf(player.getUniqueID().toString());}));
+		playerFunctions.set("lookingAt", 		new PlayerValueFunction("lookingAt", 		player-> {
+			RayTraceResult rtr = player.rayTrace(8, 0); //CHECKME
+			if(rtr!=null) {
+				BlockPos lookingAt = rtr.getBlockPos();
+				if(lookingAt!=null) {
+					LuaTable look = new LuaTable();
+					look.set(1, LuaValue.valueOf(lookingAt.getX()));
+					look.set(2, LuaValue.valueOf(lookingAt.getY()));
+					look.set(3, LuaValue.valueOf(lookingAt.getZ()));
+					return look.unpack();
+				}
+			}
+			return FALSE;
+		}));
+		playerFunctions.set("getEntityID", new PlayerValueFunction("getEntityID",player-> {return valueOf(player.getEntityId());}));
+		playerFunctions.set("getGamemode", new PlayerValueFunction("getGamemode",player-> {return valueOf(player.isSpectator()?"spectator":player.isCreative()?"creative":"survival");})); //TODO adventure?
+		playerFunctions.set("getTarget",   new PlayerValueFunction("getTarget",  player-> {
+			if(player.equals(AdvancedMacros.getMinecraft().player)) {
+				return Utils.rayTraceResultToLuaValue(AdvancedMacros.getMinecraft().objectMouseOver);
+			}
+			return FALSE;
+		}));
 
+	
+		
+		playerFunctions.set("isBlocking",    		new PlayerValueFunction("isBlocking",    	player-> {return valueOf(player.isActiveItemStackBlocking());}));
+//		playerFunctions.set("isActualySwimming",    new PlayerValueFunction("isActualySwimming",player-> {return valueOf(player.isActualySwimming());})); //doesn't exist
+//		playerFunctions.set("getPose",    			new PlayerValueFunction("getPose",    		player-> {return valueOf(player.getPose().name());})); //doesn't exist
+		playerFunctions.set("isGlowing",    		new PlayerValueFunction("isGlowing",    	player-> {return valueOf(player.isGlowing());}));
+//		playerFunctions.set("isInBubbleColumn",    	new PlayerValueFunction("isInBubbleColumn", player-> {return valueOf(player.world.getBlockState(new BlockPos(player)).getBlock() == Blocks.BUBBLE_COLUMN);}));
+		playerFunctions.set("isPassenger",    		new PlayerValueFunction("isPassenger",    	player-> {return valueOf(player.isRiding());}));
+		playerFunctions.set("isFullyAsleep",    	new PlayerValueFunction("isFullyAsleep",    player-> {return valueOf(player.isPlayerFullyAsleep());}));
+		playerFunctions.set("canBePushedByWater",   new PlayerValueFunction("canBePushedByWater",  player-> {return valueOf(player.isPushedByWater());}));
+//		playerFunctions.set("isSpinAttacking",    	new PlayerValueFunction("isSpinAttacking",  player-> {return valueOf(player.isSpinAttacking());}));
+		playerFunctions.set("isWet",    			new PlayerValueFunction("isWet",    		player-> {return valueOf(player.isWet());}));
+//		if(player instanceof ClientPlayerEntity) getHotbar
+//			t.set("invSlot", ((ClientPlayerEntity)player).inventory.currentItem+1);
+	}
+	
 	@Override
 	public LuaValue call(LuaValue playerName) {
-		if(playerName.isnil()) {
-			return entityPlayerToTable(AdvancedMacros.getMinecraft().player);
-		}else{
-			try {
-			return entityPlayerToTable(AdvancedMacros.getMinecraft().world.getPlayerEntityByName(playerName.checkjstring()));
-			}catch(NullPointerException npe) {
-				return LuaValue.FALSE;
+		LuaValue future =  Utils.runOnMCAndWait(()->{
+			if(playerName.isnil()) {
+				return entityPlayerToTable(AdvancedMacros.getMinecraft().player);
+			}else{
+				try {
+				return entityPlayerToTable(AdvancedMacros.getMinecraft().world.getPlayerEntityByName(playerName.checkjstring()));
+				}catch(NullPointerException npe) {
+					return LuaValue.FALSE;
+				}
 			}
-		}
+		});
+		return future;
 	}
 
 	public static LuaValue entityPlayerToTable(EntityPlayer player) {
@@ -169,6 +303,57 @@ public class GetPlayer extends OneArgFunction {
 		}
 	}
 	
-
+	public static Optional<EntityPlayer> getPlayerFromLuaValue(LuaValue value) {
+		if(value.isnil()) {
+			return Optional.ofNullable(AdvancedMacros.getMinecraft().player);
+		}else{
+			try {
+				String toFind = value.checkjstring();
+				EntityPlayer ep = AdvancedMacros.getMinecraft().world.getPlayerEntityByName(value.checkjstring());
+				return Optional.ofNullable(ep);
+			}catch(NullPointerException npe) {
+				return Optional.empty();
+			}
+		}
+	}
+	
+	private static class PlayerValueFunction extends VarArgFunction {
+		private boolean threadSensitive = false;
+		private final Function<EntityPlayer, Varargs> get;
+		private final String fName; 
+		
+		public PlayerValueFunction(String fName, Function<EntityPlayer, Varargs> get) {
+			this.fName = fName;
+			this.get = get;
+		}
+		
+		public PlayerValueFunction threadSensitive() {
+			threadSensitive = true;
+			return this;
+		}
+		
+		@Override
+		public Varargs invoke(Varargs args) {
+			final Optional<EntityPlayer> player = getPlayerFromLuaValue(args.arg1());
+			if(!player.isPresent())
+				return NIL;
+			if(threadSensitive) {
+				Varargs x = Utils.runOnMCAndWait(()->{
+					return get.apply(player.get());
+				});
+				return x;
+			}else {
+				return get.apply(player.get());
+			}
+		}
+		@Override
+		public LuaValue tostring() {
+			return valueOf(toString());
+		}
+		@Override
+		public String toString() {
+			return "function "+fName+"([String: playerName])";
+		}
+	}
 	
 }

@@ -87,7 +87,7 @@ public class OpenInventory extends ZeroArgFunction{
 					if(mouseButton==2) type = ClickType.CLONE;
 					ctrl.windowClick(wID, slotA-1, mouseButton, type, mc.player);
 				});
-				Utils.waitTick();
+				
 				return NONE;
 			}
 			case dragClick:{
@@ -110,7 +110,7 @@ public class OpenInventory extends ZeroArgFunction{
 					if(!held.isEmpty())
 						ctrl.windowClick(wID, -999, 0, ClickType.PICKUP, mc.player);
 				});
-				Utils.waitTick();
+				
 				return NONE;
 			case close:
 				mc.player.closeScreen();
@@ -145,7 +145,7 @@ public class OpenInventory extends ZeroArgFunction{
 						}
 					}
 				});
-				Utils.waitTick();
+				
 				return NONE;
 			}
 			case split:{
@@ -158,7 +158,7 @@ public class OpenInventory extends ZeroArgFunction{
 					ctrl.windowClick(wID, slotA-1, 1, type, mc.player);
 					ctrl.windowClick(wID, slotB-1, 0, type, mc.player);
 				});
-				Utils.waitTick();
+				
 				return NONE;
 			}
 			case getHeld:{
@@ -193,8 +193,8 @@ public class OpenInventory extends ZeroArgFunction{
 					ItemStack held = mc.player.inventory.getItemStack();
 					int slotA = args.checkint(1);
 					int slotB = args.checkint(2);
-					ItemStack is1 = container.inventorySlots.getSlot(slotA).getStack();
-					ItemStack is2 = container.inventorySlots.getSlot(slotB).getStack();
+					ItemStack is1 = container.inventorySlots.getSlot(slotA-1).getStack();
+					ItemStack is2 = container.inventorySlots.getSlot(slotB-1).getStack();
 					if(is1.isEmpty() && is2.isEmpty()) return;
 
 					ClickType type = ClickType.PICKUP;
@@ -217,7 +217,7 @@ public class OpenInventory extends ZeroArgFunction{
 					ClickType type = ClickType.SWAP;
 					ctrl.windowClick(wID, slotA-1, hotbarSlot-1, type, mc.player);
 				});
-				Utils.waitTick();
+				
 				return NONE;
 			}
 			case grabAll:{
@@ -237,7 +237,7 @@ public class OpenInventory extends ZeroArgFunction{
 					// TODO sanity check if recipe fits crafting grid
 					ctrl.func_194338_a(wID, r, makeAll, mc.player);
 				});
-				Utils.waitTick();
+				
 				return NONE;
 			}
 			case getType:

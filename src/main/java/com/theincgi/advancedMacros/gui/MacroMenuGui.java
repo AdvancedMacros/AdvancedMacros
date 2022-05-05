@@ -216,10 +216,12 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 	
 	
 	
+	@Override
 	public void reloadCurrentProfile() {
 		loadProfile(profileSelect.getSelection());
 	}
 	
+	@Override
 	public void updateProfileList() {
 		profileSelect.clear(false);
 		for(String profile : Settings.getProfileList()){
@@ -262,6 +264,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 	}
 	
 	/**Exists, and is enabled*/
+	@Override
 	public boolean doesEventExist(String eventName){
 		for(Moveable m : bindingsList.getItems()){
 			if(m instanceof IBinding){
@@ -277,6 +280,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 		}
 		return false;
 	}
+	@Override
 	public void fireEvent(boolean isKey, String eventName, Varargs args, boolean isKeyDown, OnScriptFinish onScriptFinish){
 		for(Moveable m : bindingsList.getItems()){
 			if(m instanceof IBinding){
@@ -325,6 +329,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 		}
 	}
 	
+	@Override
 	public LinkedList<String> getMatchingScripts(boolean isKey, String eventName, boolean isKeyDown) {
 		LinkedList<String> out = new LinkedList<>();
 		for(Moveable m : bindingsList.getItems()){
@@ -339,6 +344,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 		return out;
 	}
 
+	@Override
 	public boolean loadProfile(String profile){
 		updateProfileList();
 		updateScriptList();
@@ -477,6 +483,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 	}
 
 
+	@Override
 	public void onGuiOpened(){
 
 	}

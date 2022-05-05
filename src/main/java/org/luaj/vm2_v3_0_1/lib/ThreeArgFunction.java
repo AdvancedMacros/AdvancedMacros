@@ -48,24 +48,29 @@ import org.luaj.vm2_v3_0_1.Varargs;
  */
 abstract public class ThreeArgFunction extends LibFunction {
 
+	@Override
 	abstract public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3);
 	
 	/** Default constructor */
 	public ThreeArgFunction() {
 	}
 	
+	@Override
 	public final LuaValue call() {
 		return call(NIL, NIL, NIL);
 	}
 
+	@Override
 	public final LuaValue call(LuaValue arg) {
 		return call(arg, NIL, NIL);
 	}
 
+	@Override
 	public LuaValue call(LuaValue arg1, LuaValue arg2) {
 		return call(arg1, arg2, NIL);
 	}
 	
+	@Override
 	public Varargs invoke(Varargs varargs) {
 		return call(varargs.arg1(),varargs.arg(2),varargs.arg(3));
 	}

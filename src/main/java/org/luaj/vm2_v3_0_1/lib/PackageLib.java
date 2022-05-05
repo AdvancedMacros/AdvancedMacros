@@ -127,6 +127,7 @@ public class PackageLib extends TwoArgFunction {
 	 * @param modname the module name supplied if this is loaded via 'require'.
 	 * @param env the environment to load into, typically a Globals instance.
 	 */
+	@Override
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		globals = env.checkglobals();
 		globals.set("require", new require());
@@ -159,6 +160,7 @@ public class PackageLib extends TwoArgFunction {
 		package_.set(_PATH, LuaValue.valueOf(newLuaPath));
 	}
 	
+	@Override
 	public String tojstring() {
 		return "package";
 	}
@@ -193,6 +195,7 @@ public class PackageLib extends TwoArgFunction {
 	 * then require raises an error.
 	 */	
 	public class require extends OneArgFunction {
+		@Override
 		public LuaValue call( LuaValue arg ) {
 			LuaString name = arg.checkstring();
 			LuaValue loaded = package_.get(_LOADED);
@@ -240,6 +243,7 @@ public class PackageLib extends TwoArgFunction {
 	}
 
 	public class preload_searcher extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			LuaString name = args.checkstring(1);
 			LuaValue val = package_.get(_PRELOAD).get(name);
@@ -250,6 +254,7 @@ public class PackageLib extends TwoArgFunction {
 	}
 
 	public class lua_searcher extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			LuaString name = args.checkstring(1);
 			InputStream is = null;
@@ -278,6 +283,7 @@ public class PackageLib extends TwoArgFunction {
 	}
 
 	public class searchpath extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			String name = args.checkjstring(1);
 			String path = args.checkjstring(2);
@@ -322,6 +328,7 @@ public class PackageLib extends TwoArgFunction {
 	}
 	
 	public class java_searcher extends VarArgFunction {
+		@Override
 		public Varargs invoke(Varargs args) {
 			String name = args.checkjstring(1);
 			String classname = toClassname( name );

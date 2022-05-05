@@ -124,26 +124,32 @@ public class LuaThread extends LuaValue {
 		this.globals = globals;
 	}
 	
+	@Override
 	public int type() {
 		return LuaValue.TTHREAD;
 	}
 	
+	@Override
 	public String typename() {
 		return "thread";
 	}
 	
+	@Override
 	public boolean isthread() {
 		return true;
 	}
 	
+	@Override
 	public LuaThread optthread(LuaThread defval) {
 		return this;
 	}
 	
+	@Override
 	public LuaThread checkthread() {
 		return this;
 	}
 	
+	@Override
 	public LuaValue getmetatable() { 
 		return s_metatable; 
 	}
@@ -191,6 +197,7 @@ public class LuaThread extends LuaValue {
 			this.function = function;
 		}
 		
+		@Override
 		public synchronized void run() {
 			try {
 				Varargs a = this.args;

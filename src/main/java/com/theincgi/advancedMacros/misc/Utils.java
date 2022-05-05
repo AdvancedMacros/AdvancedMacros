@@ -936,6 +936,21 @@ public class Utils {
 			t.set(t.length()+1, s);
 		return t;
 	}
+	
+	public static LuaValue toTable(double x, double y, double z) {
+		LuaTable t = new LuaTable();
+		t.set(1,x);
+		t.set(2,y);
+		t.set(3,z);
+		return t;
+	}
+	public static LuaValue toTable(int x, int y, int z) {
+		LuaTable t = new LuaTable();
+		t.set(1,x);
+		t.set(2,y);
+		t.set(3,z);
+		return t;
+	}
 
 	public static void debugPrint( LuaTable t ) {
 		System.out.println( LuaTableToString(t) );
@@ -1165,7 +1180,7 @@ public class Utils {
 							else
 								hText = "URL: &b&U"+cText;
 							argNum++;
-							clickEvent = new ClickEvent(Action.OPEN_URL, cText);
+							clickEvent = new ClickEvent(Action.OPEN_URL, cText.startsWith("https://")||cText.startsWith("http://") ? cText : "https://"+cText);
 							hoverEvent = new HoverEvent(net.minecraft.util.text.event.HoverEvent.Action.SHOW_TEXT, toTextComponent(hText, null, false, false).a);
 						}else if(next == 'N') {
 							String hText;
@@ -1177,6 +1192,21 @@ public class Utils {
 							argNum++;
 
 							hoverEvent = new HoverEvent(net.minecraft.util.text.event.HoverEvent.Action.SHOW_TEXT, toTextComponent(hText, null, false, false).a);
+						}else if(next == '*') {
+							String file, tooltip;
+							if(args.arg(argNum).istable()) {
+								LuaTable table = args.arg(argNum).checktable();
+								file = table.get("click").tojstring();
+								tooltip = table.get("hover").isnil()? null : table.get("hover").tojstring();
+							}else {
+								file = args.arg(argNum).tojstring();
+								tooltip = (new File(file).exists()?"&a":"&c") + file;
+							}
+							argNum++;
+							
+							clickEvent = new ClickEvent(Action.OPEN_FILE, file);
+							if(tooltip != null)
+								hoverEvent = new HoverEvent(net.minecraft.util.text.event.HoverEvent.Action.SHOW_TEXT, toTextComponent(tooltip, null, false, false).a);
 						}
 					}
 				}
@@ -1239,6 +1269,9 @@ public class Utils {
 				case SUGGEST_COMMAND:
 					formating += "&T";
 					break;
+				case OPEN_FILE:
+					formating += "&*";
+					break;
 				default:
 					action = null;
 				}
@@ -1262,7 +1295,7 @@ public class Utils {
 		return new Pair<String, LuaTable>(out.toString(), actions);
 	}
 	private static boolean isSpecialCode(char c) {
-		return "FRTLN".indexOf(c) >= 0; //Function, Execute, Type, Url
+		return "FRTLN*".indexOf(c) >= 0; //Function, Execute, Type, Url
 	}
 	private static TextFormatting getTextFormatingColor(char c) {
 		//		 BLACK("BLACK", '0', 0),
@@ -1403,32 +1436,70 @@ public class Utils {
 		return result;
 	}
 	
-	
+	private static boolean mcExecutionStartedInLuaThread = false;
+	public static void runOnMCAndWait(Runnable r) {
+		boolean outter = false;
+		if((!mcExecutionStartedInLuaThread) && Thread.currentThread().equals(AdvancedMacros.getMinecraftThread())) {
+			outter = true;
+			mcExecutionStartedInLuaThread = true;
+		}
+		runOnMCAndWait(r, mcExecutionStartedInLuaThread);
+		if(outter)
+			mcExecutionStartedInLuaThread = false;
+	}
 	/**Returns null when done if already on MC thread*/
-	public static Object runOnMCAndWait(Runnable r) {
+	private static void runOnMCAndWait(Runnable r, boolean doThrow) {
+		
 		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {
-			r.run();
-			return null;
+			try {
+				r.run();
+				
+			}catch (Exception e) {
+				e.printStackTrace();
+				if(doThrow)
+					throw new LuaError(e);
+				Utils.logError(e);
+			}
+			return;
 		}
 		ListenableFuture<Object> a = AdvancedMacros.getMinecraft().addScheduledTask(r);
 		while(!a.isDone())
 			try {Thread.sleep(1);}catch (Exception e) {break;}
 		try {
-			return a.get();
+			a.get();
+			return;
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
-			return null;
+			if(doThrow)
+				throw new LuaError(e);
+			Utils.logError(e);
 		}
 	}
 
 	public static <T> T  runOnMCAndWait(Callable<T> c) {
+		boolean outter = false;
+		if((!mcExecutionStartedInLuaThread) && !Thread.currentThread().equals(AdvancedMacros.getMinecraftThread())) {
+			outter = true;
+			mcExecutionStartedInLuaThread = true;
+		}
+		try{
+			return runOnMCAndWait(c, mcExecutionStartedInLuaThread);
+		} finally {
+			if(outter)
+				mcExecutionStartedInLuaThread = false;
+		}
+	}
+	private static <T> T  runOnMCAndWait(Callable<T> c, boolean doThrow) {
 		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {
 			try {
 				return c.call();
-			} catch (InterruptedException | ExecutionException | ClassCastException e) {
-				e.printStackTrace();
-				return null;
+			} catch (LuaError e) {
+				if(doThrow)
+					throw e;
+				Utils.logError(e);
 			} catch (Exception e) {
+				if(doThrow)
+					throw new LuaError(e);
 				Utils.logError(e);
 			}
 		}
@@ -1439,10 +1510,15 @@ public class Utils {
 			return (T) a.get();
 		} catch (InterruptedException | ExecutionException | ClassCastException e) {
 			e.printStackTrace();
+			if(doThrow)
+				throw new LuaError(e.getCause()); 
 			return null;
 		}
 	}
+	
 	public static void waitTick() {
+		if(AdvancedMacros.getMinecraftThread().equals(Thread.currentThread()))
+			return;
 		int t = AdvancedMacros.forgeEventHandler.getSTick();
 		while(t==AdvancedMacros.forgeEventHandler.getSTick()){
 			try {

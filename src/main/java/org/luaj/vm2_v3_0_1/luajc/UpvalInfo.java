@@ -118,6 +118,7 @@ public class UpvalInfo {
 		var[nvars++] = v;
 	}
 
+	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append( pi.name );

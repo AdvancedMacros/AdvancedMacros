@@ -66,6 +66,7 @@ import com.theincgi.advancedMacros.lua.functions.HTTP;
 import com.theincgi.advancedMacros.lua.functions.IsKeyHeld;
 import com.theincgi.advancedMacros.lua.functions.LightAt;
 import com.theincgi.advancedMacros.lua.functions.MathPlus;
+import com.theincgi.advancedMacros.lua.functions.Narrate;
 import com.theincgi.advancedMacros.lua.functions.NewThread;
 import com.theincgi.advancedMacros.lua.functions.OpenInventory;
 import com.theincgi.advancedMacros.lua.functions.PCall;
@@ -132,7 +133,7 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "7.9.0"; //${version} ??
+	public static final String VERSION = "7.10.0"; //${version} ??
 	public static final String GAME_VERSION = "1.12.2";
 	
 	public static final File macrosRootFolder = getRootFolder();
@@ -155,6 +156,8 @@ public class AdvancedMacros {
 	public static FontRendererOverride otherCustomFontRenderer;
 	private static final DocumentationManager documentationManager = new DocumentationManager();
 	private JarLibSearcher jarLibSearcher;
+
+	public static Action actions;
 	private static Thread minecraftThread;
 	private static Minecraft mc;
 	private static ModContainer advMacrosModContainer;
@@ -290,6 +293,7 @@ public class AdvancedMacros {
 		globals.set("logdel", logdelFunc = new LuaFunctions.LogDel());
 		globals.set("say", sayFunc = new LuaFunctions.Say());
 		globals.set("toast", new Toast.ToastNotification());
+		globals.set("narrate", new Narrate());
 		
 		globals.set("sleep", sleepFunc = new LuaFunctions.Sleep());
 		globals.set("print", new LuaFunctions.Debug());
@@ -329,6 +333,7 @@ public class AdvancedMacros {
 		globals.set("getWorld", new GetWorld());
 		globals.set("getBlock", new GetBlock());
 		globals.set("getPlayer", new GetPlayer());
+		globals.set("playerDetails", GetPlayer.playerFunctions);
 		globals.set("getPlayerList", new GetPlayerList()); //everywhere
 		globals.set("getLoadedPlayers", new GetLoadedPlayers()); //your loaded chunks
 		globals.set("getPlayerPos", new GetPlayerPos());
@@ -357,7 +362,7 @@ public class AdvancedMacros {
 		
 		globals.set("rayTrace", RayTrace.getFunc());
 
-		new Action().getKeybindFuncts(globals);
+		(actions = new Action()).getKeybindFuncts(globals);
 		globals.set("getInventory", new GetInventory());
 		globals.set("openInventory", openInventory = new OpenInventory());
 
@@ -383,7 +388,7 @@ public class AdvancedMacros {
 		
 		LuaTable searchers = globals.get("package").get("searchers").checktable();
 		searchers.set(searchers.length() + 1, jarLibSearcher = new JarLibSearcher());
-		globals.set("getJarLibLoaders", new ZeroArgFunction() {public LuaValue call() {return jarLibSearcher.loaders;}});
+		globals.set("getJarLibLoaders", new ZeroArgFunction() {@Override public LuaValue call() {return jarLibSearcher.loaders;}});
 	}
 
 	private void loadLibJars() {
@@ -463,6 +468,13 @@ public class AdvancedMacros {
 			e.printStackTrace();
 		}
 		try {
+			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/easings.lua")).getInputStream();
+			globals.load(in, "easings", "t", globals).call();
+			in.close();
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		try {
 			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/httpquick.lua")).getInputStream();
 			globals.load(in, "httpQuick", "t", globals).call();
 			in.close();
@@ -522,8 +534,8 @@ public class AdvancedMacros {
 		}
 	}
 	private static File getRootFolder() {
-		File defaultRoot = new File(AdvancedMacros.getMinecraft().gameDir,"mods/advancedMacros");
-		File f = new File(AdvancedMacros.getMinecraft().gameDir,"config/advancedMacros.cfg");
+		File defaultRoot = new File(AdvancedMacros.getMinecraft().mcDataDir,"mods/advancedMacros");
+		File f = new File(AdvancedMacros.getMinecraft().mcDataDir,"config/advancedMacros.cfg");
 		if(!f.exists()) {
 			try (PrintWriter pw = new PrintWriter(f)){
 				pw.write("advancedMacrosRootFolder=" +defaultRoot.toString()+"\n");

@@ -54,6 +54,7 @@ public class LuaError extends RuntimeException {
 	/** Get the string message if it was supplied, or a string 
 	 * representation of the message object if that was supplied.
 	 */
+	@Override
 	public String getMessage() {
 		if (traceback != null)
 			return traceback;
@@ -122,6 +123,7 @@ public class LuaError extends RuntimeException {
 	/** 
 	 * Get the cause, if any.
 	 */
+	@Override
 	public Throwable getCause() {
 		return cause;
 	}

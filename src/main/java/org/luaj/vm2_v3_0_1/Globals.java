@@ -160,6 +160,7 @@ public class Globals extends LuaTable {
 	}
 	
 	/** Check that this object is a Globals object, and return it, otherwise throw an error. */
+	@Override
 	public Globals checkglobals() {
 		return this;
 	}
@@ -328,12 +329,15 @@ public class Globals extends LuaTable {
 			this.s = s;
 			n = s.length();
 		}
+		@Override
 		public void close() throws IOException {
 			i = n;
 		}
+		@Override
 		public int read() throws IOException {
 			return i < n ? s.charAt(i++) : -1;
 		}
+		@Override
 		public int read(char[] cbuf, int off, int len) throws IOException {
 			int j = 0;
 			for (; j < len && i < n; ++j, ++i)
@@ -352,13 +356,16 @@ public class Globals extends LuaTable {
 			this.b = new byte[buflen];
 		}
 		abstract protected int avail() throws IOException;
+		@Override
 		public int read() throws IOException {
 			int a = avail();
 			return (a <= 0 ? -1 : 0xff & b[i++]);
 		}
+		@Override
 		public int read(byte[] b) throws IOException {
 			return read(b, 0, b.length);
 		}
+		@Override
 		public int read(byte[] b, int i0, int n) throws IOException {
 			int a = avail();
 			if (a <= 0) return -1;
@@ -367,11 +374,13 @@ public class Globals extends LuaTable {
 			i += n_read;
 			return n_read;
 		}
+		@Override
 		public long skip(long n) throws IOException {
 			final long k = Math.min(n, j - i);
 			i += k;
 			return k;
 		}		
+		@Override
 		public int available() throws IOException {
 			return j - i;
 		}
@@ -388,6 +397,7 @@ public class Globals extends LuaTable {
 			super(96);
 			this.r = r;
 		}
+		@Override
 		protected int avail() throws IOException {
 			if (i < j) return j - i;
 			int n = r.read(c);
@@ -403,6 +413,7 @@ public class Globals extends LuaTable {
 			j = LuaString.encodeToUtf8(c, n, b, i = 0);
 			return j;
 		}
+		@Override
 		public void close() throws IOException {
 			r.close();
 		}
@@ -423,6 +434,7 @@ public class Globals extends LuaTable {
 			super(buflen);
 			this.s = s;
 		}
+		@Override
 		protected int avail() throws IOException {
 			if (i < j) return j - i;
 			if (j >= b.length) i = j = 0;
@@ -440,9 +452,11 @@ public class Globals extends LuaTable {
 			j += n;
 			return n;
 		}
+		@Override
 		public void close() throws IOException {
 			s.close();
 		}
+		@Override
 		public synchronized void mark(int n) {
 			if (i > 0 || n > b.length) {
 				byte[] dest = n > b.length ? new byte[n] : b;
@@ -452,9 +466,11 @@ public class Globals extends LuaTable {
 				b = dest;
 			}
 		}
+		@Override
 		public boolean markSupported() {
 			return true;
 		}
+		@Override
 		public synchronized void reset() throws IOException {
 			i = 0;
 		}

@@ -81,9 +81,11 @@ public class CoerceLuaToJava {
 	static final Map COERCIONS = Collections.synchronizedMap(new HashMap());
 	
 	static final class BoolCoercion implements Coercion {
+		@Override
 		public String toString() {
 			return "BoolCoercion()";
 		}
+		@Override
 		public int score( LuaValue value ) {
 			switch ( value.type() ) {
 			case LuaValue.TBOOLEAN:
@@ -92,6 +94,7 @@ public class CoerceLuaToJava {
 			return 1;
 		}
 
+		@Override
 		public Object coerce(LuaValue value) {
 			return value.toboolean()? Boolean.TRUE: Boolean.FALSE;
 		}
@@ -107,12 +110,14 @@ public class CoerceLuaToJava {
 		static final int TARGET_TYPE_DOUBLE = 6;
 		static final String[] TYPE_NAMES = { "byte", "char", "short", "int", "long", "float", "double" };
 		final int targetType;
+		@Override
 		public String toString() {
 			return "NumericCoercion("+TYPE_NAMES[targetType]+")";
 		}
 		NumericCoercion(int targetType) {
 			this.targetType = targetType;
 		}
+		@Override
 		public int score( LuaValue value ) {
 			int fromStringPenalty = 0;
 			if ( value.type() == LuaValue.TSTRING ) {
@@ -172,6 +177,7 @@ public class CoerceLuaToJava {
 			}
 		}
 
+		@Override
 		public Object coerce(LuaValue value) {
 			switch ( targetType ) {
 			case TARGET_TYPE_BYTE: return new Byte( (byte) value.toint() );
@@ -193,9 +199,11 @@ public class CoerceLuaToJava {
 		public StringCoercion(int targetType) {
 			this.targetType = targetType;
 		}
+		@Override
 		public String toString() {
 			return "StringCoercion("+(targetType==TARGET_TYPE_STRING? "String": "byte[]")+")";
 		}
+		@Override
 		public int score(LuaValue value) {
 			switch ( value.type() ) {
 			case LuaValue.TSTRING:
@@ -208,6 +216,7 @@ public class CoerceLuaToJava {
 				return targetType == TARGET_TYPE_STRING? SCORE_WRONG_TYPE: SCORE_UNCOERCIBLE;
 			}
 		}
+		@Override
 		public Object coerce(LuaValue value) {
 			if ( value.isnil() )
 				return null;
@@ -227,9 +236,11 @@ public class CoerceLuaToJava {
 			this.componentType = componentType;
 			this.componentCoercion = getCoercion(componentType);
 		}
+		@Override
 		public String toString() {
 			return "ArrayCoercion("+componentType.getName()+")";
 		}
+		@Override
 		public int score(LuaValue value) {
 			switch ( value.type() ) {
 			case LuaValue.TTABLE:
@@ -242,6 +253,7 @@ public class CoerceLuaToJava {
 				return SCORE_UNCOERCIBLE;
 			}
 		}
+		@Override
 		public Object coerce(LuaValue value) {
 			switch ( value.type() ) {
 			case LuaValue.TTABLE: {
@@ -286,9 +298,11 @@ public class CoerceLuaToJava {
 		ObjectCoercion(Class targetType) {
 			this.targetType = targetType;
 		}
+		@Override
 		public String toString() {
 			return "ObjectCoercion("+targetType.getName()+")";
 		}
+		@Override
 		public int score(LuaValue value) {
 			switch ( value.type() ) {
 			case LuaValue.TNUMBER:
@@ -305,6 +319,7 @@ public class CoerceLuaToJava {
 				return inheritanceLevels( targetType, value.getClass() );
 			}
 		}
+		@Override
 		public Object coerce(LuaValue value) {
 			switch ( value.type() ) {
 			case LuaValue.TNUMBER:

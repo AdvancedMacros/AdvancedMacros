@@ -125,6 +125,7 @@ public class LuajClassLoader extends ClassLoader {
 				&& !classname.startsWith(launcherInterfaceRoot);
 	}
 
+	@Override
 	public Class<?> loadClass(String classname) throws ClassNotFoundException {
 		if (classes.containsKey(classname))
 			return classes.get(classname);

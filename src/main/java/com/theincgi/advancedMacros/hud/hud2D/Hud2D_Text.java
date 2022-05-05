@@ -55,7 +55,7 @@ public class Hud2D_Text extends Hud2DItem {
 		getControls().set("getWidth", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return LuaValue.valueOf(AdvancedMacros.otherCustomFontRenderer.getStringWidth(widestLine(text)));
+				return LuaValue.valueOf(AdvancedMacros.otherCustomFontRenderer.getStringWidth(widestLine(text)) * (size/7.99f));
 			}
 		});
 		getControls().set("getHeight", new ZeroArgFunction() {
@@ -117,11 +117,11 @@ public class Hud2D_Text extends Hud2DItem {
 			//GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			FontRendererOverride fr = AdvancedMacros.otherCustomFontRenderer;
 			
-			float old = fr.FONT_HEIGHT;
-			fr.FONT_HEIGHT = (int)size;
+//			float old = fr.FONT_HEIGHT;
+//			fr.FONT_HEIGHT = (int)size;
 			for(int i = 0; s.hasNextLine(); i+=size)
 				fr.renderText(dx, dy+i, z, s.nextLine(), getOpacity(), size);//(text, (int)x, (int)y, color.toInt());
-			fr.FONT_HEIGHT = old;
+//			fr.FONT_HEIGHT = old;
 			s.close();
 			//GlStateManager.disableAlpha();
 		}

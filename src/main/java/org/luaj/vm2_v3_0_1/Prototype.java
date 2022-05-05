@@ -113,6 +113,7 @@ public class Prototype {
 		upvalues = new Upvaldesc[n_upvalues];
 	}
 	
+	@Override
 	public String toString() {
 		return source + ":" + linedefined+"-"+lastlinedefined;
 	}
