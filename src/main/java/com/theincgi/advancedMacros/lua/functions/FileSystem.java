@@ -387,7 +387,7 @@ public class FileSystem extends LuaTable{
 			synchronized(syncLock) {
 				try {
 					fos.write(arg0.checkstring().m_bytes);
-					fos.write('\n'); // should it be \r\n instead ?
+					fos.write( System.lineSeparator() );
 				} catch (IOException e) {
 					throw new LuaError("IOExeception: ("+e.getMessage()+")");
 				}
