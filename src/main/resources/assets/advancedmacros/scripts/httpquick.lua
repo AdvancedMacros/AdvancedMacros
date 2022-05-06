@@ -1,11 +1,11 @@
-local statusHTTP = function(r, logjson, lenght)
+local statusHTTP = function(r, logjson, length)
     assert(type(r)=="table", "expected httpQuick r")
-    lenght = logjson and lenght or 1024
+    length = logjson and length or 1024
 
     log("&7> From &8"..r.url)
     log("&7> Got "..r.type.." ["..r.code.."]")
-    log("&7> Bytes "..r.lenght.." Time "..r.time.."ms "..r.headers.http)
-    if r.json and logjson and r.lenght < lenght then
+    log("&7> Bytes "..r.length.." Time "..r.time.."ms "..r.headers.http)
+    if r.json and logjson and r.length < length then
         log(r.json)
     end
 end
