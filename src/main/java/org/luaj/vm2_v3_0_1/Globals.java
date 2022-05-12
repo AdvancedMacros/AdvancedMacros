@@ -503,6 +503,21 @@ public class Globals extends LuaTable {
 			luaThreads.put(Thread.currentThread(), thread);
 		}
 	}
+	public boolean unsetLuaThreadForCurrent(LuaThread thread) {
+		synchronized (luaThreads) {
+			return luaThreads.remove(Thread.currentThread(), thread);
+		}
+	}
+	public void unsetCurrentLuaThread() {
+		synchronized (luaThreads) {
+			luaThreads.remove(Thread.currentThread());
+		}
+	}
+	public boolean unsetLuaThread(Thread t, LuaThread thread) {
+		synchronized (luaThreads) {
+			return luaThreads.remove(t, thread);
+		}
+	}
 	public void setLuaThread(Thread t, LuaThread thread) {
 		synchronized (luaThreads) {
 			luaThreads.put(t, thread);
