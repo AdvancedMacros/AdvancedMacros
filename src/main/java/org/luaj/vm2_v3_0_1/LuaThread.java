@@ -202,11 +202,13 @@ public class LuaThread extends LuaValue {
 			try {
 				Varargs a = this.args;
 				this.args = LuaValue.NONE;
+				globals.setCurrentLuaThread((LuaThread)lua_thread.get());
 				this.result = function.invoke(a);
 			} catch (Throwable t) {
 				this.error = t.getMessage();
 			} finally {
 				this.status = LuaThread.STATUS_DEAD;
+				globals.unsetLuaThreadForCurrent((LuaThread)lua_thread.get());
 				this.notify();
 			}
 		}

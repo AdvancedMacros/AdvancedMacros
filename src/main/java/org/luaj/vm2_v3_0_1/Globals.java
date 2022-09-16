@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.lang.ThreadLocal;
+import java.util.function.Supplier;
 import java.util.WeakHashMap;
 
 import org.luaj.vm2_v3_0_1.lib.BaseLib;
@@ -130,7 +132,9 @@ public class Globals extends LuaTable {
 	///** The currently running thread.  Should not be changed by non-library code. */
 	private LuaThread defaultLuaThread = null;//new LuaThread(this);
 	private static final WeakHashMap<Thread, LuaThread> luaThreads = new WeakHashMap<>();
-	
+	private final ThreadLocal<LuaThread> myThread = ThreadLocal.withInitial(()->{
+		synchronized (luaThreads) { return getLuaThread(Thread.currentThread()); } // WD
+	});
 	
 	/** The BaseLib instance loaded into this Globals */
 	public BaseLib baselib;
@@ -480,13 +484,14 @@ public class Globals extends LuaTable {
 	 * @author TheINCGI
 	 * */
 	public LuaThread getCurrentLuaThread() {
-		synchronized (luaThreads) {
+		//synchronized (luaThreads) {
 			/*if(luaThreads.containsKey(Thread.currentThread()))
 				return luaThreads.get(Thread.currentThread());
 			else
 				throw new NullPointerException(String.format("Globals missing active lua thread [%s : %d]", Thread.currentThread().getName(), Thread.currentThread().getId()));*/
-			return getLuaThread(Thread.currentThread());
-		}
+			//return getLuaThread(Thread.currentThread());
+		//}
+		return myThread.get(); // WD
 	}
 	public LuaThread getLuaThread(Thread thread) {
 		synchronized (luaThreads) {
@@ -496,6 +501,21 @@ public class Globals extends LuaTable {
 	public void setCurrentLuaThread(LuaThread thread) {
 		synchronized (luaThreads) {
 			luaThreads.put(Thread.currentThread(), thread);
+		}
+	}
+	public boolean unsetLuaThreadForCurrent(LuaThread thread) {
+		synchronized (luaThreads) {
+			return luaThreads.remove(Thread.currentThread(), thread);
+		}
+	}
+	public void unsetCurrentLuaThread() {
+		synchronized (luaThreads) {
+			luaThreads.remove(Thread.currentThread());
+		}
+	}
+	public boolean unsetLuaThread(Thread t, LuaThread thread) {
+		synchronized (luaThreads) {
+			return luaThreads.remove(t, thread);
 		}
 	}
 	public void setLuaThread(Thread t, LuaThread thread) {

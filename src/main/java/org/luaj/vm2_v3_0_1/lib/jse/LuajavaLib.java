@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.StringJoiner;
 
 import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LuaError;
@@ -164,17 +165,22 @@ public class LuajavaLib extends VarArgFunction {
 				
 				// get the interfaces
 				final Class[] ifaces = new Class[niface];
+				StringJoiner impl = new StringJoiner(", ", "Proxy [", "]");
 				for ( int i=0; i<niface; i++ ) 
 					ifaces[i] = classForName(args.checkjstring(i+1));
+				for ( int i=0; i<niface; i++ ) 
+					impl.add(ifaces[i].getSimpleName()); //.getName()
 				
 				// create the invocation handler
-				InvocationHandler handler = new ProxyInvocationHandler(lobj);
+				InvocationHandler handler = new ProxyInvocationHandler(lobj, impl.toString());
 				
 				// create the proxy object
-				Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), ifaces, handler);
+				ClassLoader loader = getClass().getClassLoader();
+				loader = loader==null? ClassLoader.getSystemClassLoader() : loader;
+				Object proxy = Proxy.newProxyInstance( loader, ifaces, handler);
 				
 				// return the proxy
-				return LuaValue.userdataOf( proxy );
+				return proxy==null? LuaValue.FALSE : CoerceJavaToLua.coerce( proxy ); //LuaValue.userdataOf( proxy );
 			}
 			case LOADLIB: {
 				// get constructor
@@ -413,18 +419,32 @@ public class LuajavaLib extends VarArgFunction {
 	}
 	
 	private static final class ProxyInvocationHandler implements InvocationHandler {
+		static private final Class object = Object.class;
 		private final LuaValue lobj;
+		private final String impl;
 
 		private ProxyInvocationHandler(LuaValue lobj) {
+			this.impl = "Proxy [" + lobj.toString() + "]";
 			this.lobj = lobj;
+		}
+
+		private ProxyInvocationHandler(LuaValue lobj, String impl) {
+			this.lobj = lobj;
+			this.impl = impl;
 		}
 
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			String name = method.getName();
 			LuaValue func = lobj.get(name);
-			if ( func.isnil() )
+			if ( func.isnil() ) {
+				if ( method.getDeclaringClass() == object ) {
+					if ( name == "toString" ) return impl;
+					return method.invoke(this, args); // is this leagal?
+				}
 				return null;
+			}
+				
 			boolean isvarargs = ((method.getModifiers() & METHOD_MODIFIERS_VARARGS) != 0);
 			int n = args!=null? args.length: 0; 
 			LuaValue[] v;

@@ -52,7 +52,7 @@ import com.theincgi.advancedMacros.misc.Settings;
 class JavaClass extends JavaInstance implements CoerceJavaToLua.Coercion {
 
 	static final Map classes = Collections.synchronizedMap(new HashMap());
-
+	static final boolean allowPrivateAccess;
 	static final LuaValue NEW = valueOf("new");
 	Map<LuaValue, Field> fields;
 	Map<LuaValue, LuaValue> methods;
@@ -178,14 +178,17 @@ class JavaClass extends JavaInstance implements CoerceJavaToLua.Coercion {
 		return (LuaValue) methods.get(key);
 	}
 
-	private boolean checkPrivateAccessSetting() { //TODO make this a setting of _T
+	static {
 		LuaValue luajavaSettings;
 		if(!(luajavaSettings = Settings.settings.get("luajava")).istable())
 			Settings.settings.set("luajava", luajavaSettings = new LuaTable());
 		if(!luajavaSettings.get("allowPrivateAccess").isboolean())
 			luajavaSettings.set("allowPrivateAccess", false);
+		allowPrivateAccess = luajavaSettings.get("allowPrivateAccess").optboolean(false);
+	}
 
-		return luajavaSettings.get("allowPrivateAccess").optboolean(false);
+	private boolean checkPrivateAccessSetting() { //TODO make this a setting of _T
+		return allowPrivateAccess; // checked once at runtime, restart to reset ~WD
 	}
 
 	Class getInnerClass(LuaValue key) {
