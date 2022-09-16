@@ -3,6 +3,7 @@ package com.theincgi.advancedMacros.lua.functions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
@@ -69,7 +70,8 @@ public class GetRecipe extends CallableTable {
 		ArrayList<IRecipe> out = new ArrayList<IRecipe>();
 
 		RegistryNamespaced<ResourceLocation, IRecipe> recipes = CraftingManager.REGISTRY;
-		for (IRecipe iRecipe : recipes) {
+		for (ResourceLocation loc : recipes.getKeys()) {
+			IRecipe iRecipe = recipes.getObject(loc);
 			ItemStack is = iRecipe.getRecipeOutput();
 			if(sItem.isItemEqual(is)){
 				out.add(iRecipe);
