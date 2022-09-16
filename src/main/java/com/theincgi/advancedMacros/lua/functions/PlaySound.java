@@ -6,8 +6,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine;
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineListener;
@@ -19,6 +21,7 @@ import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
+import org.luaj.vm2_v3_0_1.lib.jse.CoerceJavaToLua;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 
@@ -30,8 +33,10 @@ public class PlaySound {
 
 		public static LuaTable play(File f) {
 			try {
+				final AudioInputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(f)));
+				DataLine.Info info = new DataLine.Info(Clip.class, ais.getFormat());
 				final Clip clip = AudioSystem.getClip();
-				clip.open(AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(f))));
+				clip.open( ais );
 				
 				final Cntrls cntrls = new Cntrls(clip);
 				
@@ -40,6 +45,10 @@ public class PlaySound {
 					public void update(LineEvent event) {
 						if(event.getType().equals(LineEvent.Type.STOP) && !cntrls.paused) {
 							clip.close();
+							try {
+								ais.close();
+							} catch (IOException e) {
+							}
 						}
 					}
 				});
@@ -74,6 +83,7 @@ public class PlaySound {
 				t.set("pause", new Pause());
 				t.set("play", new Start());
 				t.set("setVolume", new SetVolume());
+				t.set("getClip", new GetRaw());
 				return t;
 			}
 			public class SetVolume extends OneArgFunction{
@@ -126,6 +136,12 @@ public class PlaySound {
 				@Override
 				public LuaValue call() {
 					return LuaValue.valueOf(c.isRunning());
+				}
+			}
+			private class GetRaw extends ZeroArgFunction{	
+				@Override
+				public LuaValue call() {
+					return CoerceJavaToLua.coerce(c);
 				}
 			}
 		}

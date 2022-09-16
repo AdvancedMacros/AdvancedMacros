@@ -209,7 +209,7 @@ public class MinecraftSettings extends LuaTable {
 				}
 				return NONE;
 			case setDifficulty:
-				mc.gameSettings.difficulty = args.arg1().isnumber()? EnumDifficulty.getDifficultyEnum(args.arg1().checkint()) : EnumDifficulty.valueOf(args.arg1().checkjstring().toUpperCase());
+				mc.gameSettings.difficulty = args.arg1().isnumber()? EnumDifficulty.byId(args.arg1().checkint()) : EnumDifficulty.valueOf(args.arg1().checkjstring().toUpperCase());
 				return NONE;
 			case setEntityShadows:
 				mc.gameSettings.entityShadows = args.arg1().checkboolean();
@@ -232,7 +232,7 @@ public class MinecraftSettings extends LuaTable {
 				}
 				return NONE;
 			case setHeldItemTooltips:
-				mc.gameSettings.advancedItemTooltips = args.checkboolean(1);
+				mc.gameSettings.heldItemTooltips = args.checkboolean(1);
 				return NONE;
 			case setInvertMouse:
 				mc.gameSettings.invertMouse = args.checkboolean(1);

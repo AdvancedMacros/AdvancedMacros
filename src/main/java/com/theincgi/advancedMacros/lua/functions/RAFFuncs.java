@@ -220,7 +220,7 @@ public class RAFFuncs {
 		@Override
 		public LuaValue call(LuaValue arg0) {
 			try{
-				raf.writeBytes(arg0.checkjstring());
+				raf.write(arg0.checkstring().m_bytes);
 			}catch(IOException e) {throw new LuaError("IOException: ("+e.getMessage()+")");}
 			return LuaValue.NONE;
 		}
@@ -292,7 +292,7 @@ public class RAFFuncs {
 		@Override
 		public LuaValue call(LuaValue arg0) {
 			try{
-				raf.writeUTF(arg0.checkjstring());
+				raf.writeUTF(arg0.checkjstring()); // I will allow it ~WD
 			}catch(IOException e) {throw new LuaError("IOException: ("+e.getMessage()+")");}
 			return LuaValue.NONE;
 		}

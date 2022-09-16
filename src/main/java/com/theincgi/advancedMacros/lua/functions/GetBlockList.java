@@ -26,7 +26,7 @@ public class GetBlockList extends ZeroArgFunction{
 				NonNullList<ItemStack> subtypes = NonNullList.create();
 				item.getSubItems(CreativeTabs.SEARCH, subtypes);
 				LuaTable types = new LuaTable();
-				t.set(r.getResourceDomain()+":"+r.getResourcePath(), types);
+				t.set(r.toString(), types);
 				for(ItemStack s : subtypes) {
 					types.set(s.getItemDamage(), Utils.itemStackToLuatable(s));
 				}

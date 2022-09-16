@@ -219,7 +219,7 @@ public class LuajavaLib extends VarArgFunction {
 					if(ji.jclass == null) {
 							ji.jclass = JavaClass.forClass(ji.m_instance.getClass());
 					}
-					m = CoerceJavaToLua.coerce(ji.jclass.getField(args.arg(2)).get(ji));
+					m = CoerceJavaToLua.coerce(ji.jclass.getField(args.arg(2)).get(ji.m_instance));
 					if(m!=null) return m;
 				}
 				return NIL;

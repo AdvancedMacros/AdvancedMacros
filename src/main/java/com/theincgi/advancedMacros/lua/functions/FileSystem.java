@@ -16,6 +16,7 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
+import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
@@ -64,6 +65,8 @@ public class FileSystem extends LuaTable{
 					FileInputStream fis = new FileInputStream(file);
 					Object syncLock = new Object();
 					controls.set("readByte", new ReadByte(fis, syncLock));
+					controls.set("readBytes", new ReadBytes(syncLock, fis));
+					controls.set("skipBytes", new Skip(syncLock, fis));
 					controls.set("readLine", new Read(fis, syncLock, true));
 					controls.set("read", new Read(fis, syncLock, false));
 					controls.set("readAll", new ReadAll(syncLock, fis));
@@ -171,10 +174,53 @@ public class FileSystem extends LuaTable{
 					int avail=fis.available();
 					byte[] b = new byte[avail];
 					fis.read(b);
-					return LuaValue.valueOf(new String(b));
+					return LuaValue.valueOf(b);
 				} catch (IOException e) {
 					throw new LuaError("IOExeception: ("+e.getMessage()+")");
 				}
+			}
+		}
+	}
+	private static class ReadBytes extends VarArgFunction{
+		Object syncLock;
+		FileInputStream fis;
+		public ReadBytes(Object syncLock, FileInputStream fis) {
+			super();
+			this.syncLock = syncLock;
+			this.fis = fis;
+		}
+		@Override
+		public Varargs invoke(Varargs amount) {
+			synchronized (syncLock) {
+				try {
+					int attempt = Math.min(fis.available(),amount.arg1().checkint());
+					byte[] b = new byte[attempt];
+					fis.read(b);
+					return varargsOf(valueOf(b),valueOf(attempt));
+				} catch (IOException e) {
+					throw new LuaError("IOExeception: ("+e.getMessage()+")");
+				}
+			}
+		}
+	}
+	private static class Skip extends OneArgFunction{
+		private Object syncLock;
+		private FileInputStream fis;
+		public Skip(Object syncLock, FileInputStream fis) {
+			super();
+			this.syncLock = syncLock;
+			this.fis = fis;
+		}
+		@Override
+		public LuaValue call(LuaValue bytes) {
+			synchronized (syncLock) {
+
+				try {
+					return LuaValue.valueOf(fis.skip(bytes.checkint()));
+				} catch (IOException e) {
+					throw new LuaError("IOExeception: ("+e.getMessage()+")");
+				}
+
 			}
 		}
 	}
@@ -318,7 +364,7 @@ public class FileSystem extends LuaTable{
 		public LuaValue call(LuaValue arg0) {
 			synchronized(syncLock) {
 				try {
-					fos.write(arg0.tojstring().getBytes());
+					fos.write(arg0.checkstring().m_bytes);
 				} catch (IOException e) {
 					throw new LuaError("IOExeception: ("+e.getMessage()+")");
 				}
@@ -340,7 +386,8 @@ public class FileSystem extends LuaTable{
 		public LuaValue call(LuaValue arg0) {
 			synchronized(syncLock) {
 				try {
-					fos.write((arg0.tojstring()+"\n").getBytes());
+					fos.write(arg0.checkstring().m_bytes);
+					fos.write( System.lineSeparator() );
 				} catch (IOException e) {
 					throw new LuaError("IOExeception: ("+e.getMessage()+")");
 				}

@@ -18,8 +18,10 @@ import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaNumber;
 import org.luaj.vm2_v3_0_1.LuaTable;
+import org.luaj.vm2_v3_0_1.LuaUserdata;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
+import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.google.common.util.concurrent.ListenableFuture;
@@ -34,6 +36,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -65,6 +68,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.ClickEvent.Action;
 import net.minecraft.util.text.event.HoverEvent;
+import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class Utils {
@@ -444,6 +448,19 @@ public class Utils {
 	}
 
 
+	public static AbstractClientPlayer findPlayerByName(World world, String toFind) {
+		Object[] players = AdvancedMacros.getMinecraft().world.playerEntities.toArray();
+		for(int i = 0; i<players.length; i++) {
+			if(players[i] instanceof AbstractClientPlayer) {
+				AbstractClientPlayer acpe = (AbstractClientPlayer)players[i];
+				if(acpe.getName().equals(toFind)) {
+					return acpe;
+				}
+			}
+		}
+		return null;
+	}
+	
 	public static LuaTable blockPosToTable(BlockPos pos) {
 		LuaTable t = new LuaTable();        
 		t.set(1, LuaValue.valueOf(pos.getX()));
@@ -463,6 +480,7 @@ public class Utils {
 		if(entity==null) return LuaValue.FALSE;
 		LuaTable t = new LuaTable();
 		t.set("name", entity.getName());
+		t.set("id", entity.getEntityId());
 		t.set("class", entity.getClass().getName());
 		//t.set("inventory", Utils.inventoryToTable(entity.inventory, !(entity instanceof EntityPlayerSP)));
 		{
@@ -497,7 +515,7 @@ public class Utils {
 		//				t.set("bedLocation", pos);
 		//			}
 		//		}
-		t.set("team", entity.getTeam()==null?"none":entity.getTeam().getName());
+		t.set("team", entity.getTeam()==null?LuaValue.FALSE:LuaValue.valueOf(entity.getTeam().getName()));
 		{
 			LuaTable velocity = new LuaTable();
 			Entity e = entity.getLowestRidingEntity();
@@ -704,10 +722,11 @@ public class Utils {
 				thisTag = LuaValue.valueOf(((NBTTagDouble) tag).getDouble());
 			}else if(tag instanceof NBTTagByteArray){
 				byte[] bytes = ((NBTTagByteArray) tag).getByteArray();
-				thisTag = new LuaTable();
-				for(int j = 0; j<bytes.length; j++){
-					thisTag.set(j+1, LuaValue.valueOf(bytes[j]));
-				}
+				thisTag = LuaValue.valueOf(bytes);
+				//thisTag = new LuaTable();
+				//for(int j = 0; j<bytes.length; j++){
+				//	thisTag.set(j+1, LuaValue.valueOf(bytes[j]));
+				//}
 			}else if(tag instanceof NBTTagString){
 				thisTag = LuaValue.valueOf(((NBTTagString) tag).getString());
 			}else if(tag instanceof NBTTagList){
@@ -898,8 +917,7 @@ public class Utils {
 			return LuaValue.NIL;
 		}
 	}
-	/**nah, its invoke, but it has one return*/
-	public static Varargs pcallVargargs(LuaFunction func, Varargs luaValues) {
+	public static Varargs pcallVarArgs(LuaFunction func, Varargs luaValues) {
 		try {
 
 			if(AdvancedMacros.globals.getCurrentLuaThread()==null) {
@@ -1521,5 +1539,11 @@ public class Utils {
 	}
 	public static Varargs varargs(LuaValue...args) {
 		return LuaValue.varargsOf(args);
+	}
+	public static class WrapAsUserdata extends VarArgFunction{
+		@Override
+		public LuaValue invoke(Varargs args) {
+			return userdataOf(args);
+		}
 	}
 }

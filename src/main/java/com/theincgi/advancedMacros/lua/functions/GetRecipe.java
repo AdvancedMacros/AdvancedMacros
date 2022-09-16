@@ -101,7 +101,6 @@ public class GetRecipe extends CallableTable {
 				}
 			}
 			t.set("type", "shaped");
-			return t;
 		}else if(r instanceof ShapedOreRecipe) {
 			ShapedOreRecipe sr = (ShapedOreRecipe) r;
 			t = dimTable(sr.getRecipeWidth(), sr.getRecipeHeight());
@@ -115,7 +114,6 @@ public class GetRecipe extends CallableTable {
 				}
 			}
 			t.set("type", "shaped ore");
-			return t;
 
 		}else if(r instanceof ShapelessRecipes) {
 			ShapelessRecipes sr = (ShapelessRecipes) r;
@@ -127,7 +125,6 @@ public class GetRecipe extends CallableTable {
 				}
 			}
 			t.set("type", "shapeless");
-			return t;
 		}else if(r instanceof ShapelessOreRecipe) {
 			ShapelessOreRecipe sr = (ShapelessOreRecipe) r;
 			t = new LuaTable();
@@ -138,7 +135,6 @@ public class GetRecipe extends CallableTable {
 				}
 			}
 			t.set("type", "shapeless ore");
-			return t;
 		}else {
 			t = new LuaTable();
 			for(int i = 0; i< r.getIngredients().size(); i++) {
@@ -148,8 +144,9 @@ public class GetRecipe extends CallableTable {
 				}
 			}
 			t.set("type", r.getClass().getName());
-			return t;
 		}
+		t.set("id",CraftingManager.getIDForRecipe(r));
+		return t;
 	}
 
 	//indexed x,y, itemOption

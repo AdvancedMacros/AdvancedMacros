@@ -1,5 +1,7 @@
 package com.theincgi.advancedMacros.lua.functions.lua5_3;
 
+import com.google.common.primitives.Bytes;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -262,7 +264,7 @@ public class StringSerialization {
 		@Override
 		public Varargs invoke(Varargs args) {
 			String format = args.checkjstring(1);
-			byte[] str = args.checkjstring(2).getBytes();
+			byte[] str = args.checkstring(2).m_bytes;
 			int startPos = args.optint(3, 1) - 1;
 			ByteBuffer buffer = ByteBuffer.allocate(16);
 
@@ -313,9 +315,9 @@ public class StringSerialization {
 
 					break;
 				case FIXED_SIZE_STRING:{
-					String m = new String(str, sPos, str.length-sPos).substring(0, sizeArg);
-					sPos+=m.getBytes().length;
-					output.set(nOut++, LuaValue.valueOf(m));
+					byte[] m = Arrays.copyOfRange(str, sPos, str.length-sPos); //.substring(0, sizeArg);
+					output.set(nOut++, LuaValue.valueOf(m,0,sizeArg));
+					sPos+=m.length;
 					break;
 				}
 				case FLOAT:
@@ -328,10 +330,10 @@ public class StringSerialization {
 					break;
 
 				case ZERO_TERMINATED_STRING:{
-					String temp = new String(str, sPos, str.length-sPos);
-					temp = temp.substring(0, temp.indexOf(0));
-					sPos+=temp.getBytes().length+1;
-					output.set(nOut++, LuaValue.valueOf(temp));
+					byte[] temp = Arrays.copyOfRange(str, sPos, str.length-sPos);
+					int idx = Bytes.indexOf(temp, (byte)0);
+					output.set(nOut++, LuaValue.valueOf(temp,0,idx));
+					sPos+=temp.length+1;
 					break;
 				}
 				case LENGTH_LABELD_STRING:{
@@ -340,9 +342,9 @@ public class StringSerialization {
 					sPos+=Integer.BYTES;
 					buffer.flip();
 					int len = buffer.getInt();
-					String m = new String(str, sPos, str.length-sPos).substring(0, len);
-					sPos+=m.getBytes().length;
-					output.set(nOut++, LuaValue.valueOf(m));
+					byte[] m = Arrays.copyOfRange(str, sPos, str.length-sPos); //.substring(0, len);
+					output.set(nOut++, LuaValue.valueOf(m,0,len));
+					sPos+=m.length;
 					break;
 				}
 

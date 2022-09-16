@@ -1,10 +1,14 @@
 package com.theincgi.advancedMacros;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
@@ -15,6 +19,7 @@ import java.util.jar.JarFile;
 import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
+import org.luaj.vm2_v3_0_1.LuaNil;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaThread;
 import org.luaj.vm2_v3_0_1.LuaValue;
@@ -40,6 +45,7 @@ import com.theincgi.advancedMacros.lua.functions.Action;
 import com.theincgi.advancedMacros.lua.functions.Call;
 import com.theincgi.advancedMacros.lua.functions.Connect;
 import com.theincgi.advancedMacros.lua.functions.Disconnect;
+import com.theincgi.advancedMacros.lua.functions.entity.GetNBT;
 import com.theincgi.advancedMacros.lua.functions.FileSystem;
 import com.theincgi.advancedMacros.lua.functions.GetBiome;
 import com.theincgi.advancedMacros.lua.functions.GetBlock;
@@ -98,6 +104,7 @@ import com.theincgi.advancedMacros.publicInterfaces.LuaPlugin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -112,6 +119,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import paulscode.sound.SoundSystemConfig;
+import paulscode.sound.SoundSystemException;
+import paulscode.sound.codecs.CodecWav;
+
+//import paulscode.sound.codecs.CodecIBXM;
+// Caused by: java.lang.SecurityException: class "paulscode.sound.codecs.CodecIBXM"'s 
+// signer information does not match signer information of other classes in the same package
+import com.theincgi.advancedMacros.misc.CodecIBXM; // imported into AM package
 
 @Mod(modid = AdvancedMacros.MODID, version = AdvancedMacros.VERSION)
 public class AdvancedMacros {
@@ -157,6 +172,7 @@ public class AdvancedMacros {
 			if(event.getSide().isServer()){return;}
 			minecraftThread = Thread.currentThread();
 			globals.setLuaThread(minecraftThread, new LuaThread(globals));
+			globals.setDefaultLuaThread(new LuaThread(globals));
 			macrosRootFolder.mkdirs();
 			macrosFolder.mkdirs();
 			macroSoundsFolder.mkdirs();
@@ -182,6 +198,20 @@ public class AdvancedMacros {
 				e.printStackTrace();
 			}
 			
+			// LuaNil.s_metatable = LuaValue.tableOf(new LuaValue[] { LuaValue.INDEX, new ZeroArgFunction() {public LuaValue call() {return NIL;}}});
+			
+			try
+			{
+				// These add available sound codecs that weren't used
+				SoundSystemConfig.setCodec("wav", CodecWav.class);
+				SoundSystemConfig.setCodec("mod", CodecIBXM.class);
+				SoundSystemConfig.setCodec("s3m", CodecIBXM.class);
+				SoundSystemConfig.setCodec("xm", CodecIBXM.class);
+			}
+			catch (SoundSystemException soundsystemexception)
+			{
+				soundsystemexception.printStackTrace();
+			}
 			
 			loadFunctions();
 			loadLibJars();
@@ -218,6 +248,7 @@ public class AdvancedMacros {
 
 
 	public static LuaFunctions.Log logFunc;
+	public static LuaFunctions.LogDel logdelFunc;
 	public static LuaFunctions.Say sayFunc;
 	public static LuaFunctions.Sleep sleepFunc;
 	public static LuaFunctions.Debug debugFunc;
@@ -259,6 +290,7 @@ public class AdvancedMacros {
 		}
 		globals.set("getBlockList", new GetBlockList());
 		globals.set("log", logFunc = new LuaFunctions.Log());
+		globals.set("logdel", logdelFunc = new LuaFunctions.LogDel());
 		globals.set("say", sayFunc = new LuaFunctions.Say());
 		globals.set("toast", new Toast.ToastNotification());
 		globals.set("narrate", new Narrate());
@@ -273,6 +305,7 @@ public class AdvancedMacros {
 		globals.get("os").set("getClipboard", new ClipBoard.GetClipboard());
 		globals.get("os").set("setClipboard", new ClipBoard.SetClipboard());
 		globals.get("string").set("trim", new StringTrim());
+		globals.get("luajava").set("wrap", new Utils.WrapAsUserdata());
 		
 		LuaTable imgTools = new LuaTable();
 		imgTools.set("new", new BufferedImageControls.CreateImg());
@@ -305,6 +338,7 @@ public class AdvancedMacros {
 		globals.set("getLoadedPlayers", new GetLoadedPlayers()); //your loaded chunks
 		globals.set("getPlayerPos", new GetPlayerPos());
 		globals.set("getPlayerBlockPos", new GetPlayerBlockPos());
+		globals.set("getPlayerNBT", new GetNBT());
 
 		//globals.set("minecraft", new MinecraftFunctions());
 		globals.set("getRecipes", new GetRecipe());
@@ -313,6 +347,7 @@ public class AdvancedMacros {
 		
 		globals.set("getEntityList", new GetEntityList());
 		globals.set("getEntity", new GetEntityData());
+		globals.set("getEntityNBT", new GetNBT());
 		globals.set("getBoundingBox", new GetAABB().getFunc()); 
 		globals.set("highlightEntity", new CallableTable(new String[] {"highlightEntity"}, new HighlightEntity()));
 		
@@ -335,6 +370,7 @@ public class AdvancedMacros {
 		globals.set("getBlockLight", new LightAt.BlockLight());
 		globals.set("getSkyLight", new LightAt.SkyLight());
 		globals.set("getBiome", new GetBiome());
+		globals.set("getNBT", new GetNBT());
 
 		globals.set("playSound", new PlaySound.FromFile());
 		globals.set("getSound", new GetSound());
@@ -439,6 +475,13 @@ public class AdvancedMacros {
 			e.printStackTrace();
 		}
 		try {
+			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/httpquick.lua")).getInputStream();
+			globals.load(in, "httpQuick", "t", globals).call();
+			in.close();
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		try {
 			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/repl.lua")).getInputStream();
 			repl = globals.load(in, "REPL", "t", globals);
 			in.close();
@@ -467,10 +510,19 @@ public class AdvancedMacros {
 		LuaTable args = new LuaTable();
 		args.set(1, "manual");
 		try {
-			FileReader fr = new FileReader(f);
-			LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
-			LuaDebug.LuaThread t = new LuaDebug.LuaThread(function, args.unpack(), scriptName);
-			t.start();
+			//try{
+				//FileReader fr = new FileReader(f);
+				//BufferedReader fr = new BufferedReader(
+				//	new InputStreamReader( new FileInputStream(f), "UTF8")
+				//);
+				Globals g = AdvancedMacros.globals;
+				LuaValue function = g.load(new FileInputStream(f), f.getAbsolutePath(), "bt", g);
+				LuaDebug.LuaThread t = new LuaDebug.LuaThread(function, args.unpack(), scriptName);
+				t.start();
+			//} catch (UnsupportedEncodingException e){
+			//	e.printStackTrace();
+			//	throw new LuaError("Unable to read UTF-8 in: "+scriptName);
+			//}
 		} catch (FileNotFoundException e) {
 			Utils.logError(new LuaError("Could not find script '"+scriptName+"'"));
 			AdvancedMacros.logFunc.call(LuaValue.valueOf("&c"+"Could not find script '"+scriptName+"'"));
@@ -482,8 +534,8 @@ public class AdvancedMacros {
 		}
 	}
 	private static File getRootFolder() {
-		File defaultRoot = new File(AdvancedMacros.getMinecraft().mcDataDir,"mods/advancedMacros");
-		File f = new File(AdvancedMacros.getMinecraft().mcDataDir,"config/advancedMacros.cfg");
+		File defaultRoot = new File(AdvancedMacros.getMinecraft().gameDir,"mods/advancedMacros");
+		File f = new File(AdvancedMacros.getMinecraft().gameDir,"config/advancedMacros.cfg");
 		if(!f.exists()) {
 			try (PrintWriter pw = new PrintWriter(f)){
 				pw.write("advancedMacrosRootFolder=" +defaultRoot.toString()+"\n");

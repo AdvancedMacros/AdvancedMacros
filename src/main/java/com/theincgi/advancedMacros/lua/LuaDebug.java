@@ -61,6 +61,13 @@ public class LuaDebug extends DebugLib{
 				}
 				return;
 			}
+			/*case DONE:{ // not the case
+				synchronized (threads) {
+					threads.remove(Thread.currentThread());
+				}
+				return;
+			}*/
+			case CRASH:
 			case STOPPED:
 				synchronized (threads) {
 					threads.remove(Thread.currentThread());
@@ -69,6 +76,14 @@ public class LuaDebug extends DebugLib{
 			default:
 				break;
 			}
+
+			// TO-DO: find where thread gets nil status from
+			// nil status causes leaking; this is workaround:
+			/*if(lt.status == null) { // note: not reached by ended LuaThreads
+				synchronized (threads) {
+					threads.remove(Thread.currentThread());
+				}
+			}*/
 		}
 	}
 
@@ -141,6 +156,13 @@ public class LuaDebug extends DebugLib{
 				threads.put(t, this);
 			}
 		}
+
+		protected void unregister(Thread t){
+			synchronized (threads) {
+				threads.remove(t);
+			}
+		}
+
 		/**returns a LuaTable for controlling this thread*/
 		public LuaTable start(){
 			return start(null);
@@ -172,6 +194,7 @@ public class LuaDebug extends DebugLib{
 								Utils.logError(e);
 							}
 							LuaMutex.cleanup();
+							unregister(thread); // WD
 						}
 					});
 					thread.setName(sFunc.tojstring());
@@ -228,6 +251,8 @@ public class LuaDebug extends DebugLib{
 							e.printStackTrace();
 							Utils.logError(e);
 						}
+						LuaMutex.cleanup();
+						unregister(thread); // WD
 					}
 				});
 

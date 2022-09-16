@@ -1,0 +1,11 @@
+{
+    "required": true,
+    "compatibilityLevel": "JAVA_8",
+    "package": "com.theincgi.advancedMacros.mixin",
+    "refmap": "mixins.advancedmacros.refmap.json",
+    "mixins": [
+        "MixinChatLinesLimit",
+        "MixinLuaComponentClick"
+    ],
+    "minVersion": "0.7"
+}

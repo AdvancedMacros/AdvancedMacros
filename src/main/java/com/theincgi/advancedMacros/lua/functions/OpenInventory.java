@@ -6,6 +6,7 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
+import org.luaj.vm2_v3_0_1.lib.jse.CoerceJavaToLua;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.CallableTable;
@@ -31,6 +32,8 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.ContainerPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.IRecipe;
 
 public class OpenInventory extends ZeroArgFunction{
 	private static LuaValue mapping = LuaValue.FALSE;
@@ -81,9 +84,24 @@ public class OpenInventory extends ZeroArgFunction{
 					int slotA = args.arg1().checkint();
 					int mouseButton = args.optint(2, 0);
 					ClickType type = ClickType.PICKUP;
+					if(mouseButton==2) type = ClickType.CLONE;
 					ctrl.windowClick(wID, slotA-1, mouseButton, type, mc.player);
 				});
 				
+				return NONE;
+			}
+			case dragClick:{
+				Utils.runOnMCAndWait(()->{
+					LuaValue slots = args.arg1().checktable();
+					int mouseButton = args.optint(2, 0) == 0 ? 1 : 5;
+					ctrl.windowClick(wID, -999, mouseButton-1, ClickType.QUICK_CRAFT, mc.player);
+					for (int i = 1; i <= slots.length(); i++) {
+						int slot = slots.get(i).checkint();
+						ctrl.windowClick(wID, slot-1, mouseButton, ClickType.QUICK_CRAFT, mc.player);
+					}
+					ctrl.windowClick(wID, -999, mouseButton+1, ClickType.QUICK_CRAFT, mc.player);
+				});
+				Utils.waitTick();
 				return NONE;
 			}
 			case closeAndDrop:
@@ -99,9 +117,33 @@ public class OpenInventory extends ZeroArgFunction{
 				return NONE;
 			case quick:{
 				Utils.runOnMCAndWait(()->{
-					int slotA = args.arg1().checkint();
 					ClickType type = ClickType.QUICK_MOVE;
-					ctrl.windowClick(wID, slotA-1, 0, type, mc.player);
+					if (args.arg1().istable()) {
+						LuaTable tomove = args.arg1().checktable();
+						if (!tomove.next(LuaValue.NIL).arg1().isnil()) {
+							int idx = 1;
+							int limit = 1 + args.arg(2).optint(container.inventorySlots.inventorySlots.size());
+							LuaValue v = tomove.rawget(idx++);
+							while (!v.isnil() && idx <= limit) {
+								int slotA = v.checkint();
+								if (!container.inventorySlots.getSlot(slotA-1).getStack().isEmpty()){
+									ctrl.windowClick(wID, slotA-1, 0, type, mc.player);
+									if (!container.inventorySlots.getSlot(slotA-1).getStack().isEmpty())
+										break; // container filled up, could not move
+								}
+								v = tomove.rawget(idx++);
+							}
+						}
+					} else {
+						for (int i = 1; i <= args.narg(); i++) {
+							int slotA = args.arg(i).checkint();
+							if (!container.inventorySlots.getSlot(slotA-1).getStack().isEmpty()){
+								ctrl.windowClick(wID, slotA-1, 0, type, mc.player);
+								if (!container.inventorySlots.getSlot(slotA-1).getStack().isEmpty())
+									break; // container filled up, could not move
+							}
+						}
+					}
 				});
 				
 				return NONE;
@@ -120,12 +162,31 @@ public class OpenInventory extends ZeroArgFunction{
 				return NONE;
 			}
 			case getHeld:{
+				LuaValue opt = args.arg(2);
 				ItemStack held = mc.player.inventory.getItemStack();
-				return Utils.itemStackToLuatable(held);
+				if(opt.isnil() || (opt.isboolean() && opt.checkboolean() == false))
+					return Utils.itemStackToLuatable(held);
+				else
+					return CoerceJavaToLua.coerce(held);
 			}
 			case getSlot:{
+				LuaValue opt = args.arg(2);
 				int slotA = args.arg1().checkint();
-				return Utils.itemStackToLuatable( container.inventorySlots.getSlot(slotA-1).getStack() );
+				ItemStack item = container.inventorySlots.getSlot(slotA-1).getStack();
+				if(opt.isnil() || (opt.isboolean() && opt.checkboolean() == false))
+					return Utils.itemStackToLuatable(item);
+				else
+					return CoerceJavaToLua.coerce(item);
+			}
+			case drop:{
+				Utils.runOnMCAndWait(()->{
+					int slotA = args.arg1().checkint();
+					boolean stack = args.optboolean(2, false);
+					ClickType type = ClickType.THROW;
+					ctrl.windowClick(wID, slotA-1, stack?1:0, type, mc.player);
+				});
+				Utils.waitTick();
+				return NONE;
 			}
 			case swap:{
 				Utils.runOnMCAndWait((Runnable)()->{
@@ -149,13 +210,34 @@ public class OpenInventory extends ZeroArgFunction{
 				
 				return NONE;
 			}
+			case hotSwap:{ //TODO add swap for currently held
+				Utils.runOnMCAndWait(()->{
+					int slotA = args.arg1().checkint();
+					int hotbarSlot = args.arg(2).checkint();
+					ClickType type = ClickType.SWAP;
+					ctrl.windowClick(wID, slotA-1, hotbarSlot-1, type, mc.player);
+				});
+				Utils.waitTick();
+				return NONE;
+			}
 			case grabAll:{
 				Utils.runOnMCAndWait(()->{
 					int slotA = args.checkint(1);
-					ctrl.windowClick(wID, slotA-1, 1, ClickType.PICKUP, mc.player);
-					ctrl.windowClick(wID, slotA-1, 1, ClickType.PICKUP_ALL, mc.player);
+					ctrl.windowClick(wID, slotA-1, 0, ClickType.PICKUP, mc.player);
+					ctrl.windowClick(wID, slotA-1, 0, ClickType.PICKUP_ALL, mc.player);
 				});
 				
+				return NONE;
+			}
+			case setRecipe:{
+				Utils.runOnMCAndWait(()->{
+					int id = args.checkint(1);
+					boolean makeAll = args.optboolean(2, false);
+					IRecipe r = CraftingManager.getRecipeById(id);
+					// TODO sanity check if recipe fits crafting grid
+					ctrl.func_194338_a(wID, r, makeAll, mc.player);
+				});
+				Utils.waitTick();
 				return NONE;
 			}
 			case getType:
@@ -207,15 +289,19 @@ public class OpenInventory extends ZeroArgFunction{
 	private static enum OpCode {
 		close,
 		closeAndDrop,
+		drop,
 		swap,
+		hotSwap,
 		split,
 		getHeld,
 		getSlot,
 		quick,
 		grabAll,
+		setRecipe,
 		getType,
 		getTotalSlots,
 		click,
+		dragClick,
 		getMap;
 
 		public String[] getDocLocation() {

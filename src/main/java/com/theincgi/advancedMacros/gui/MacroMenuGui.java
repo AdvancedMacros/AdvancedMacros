@@ -1,11 +1,16 @@
 package com.theincgi.advancedMacros.gui;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
@@ -298,10 +303,19 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 							File f = new File(AdvancedMacros.macrosFolder, b.getScriptName());
 							if(f.exists() && f.isFile()) {
 								try {
-									FileReader fr = new FileReader(f);
-									LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
-									LuaDebug.LuaThread t = new LuaDebug.LuaThread(function, args, b.getScriptName());
-									t.start(onScriptFinish);
+									//FileReader fr = new FileReader(f);
+									//try{
+										//BufferedReader fr = new BufferedReader(
+										//	new InputStreamReader( new FileInputStream(f), "UTF8")
+										//);
+										Globals g = AdvancedMacros.globals;
+										LuaValue function = g.load(new FileInputStream(f), f.getAbsolutePath(), "bt", g);
+										LuaDebug.LuaThread t = new LuaDebug.LuaThread(function, args, b.getScriptName());
+										t.start(onScriptFinish);
+									//} catch (UnsupportedEncodingException e){
+									//	e.printStackTrace();
+									//	throw new LuaError("Unable to read UTF-8 in: "+b.getScriptName());
+									//}
 								} catch (FileNotFoundException e) {
 									e.printStackTrace();
 								}catch (LuaError le){

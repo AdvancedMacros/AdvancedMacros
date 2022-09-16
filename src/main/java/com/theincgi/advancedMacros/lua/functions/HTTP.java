@@ -3,10 +3,16 @@ package com.theincgi.advancedMacros.lua.functions;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+
+import org.apache.commons.io.IOUtils;
 
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
@@ -74,7 +80,11 @@ public class HTTP extends OneArgFunction{
 			this.set("getContentType", new ZeroArgFunction() {
 				@Override
 				public LuaValue call() {
-					return LuaValue.valueOf(conn.getContentType());
+					try {
+						return LuaValue.valueOf(conn.getContentType());
+					} catch(Exception e) {
+						return LuaValue.valueOf("none");
+					}
 				}
 			});
 			this.set("getContentEncoding", new ZeroArgFunction() {
@@ -100,6 +110,31 @@ public class HTTP extends OneArgFunction{
 				public LuaValue call() {
 					conn.disconnect();
 					return LuaValue.NONE;
+				}
+			});
+			this.set("getHeaderFields", new ZeroArgFunction() {
+				@Override
+				public LuaValue call() {
+					System.out.println(conn.getHeaderFields().toString());
+					LuaTable t = new LuaTable();
+					try{
+						conn.getHeaderFields().forEach((String field, List<String> value) -> 
+						{
+							String s = value.get(0);
+							if (field==null)
+								t.set("http",s);
+							else if (value.size() == 1)
+								t.set(field,s);
+							else{
+								LuaTable u = new LuaTable();
+								for(int i=0, j=1; j<value.size(); j++)
+									u.set(i++,value.get(j));
+								t.set(field,u);
+							}
+						});
+						return t;
+					}catch(Exception e) { e.printStackTrace(); }
+					return LuaValue.FALSE;
 				}
 			});
 		}
@@ -171,6 +206,16 @@ public class HTTP extends OneArgFunction{
 					return LuaValue.NONE;
 				}
 			});
+			this.set("getContent", new ZeroArgFunction() {
+				@Override
+				public LuaValue call() {
+					try {
+						// return LuaValue.valueOf(IOUtils.toString(in,Charset.forName(charset.optjstring("UTF-8"))));
+						return LuaValue.valueOf(IOUtils.toByteArray(in));
+					} catch (IOException e) {}
+					return LuaValue.NONE;
+				}
+			});
 		}
 		
 	}
@@ -211,7 +256,7 @@ public class HTTP extends OneArgFunction{
 				@Override
 				public LuaValue call(LuaValue arg) {
 					try {
-						out.write(arg.checkjstring().getBytes());
+						out.write(arg.checkstring().m_bytes);
 					} catch (IOException e) {
 						throw new LuaError("IOException occurred");
 					}
@@ -222,7 +267,8 @@ public class HTTP extends OneArgFunction{
 				@Override
 				public LuaValue call(LuaValue arg) {
 					try {
-						out.write((arg.checkjstring()+"\n").getBytes());
+						out.write(arg.checkstring().m_bytes);
+						out.write('\n');
 					} catch (IOException e) {
 						throw new LuaError("IOException occurred");
 					}

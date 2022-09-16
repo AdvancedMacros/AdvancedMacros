@@ -1,10 +1,15 @@
 package com.theincgi.advancedMacros.event;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -15,7 +20,9 @@ import java.util.List;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarFile;
+import java.util.Collection;
 
+import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
 import org.luaj.vm2_v3_0_1.LuaTable;
@@ -27,6 +34,8 @@ import org.luaj.vm2_v3_0_1.lib.jse.LuajavaLib;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
+
+import com.mojang.authlib.GameProfile;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.gui.Gui;
@@ -53,6 +62,7 @@ import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.GlStateManager.CullFace;
@@ -87,6 +97,7 @@ import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.SaveToFile;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.ASMEventHandler;
 import net.minecraftforge.fml.common.eventhandler.Event;
@@ -116,12 +127,13 @@ public class ForgeEventHandler {
 	int[] lastArmourDurability = new int[4];
 	int lastXP, lastXPLevel;
 	int lastDim;
+	boolean worldChanged = false; // sameDim
 	boolean wasRaining, wasThundering;
 	/**Keeping this syncronized!*/
 	private LinkedList<WorldHudItem> worldHudItems = new LinkedList<>();
 	private LinkedList<Hud2DItem> hud2DItems = new LinkedList<>();
 	private int sTick = 0; private Object sTickSync = new Object();
-	private ConcurrentHashMap<String, Boolean> lastPlayerList;
+	private ConcurrentHashMap<String, Boolean> lastPlayerList = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<String, Boolean> nowPlayerList = new ConcurrentHashMap<>();
 	public WeakHashMap<Entity, RenderFlags> entityRenderFlags = new WeakHashMap<>();
 	private boolean wasOnFire = false;
@@ -262,7 +274,7 @@ public class ForgeEventHandler {
 	}
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onPlayerTick(TickEvent.PlayerTickEvent event){
+	public void onPlayerTick(TickEvent.ClientTickEvent event){
 		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) 
 			return; //lik srsly
 		if(event.phase.equals(TickEvent.Phase.START)) return; //only do on the second half of tick after all stuff happens
@@ -303,12 +315,13 @@ public class ForgeEventHandler {
 			playerWasNull=false;
 		}
 
-		if(player.dimension != lastDim) {
+		if(worldChanged || player.dimension != lastDim) {
 			LuaTable e = createEvent(EventName.DimensionChanged);
 			e.set(3, LuaValue.valueOf(player.dimension));
 			e.set(4, LuaValue.valueOf(lastDim));
 			fireEvent(EventName.DimensionChanged, e);
 			lastDim = player.dimension;
+			worldChanged = false;
 		}
 		if(player.isPlayerSleeping() != lastSleepingState) {
 			if(player.isPlayerSleeping())
@@ -614,13 +627,39 @@ public class ForgeEventHandler {
 		e.set(3, Utils.itemStackToLuatable(event.getStack()));
 		fireEvent(EventName.ItemPickup, e);
 	}
+	//@SubscribeEvent @SideOnly(Side.CLIENT)
+	//public void onDimChange(PlayerEvent.PlayerChangedDimensionEvent event) { //DEAD //FIXME
+		//if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
+		//LuaTable e = createEvent(EventName.DimensionChanged);
+		//e.set(3, LuaValue.valueOf(event.toDim));
+		//e.set(4, LuaValue.valueOf(event.fromDim));
+		//fireEvent(EventName.DimensionChanged, e);
+	//}
 	@SubscribeEvent @SideOnly(Side.CLIENT)
-	public void onDimChange(PlayerEvent.PlayerChangedDimensionEvent event) { //DEAD //FIXME
-		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return; 
-		LuaTable e = createEvent(EventName.DimensionChanged);
-		e.set(3, LuaValue.valueOf(event.toDim));
-		e.set(4, LuaValue.valueOf(event.fromDim));
-		fireEvent(EventName.DimensionChanged, e);
+	public void worldChangedUnload(WorldEvent.Unload event) { 
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return;
+		//WorldClient newWorld = AdvancedMacros.getMinecraft().world;
+		//worldChanged = newWorld != null && event.getWorld() != null;
+		//System.out.println("UNLOADED_"+event.getWorld().toString());
+		//System.out.println("UNLOADED_"+from.toString());
+		//System.out.println("worldChanged "+worldChanged);
+		/*if (worldChanged){
+			EntityPlayerSP player = AdvancedMacros.getMinecraft().player;
+			if(player != null) {
+				lastDim = player.dimension;
+			}
+		}*/
+		worldChanged = true;
+	}
+	@SubscribeEvent @SideOnly(Side.CLIENT)
+	public void worldChangedLoad(WorldEvent.Load event) { 
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER) return;
+		if (!worldChanged){
+			EntityPlayerSP player = AdvancedMacros.getMinecraft().player;
+			if(player != null) {
+				lastDim = player.dimension;
+			}
+		}
 	}
 	@SubscribeEvent @SideOnly(Side.CLIENT)
 	public void onCraft(PlayerEvent.ItemCraftedEvent event) { //CONFIRMED MP
@@ -676,6 +715,9 @@ public class ForgeEventHandler {
 		//			} catch (IOException e) {e.printStackTrace();}
 		//		});
 		//		t.start();
+
+		lastDim = 0;
+		worldChanged = false; // suppreses triggering from past servers
 
 		LuaTable e = createEvent(EventName.JoinWorld);
 		e.set(3, event.getConnectionType()); //yeilded modded
@@ -842,8 +884,12 @@ public class ForgeEventHandler {
 			args.set(3, controls);
 			args.set(4, name);
 
-
-			fireEvent(EventName.GUIOpened, args);
+			try {
+				fireEvent(EventName.GUIOpened, args);
+			} catch (Throwable e) {
+				// prevents crashes from pointing to AM
+				e.printStackTrace();
+			}
 
 		}
 	}
@@ -930,7 +976,7 @@ public class ForgeEventHandler {
 			thisMessageIndex = messageIndex++;
 		}
 		
-		System.out.println("Got " + event.getMessage().getUnformattedText() + " as " + thisMessageIndex);
+		//System.out.println("Got " + event.getMessage().getUnformattedText() + " as " + thisMessageIndex);
 		
 		final LinkedList<String> toRun = AdvancedMacros.macroMenuGui.getMatchingScripts(false, EventName.ChatFilter.name(), false);
 		JavaThread t = new JavaThread(()->{
@@ -959,15 +1005,28 @@ public class ForgeEventHandler {
 				File f = new File(AdvancedMacros.macrosFolder, script);
 				if(f.exists() && f.isFile()) {
 					try {
-						FileReader fr = new FileReader(f);
-						Thread.currentThread().setName("ChatFilter - " + script);
-						LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
-						Varargs ret = function.invoke(e2.unpack());
-						if(!ret.toboolean(1)) 
-							return;
-						e2 = createEvent(EventName.ChatFilter);
-						for(int i = 1; i<= ret.narg(); i++)
-							e2.set(2+i, ret.arg(i));
+						// try{
+							//FileReader fr = new FileReader(f);
+							//BufferedReader fr = new BufferedReader(
+							//	new InputStreamReader( new FileInputStream(f), "UTF8")
+							//);
+							Thread.currentThread().setName("ChatFilter - " + script);
+							Globals g = AdvancedMacros.globals;
+							LuaValue function = g.load(new FileInputStream(f), f.getAbsolutePath(), "bt", g);
+							Varargs ret = function.invoke(e2.unpack());
+							if(!ret.toboolean(1)){
+								synchronized (messageCounterLock) { // WD was here
+									nextMessageToAddToChat = Math.max(thisMessageIndex+1, nextMessageToAddToChat);
+								}
+								return;
+							}
+							e2 = createEvent(EventName.ChatFilter);
+							for(int i = 1; i<= ret.narg(); i++)
+								e2.set(2+i, ret.arg(i));
+						//} catch (UnsupportedEncodingException ex){
+						//	ex.printStackTrace();
+						//	throw new LuaError("Unable to read UTF-8 in: "+script);
+						//}
 					} catch (FileNotFoundException ex) {
 						ex.printStackTrace();
 					}catch (LuaError le){
@@ -1000,7 +1059,7 @@ public class ForgeEventHandler {
 				try {Thread.sleep(50);}catch(Exception ex) {}
 			}
 			
-			System.out.println("Adding msg "+thisMessageIndex);
+			//System.out.println("Adding msg "+thisMessageIndex);
 			if(e2.get(3).toboolean()) {
 				//AdvancedMacros.logFunc.invoke(e2.unpack().subargs(3));
 				Pair<ITextComponent, Varargs> text = Utils.toTextComponent(e2.unpack().arg(3).checkjstring(), e2.unpack().subargs(4), true);
@@ -1032,15 +1091,24 @@ public class ForgeEventHandler {
 				File f = new File(AdvancedMacros.macrosFolder, script);
 				if(f.exists() && f.isFile()) {
 					try {
-						FileReader fr = new FileReader(f);
-						Thread.currentThread().setName("ChatSendFilter - " + script);
-						LuaValue function = AdvancedMacros.globals.load(fr, f.getAbsolutePath());
-						Varargs ret = function.invoke(e.unpack());
-						if(!ret.toboolean(1)) 
-							return;
-						e = createEvent(EventName.ChatSendFilter);
-						for(int i = 1; i<= ret.narg(); i++)
-							e.set(2+i, ret.arg(i));
+						//try{
+							//FileReader fr = new FileReader(f);
+							//BufferedReader fr = new BufferedReader(
+							//	new InputStreamReader( new FileInputStream(f), "UTF8")
+							//);
+							Thread.currentThread().setName("ChatSendFilter - " + script);
+							Globals g = AdvancedMacros.globals;
+							LuaValue function = g.load(new FileInputStream(f), f.getAbsolutePath(), "bt", g);
+							Varargs ret = function.invoke(e.unpack());
+							if(!ret.toboolean(1)) 
+								return;
+							e = createEvent(EventName.ChatSendFilter);
+							for(int i = 1; i<= ret.narg(); i++)
+								e.set(2+i, ret.arg(i));
+						//} catch (UnsupportedEncodingException ex){
+						//	ex.printStackTrace();
+						//	throw new LuaError("Unable to read UTF-8 in: "+script);
+						//}
 					} catch (FileNotFoundException ex) {
 						ex.printStackTrace();
 					}catch (LuaError le){
@@ -1106,13 +1174,11 @@ public class ForgeEventHandler {
 	private void forceSendMsg(String msg, boolean addToChat) {
 		Minecraft mc = AdvancedMacros.getMinecraft();
 		if (msg.isEmpty()) return;
-		if (addToChat)
-		{
-			mc.ingameGUI.getChatGUI().addToSentMessages(msg);
-		}
-		if (net.minecraftforge.client.ClientCommandHandler.instance.executeCommand(mc.player, msg) != 0) return;
-
-		mc.player.sendChatMessage(msg);
+		AdvancedMacros.getMinecraft().addScheduledTask(() -> {
+			if (addToChat) mc.ingameGUI.getChatGUI().addToSentMessages(msg);
+			if (net.minecraftforge.client.ClientCommandHandler.instance.executeCommand(mc.player, msg) != 0) return;
+			mc.player.sendChatMessage(msg);
+		});
 	}
 
 	@SubscribeEvent @SideOnly(Side.CLIENT)
@@ -1213,7 +1279,7 @@ public class ForgeEventHandler {
 
 		//src color -> src color?
 		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-
+		GlStateManager.pushMatrix();
 
 		//GlStateManager.enableLighting();
 
@@ -1229,6 +1295,7 @@ public class ForgeEventHandler {
 				worldHudItem.render(accuPlayerX(p, player), accuPlayerY(p, player), accuPlayerZ(p, player));
 			}
 		}
+		GlStateManager.popMatrix();
 		GlStateManager.disableBlend();//F1 is black otherwise
 		GlStateManager.popAttrib();
 	}
@@ -1468,22 +1535,20 @@ public class ForgeEventHandler {
 
 	private void populatePlayerList(ConcurrentHashMap<String, Boolean> map) {
 		Minecraft mc = AdvancedMacros.getMinecraft();
-		Iterator<NetworkPlayerInfo> iter = mc.getConnection().getPlayerInfoMap().iterator();
-		while(iter.hasNext()) {
-			NetworkPlayerInfo playerInfo = iter.next();
-			String name = mc.ingameGUI.getTabList().getPlayerName(playerInfo);
-			String formated   = name
-					.replaceAll("&", "&&")
-					.replaceAll("\u00A7", "&")
-					.replaceAll("&k", "&O") //Obfuscated
-					.replaceAll("&l", "&B") //Bold
-					.replaceAll("&m", "&S") //Strikethru
-					.replaceAll("&o", "&I") //Italics
-					.replaceAll("&r", "&f")   //reset (to white in this case)
-					;
-			if(name!=null)
-				map.put(formated.replaceAll("&[^&]", "").replaceAll("&&", "&"), true);
-		}
+		Collection<NetworkPlayerInfo> coll = mc.getConnection().getPlayerInfoMap();
+		coll.forEach( (NetworkPlayerInfo playerInfo) -> { // WD
+			//ITextComponent disp = playerInfo.getDisplayName();
+			//if( disp != null ) {
+				//String name = disp.getUnformattedText();
+				GameProfile player = playerInfo.getGameProfile();
+				if( player.getId().version() != 2 ){ // exclude bots
+					//if( !Character.isWhitespace(name.charAt(0)) )
+					String s = player.getName();
+					if( !s.isEmpty() && s.charAt(0) != '!' )
+						map.put( s, true);
+				}
+			//}
+		});
 	}
 
 	//private LinkedList<HeldKeybinds> heldKeybinds = new LinkedList<>();
