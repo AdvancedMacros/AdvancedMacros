@@ -220,13 +220,23 @@ public class OpenInventory extends ZeroArgFunction{
 				
 				return NONE;
 			}
+			case hotSwap:{ //TODO add swap for currently held
+				Utils.runOnMCAndWait(()->{
+					int slotA = args.arg1().checkint();
+					int hotbarSlot = args.arg(2).checkint();
+					ClickType type = ClickType.SWAP;
+					ctrl.windowClick(wID, slotA-1, hotbarSlot-1, type, mc.player);
+				});
+				Utils.waitTick();
+				return NONE;
+			}
 			case grabAll:{
 				Utils.runOnMCAndWait(()->{
 					int slotA = args.checkint(1);
 					ctrl.windowClick(wID, slotA-1, 0, ClickType.PICKUP, mc.player);
 					ctrl.windowClick(wID, slotA-1, 0, ClickType.PICKUP_ALL, mc.player);
 				});
-				Utils.waitTick();
+				
 				return NONE;
 			}
 			case setRecipe:{
@@ -237,7 +247,7 @@ public class OpenInventory extends ZeroArgFunction{
 					// TODO sanity check if recipe fits crafting grid
 					ctrl.func_194338_a(wID, r, makeAll, mc.player);
 				});
-				
+				Utils.waitTick();
 				return NONE;
 			}
 			case getType:
