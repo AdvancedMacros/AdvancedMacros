@@ -218,15 +218,6 @@ public class OpenInventory extends ZeroArgFunction{
 					ctrl.windowClick(wID, slotA-1, hotbarSlot-1, type, mc.player);
 				});
 				
-				return NONE;
-			}
-			case hotSwap:{ //TODO add swap for currently held
-				Utils.runOnMCAndWait(()->{
-					int slotA = args.arg1().checkint();
-					int hotbarSlot = args.arg(2).checkint();
-					ClickType type = ClickType.SWAP;
-					ctrl.windowClick(wID, slotA-1, hotbarSlot-1, type, mc.player);
-				});
 				Utils.waitTick();
 				return NONE;
 			}
