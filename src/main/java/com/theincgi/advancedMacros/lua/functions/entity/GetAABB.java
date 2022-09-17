@@ -86,7 +86,7 @@ public class GetAABB {
 		}
 	}
 
-	private static class AABB extends LuaTable {
+	protected static class AABB extends LuaTable {
 		AxisAlignedBB aabb;
 		Entity entity;
 		public AABB(AxisAlignedBB aabb, Entity e) {this(aabb); entity = e;}
