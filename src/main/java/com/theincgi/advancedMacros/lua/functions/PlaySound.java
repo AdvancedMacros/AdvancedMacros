@@ -25,7 +25,6 @@ import org.luaj.vm2_v3_0_1.lib.jse.CoerceJavaToLua;
 
 import com.theincgi.advancedMacros.AdvancedMacros;
 
-@Deprecated
 public class PlaySound {
 	public static class FromFile extends OneArgFunction{
 

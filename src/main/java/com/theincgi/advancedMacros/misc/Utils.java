@@ -21,8 +21,10 @@ import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaUserdata;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
+import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
+import org.luaj.vm2_v3_0_1.lib.jse.CoerceJavaToLua;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.theincgi.advancedMacros.AdvancedMacros;
@@ -1414,7 +1416,18 @@ public class Utils {
 		case MISS:
 			return LuaValue.FALSE;
 		case ENTITY:
-			result.set("entity", Utils.entityToTable(rtr.entityHit));
+			result.set("entityID", rtr.entityHit.getEntityId());
+			final int id = rtr.entityHit.getEntityId();
+			result.set("getEntityInfo", new OneArgFunction() {	
+				@Override public LuaValue call(LuaValue coerce) {
+					Entity e = AdvancedMacros.getMinecraft().world.getEntityByID(id);
+					if(e==null) {return LuaValue.FALSE;}
+					if( !coerce.optboolean(false) )
+						return Utils.entityToTable(e);
+					else
+						return CoerceJavaToLua.coerce(e);
+				}
+			});
 			break;
 		case BLOCK:
 			BlockPos pos = rtr.getBlockPos();

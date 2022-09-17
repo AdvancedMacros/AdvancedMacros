@@ -12,6 +12,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -79,6 +80,7 @@ import com.theincgi.advancedMacros.lua.functions.SkinCustomizer;
 import com.theincgi.advancedMacros.lua.functions.StopAllScripts;
 import com.theincgi.advancedMacros.lua.functions.StringTrim;
 import com.theincgi.advancedMacros.lua.functions.Toast;
+import com.theincgi.advancedMacros.lua.functions.entity.CreateAABB;
 import com.theincgi.advancedMacros.lua.functions.entity.GetAABB;
 import com.theincgi.advancedMacros.lua.functions.entity.GetEntityData;
 import com.theincgi.advancedMacros.lua.functions.entity.GetEntityList;
@@ -104,8 +106,6 @@ import com.theincgi.advancedMacros.publicInterfaces.LuaPlugin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -115,7 +115,6 @@ import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -133,7 +132,7 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "7.10.0"; //${version} ??
+	public static final String VERSION = "7.11.0"; //${version} ??
 	public static final String GAME_VERSION = "1.12.2";
 	
 	public static final File macrosRootFolder = getRootFolder();
@@ -177,6 +176,9 @@ public class AdvancedMacros {
 			macrosFolder.mkdirs();
 			macroSoundsFolder.mkdirs();
 			customDocsFolder.mkdirs();
+			
+			new File(macrosFolder,"libs").mkdirs();//this is in require search path
+			
 			modKeybind = new KeyBinding("Bindings Menu", Keyboard.KEY_L, "AdvancedMacros");
 			advMacrosModContainer = Loader.instance().activeModContainer();
 			MinecraftForge.EVENT_BUS.register(forgeEventHandler = new ForgeEventHandler());
@@ -349,6 +351,7 @@ public class AdvancedMacros {
 		globals.set("getEntity", new GetEntityData());
 		globals.set("getEntityNBT", new GetNBT());
 		globals.set("getBoundingBox", new GetAABB().getFunc()); 
+		globals.set("newAABB", new CreateAABB());
 		globals.set("highlightEntity", new CallableTable(new String[] {"highlightEntity"}, new HighlightEntity()));
 		
 		globals.set("getScreen", new GetScreen());
@@ -361,6 +364,7 @@ public class AdvancedMacros {
 		
 		
 		globals.set("rayTrace", RayTrace.getFunc());
+		globals.set("entityRayTrace", new RayTrace.EntityRayTrace() );
 
 		(actions = new Action()).getKeybindFuncts(globals);
 		globals.set("getInventory", new GetInventory());
@@ -446,43 +450,28 @@ public class AdvancedMacros {
 	
 	
 	private void loadScripts() {
-		try {
-			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/searcher.lua")).getInputStream();
-			globals.load(in, "searcher", "t", globals).call();
-			in.close();
-		} catch (Throwable e) {
-			e.printStackTrace();
+		String[] scripts = new String[] {
+			"searcher",
+			"settings_fix",
+			"morefunc",
+			"easings",
+			"httpquick",
+			"class",
+			"utils"
+		};
+		for( String script : scripts ) {
+			try {
+				InputStream in = getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/"+script+".lua")).getInputStream();
+				globals.load(in, script, "t", globals).call();
+				in.close();
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}			
 		}
+		
+		//REPL is different, result saved to variable
 		try {
-			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/settings_fix.lua")).getInputStream();
-			globals.load(in, "settingsFix", "t", globals).call();
-			in.close();
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-		try {
-			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/morefunc.lua")).getInputStream();
-			globals.load(in, "moreFunctions", "t", globals).call();
-			in.close();
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-		try {
-			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/easings.lua")).getInputStream();
-			globals.load(in, "easings", "t", globals).call();
-			in.close();
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-		try {
-			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/httpquick.lua")).getInputStream();
-			globals.load(in, "httpQuick", "t", globals).call();
-			in.close();
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-		try {
-			InputStream in = AdvancedMacros.getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/repl.lua")).getInputStream();
+			InputStream in = getMinecraft().getResourceManager().getResource(new ResourceLocation(AdvancedMacros.MODID, "scripts/repl.lua")).getInputStream();
 			repl = globals.load(in, "REPL", "t", globals);
 			in.close();
 		} catch (Throwable e) {
