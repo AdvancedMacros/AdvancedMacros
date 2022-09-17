@@ -75,13 +75,13 @@ function newClass( className, baseClass )
           if #values > 0 then return table.unpack( values ) end
           local indexer = this.__index
           if type( indexer ) == "function" then
-            return indexer( t, k )
+            return indexer( self, t, k )
           else
             return indexer[ k ]
           end
         end
       else
-        meta[ name ] = self[ name ]
+        meta[ name ] = function(...) self[ name ](self, ...) end
       end
     end
   end
