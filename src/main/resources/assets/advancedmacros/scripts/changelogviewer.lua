@@ -17,6 +17,14 @@ local changeLog = {
   "A clickable link can be found in the Mods menu in this mod's description",
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
+  "&aBug fixes",
+  " - Missing credit",
+  " - entityRayTrace now allows for just yaw or pitch",
+  " - Fixed &aopenInventory&f().&bgetHeld&f(true) instead needing to be .&bgetHeld&f(nil, true)"
+  
+  "&7"..DIVIDER,
+  
+
   "&bFeatures:",
   " - Added getter for &dItemStack&f in &aopenInventory", --check
   " - Added getter for &dEntity&f in &egetEntity", --check

@@ -132,7 +132,7 @@ public class AdvancedMacros {
 	/**advancedMacros*/
 	public static final String MODID = "advancedmacros";
 
-	public static final String VERSION = "7.11.0"; //${version} ??
+	public static final String VERSION = "7.11.1"; //${version} ??
 	public static final String GAME_VERSION = "1.12.2";
 	
 	public static final File macrosRootFolder = getRootFolder();
