@@ -18,9 +18,8 @@ local changeLog = {
   "&7"..DIVIDER, --keep
   "&b&BChange Log: &7version ".._MOD_VERSION, --do not remove
   "&aBug fixes",
-  " - Missing credit",
   " - entityRayTrace now allows for just yaw or pitch",
-  " - Fixed &aopenInventory&f().&bgetHeld&f(true) instead needing to be .&bgetHeld&f(nil, true)"
+  " - Fixed &aopenInventory&f().&bgetHeld&f(true) instead needing to be .&bgetHeld&f(nil, true)",
   
   "&7"..DIVIDER,
   
