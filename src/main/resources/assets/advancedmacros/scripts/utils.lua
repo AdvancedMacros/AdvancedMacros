@@ -477,13 +477,17 @@ end
 function utils.typeMatches( value, options )
   local typeName = type(value)
   for _, opt in ipairs(options) do
-    if typeName == opt then return true end
-    if opt:sub(1,6) == "class:" then
-      local cName = opt:sub(7)
-      local ok, cl = pcall( require,  cName )
-      if ok and isClass( cl ) then
-        if value:isA( cl ) then
-          return true
+    if isClass(value) and isClass( opt ) then
+      value:isA( opt )
+    else
+      if typeName == opt then return true end
+      if opt:sub(1,6) == "class:" then
+        local cName = opt:sub(7)
+        local ok, cl = pcall( require,  cName )
+        if ok and isClass( cl ) then
+          if value:isA( cl ) then
+            return true
+          end
         end
       end
     end

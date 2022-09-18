@@ -162,7 +162,7 @@ public class OpenInventory extends ZeroArgFunction{
 				return NONE;
 			}
 			case getHeld:{
-				LuaValue opt = args.arg(2);
+				LuaValue opt = args.arg(1);
 				ItemStack held = mc.player.inventory.getItemStack();
 				if(opt.isnil() || (opt.isboolean() && opt.checkboolean() == false))
 					return Utils.itemStackToLuatable(held);

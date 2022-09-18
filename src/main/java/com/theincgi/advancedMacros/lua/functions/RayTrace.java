@@ -20,6 +20,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 
@@ -106,12 +107,12 @@ public class RayTrace {
 				if( reach.isnumber() ) {
 					toVec = toVec.subtract( fromVec ).normalize().add( fromVec ); //limit to distance
 				}
-			}else if( yaw.isnumber() && pitch.isnumber() ) {
+			}else if( yaw.isnumber() || pitch.isnumber() ) {
 				//north  0  0 -1
 				//west  -1  0  0
 				toVec = new Vec3d(0, 0, -distance); //north
-				toVec = toVec.rotateYaw( (float) yaw.checkdouble() );
-				toVec = toVec.rotatePitch( (float) pitch.checkdouble() );
+				toVec = toVec.rotateYaw( (float) yaw.optdouble(MathHelper.wrapDegrees(p.rotationYaw)) );
+				toVec = toVec.rotatePitch( (float) pitch.optdouble( MathHelper.wrapDegrees(p.rotationPitch) ) );
 			} else {
 				toVec = fromVec.add( p.getLookVec().normalize().scale( distance ) );
 			}
