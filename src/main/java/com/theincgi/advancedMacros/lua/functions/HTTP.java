@@ -115,7 +115,6 @@ public class HTTP extends OneArgFunction{
 	
 	public static class LuaInputStream extends LuaTable{
 		InputStream in;
-		Scanner scanner;
 		public LuaInputStream(InputStream in) {
 			this.in = in;
 			scanner = new Scanner(in);
