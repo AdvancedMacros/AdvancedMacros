@@ -150,11 +150,9 @@ public class HTTP extends OneArgFunction{
 	
 	public static class LuaInputStream extends LuaTable{
 		InputStream in;
-		Scanner scanner;
 		public LuaInputStream(InputStream in) {
 			this.in = in;
-			scanner = new Scanner(in);
-			
+
 			this.set("readByte", new ZeroArgFunction() {
 				@Override
 				public LuaValue call() {
@@ -191,33 +189,37 @@ public class HTTP extends OneArgFunction{
 			this.set("readLine", new ZeroArgFunction() {
 				@Override
 				public LuaValue call() {
-					if(scanner.hasNextLine())
-						return LuaValue.valueOf(scanner.nextLine());
-					return LuaValue.NIL;
+					StringBuilder b = new StringBuilder();
+					try {
+						while(in.available()>0) {
+							int read;
+							
+							read = in.read();
+							
+							if(read==-1) break;
+							if(read=='\n')break;
+							b.append((char)read);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+						throw new LuaError(e);
+					}
+					return LuaValue.valueOf(b.toString());
 				}
 			});
 			this.set("close", new ZeroArgFunction() {
 				@Override
 				public LuaValue call() {
-					scanner.close();
 					try {
 						in.close();
 					} catch (IOException e) {}
 					return LuaValue.NONE;
 				}
 			});
-			this.set("getContent", new ZeroArgFunction() {
-				@Override
-				public LuaValue call() {
-					try {
-						// return LuaValue.valueOf(IOUtils.toString(in,Charset.forName(charset.optjstring("UTF-8"))));
-						return LuaValue.valueOf(IOUtils.toByteArray(in));
-					} catch (IOException e) {}
-					return LuaValue.NONE;
-				}
-			});
 		}
-		
+		public InputStream getInputStream() {
+			return in;
+		}
 	}
 	
 	public static class LuaOutputStream extends LuaTable{
@@ -256,7 +258,7 @@ public class HTTP extends OneArgFunction{
 				@Override
 				public LuaValue call(LuaValue arg) {
 					try {
-						out.write(arg.checkstring().m_bytes);
+						out.write(arg.checkjstring().getBytes());
 					} catch (IOException e) {
 						throw new LuaError("IOException occurred");
 					}
@@ -267,8 +269,7 @@ public class HTTP extends OneArgFunction{
 				@Override
 				public LuaValue call(LuaValue arg) {
 					try {
-						out.write(arg.checkstring().m_bytes);
-						out.write('\n');
+						out.write((arg.checkjstring()+"\n").getBytes());
 					} catch (IOException e) {
 						throw new LuaError("IOException occurred");
 					}
