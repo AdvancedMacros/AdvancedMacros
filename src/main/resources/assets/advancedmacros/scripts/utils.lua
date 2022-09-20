@@ -90,6 +90,7 @@ function utils.clone( x, deep )
     return x
   end
 end
+
 --for combining tables with numbered index
 function utils.append( a, b, inPlace )
   out = inPlace and a or {}
@@ -199,9 +200,6 @@ end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
-function utils.printf(fstr,...)
-  print(fstr:format(...))
-end
 
 function utils.split(text, delims)
   utils.assertType("string",text,"split",1)
@@ -279,41 +277,9 @@ function utils.autoComplete( text, allOpts )
   end
 end
 
-function utils.reduce( tbl, f, i )
-  local k = next(tbl)
-  if not k then return i end
-  if not i then
-    i = tbl[k]
-    k = next(tbl, k)
-  end
-  while k do
-    i = f(i, tbl[k])
-    k = next(tbl, k)
-  end
-  return i
-end
 
-function utils.clone( x, deep )
-  local tx = type(x)
-  if tx=="table" then
-    local g = {}
-    for a,b in pairs(x) do
-      local tb=type(b)
-      if tb=="table" then
-        if deep then
-          g[a] = utils.clone(b, deep)
-        else
-          g[a] = b
-        end
-      elseif tb~="function" then
-        g[a] = b
-      end
-    end
-    return g
-  else
-    return x
-  end
-end
+
+
 
 function utils.writeFile( str, file, append )
   local f = filesystem.open( file or "debugOutput.txt", (append == true) and "a" or "w" )
