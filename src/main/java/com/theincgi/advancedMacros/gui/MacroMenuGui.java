@@ -34,6 +34,7 @@ import com.theincgi.advancedMacros.gui.elements.PopupPrompt.Choice;
 import com.theincgi.advancedMacros.gui.elements.WidgetID;
 import com.theincgi.advancedMacros.lua.LuaDebug;
 import com.theincgi.advancedMacros.lua.OpenChangeLog;
+import com.theincgi.advancedMacros.lua.VSCDebugger;
 import com.theincgi.advancedMacros.lua.LuaDebug.OnScriptFinish;
 import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Settings;
@@ -57,6 +58,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 	GuiButton addBinding       = new GuiButton(5, 17, 36, 12, Settings.getTextureID("resource:whitenewbinding.png"), LuaValue.NIL, "bindingsMenu", "addBindingButton");
 	GuiButton showScriptManager=new GuiButton(41, 17, 36, 12, Settings.getTextureID("resource:whitescripts.png"), LuaValue.NIL, "bindingsMenu", "scriptManagerButton");
 	//whitescripts
+	GuiButton connectDebugger = new GuiButton(width-36-6-82, 17, 82, 12, Settings.getTextureID("resource:whiteconnectdebugger.png"), LuaValue.NIL, "bindingsMenu","connectDebuggerButton");
 	GuiButton openChangeLog = new GuiButton(width-36-6, 17, 37, 12, Settings.getTextureID("resource:whiteopenchangelog.png"), LuaValue.NIL, "bindingsMenu", "openChangeLog");
 	//GuiButton showScriptManager=new GuiButton(new WidgetID(5), 41, 17, 36, 12, Settings.getTextureID("resource:whitescripts.png"), LuaValue.NIL, propAddress, Color.BLACK, Color.WHITE, Color.WHITE); //file browser thing, no folders tho, all macros are in /macros, this will be sepereate gui housing the script manager
 	//GuiButton gotoSettings	  = new GuiButton(new WidgetID(6), width-5-36, 17, 36, 12, Settings.getTextureID("resource:whitesettings.png"), LuaValue.NIL, null, Color.BLACK, Color.WHITE, Color.BLACK);
@@ -183,6 +185,13 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 			}
 		});
 		
+		connectDebugger.setOnClick(new OnClickHandler() {
+			@Override
+			public void onClick(int button, GuiButton sButton) {
+				VSCDebugger.openConnectionGui();
+			}
+		});
+		
 		openChangeLog.setOnClick(new OnClickHandler() {
 			@Override
 			public void onClick(int button, GuiButton sButton) {
@@ -197,6 +206,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 		addInputSubscriber(showScriptManager);
 		//inputSubscribers.add(gotoSettings);
 		addInputSubscriber(addBinding);
+		addInputSubscriber(connectDebugger);
 		addInputSubscriber(openChangeLog);
 
 		addDrawable(bindingsList);
@@ -206,6 +216,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 		addDrawable(showScriptManager);
 		//drawables.add(gotoSettings);
 		addDrawable(addBinding);
+		addDrawable(connectDebugger);
 		addDrawable(openChangeLog);
 
 		//updateProfileList();
@@ -406,6 +417,10 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 		profileSelect.setPos(5, 5);
 		profileSelect.setWidth(w-35);
 		profileSelect.setMaxHeight(h/2);
+		
+		connectDebugger.setX(width-36-6-82);
+		connectDebugger.setWidth(82);
+		
 		openChangeLog.setPos(width -36-6, 17);
 		openChangeLog.setWidth(37);
 		
