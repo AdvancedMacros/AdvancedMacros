@@ -111,7 +111,8 @@ dependencies {
 
 //    compile 'org.spongepowered:mixin:0.8.3'
 //    annotationProcessor 'org.spongepowered:mixin:0.8:processor'
-	compile group: 'com.corundumstudio.socketio', name: 'netty-socketio', version: '1.7.19'
+	//compile group: 'com.corundumstudio.socketio', name: 'netty-socketio', version: '1.7.19'
+	compile group: 'io.socket', name: 'socket.io-client', version: '2.1.0'
 	
     embed('org.spongepowered:mixin:0.8.3') {
         // Mixin includes a lot of dependencies that are too up-to-date

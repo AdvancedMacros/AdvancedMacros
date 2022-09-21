@@ -4,7 +4,14 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -22,9 +29,12 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 import org.luaj.vm2_v3_0_1.lib.jse.CoerceJavaToLua;
+import org.xml.sax.InputSource;
 
-
+import com.theincgi.advancedMacros.AdvancedMacros;
 import com.theincgi.advancedMacros.misc.Utils;
+
+import net.minecraft.util.ResourceLocation;
 
 public class GetSound extends OneArgFunction{
 	@Override
@@ -147,4 +157,29 @@ public class GetSound extends OneArgFunction{
 			}
 		}
 	}
+	
+	
+	public static void copyResourceSounds() throws IOException, URISyntaxException {
+		URL url = GetSound.class.getResource("/assets/advancedMacros/sounds/blip.wav");
+		
+		URI uri = new File(url.getFile()).getParentFile().toURI();
+		Path path = Paths.get( uri );
+		String root = path.toString();
+		
+		Files.walk(path, 3).forEach((p)->{
+			String name = p.toString().substring(root.length());
+			if(name.isEmpty()) return;
+			File target = new File(AdvancedMacros.macroSoundsFolder, name);
+			File src = p.toFile();
+			if(!target.exists() && src.isFile()) {
+				target.getParentFile().mkdirs();
+				try(FileOutputStream fos = new FileOutputStream(target)) {
+					Files.copy(p, fos);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+	
 }
