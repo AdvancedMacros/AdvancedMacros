@@ -211,7 +211,7 @@ public class LuaFunctions {
 		for(LuaValue k : t.keys()){
 			LuaValue v = t.get(k);
 			String keyText = escAND(k.tojstring());
-			if(k.type() == LuaValue.TSTRING) 
+			if(k.isstring()) 
 				keyText = "\""+keyText+"\"";
 			if(v.istable()){
 				if(antiR.indexOf(v)>=0){

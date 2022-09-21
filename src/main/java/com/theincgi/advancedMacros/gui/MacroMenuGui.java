@@ -34,7 +34,7 @@ import com.theincgi.advancedMacros.gui.elements.PopupPrompt.Choice;
 import com.theincgi.advancedMacros.gui.elements.WidgetID;
 import com.theincgi.advancedMacros.lua.LuaDebug;
 import com.theincgi.advancedMacros.lua.OpenChangeLog;
-import com.theincgi.advancedMacros.lua.VSCDebugger;
+import com.theincgi.advancedMacros.lua.LuaSocketIO;
 import com.theincgi.advancedMacros.lua.LuaDebug.OnScriptFinish;
 import com.theincgi.advancedMacros.misc.PropertyPalette;
 import com.theincgi.advancedMacros.misc.Settings;
@@ -188,7 +188,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui{
 		connectDebugger.setOnClick(new OnClickHandler() {
 			@Override
 			public void onClick(int button, GuiButton sButton) {
-				VSCDebugger.openConnectionGui();
+				LuaSocketIO.openConnectionGui();
 			}
 		});
 		

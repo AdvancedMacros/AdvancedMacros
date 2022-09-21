@@ -94,6 +94,7 @@ import com.theincgi.advancedMacros.lua.modControl.EditorControls;
 import com.theincgi.advancedMacros.lua.scriptGui.ScriptGui;
 import com.theincgi.advancedMacros.lua.util.BufferedImageControls;
 import com.theincgi.advancedMacros.lua.util.GraphicsContextControls;
+import com.theincgi.advancedMacros.lua.util.LuaJson;
 import com.theincgi.advancedMacros.lua.util.LuaMutex;
 import com.theincgi.advancedMacros.misc.CallableTable;
 import com.theincgi.advancedMacros.misc.CustomFontRenderer;
@@ -270,6 +271,7 @@ public class AdvancedMacros {
 		LuaTable editor = new LuaTable();
 		advancedMacrosTable.set("editor", editor);
 		advancedMacrosTable.set("openChangeLog", new OpenChangeLog());
+		advancedMacrosTable.set("json", LuaJson.makeLib());
 		editor.set("jumpToLine", new EditorControls.JumpToLine());
 		
 		globals.set("run", new Call());
