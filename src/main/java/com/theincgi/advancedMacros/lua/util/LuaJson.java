@@ -96,17 +96,25 @@ public class LuaJson {
 			String key = v.checkjstring(1);
 			LuaValue val = v.arg(2);
 
-			if (val.isstring())
-				out.put(key, val.checkstring());
+			
 
+			if (val.isint())
+				out.put(key, val.checkint());
+			
+			else if (val.islong())
+				out.put(key, val.checklong());
+			
 			else if (val.isnumber())
-				out.put(key, val.checknumber());
+				out.put(key, val.todouble());
 
 			else if (val.isboolean())
 				out.put(key, val.checkboolean());
 
 			else if (val.istable())
 				out.put(key, auto(val.checktable()));
+			
+			else if (val.isstring())
+				out.put(key, val.checkstring());
 		}
 
 		return out;
@@ -118,17 +126,25 @@ public class LuaJson {
 		for (int i = 1; i <= tbl.length(); i++) {
 			LuaValue val = tbl.get(i);
 
-			if (val.isstring())
-				out.put(val.checkstring());
-
+			
+			if (val.isint())
+				out.put(val.checkint());
+			
+			else if (val.islong())
+				out.put(val.checklong());
+			
 			else if (val.isnumber())
-				out.put(val.checknumber());
+				out.put(val.todouble());
 
 			else if (val.isboolean())
 				out.put(val.checkboolean());
 
 			else if (val.istable())
 				out.put(auto(val.checktable()));
+			
+			else if (val.isstring())
+				out.put(val.checkstring());
+
 		}
 		return out;
 	}

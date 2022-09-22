@@ -1,18 +1,13 @@
 package com.theincgi.advancedMacros;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Scanner;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -20,7 +15,6 @@ import java.util.jar.JarFile;
 import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaFunction;
-import org.luaj.vm2_v3_0_1.LuaNil;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaThread;
 import org.luaj.vm2_v3_0_1.LuaValue;
@@ -41,12 +35,12 @@ import com.theincgi.advancedMacros.hud.hud3D.Hud3D;
 import com.theincgi.advancedMacros.lua.DocumentationManager;
 import com.theincgi.advancedMacros.lua.LuaDebug;
 import com.theincgi.advancedMacros.lua.LuaFunctions;
+import com.theincgi.advancedMacros.lua.LuaSocketIO;
 import com.theincgi.advancedMacros.lua.OpenChangeLog;
 import com.theincgi.advancedMacros.lua.functions.Action;
 import com.theincgi.advancedMacros.lua.functions.Call;
 import com.theincgi.advancedMacros.lua.functions.Connect;
 import com.theincgi.advancedMacros.lua.functions.Disconnect;
-import com.theincgi.advancedMacros.lua.functions.entity.GetNBT;
 import com.theincgi.advancedMacros.lua.functions.FileSystem;
 import com.theincgi.advancedMacros.lua.functions.GetBiome;
 import com.theincgi.advancedMacros.lua.functions.GetBlock;
@@ -84,6 +78,7 @@ import com.theincgi.advancedMacros.lua.functions.entity.CreateAABB;
 import com.theincgi.advancedMacros.lua.functions.entity.GetAABB;
 import com.theincgi.advancedMacros.lua.functions.entity.GetEntityData;
 import com.theincgi.advancedMacros.lua.functions.entity.GetEntityList;
+import com.theincgi.advancedMacros.lua.functions.entity.GetNBT;
 import com.theincgi.advancedMacros.lua.functions.entity.HighlightEntity;
 import com.theincgi.advancedMacros.lua.functions.midi.MidiLib2;
 import com.theincgi.advancedMacros.lua.functions.minecraft.GetChunkUpdates;
@@ -97,6 +92,10 @@ import com.theincgi.advancedMacros.lua.util.GraphicsContextControls;
 import com.theincgi.advancedMacros.lua.util.LuaJson;
 import com.theincgi.advancedMacros.lua.util.LuaMutex;
 import com.theincgi.advancedMacros.misc.CallableTable;
+//import paulscode.sound.codecs.CodecIBXM;
+// Caused by: java.lang.SecurityException: class "paulscode.sound.codecs.CodecIBXM"'s 
+// signer information does not match signer information of other classes in the same package
+import com.theincgi.advancedMacros.misc.CodecIBXM; // imported into AM package
 import com.theincgi.advancedMacros.misc.CustomFontRenderer;
 import com.theincgi.advancedMacros.misc.FontRendererOverride;
 import com.theincgi.advancedMacros.misc.JarLibSearcher;
@@ -112,21 +111,15 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
 import paulscode.sound.SoundSystemConfig;
 import paulscode.sound.SoundSystemException;
 import paulscode.sound.codecs.CodecWav;
-
-//import paulscode.sound.codecs.CodecIBXM;
-// Caused by: java.lang.SecurityException: class "paulscode.sound.codecs.CodecIBXM"'s 
-// signer information does not match signer information of other classes in the same package
-import com.theincgi.advancedMacros.misc.CodecIBXM; // imported into AM package
 
 @Mod(modid = AdvancedMacros.MODID, version = AdvancedMacros.VERSION)
 public class AdvancedMacros {
@@ -272,6 +265,7 @@ public class AdvancedMacros {
 		advancedMacrosTable.set("editor", editor);
 		advancedMacrosTable.set("openChangeLog", new OpenChangeLog());
 		advancedMacrosTable.set("json", LuaJson.makeLib());
+		advancedMacrosTable.set("newSocketIO", new LuaSocketIO.NewLuaSocketIO());
 		editor.set("jumpToLine", new EditorControls.JumpToLine());
 		
 		globals.set("run", new Call());

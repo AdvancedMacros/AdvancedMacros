@@ -165,21 +165,24 @@ public class GetSound extends OneArgFunction{
 		URI uri = new File(url.getFile()).getParentFile().toURI();
 		Path path = Paths.get( uri );
 		String root = path.toString();
-		
-		Files.walk(path, 3).forEach((p)->{
-			String name = p.toString().substring(root.length());
-			if(name.isEmpty()) return;
-			File target = new File(AdvancedMacros.macroSoundsFolder, name);
-			File src = p.toFile();
-			if(!target.exists() && src.isFile()) {
-				target.getParentFile().mkdirs();
-				try(FileOutputStream fos = new FileOutputStream(target)) {
-					Files.copy(p, fos);
-				} catch (IOException e) {
-					e.printStackTrace();
+		try {
+			Files.walk(path, 3).forEach((p)->{
+				String name = p.toString().substring(root.length());
+				if(name.isEmpty()) return;
+				File target = new File(AdvancedMacros.macroSoundsFolder, name);
+				File src = p.toFile();
+				if(!target.exists() && src.isFile()) {
+					target.getParentFile().mkdirs();
+					try(FileOutputStream fos = new FileOutputStream(target)) {
+						Files.copy(p, fos);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
-			}
-		});
+			});
+		}catch (Exception e2) {
+			e2.printStackTrace();
+		}
 	}
 	
 }

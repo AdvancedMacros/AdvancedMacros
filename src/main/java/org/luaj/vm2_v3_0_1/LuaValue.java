@@ -128,6 +128,7 @@ public class LuaValue extends Varargs {
 	public static final int TNUMBER			= 3;
 	
 	/** Type enumeration constant for lua strings */
+	public static final int TSTRING         = 4;
 	
 	/** Type enumeration constant for lua tables */
 	public static final int TTABLE			= 5;
