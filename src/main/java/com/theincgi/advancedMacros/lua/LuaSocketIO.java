@@ -230,10 +230,10 @@ public class LuaSocketIO {
 						params.set(params.length()+1, LuaValue.valueOf((Long)o));
 					if( o instanceof Double )
 						params.set(params.length()+1, LuaValue.valueOf((Double)o));
-					if( o instanceof String )
-						params.set(params.length()+1, LuaValue.valueOf((String)o));
 					if( o instanceof Boolean )
 						params.set(params.length()+1, LuaValue.valueOf((Boolean)o));
+					if( o instanceof String )
+						params.set(params.length()+1, LuaValue.valueOf((String)o));
 				}
 				f.invoke( params.unpack() ); 
 			} catch (JSONException e) {

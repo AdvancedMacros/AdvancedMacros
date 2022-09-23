@@ -155,7 +155,7 @@ public class LuaJson {
 		@SuppressWarnings("unchecked")
 		Iterator<String> it = obj.keys();
 		if (it.hasNext())
-			for (String k = it.next(); it.hasNext(); k = it.next()) {
+			for (String k = it.next(); k != null; k = it.hasNext() ? it.next() : null) {
 				Object val = obj.get(k);
 
 				if (val instanceof JSONArray) {
