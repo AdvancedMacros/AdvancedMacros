@@ -156,6 +156,9 @@ public class LuaSocketIO {
 				return LuaValue.valueOf(socket.isActive());
 			}
 		});
+		funcs.set("EVENT_CONNECT",       Socket.EVENT_CONNECT      );
+		funcs.set("EVENT_DISCONNECT",    Socket.EVENT_DISCONNECT   );
+		funcs.set("EVENT_CONNECT_ERROR", Socket.EVENT_CONNECT_ERROR);
 		
 		return funcs;
 	}
