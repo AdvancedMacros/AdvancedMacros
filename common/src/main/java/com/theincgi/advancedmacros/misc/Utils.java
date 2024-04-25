@@ -1036,11 +1036,11 @@ public class Utils {
         return lvt;
     }
 
-    public static char mcSelectCode = '\u00A7';
+    public static char mcSelectCode = '§';
 
     public static String toMinecraftColorCodes(String text) {
-        char sel = '\u00A7';
-        String reset = sel + "r";
+        char sel = '§';
+        String reset = "";
         return reset + sel + "f" +
                 text.replaceAll("&0", reset + sel + "0")
                         .replaceAll("&1", reset + sel + "1")
@@ -1069,14 +1069,14 @@ public class Utils {
 
     public static String fromMinecraftColorCodes(String text) {
         return text
-                .replaceAll("&", "&&")
-                .replaceAll("\u00A7", "&")
-                .replaceAll("&k", "&O") //Obfuscated
-                .replaceAll("&l", "&B") //Bold
-                .replaceAll("&m", "&S") //Strikethru
-                .replaceAll("&o", "&I") //Italics
-                .replaceAll("&r", "&f")  //reset (to white in this case)
-                .replaceAll("&n", "&U")  //Underline
+                .replaceAll("§", "&&")
+                .replaceAll("&", "&")
+                .replaceAll("§k", "&O") //Obfuscated
+                .replaceAll("§l", "&B") //Bold
+                .replaceAll("§m", "&S") //Strikethru
+                .replaceAll("§o", "&I") //Italics
+                .replaceAll("§r", "&f")  //reset (to white in this case)
+                .replaceAll("§n", "&U")  //Underline
                 ;
     }
 
@@ -1110,137 +1110,17 @@ public class Utils {
             if (c != '&') {
                 temp.append(c);
             } else {
-                if (i < codedText.length() - 1) {
-                    char next = codedText.charAt(i + 1);
-                    if (next == '&') {
-                        temp.append(next);
-                        i++;
-                    } else if (isTextColorCode(next) || isTextStyleCode(next) || isSpecialCode(next)) {
-                        i++;
-                        if (temp.length() > 0) {
-                            Text component = ltcce && allowFunctions ? new LuaTextComponent(temp.toString(), args.arg(argNum++), allowHover) : Text.literal(temp.toString());
-                            Style style = component.getStyle();
-                            style.withBold(bold);
-                            style.withItalic(italics);
-                            style.withObfuscated(obfusc);
-                            style.withStrikethrough(strike);
-                            style.withUnderline(underline);
-                            style.withColor(color);
-                            style.withParent(pStyle);
-                            if (clickEvent != null) {
-                                style.withClickEvent(clickEvent);
-                            }
-                            out.append(component);
-                            if (hoverEvent != null) {
-                                style.withHoverEvent(hoverEvent);
-                            }
-                            bold = italics = obfusc = strike = underline = null;
-                            //color = null;
-                            ltcce = false;
-                            clickEvent = null;
-                            hoverEvent = null;
-                            temp = new StringBuilder();
-                            pStyle = component.getStyle();
-                        }
-                        if (isTextColorCode(next)) {
-                            color = getTextFormatingColor(next);
-                            bold = italics = obfusc = strike = underline = false;
-                        }/*else if(next == 'x') { //custom color
-							color = parseColor(args.arg(argNum++));
-							bold = italics = obfusc = strike = underline = false;
-						}*/ else if (isTextStyleCode(next)) {
-                            switch (next) {
-                                case 'B' -> bold = true;
-                                case 'I' -> italics = true;
-                                case 'O' -> obfusc = true;
-                                case 'S' -> strike = true;
-                                case 'U' -> underline = true;
-                                default -> {
-                                }
-                            }
-                        } else if (next == 'F') { //Function/table
-                            ltcce = true;
-                        } else if (next == 'R') { //execute
-                            String cText, hText;
-                            if (args.arg(argNum).istable() && !args.arg(argNum).get("click").isnil()) {
-                                cText = args.arg(argNum).get("click").tojstring();
-                            } else {
-                                cText = args.arg(argNum).tojstring();
-                            }
-
-                            if (args.arg(argNum).istable() && !args.arg(argNum).get("hover").isnil()) {
-                                hText = args.arg(argNum).get("hover").tojstring();
-                            } else {
-                                hText = "Run: &b" + cText;
-                            }
-                            argNum++;
-                            clickEvent = new ClickEvent(ClickEvent.Action.RUN_COMMAND, cText);
-                            hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, toTextComponent(hText, null, false, false).a);
-                        } else if (next == 'T') { //type (suggest)
-                            String cText, hText;
-                            if (args.arg(argNum).istable() && !args.arg(argNum).get("click").isnil()) {
-                                cText = args.arg(argNum).get("click").tojstring();
-                            } else {
-                                cText = args.arg(argNum).tojstring();
-                            }
-
-                            if (args.arg(argNum).istable() && !args.arg(argNum).get("hover").isnil()) {
-                                hText = args.arg(argNum).get("hover").tojstring();
-                            } else {
-                                hText = "Type: &b" + cText;
-                            }
-                            argNum++;
-                            clickEvent = new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, cText);
-                            hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, toTextComponent(hText, null, false, false).a);
-                        } else if (next == 'L') { //Link
-                            String cText, hText;
-                            if (args.arg(argNum).istable() && !args.arg(argNum).get("click").isnil()) {
-                                cText = args.arg(argNum).get("click").tojstring();
-                            } else {
-                                cText = args.arg(argNum).tojstring();
-                            }
-
-                            if (args.arg(argNum).istable() && !args.arg(argNum).get("hover").isnil()) {
-                                hText = args.arg(argNum).get("hover").tojstring();
-                            } else {
-                                hText = "URL: &b&U" + cText;
-                            }
-                            argNum++;
-                            if (!cText.matches("^https?://")) {
-                                cText = "https://" + cText;
-                            }
-                            clickEvent = new ClickEvent(ClickEvent.Action.OPEN_URL, cText);
-                            hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, toTextComponent(hText, null, false, false).a);
-                        } else if (next == 'N') {
-                            String hText;
-
-                            if (args.arg(argNum).istable() && !args.arg(argNum).get("hover").isnil()) {
-                                hText = args.arg(argNum).get("hover").tojstring();
-                            } else {
-                                hText = args.arg(argNum).tojstring();
-                            }
-                            argNum++;
-
-                            hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, toTextComponent(hText, null, false, false).a);
-                        } else if (next == '*') {
-                            String file, tooltip;
-                            if (args.arg(argNum).istable()) {
-                                LuaTable table = args.arg(argNum).checktable();
-                                file = table.get("click").tojstring();
-                                tooltip = table.get("hover").isnil() ? null : table.get("hover").tojstring();
-                            } else {
-                                file = args.arg(argNum).tojstring();
-                                tooltip = (new File(file).exists() ? "&a" : "&c") + file;
-                            }
-                            argNum++;
-
-                            clickEvent = new ClickEvent(ClickEvent.Action.OPEN_FILE, file);
-                            if (tooltip != null) {
-                                hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, toTextComponent(tooltip, null, false, false).a);
-                            }
-                        }
-                    }
+                if (i == codedText.length()) {
+                  break;
                 }
+                char next = codedText.charAt(i + 1);
+                if (next == '&') {
+                  temp.append('&');
+                } else {
+                  temp.append('§');
+                  temp.append(next);
+                }
+                i++;
             }
         }
         if (temp.length() > 0) {
@@ -1251,7 +1131,7 @@ public class Utils {
             style.withObfuscated(obfusc);
             style.withStrikethrough(strike);
             style.withUnderline(underline);
-            style.withColor(color);
+            //style.withColor(color);
             style.withParent(pStyle);
             if (clickEvent != null) {
                 style.withClickEvent(clickEvent);
@@ -1263,6 +1143,7 @@ public class Utils {
             temp = new StringBuilder();
             pStyle = component.getStyle();
         }
+
         return new Pair<>(out, args.subargs(argNum));
     }
 

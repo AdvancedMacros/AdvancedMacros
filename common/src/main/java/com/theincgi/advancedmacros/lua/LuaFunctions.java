@@ -123,6 +123,7 @@ public class LuaFunctions {
         @Override
         public Varargs invoke(Varargs arg0) {
             try {
+
                 MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(formatString(arg0));
             } catch (LuaError err) {
                 throw err;
@@ -166,9 +167,9 @@ public class LuaFunctions {
 
     public static String formatTableForLog(LuaTable t) {
         LinkedList<LuaTable> l = new LinkedList<>();
-        String f = "&e" + t.tojstring() + " &f{\n";
+        String f = "§e" + t.tojstring() + " §f{\n";
         f += formatTableForLog(t, l, 2);
-        f += "&f}";
+        f += "§f}";
         return f;
     }
 
@@ -188,53 +189,53 @@ public class LuaFunctions {
             if (v.istable()) {
                 if (antiR.indexOf(v) >= 0) {
                     //repeat subTable
-                    s.append(rep(" ", indent)).append("&f[&c").append(keyText).append("&f] = <&4RECURSIVE&f> &e").append(escAND(v.tojstring())).append("&f{&4...&f}\n");
+                    s.append(rep(" ", indent)).append("§f[§c").append(keyText).append("§f] = <§4RECURSIVE§f> §e").append(escAND(v.tojstring())).append("§f{§4...§f}\n");
                 } else {
                     LuaTable vTab = v.checktable();
                     if (vTab.getmetatable() != null && vTab.getmetatable().istable() && vTab.getmetatable().get(CallableTable.LUA_FUNCTION_KEY).optboolean(false)) {
-                        s.append(rep(" ", indent)).append("&f[&c").append(keyText).append("&f] = &b").append(escAND((v.tojstring())));
+                        s.append(rep(" ", indent)).append("§f[§c").append(keyText).append("§f] = §b").append(escAND((v.tojstring())));
                         if (tableContainsKeys(vTab)) {
-                            s.append(" &f{\n");
+                            s.append(" §f{\n");
                             s.append(formatTableForLog(vTab, antiR, indent + 2));
-                            s.append(rep(" ", indent)).append("&f}\n");
+                            s.append(rep(" ", indent)).append("§f}\n");
                         } else {
-                            s.append("&f\n");
+                            s.append("§f\n");
                         }
                     } else {
                         //antiR.add(t);
-                        s.append(rep(" ", indent)).append("&f[&c").append(keyText).append("&f] = &e").append(escAND(v.tojstring())); //TODO remove \n if no keys of any type
+                        s.append(rep(" ", indent)).append("§f[§c").append(keyText).append("§f] = §e").append(escAND(v.tojstring())); //TODO remove \n if no keys of any type
                         if (tableContainsKeys(vTab)) {
-                            s.append(" &f{\n");
+                            s.append(" §f{\n");
                             s.append(formatTableForLog(vTab, antiR, indent + 2));
-                            s.append(rep(" ", indent)).append("&f}\n");
+                            s.append(rep(" ", indent)).append("§f}\n");
                         } else {
-                            s.append(" &f{}\n");
+                            s.append(" §f{}\n");
                         }
                     }
 
                 }
             } else {
-                s.append(rep(" ", indent)).append("&f[&c").append(keyText).append("&f] = &b");
+                s.append(rep(" ", indent)).append("§f[§c").append(keyText).append("§f] = §b");
                 if (v.typename().equals("string")) {
-                    s.append("&f\"&b").append(escAND(v.tojstring())).append("&f\""); //added &b to fix color formating in these
+                    s.append("§f\"§b").append(escAND(v.tojstring().replaceAll("&","§"))).append("§f\""); //added §b to fix color formating in these
                     //added .replaceAll so that way color formating doesnt trigger inside the table print
                 } else {
-                    s.append(v.isuserdata() ? "&d" + escAND(v.tojstring()) : escAND(v.tojstring()));
+                    s.append(v.isuserdata() ? "§d" + escAND(v.tojstring()) : escAND(v.tojstring()));
                 }
                 s.append("\n");
             }
         }
         if (t.getmetatable() != null && t.getmetatable().istable()) {
             antiR.add(t.getmetatable().checktable());
-            s.append(rep(" ", indent)).append("&f[&dmetatable&f] = &d").append(t.getmetatable().tojstring()).append(" &f{\n");
+            s.append(rep(" ", indent)).append("§f[§dmetatable§f] = §d").append(t.getmetatable().tojstring()).append(" §f{\n");
             s.append(formatTableForLog(t.getmetatable().checktable(), antiR, indent + 4));
-            s.append(rep(" ", indent)).append("&f}\n");
+            s.append(rep(" ", indent)).append("§f}\n");
         }
         return s.toString();
     }
 
     private static String escAND(String s) {
-        return s.replace("&", "&&");
+        return s.replace("§", "&&");
     }
 
     public static String rep(String s, int t) {

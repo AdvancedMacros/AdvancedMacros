@@ -24,7 +24,7 @@ public class ScriptGuiText extends ScriptGuiElement {
 
     public int textSize = 12;
     private String text = "";
-    public boolean monospaced = true;
+    public boolean monospaced = false;
 
     public ScriptGuiText(Gui gui, Group parent) {
         super(gui, parent);

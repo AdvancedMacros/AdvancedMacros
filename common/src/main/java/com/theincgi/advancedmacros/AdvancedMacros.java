@@ -73,7 +73,7 @@ public class AdvancedMacros {
     public static final String MOD_ID = "advancedmacros";
 
     public static final String VERSION = "11";
-    public static final String GAME_VERSION = "1.19";
+    public static final String GAME_VERSION = "1.20.4";
 
     public static final File MACROS_ROOT_FOLDER = getRootFolder();
     public static final File MACROS_FOLDER = new File(MACROS_ROOT_FOLDER, "macros");
