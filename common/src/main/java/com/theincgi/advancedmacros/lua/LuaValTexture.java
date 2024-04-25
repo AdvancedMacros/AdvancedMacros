@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.theincgi.advancedmacros.event.TaskDispatcher;
 import com.theincgi.advancedmacros.misc.Settings;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.util.Identifier;
@@ -68,8 +69,9 @@ public class LuaValTexture extends LuaValue {
         });
     }
 
+    @Deprecated
     public void setBlockResource() {
-        this.r = PlayerScreenHandler.BLOCK_ATLAS_TEXTURE;
+//        this.r = PlayerScreenHandler.BLOCK_ATLAS_TEXTURE;
     }
 
     @Override
@@ -82,13 +84,8 @@ public class LuaValTexture extends LuaValue {
     }
 
     public void bindTexture() {
-        if (r != null) {
-            MinecraftClient.getInstance().getTextureManager().bindTexture(r);
-        } else {
-            //GL11.glBindTexture(GL11.GL_TEXTURE_2D, dTex.getGlTextureId());
-            // RenderSystem was spamming errors.... "OpenGL debug message, id=1281, source=API, type=ERROR, severity=HIGH, message=Error has been generated. GL error GL_INVALID_VALUE in (null): (ID: 173538523) Generic error"
-            RenderSystem.bindTexture(dTex.getGlId());
-        }
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+        RenderSystem.setShaderTexture(0, r);
     }
 
     public NativeImageBackedTexture getDynamicTexture() {

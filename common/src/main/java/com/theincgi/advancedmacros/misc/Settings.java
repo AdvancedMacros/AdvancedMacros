@@ -95,31 +95,6 @@ public class Settings {
      * [not implemented]
      */
     public static LuaValue getTextureID(String file) {
-
-        //		if(Thread.currentThread()!=minecraftThread) {
-        //			final String file2 = file;
-        //			ListenableFuture<LuaValue> future = MinecraftClient.getInstance().addScheduledTask(new Callable<LuaValue>() {
-        //
-        //				@Override
-        //				public LuaValue call() throws Exception {
-        //					return getTextureID(file2);
-        //				}
-        //			});
-        //			while(!future.isDone()) {
-        //				try {
-        //					Thread.sleep(10);
-        //				} catch (InterruptedException e) {break;}
-        //
-        //			}
-        //			if(!future.isCancelled())
-        //				try {
-        //					return future.get();
-        //				} catch (InterruptedException e) {
-        //				} catch (ExecutionException e) {
-        //				}
-        //			return null;
-        //		}
-
         if (settings.get("textures").isnil()) {
             settings.set("textures", TEXTURES); //keep it available, no excuses
         }
@@ -135,28 +110,10 @@ public class Settings {
             Identifier r = new Identifier(AdvancedMacros.MOD_ID, file);
             val = new LuaValTexture("resource:" + file, r);
         } else if (file.startsWith("block:")) {
+            // in 1.20.4 the location is minecraft:textures/block/*.png
             file = file.substring("block:".length());
-
-            //ResourceLocation r = AtlasTexture.LOCATION_BLOCKS_TEXTURE;
-            Identifier r;
-            if (file.contains(":")) {
-                r = new Identifier(file.substring(0, file.indexOf(":")), file.substring(file.indexOf(":") + 1));
-            } else {
-                r = new Identifier(file);
-            }
-
-            Sprite sprite = MinecraftClient.getInstance().getSpriteAtlas(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE).apply(r);
-            AbstractTexture texture = MinecraftClient.getInstance().getTextureManager().getTexture(r);//getTextureMap().getSprite(r);
-            LuaValTexture tex;
-            val = tex = new LuaValTexture("game:" + file, r);
-            tex.setBlockResource();
-            //			tex.setUV(0, 0, 1, 1);//CHECKME
-
-            //			RenderType t = RenderTypeLookup.getRenderType(...);
-            //			t.setupRenderState();
-
-            tex.setUV(sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV());
-
+            Identifier r = new Identifier("minecraft",file);
+            val = new LuaValTexture("game:" + file, r);
         } else {
             val = loadTex(file);
         }

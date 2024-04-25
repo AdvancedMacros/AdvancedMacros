@@ -1111,28 +1111,14 @@ public class EventHandler {
     }
 
     public void onLastWorldRender(MatrixStack matrixStack) {
-
         Camera renderInfo = MinecraftClient.getInstance().gameRenderer.getCamera();
         Vec3d projectedView = renderInfo.getPos();
 
         matrixStack.push();
-        //		ms.rotate(Vector3f.XP.rotationDegrees(renderInfo.getPitch()));
-        //		ms.rotate(Vector3f.YP.rotationDegrees(renderInfo.getYaw()));
-        //		ms.translate(-projectedView.x, -projectedView.y, -projectedView.z);
-        //		ms.rotate(Vector3f.XP.rotationDegrees(renderInfo.getPitch()));
 
-        //double x,y,z,uMin,vMin,uMax,vMax, wid, hei;
-        float p = MinecraftClient.getInstance().getTickDelta();
-        Entity player = MinecraftClient.getInstance().getCameraEntity();
-
-        //TODO 1.19 Update: RenderSystem.pushTextureAttributes();
         RenderSystem.enableCull();
         RenderSystem.enableBlend();
-
-        //src color -> src color?
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
-
-        //ms.translate(0, -(projectedView.y-accuPlayerY(p, player)), 0); //using the projected accounts for crouching motion
 
         synchronized (worldHudItems) {
             for (WorldHudItem worldHudItem : worldHudItems) {
@@ -1142,14 +1128,10 @@ public class EventHandler {
                 } else {
                     RenderSystem.enableDepthTest();
                 }
-                double acuX = projectedView.x;//accuPlayerX(p, player),
-                double acuY = projectedView.y; //accuPlayerY(p, player),
-                double acuZ = projectedView.z;//accuPlayerZ(p, player);
-                worldHudItem.apply3dRotation(matrixStack, acuX, acuY, acuZ);
+                worldHudItem.apply3dRotation(matrixStack, projectedView.x, projectedView.y, projectedView.z);
                 RenderSystem.setShaderColor(1, 1, 1, worldHudItem.getOpacity());
                 worldHudItem.render(matrixStack);
                 matrixStack.pop();
-
             }
         }
         matrixStack.pop();

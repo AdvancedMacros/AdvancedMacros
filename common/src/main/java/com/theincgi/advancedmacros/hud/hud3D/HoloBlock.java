@@ -36,7 +36,7 @@ public class HoloBlock extends WorldHudItem {
     float uMin, uMax, vMin, vMax, width;
 
     public HoloBlock() {
-        this("resource:holoblock.png");
+        this("resource:holoblock");
     }
 
     public HoloBlock(String resourceName) {
@@ -126,28 +126,14 @@ public class HoloBlock extends WorldHudItem {
         float x = this.x - dx;
         float y = this.y - dy;
         float z = this.z - dz;
-        //		double x = px - this.x;
-        //		double y = py - this.y ;
-        //		double z = pz - this.z;
-        //		double x,y,z;
-        //		x=y=z=0;
-        //		if(drawType.isScaled()){
-        //			width*=scale;
-        //
-        //		}else if(drawType.equals(DrawType.OVERLAY)){
-        //			width*=1.0001;
-        //			z+=.001;
-        //		}else if(drawType.equals(DrawType.INSIDE)){
-        //			width/=1.0001;
-        //			z-=.001;
-        //		}
-        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
         buffer.vertex(trf, x, y, z).texture(uMax, vMax).next();
         buffer.vertex(trf, x, y + yHei, z).texture(uMax, vMin).next();
         buffer.vertex(trf, x + xWid, y + yHei, z + zWid).texture(uMin, vMin).next();
         buffer.vertex(trf, x + xWid, y, z + zWid).texture(uMin, vMax).next();
-        Tessellator.getInstance().draw();
+        tessellator.draw();
     }
 
     private void drawTopFace(Matrix4f trf, float dx, float dy, float dz, float wid, float len) {
