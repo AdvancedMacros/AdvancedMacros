@@ -24,6 +24,7 @@ import com.theincgi.advancedmacros.lua.functions.entity.HighlightEntity;
 import com.theincgi.advancedmacros.lua.functions.midi.MidiLib2;
 import com.theincgi.advancedmacros.lua.functions.minecraft.GetChunkUpdates;
 import com.theincgi.advancedmacros.lua.functions.minecraft.GetFPS;
+import com.theincgi.advancedmacros.lua.functions.minecraft.MinecraftFunctions;
 import com.theincgi.advancedmacros.lua.functions.os.ClipBoard;
 import com.theincgi.advancedmacros.lua.functions.os.GetOSMilliseconds;
 import com.theincgi.advancedmacros.lua.modControl.EditorControls;
@@ -151,6 +152,7 @@ public class AdvancedMacros {
     }
 
     public static LuaFunctions.Log logFunc;
+    public static LuaFunctions.GetMinecraft getMinecraft;
     public static LuaFunctions.Say sayFunc;
     public static LuaFunctions.Sleep sleepFunc;
     public static LuaFunctions.Debug debugFunc;
@@ -198,6 +200,7 @@ public class AdvancedMacros {
         globals.set("narrate", new Narrate());
 
         globals.set("sleep", sleepFunc = new LuaFunctions.Sleep());
+        globals.set("getMinecraft", getMinecraft = new LuaFunctions.GetMinecraft());
         globals.set("print", new LuaFunctions.Debug());
         globals.set("getSettings", new Settings.GetSettings());
         globals.set("newMutex", new LuaMutex());
@@ -233,6 +236,7 @@ public class AdvancedMacros {
         globals.set("httpRequest", new HTTP());
         globals.set("getWorld", new GetWorld());
         globals.set("getBlock", new GetBlock());
+        globals.set("getBlockName", new GetBlockName());
         globals.set("getPlayer", new GetPlayer());
         globals.set("playerDetails", GetPlayer.playerFunctions);
         globals.set("getPlayerList", new GetPlayerList()); //everywhere
@@ -241,7 +245,7 @@ public class AdvancedMacros {
         globals.set("getPlayerBlockPos", new GetPlayerBlockPos());
         globals.set("getPlayerNBT", new GetNBT.GetPlayerNBT());
 
-        //globals.set("minecraft", new MinecraftFunctions());
+//        globals.set("minecraft", new MinecraftFunctions());
         globals.set("getRecipes", new GetRecipe());
         globals.set("getFps", new GetFPS());
         globals.set("getChunkUpdateCount", new GetChunkUpdates());

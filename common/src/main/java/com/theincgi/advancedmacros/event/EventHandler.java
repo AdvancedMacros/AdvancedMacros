@@ -13,11 +13,15 @@ import com.theincgi.advancedmacros.gui2.ScriptBrowser2;
 import com.theincgi.advancedmacros.hud.hud2D.Hud2DItem;
 import com.theincgi.advancedmacros.hud.hud3D.WorldHudItem;
 import com.theincgi.advancedmacros.lua.LuaDebug;
+import com.theincgi.advancedmacros.lua.LuaText;
 import com.theincgi.advancedmacros.lua.functions.GuiControls;
 import com.theincgi.advancedmacros.misc.HIDUtils;
+import com.theincgi.advancedmacros.misc.Pair;
 import com.theincgi.advancedmacros.misc.Utils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.hud.ChatHud;
+import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.network.PlayerListEntry;
@@ -31,6 +35,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.dimension.DimensionType;
@@ -47,6 +53,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
+
 
 public class EventHandler {
 
@@ -81,6 +88,24 @@ public class EventHandler {
         for (int i = 0; i < HIDUtils.Mouse.getButtonCount(); i++) {
             heldMouseButtons.add(false);
         }
+    }
+
+    public void onChatEvent(Text message, EventName eventName) {
+
+        LuaTable chatEvent = createEvent(EventName.Chat);
+        LuaTable chatFilterEvent = createEvent(EventName.ChatFilter);
+        String unformatted = message.getString();
+
+        MutableText mutableText = Text.literal("");
+        mutableText.append(message);
+        LuaText formatted = new LuaText(message);
+
+
+        chatEvent.set(3,formatted);
+        chatFilterEvent.set(3, formatted);
+        chatEvent.set(4, unformatted);
+        chatFilterEvent.set(4, unformatted);
+        AdvancedMacros.macroMenuGui.fireEvent(false, eventName.name(), chatEvent.unpack(),false, null);
     }
 
     public static enum EventName {
@@ -182,21 +207,19 @@ public class EventHandler {
                 repeatingKeys.put(scancode, n = (repeatingKeys.getOrDefault(scancode, 0) + 1));
                 g.onKeyRepeated(g, key, scancode, mods, n);
             }
-            return;
-        }
-
-        //Keyboard.onKey(eventKey, event.getAction());
+            return; } //Keyboard.onKey(eventKey, event.getAction());
 
         LuaTable eventDat = new LuaTable();
         eventDat.set(1, "key");
-        eventDat.set(2, HIDUtils.Keyboard.nameOf(key));
+        String name = HIDUtils.Keyboard.nameOf(key);
+        eventDat.set(2, name.equals(HIDUtils.Keyboard.UNKNOWN_KEY_NAME) ? HIDUtils.Mouse.nameOf(key) : name );
         eventDat.set(3, LuaValue.valueOf(action == GLFW.GLFW_PRESS ? "down" : "up"));
         eventDat.set(4, LuaValue.valueOf(key));
         AdvancedMacros.macroMenuGui.fireEvent(true, HIDUtils.Keyboard.nameOf(key), eventDat.unpack(), action == GLFW.GLFW_PRESS, null);
     }
 
     public void onMouseClick(int mButton, boolean state) {
-        //System.out.println("MOUSE FIRED");
+//        System.out.println("MOUSE FIRED");
         String buttonName = switch (mButton) {
             case 0 -> "LMB";
             case 1 -> "RMB";

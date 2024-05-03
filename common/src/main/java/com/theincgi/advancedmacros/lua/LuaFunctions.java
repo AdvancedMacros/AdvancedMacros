@@ -1,9 +1,11 @@
 package com.theincgi.advancedmacros.lua;
 
+import com.theincgi.advancedmacros.AdvancedMacros;
 import com.theincgi.advancedmacros.misc.CallableTable;
 import com.theincgi.advancedmacros.misc.Pair;
 import com.theincgi.advancedmacros.misc.Utils;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import org.luaj.vm2_v3_0_1.LuaError;
@@ -12,6 +14,7 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
 import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
+import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -50,6 +53,14 @@ public class LuaFunctions {
             } catch (InterruptedException e) {
             }
             return LuaValue.NONE;
+        }
+
+    }
+
+    public static class GetMinecraft extends ZeroArgFunction {
+        @Override
+        public LuaValue call() {
+            return LuaValue.userdataOf(MinecraftClient.getInstance());
         }
 
     }
@@ -124,7 +135,10 @@ public class LuaFunctions {
         public Varargs invoke(Varargs arg0) {
             try {
 
-                MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(formatString(arg0));
+                // tricky way to avoid mixin for chat logging getting fired (it injects at event with just message arg so we supply this manually.)
+                // if the implementation inside net.minecraft.client.gui.hud.ChatHud.addMessage(net.minecraft.text.Text)
+                // then we have to adjust it to match
+                MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(formatString(arg0), null, MinecraftClient.getInstance().isConnectedToLocalServer() ? MessageIndicator.singlePlayer() : MessageIndicator.system());
             } catch (LuaError err) {
                 throw err;
             } catch (Throwable e) {
@@ -137,20 +151,22 @@ public class LuaFunctions {
         public synchronized Text formatString(Varargs arg0) { //TODO make it so hovering a callable table shows the tooltip
             String toParse;
             MutableText out = null;
+            if (arg0.arg1() instanceof LuaText) return ((LuaText) arg0.arg1()).getMessage();
             for (int i = 1; arg0.narg() > 0; i++) {
-                //				if(i!=1) {
-                //					out.appendText(" ");
-                //				}
                 LuaValue arg = arg0.arg1();
                 Pair<MutableText, Varargs> pair;
 
                 if (arg.istable()) {
-                    toParse = formatTableForLog(arg.checktable());
+                    Varargs args = arg0.subargs(2);
+                    if (args == null) {
+                        args = new LuaTable().unpack();
+                    }
+                    pair = new Pair<>(Text.literal(formatTableForLog(arg.checktable())), args.subargs(1));
                 } else {
                     toParse = arg.tojstring();
+                    pair = Utils.toTextComponent(toParse, arg0.subargs(2), true);
                 }
 
-                pair = Utils.toTextComponent(toParse, arg0.subargs(2), true);
                 arg0 = pair.b;
                 if (out == null) {
                     out = pair.a;
@@ -235,7 +251,7 @@ public class LuaFunctions {
     }
 
     private static String escAND(String s) {
-        return s.replace("§", "&&");
+        return s.replaceAll("&", "§").replaceAll("§", "&&");
     }
 
     public static String rep(String s, int t) {

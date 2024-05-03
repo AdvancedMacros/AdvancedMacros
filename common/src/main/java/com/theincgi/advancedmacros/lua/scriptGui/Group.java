@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 public class Group extends LuaTable implements Moveable, InputSubscriber, Drawable {
 
-    //gui group, xy 0,0
+    //gui group, xy 1,0
     //passes events to child elements/groups
     //child element needs getParent detail functions
     //moving a group should shift all child elements
