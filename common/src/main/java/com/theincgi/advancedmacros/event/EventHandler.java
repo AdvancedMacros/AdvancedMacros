@@ -25,6 +25,8 @@ import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.client.sound.SoundInstanceListener;
@@ -37,6 +39,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.dimension.DimensionType;
@@ -232,6 +238,50 @@ public class EventHandler {
         eDat.set(3, state ? "down" : "up");
         AdvancedMacros.macroMenuGui.fireEvent(true, buttonName, eDat.unpack(), state, null);
     }
+
+
+    MinecraftClient minecraft = MinecraftClient.getInstance();
+    public void onPlayerTick() {
+        synchronized (sTickSync) {
+            sTick++;
+            synchronized (tickLock) {
+                tickLock.notifyAll();
+            }
+        }
+
+        LinkedList<InputUtil.Key> toRemove = new LinkedList<>();
+        for ( InputUtil.Key i : keyBindReleaseMap.keySet()) {
+            HeldKeybinds hk = keyBindReleaseMap.get(i);
+            if (hk.releaseTime < System.currentTimeMillis()) {
+                KeyBinding.setKeyPressed(i, false);
+                hk.done = true; //is this even needed anymore?
+                toRemove.add(i);
+            }
+
+            GameOptions sets = minecraft.options;
+            InputUtil.Key attackKey = sets.attackKey.getDefaultKey();
+            if (hk.input.equals(attackKey)) {
+                MinecraftClient minecraft = AdvancedMacros.getMinecraft();
+                if (minecraft.crosshairTarget != null && minecraft.crosshairTarget.getType() == net.minecraft.util.hit.HitResult.Type.BLOCK) {
+                    BlockHitResult blockHitResult = (BlockHitResult)minecraft.crosshairTarget;
+                    BlockPos blockPos = blockHitResult.getBlockPos();
+                    if (!minecraft.world.getBlockState(blockPos).isAir()) {
+                        Direction direction = blockHitResult.getSide();
+                        if (minecraft.interactionManager.updateBlockBreakingProgress(blockPos, direction)) {
+                            minecraft.particleManager.addBlockBreakingParticles(blockPos, direction);
+                            minecraft.player.swingHand(Hand.MAIN_HAND);
+                        }
+                    }
+                } else {
+                    minecraft.interactionManager.cancelBlockBreaking();
+                }
+            }
+        }
+        while (!toRemove.isEmpty()) {
+            keyBindReleaseMap.remove(toRemove.pop());
+        }
+    }
+
 
 /*
 

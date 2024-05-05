@@ -69,7 +69,11 @@ public class LuaFunctions {
 
         @Override
         public LuaValue call(LuaValue arg) {
-            MinecraftClient.getInstance().getNetworkHandler().sendChatMessage(arg.tojstring());
+            if (arg.tojstring().startsWith("/")) {
+                MinecraftClient.getInstance().getNetworkHandler().sendChatCommand(arg.tojstring().substring(1));
+            } else {
+                MinecraftClient.getInstance().getNetworkHandler().sendChatMessage(arg.tojstring());
+            }
             MinecraftClient.getInstance().inGameHud.getChatHud().addToMessageHistory(arg.tojstring());
             return LuaValue.NONE;
         }

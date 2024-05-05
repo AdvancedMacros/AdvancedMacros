@@ -15,7 +15,8 @@
     "events.MixinKeyboard",
     "events.MixinLivingEntityRenderer",
     "events.MixinMinecraftClient",
-    "events.MixinMouse"
+    "events.MixinMouse",
+    "events.MixinTick"
   ],
   "mixins": [
     "MixinEntity",

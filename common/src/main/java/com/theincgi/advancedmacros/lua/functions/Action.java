@@ -154,6 +154,7 @@ public class Action {
                     ((IMinecraftClient) minecraft).am_doAttack();
                 });
             } else {
+
                 holdKeybind(sets.attackKey, arg.checklong());
             }
             return LuaValue.NONE;
@@ -317,7 +318,6 @@ public class Action {
                     ClientPlayerEntity player = minecraft.player;
                     player.setPitch((float) args.arg(2).todouble());
                     player.setYaw((float) args.arg(1).todouble());
-                    System.out.println(player.getYaw());
                 }
             } else {
                 throw new LuaError("Args: [yaw][,pitch]<,time>");

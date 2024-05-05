@@ -595,6 +595,22 @@ public class Globals extends LuaTable {
 
     }
 
+    public boolean unsetLuaThreadForCurrent(LuaThread thread) {
+        synchronized (luaThreads) {
+            return luaThreads.remove(Thread.currentThread(), thread);
+        }
+    }
+    public void unsetCurrentLuaThread() {
+        synchronized (luaThreads) {
+            luaThreads.remove(Thread.currentThread());
+        }
+    }
+    public boolean unsetLuaThread(Thread t, LuaThread thread) {
+        synchronized (luaThreads) {
+            return luaThreads.remove(t, thread);
+        }
+    }
+
     /**
      * @author TheINCGI
      */
@@ -603,6 +619,7 @@ public class Globals extends LuaTable {
             if (luaThreads.containsKey(Thread.currentThread())) {
                 return luaThreads.get(Thread.currentThread());
             } else {
+                System.out.println(luaThreads.containsKey(Thread.currentThread()));
                 throw new NullPointerException(String.format("Globals missing active lua thread [%s : %d]", Thread.currentThread().getName(), Thread.currentThread().getId()));
             }
         }
