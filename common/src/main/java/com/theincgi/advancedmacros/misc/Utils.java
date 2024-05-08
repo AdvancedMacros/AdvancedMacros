@@ -415,7 +415,7 @@ public class Utils {
             return LuaValue.FALSE;
         }
         LuaTable table = new LuaTable();
-        table.set("name", stack.getName() == null ? LuaValue.NIL : LuaValue.valueOf(codedFromTextComponent(stack.getName()).a));
+        table.set("name", stack.getName() == null ? LuaValue.NIL : LuaValue.valueOf(stack.getName().getString()));
         table.set("id", Registries.ITEM.getId(stack.getItem()).toString());
         table.set("dmg", stack.getDamage());
         table.set("maxDmg", stack.getMaxDamage());
