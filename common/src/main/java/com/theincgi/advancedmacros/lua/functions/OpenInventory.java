@@ -109,7 +109,9 @@ public class OpenInventory extends ZeroArgFunction {
                     });
                     return NONE;
                 case close:
-                    mc.player.closeScreen();
+                    TaskDispatcher.addTask(() -> {
+                        mc.player.closeScreen();
+                    });
                     return NONE;
                 case quick: {
                     TaskDispatcher.addTask(() -> {
