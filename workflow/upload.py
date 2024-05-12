@@ -108,11 +108,16 @@ def upload_file(project_id, metadata, fileName, filePath):
     else:
         print("Failed to upload file.")
 
+def chooseJar( libsDir ):
+    for opt in os.listdir( libsDir ):
+        if opt.endswith("1.0.0.jar"):
+            return libsDir + os.sep + opt 
+    raise Exception("no jar selected")
 
 if __name__ == "__main__":
     platform = sys.argv[1]
     libsDir = sys.argv[2]
-    filePath = libsDir + os.sep + os.listdir( libsDir )[0]
+    filePath = chooseJar( libsDir )
 
 
     projectID = "advanced-macros"
