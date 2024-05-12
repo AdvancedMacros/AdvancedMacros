@@ -75,7 +75,7 @@ jobs:
       - name: Build
         if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
         run: |
-          ./gradlew shadowJar | tee buildResult.txt
+          ./gradlew build | tee buildResult.txt
           
           if  grep -q "FAILED" buildResult.txt; then
               echo "Build failed"
