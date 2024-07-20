@@ -193,6 +193,8 @@ public class OpenInventory extends ZeroArgFunction {
                 case getMap: {
                     return getMapping().get(getType(container));
                 }
+                case getUpperLabel:
+                    return getUpperLabel(container);
                 default:
                     break;
             }
@@ -200,8 +202,12 @@ public class OpenInventory extends ZeroArgFunction {
         }
 
     }
+    public LuaValue getUpperLabel(HandledScreen<?> container) {
+        return valueOf(container.getTitle().getString());
+    }
 
-    public LuaValue getType(HandledScreen<?> container) {
+
+        public LuaValue getType(HandledScreen<?> container) {
         if (container instanceof InventoryScreen) {
             return valueOf("inventory");
         }
@@ -260,6 +266,7 @@ public class OpenInventory extends ZeroArgFunction {
         getMap,
         getTotalSlots,
         click,
+        getUpperLabel,
         dragClick;
 
         public String[] getDocLocation() {
