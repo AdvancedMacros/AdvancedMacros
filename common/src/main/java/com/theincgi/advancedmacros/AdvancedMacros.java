@@ -252,6 +252,8 @@ public class AdvancedMacros {
 
         globals.set("getEntityList", new GetEntityList());
         globals.set("getEntity", new GetEntityData());
+        globals.set("getBossBars", new GetBossBars());
+
         globals.set("getEntityNBT", new GetNBT.GetEntityNBT());
         globals.set("getBoundingBox", new GetAABB().getFunc());
         globals.set("highlightEntity", new CallableTable(new String[]{"highlightEntity"}, new HighlightEntity()));

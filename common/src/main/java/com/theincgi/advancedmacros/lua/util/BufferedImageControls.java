@@ -48,25 +48,15 @@ public class BufferedImageControls extends LuaTable {
     }
 
     public static class LoadImg extends OneArgFunction {
-
         @Override
         public LuaValue call(LuaValue arg) {
-            if (arg instanceof HTTP.LuaInputStream) {
-                try {
-                    return new BufferedImageControls(ImageIO.read(((HTTP.LuaInputStream) arg).getInputStream()));
-                } catch (IOException e) {
-                    throw new LuaError("IOException occurred, " + e.getMessage());
-                }
-            } else {
-                File f = Utils.parseFileLocation(arg);//new File(AdvancedMacros.macrosRootFolder, arg.checkjstring());
-                try {
-                    return new BufferedImageControls(ImageIO.read(f));
-                } catch (IOException e) {
-                    throw new LuaError("IOException occurred, " + e.getMessage());
-                }
+            File f = Utils.parseFileLocation(arg);//new File(AdvancedMacros.macrosRootFolder, arg.checkjstring());
+            try {
+                return new BufferedImageControls(ImageIO.read(f));
+            } catch (IOException e) {
+                throw new LuaError("IOException occurred, "+e.getMessage());
             }
         }
-
     }
 
     public static class GetFonts extends ZeroArgFunction {
