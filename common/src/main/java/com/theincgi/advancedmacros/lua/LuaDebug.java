@@ -14,6 +14,8 @@ import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 import org.luaj.vm2_v3_0_1.lib.DebugLib;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
+import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
+import org.luaj.vm2_v3_0_1.lib.VarArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import java.util.HashMap;
@@ -390,7 +392,10 @@ public class LuaDebug extends DebugLib {
             set("unpause", new Unpause());
             set("getID", new GetID());
             set("getLabel", new GetLabel());
+            set("setLabel", new SetLabel());
             set("getUptime", new GetUptime());
+            set("getWorkspace", new GetWorkspace());
+            set("setWorkspace", new SetWorkspace());
             controlLookup.put(t, this);
         }
 
@@ -478,8 +483,42 @@ public class LuaDebug extends DebugLib {
 
         }
         
-        
+        class SetLabel extends OneArgFunction {
+        	@Override
+        	public LuaValue call(LuaValue arg) {
+        		t.label = arg.tojstring();
+        		return LuaValue.NONE;
+        	}
+        }
 
+        class GetWorkspace extends ZeroArgFunction {
+        	@Override
+        	public LuaValue call() {
+        		return t.workspace.asTable();
+        	}
+        }
+        
+        class SetWorkspace extends VarArgFunction {
+        	@Override
+        	public Varargs invoke(Varargs args) {
+        		if(args.istable(1)) {
+        			var arg = args.checktable(1);
+        			var name = arg.get(1).or(arg.get("workspaceName")).or(arg.get("name")).tojstring();
+        			var path = arg.get(2).or(arg.get("workspacePath")).or(arg.get("path")).tojstring();
+        			t.workspace = new Workspace(
+        				name, 
+        				path
+        			);
+        		} else if(args.narg() >= 2) {
+        			t.workspace = new Workspace(
+    					args.checkjstring(1), //name 
+    					args.checkjstring(2)  //path
+					);
+        		}
+        		return NONE;
+        	}
+        }
+        
         public LuaThread getThread() {
             return t;
         }
