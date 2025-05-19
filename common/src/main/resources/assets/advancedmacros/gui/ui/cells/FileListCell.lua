@@ -1,5 +1,4 @@
 local utils = advancedMacros.utils
-local misc = require"misc"
 
 local ViewCell = require"ui/layout/ViewCell"
 local FileListCell = newClass("ui/cells/FileListCell", ViewCell)
@@ -11,7 +10,7 @@ FileListCell.static = {
 function FileListCell:new( ... )
   local obj = FileListCell._new( self, ... )
   
-  local pixelScale = misc.resScale( obj.screen )
+  local pixelScale = utils.resScale( obj.screen )
   obj.thumbnail = image.new( obj.height * pixelScale, obj.height * pixelScale )
 
   obj.elements.fileListCell = {
@@ -30,7 +29,7 @@ function FileListCell:new( ... )
   obj.selected = false
 
   obj.elements.fileListCell.bounds.setOnMouseClick(function(x,y,b) 
-    if b == misc.LMB then
+    if b == utils.LMB then
       obj.events.mouseClicked:notify(x,y,b, obj.model) 
     else
       obj:openContextMenu()

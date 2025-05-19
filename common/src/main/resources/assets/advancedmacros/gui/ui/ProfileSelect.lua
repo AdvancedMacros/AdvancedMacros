@@ -1,6 +1,5 @@
 local utils = advancedMacros.utils
 
-local misc = require"misc"
 local File = require"File"
 local EventChannel = require"ui/EventChannel"
 local StringListCell = require"ui/cells/StringListCell"
@@ -59,7 +58,7 @@ end
 function ProfileSelect:loadProfiles()
   local options = {}
   local profiles = {}
-  local files = misc.profileDir:list".json$"
+  local files = File.static.profileDir:list".json$"
   -- local settings = getSettings()
   -- local profiles = {} --settings.profilesV2 or {}
 
@@ -141,7 +140,7 @@ end
 function ProfileSelect:newProfile( name, _fromUI )
   name = name:trim()
   --check if exists
-  local file = misc.profileDir:navigate(name..".json")
+  local file = File.static.profileDir:navigate(name..".json")
   if file:exists() then
     if not _fromUI then
       error('Profile "'..name..'" already exists', 2)
@@ -172,7 +171,7 @@ function ProfileSelect:newProfile( name, _fromUI )
 end
 
 function ProfileSelect:clearProfile()
-  local file = misc.profileDir:navigate(self:getProfile()..".json")
+  local file = File.static.profileDir:navigate(self:getProfile()..".json")
   file:write"[]"
   self.events.profileChanged:notify( self, name )
 end

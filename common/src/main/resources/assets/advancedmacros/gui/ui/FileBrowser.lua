@@ -1,5 +1,5 @@
 local utils = advancedMacros.utils
-local misc = require"misc"
+local File = require"File"
 local FileListCell = require"ui/cells/FileListCell"
 local StringListCell = require"ui/cells/StringListCell"
 local ListView = require"ui/layout/ListView"
@@ -20,7 +20,7 @@ function FileBrowser:new( ... )
   
   local args = utils.kwargs({
     { onSelect = {"nil","function"} },
-    { file = "string", misc.macrosDir:getPath(), "path"}, --TODO support File arg
+    { file = "string", File.static.macrosDir:getPath(), "path"}, --TODO support File arg
     { workspace = {"nil","string"} },
     { filter = {"nil","string","table","function"}, nil, "filters" }, --lua pattern or patterns or function(name) return bool
   }, ...)
@@ -93,12 +93,12 @@ function FileBrowser:updateWorkspaceList(newSelection)
       path = filesystem.getMacrosAddress(),
       workspace = Workspace:new{
         workspaceName = "AM Default",
-        workspacePath = misc.macrosDir:getPath()
+        workspacePath = File.static.macrosDir:getPath()
       }
     }
   }
 
-  for i, f in ipairs(misc.workspaceDir:list".json$") do
+  for i, f in ipairs(File.static.workspaceDir:list".json$") do
     local workspace = Workspace:load(f)
     table.insert( list, {
       text = workspace.workspaceName,
@@ -181,7 +181,7 @@ function FileBrowser:_confirmationTryRename(msg, callback, ...)
 end
 
 function FileBrowser:onFileClicked( x, y, b, model )
-  if b == misc.LMB then
+  if b == utils.LMB then
     if filesystem.isDir( model.path ) then
       self:setPath( model.path )
     elseif self.onSelect then
@@ -204,7 +204,7 @@ function FileBrowser:onWorkspaceClicked( x, y, b, model )
     self.workspaceList:updateCells()
   end
 
-  if b == misc.RMB and model.text ~= "AM Default" then
+  if b == utils.RMB and model.text ~= "AM Default" then
     local x, y = self.screen.getMousePos()
     self.workspaceContextMenu:open(x, y)
   end
@@ -279,7 +279,7 @@ function FileBrowser:deleteWorkspace()
     title = "Confirm delete",
     msg = "Are you sure you want to delete this workspace?\n&e"..self.activeWorkspace.text,
     yes = function()
-      misc.workspaceDir:navigate(self.activeWorkspace.text..".json"):delete()
+      File.static.workspaceDir:navigate(self.activeWorkspace.text..".json"):delete()
       self:updateWorkspaceList("AM Default")
     end,
     no = function() end

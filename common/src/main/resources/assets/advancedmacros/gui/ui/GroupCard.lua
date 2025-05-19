@@ -1,5 +1,4 @@
 local utils = advancedMacros.utils
-local misc = require"misc"
 local Flow = require"ui/layout/Flow"
 
 local Card = require"ui/Card"
@@ -53,7 +52,7 @@ end
 function GroupCard:addBinding( binding )
   local Binding = require"model/Binding"
   local BindingCard = require"ui/BindingCard"
-  local color = misc.randomColor()
+  local color = utils.randomColor()
   binding = binding or Binding:new{
     color = color
   }
@@ -150,7 +149,7 @@ function GroupCard:listBindings(bindings)
       end
     end
   end
-  
+
   return bindings
 end
 

@@ -1,5 +1,4 @@
 local utils = advancedMacros.utils
-local misc = require"misc"
 local Card = require"ui/Card"
 local ExampleCard = require"ui/ExampleCard"
 
@@ -41,7 +40,7 @@ function ColorPicker:new( ... )
     },
   }
   local imgSize = math.min(obj.elements.card:getBodyHeight() - 12, cardWidth * 2 / 3 - 12)
-  obj.scale = misc.resScale( obj.screen )
+  obj.scale = utils.resScale( obj.screen )
 
   obj.wheelImage = image.new(imgSize * obj.scale, imgSize * obj.scale)
   thread.new(function()

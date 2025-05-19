@@ -1,5 +1,4 @@
 local utils = advancedMacros.utils
-local misc = require"misc"
 local Element = require"ui/Element"
 local ContextMenuItem = require"ui/ContextMenuItem"
 local DelayedTask = require"DelayedTask"

@@ -309,4 +309,21 @@ function File:toJson()
   return out
 end
 
+File.static = {
+  profileDir = File:new{
+    --workspacePath default to macros address,
+    path = "../profiles"
+  },
+  macrosDir = File:new{
+    --workspacePath default to macros address,
+    path = "../macros"
+  },
+  workspaceDir = File:new{
+    --workspacePath default to macros address,
+    path = "../workspaces"
+  }
+}
+
+File.static.workspaceDir:mkDirs()
+
 return File

@@ -1,5 +1,4 @@
 local utils = advancedMacros.utils
-local misc = require"misc"
 local Element = require"ui/Element"
 local ContextMenu = require"ui/ContextMenu"
 local EnableToggle = require"ui/EnableToggle"
@@ -14,7 +13,7 @@ Card.static = {
 }
 
 -- local TOP_COLOR = {.8, .8, .8, 1}
--- local TOP_FRAME_COLOR = misc.trimColor( TOP_COLOR )
+-- local TOP_FRAME_COLOR = utils.trimColor( TOP_COLOR )
 --store defaults true, set false if testing colors to not save a bunch of junk
 local function generateCornerTile( cx, cy, r, color, frameColor, borderThickness, store )
   local key = ("CORNER_%.3f:%.3f:%.3f:%.3f:%.3f:%.3f"):format( cx, cy, r, table.unpack(color) )
@@ -207,7 +206,7 @@ function Card:setCollapsed( collapse )
 end
 
 function Card:onCardClick( x, y, button, element )
-  if button == misc.RMB and self.menu then
+  if button == utils.RMB and self.menu then
     self.menu:open( self.screen.getMousePos() )
   end
 end
@@ -284,7 +283,7 @@ function Card:getColor()
 end
 
 function Card:updateTiles()
-    local scale = misc.resScale( self.screen )
+    local scale = utils.resScale( self.screen )
     local pixelRadius = self.radius * scale
     local pixelRadius2 = self.labelHeight * scale
     local boarder = self.borderThickness * scale
@@ -293,7 +292,7 @@ function Card:updateTiles()
     
     self.color = self:isEnabled() and self.enabledColor or Card.static.disabledColor
 
-    local frameColor = misc.trimColor( self.color )
+    local frameColor = utils.trimColor( self.color )
 
     self.tiles.topLeft = generateCornerTile( pixelRadius, pixelRadius, pixelRadius, self.color, frameColor, boarder+1, self.useColorCache )
     self.tiles.topRight = generateCornerTile( 1, pixelRadius, pixelRadius, self.color, frameColor, boarder+1, self.useColorCache )

@@ -1,5 +1,4 @@
 local utils = advancedMacros.utils
-local misc = require"misc"
 local Element = require"ui/Element"
 
 local EnableToggle = newClass("ui/EnableToggle", Element)
@@ -18,7 +17,7 @@ local function generateBubble( self, size, borderThickness, color, frame )
     return EnableToggle.static.tiles[ key ]
   end
 
-  local resScale = misc.resScale( self.screen )
+  local resScale = utils.resScale( self.screen )
   size = size*resScale
   borderThickness = borderThickness*resScale
 
@@ -104,10 +103,10 @@ function EnableToggle:updateImage()
   
   if self.enabled then
     color = self.enabledColor or EnableToggle.static.defaultEnabledColor
-    frameColor = misc.trimColor(color)
+    frameColor = utils.trimColor(color)
   else
     color = self.disabledColor or EnableToggle.static.defaultDisabledColor
-    frameColor = misc.trimColor(color)
+    frameColor = utils.trimColor(color)
   end
   
   if not self.parentEnabled then
@@ -116,7 +115,7 @@ function EnableToggle:updateImage()
 
   --log(self.elements.enableToggle.button.isHover())
   if self.elements.enableToggle.button.isHover() then
-    color = misc.darkenColor( color )
+    color = utils.darkenColor( color )
   end
   --log("&aColor: ", color)
 

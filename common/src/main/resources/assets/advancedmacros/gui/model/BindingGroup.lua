@@ -23,10 +23,9 @@ end
 function BindingGroup:toJson()
   local json = require("JsonObject"):new()
   local array = require("JsonArray"):new()
-  local misc = require"misc"
 
   json:put("label",     self.label                        )
-  json:put("color",     misc.colorToJsonValue(self.color) )
+  json:put("color",     utils.colorToJsonValue(self.color) )
   json:put("enabled",   self.enabled                      )
   json:put("children",  array                             )
   json:put("className", self:className()                  )

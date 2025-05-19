@@ -1,5 +1,4 @@
 local utils = advancedMacros.utils
-local misc = require"misc"
 
 local EventChannel = require"ui/EventChannel"
 local ListView = require"ui/layout/ListView"
@@ -82,10 +81,10 @@ function ComboBox:new( ... )
   obj.elements.widget.triangleButton.setHoverTint( 0x44FFFFFF )
 
   obj.elements.widget.box:setOnMouseClick(function(x,y,b) 
-    if b == misc.LMB then 
+    if b == utils.LMB then 
       obj:open() 
       return true
-    elseif b == misc.RMB then
+    elseif b == utils.RMB then
       obj.events.rmb:notify(obj, x, y)
     end
   end)

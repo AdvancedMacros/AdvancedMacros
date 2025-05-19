@@ -62,7 +62,6 @@ end
 
 function Binding:toJson()
   local json = require("JsonObject"):new()
-  local misc = require"misc"
   
   --names match kwargs for Binding:new(...)
 
@@ -76,7 +75,7 @@ function Binding:toJson()
     json:put("scriptValue", self.scriptValue                )
   end
   json:put("label",       self.label                        )
-  json:put("color",       misc.colorToJsonValue(self.color) )
+  json:put("color",       utils.colorToJsonValue(self.color) )
   json:put("className",   self:className()                  )
   return json
 end

@@ -684,3 +684,52 @@ function utils.hsvToRgb(h, s, v, a)
 
   return r + m, g + m, b + m, a
 end
+
+utils.LMB = 0
+utils.MMB = 2
+utils.RMB = 1
+
+function utils.randomColor()
+  return { utils.hsvToRgb( math.random() * 360, 1, .7, 1 ) }
+end
+
+function misc.colorToJsonValue( color )
+  if type(color) == "number" then
+    return color
+  elseif type(color) == "table" then
+    if color.r then
+      local json = require"JsonObject":new()
+      json:put("r", color.r)
+      json:put("g", color.g)
+      json:put("b", color.b)
+      json:put("a", color.a)
+      return json
+    else
+      local array = require"JsonArray":new()
+      for i = 1, 4 do
+        array:put( color[i] )
+      end
+      return array
+    end
+  end
+end
+
+function utils.resScale( screen )
+  local sw,sh,pw,ph = screen.getSize()
+  return math.max( (pw/sw), (ph/sh) )
+end
+
+---returns a color with same hue, less saturation, and a value that should offer some contrast
+function utils.trimColor( color )
+  local h,s,v,a = utils.rgbToHsv( table.unpack( color ))
+  s = s * .5
+  v = 1 - ( (1-v) * .5 )
+  return { utils.hsvToRgb( h,s,v,a ) }
+end
+
+function utils.darkenColor( color )
+  local h,s,v,a = utils.rgbToHsv( table.unpack( color ))
+  v = v * .6
+  return { utils.hsvToRgb( h,s,v,a ) }
+end
+

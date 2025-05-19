@@ -1,5 +1,4 @@
 local File = require"File"
-local misc = require"misc"
 local Json = require"Json"
 local utils = advancedMacros.utils
 local JsonObject = require"JsonObject"
@@ -32,7 +31,7 @@ function Workspace:load( name )
   if isClass(name) and name:isA(File) then
     file = name
   else
-    file = misc.workspaceDir:navigate(name..".json")
+    file = File.static.workspaceDir:navigate(name..".json")
   end
   if not file:exists() then
     error(("Workspace with name '%s' doesn't exist"):format(name),2)
@@ -58,7 +57,7 @@ function Workspace:save()
 end
 
 function Workspace:getConfigFile()
-  return misc.workspaceDir:navigate(self.workspaceName..".json")
+  return File.static.workspaceDir:navigate(self.workspaceName..".json")
 end
 
 return Workspace

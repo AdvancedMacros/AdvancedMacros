@@ -47,8 +47,8 @@ end
 
 -- run("ResourceSearcher.lua")
 --preload
-local misc = require"misc"
 local Json = require"Json"
+local File = require"File"
 require"JsonArray"
 require"JsonObject"
 require"DelayedTask"
@@ -188,7 +188,7 @@ end
 
 function BindingsMenu:openREPL( x, y, b )
   --TODO run REPL if REPL is not defined yet
-  if b == misc.RMB then
+  if b == utils.RMB then
     --context menu
     --reset
   else
@@ -220,7 +220,7 @@ function BindingsMenu:loadProfile( name, previous )
   previous = previous or "DEFAULT"
   utils.tryCatch{
     try = function()
-      local profileJson = misc.profileDir:navigate( name..".json" )
+      local profileJson = File.static.profileDir:navigate( name..".json" )
       if not profileJson:exists() and name ~= "DEFAULT" then
         error(("File not found: %s"):format(name, profileJson:getPath()), 2)
       end
@@ -278,7 +278,7 @@ function BindingsMenu:save()
   end
 
   thread.new(function()
-    local file = misc.profileDir:navigate( self:getProfileName()..".json" )
+    local file = File.static.profileDir:navigate( self:getProfileName()..".json" )
     -- file:write(utils.serializeOrdered(bindings, nil, 2))
     file:write( array:toString() )
   end).start()
@@ -294,7 +294,7 @@ end
 
 function BindingsMenu:newBinding( binding )
   binding = binding or Binding:new{
-    color = misc.randomColor()
+    color = utils.randomColor()
   }
   local card = BindingCard:new{
     screen = self.screen,
@@ -319,7 +319,7 @@ function BindingsMenu:newGroup( group )
     y = 0,
     width = width - 12,
     height = 120,
-    color = misc.randomColor(),
+    color = utils.randomColor(),
   }
   
   if group then
