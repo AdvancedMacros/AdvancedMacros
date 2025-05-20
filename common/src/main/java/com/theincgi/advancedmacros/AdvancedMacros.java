@@ -80,6 +80,7 @@ public class AdvancedMacros {
     public static final String DEFAULT_WORKSPACE_NAME = "AM Default";
     public static final File MACROS_ROOT_FOLDER = getRootFolder();
     public static final File MACROS_FOLDER = new File(MACROS_ROOT_FOLDER, "macros");
+    public static final File WORKSPACES_FOLDER = new File(MACROS_ROOT_FOLDER, "workspaces");
     public static final File MACRO_SOUNDS_FOLDER = new File(MACROS_ROOT_FOLDER, "sounds");
     public static final File CUSTOM_DOCS_FOLDER = new File(MACROS_ROOT_FOLDER, "docs");
     public static final Workspace DEFAULT_WORKSPACE = new Workspace(DEFAULT_WORKSPACE_NAME, MACROS_FOLDER.getAbsolutePath().replace(File.separator, "/"));
@@ -112,6 +113,7 @@ public class AdvancedMacros {
     public static void init() {
         MACROS_ROOT_FOLDER.mkdirs();
         MACROS_FOLDER.mkdirs();
+        WORKSPACES_FOLDER.mkdirs();
         MACRO_SOUNDS_FOLDER.mkdirs();
         CUSTOM_DOCS_FOLDER.mkdirs();
 

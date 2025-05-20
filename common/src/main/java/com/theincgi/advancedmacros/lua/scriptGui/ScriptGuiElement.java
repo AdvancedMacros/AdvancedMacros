@@ -273,13 +273,14 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
                 return LuaValue.valueOf(mouseIsOver);
             }
         });
-        this.set("setEventWorkspace", new OneArgFunction() {
-			@Override
-			public LuaValue call(LuaValue arg) {
-				workspace = Workspaces.getWorkspaceByName(arg.checkjstring(1));
-				return workspace.asTable();
-			}
-		});
+        //TODO set gui workspace on creation
+//        this.set("setEventWorkspace", new OneArgFunction() {
+//			@Override
+//			public LuaValue call(LuaValue arg) {
+//				workspace = Workspaces.getWorkspaceByName(arg.checkjstring(1));
+//				return workspace.asTable();
+//			}
+//		});
         this.set("getEventWorkspace", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {

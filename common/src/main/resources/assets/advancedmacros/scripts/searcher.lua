@@ -1,8 +1,8 @@
 if(#package.path <= #("?.lua"))then
   local paths = {
-    filesystem.getMacrosAddress().."\\libs\\?.lua",
-    filesystem.getMacrosAddress().."\\libs\\?\\init.lua",
-   -- "C:\\Program Files (x86)\\Lua\\5.1\\clibs\\?.dll"
+    -- filesystem.getMacrosAddress().."\\libs\\?.lua",
+    -- filesystem.getMacrosAddress().."\\libs\\?\\init.lua",
+    -- "C:\\Program Files (x86)\\Lua\\5.1\\clibs\\?.dll"
   }
   package.path = ".\\?.lua;"..package.path
   for a,b in pairs(paths) do
@@ -20,8 +20,38 @@ function package.invalidateWorkspaceCache()
   workspaceCache = {}
 end
 
---unload all instances of `module` across all workspaces
+---path to workspace + / + module name
+---@param name string name of module
+---@param workspace Workspace the workspace
+local function getGlobalModuleName(name, workspace)
+  return workspace:navigate(name):getPath()
+end
+
+---unloads all instances of `module` across all workspaces & removes from package.globalLoaded
+---@param module string name of the module
+---@param workspace nil|string|Workspace name or instance of workspace, if nil then defaults to current workspace
 function package.unload(module, workspace)
+  if workspace == nil then
+    workspace = getCurrentWorkspace()
+  elseif type(workspace)=="string" then
+    workspace = getWorkspaceByName(workspace)
+  elseif instanceOf(workspace, package.preload["Workspace"]) then
+    --no action needed
+  else
+    error("invalid arg 2 [workspace], expected nil|string|class:Workspace, got "..type(workspace))
+  end
+
+  local globalName = getGlobalModuleName(module, workspace)
+  local loaded = package.globalLoaded[globalName]
+  package.globalLoaded[globalName] = nil
+  for path, cache in pairs(workspaceLoads) do
+    for k, v in pairs(cache) do
+      if v == loaded then
+        cache[k] = nil
+        break
+      end
+    end
+  end
 end
 
 local function getCurrentWorkspace()
@@ -37,20 +67,36 @@ local function getWorkspaceByName(name)
   local cached = workspaceCache[name]
   if cached then return cached end
   local Workspace = package.preload["Workspace"]
-  local workspace = Workspace:load(name)
+  local workspace
+  if name == "internal" then
+    workspace = Workspace:new{
+      workspaceName = "internal",
+      workspacePath = "resource:"
+    }
+  else 
+    workspace = Workspace:load(name)
+  end
   workspaceCache[name] = workspace
   return workspace
 end
 
----path to workspace + / + module name
-local function getGlobalModuleName(name, workspaceName)
-  local path
-  if workspaceName then
-    path = getWorkspaceByName(workspaceName).workspacePath
-  else
-    path = getCurrentWorkspace().workspacePath
+
+
+---wrapper function to pull from `package.globalLoaded`
+---makes it so if nested workspaces refer to the same file it's only loaded once
+---TODO setting/workspace permission?
+---@param path string value from `getGlobalModuleName`
+---@param loader function loader function for the module
+---@return function wrappedLoader loader that stashes it's returned value in package.globalLoaded
+local function cacheGlobalModule(path, loader)
+  return function()
+    local value = package.globalLoaded[path]
+    if not value then
+      value = loader()
+      package.globalLoaded[path] = value
+    end
+    return value
   end
-  return path.."/"..name
 end
 
 local workspaceLoads = {}
@@ -119,12 +165,16 @@ local function luaSearcher(name, workspaceName)
     return "no such workspace '"..tostring(workspaceName).."'"
   end
 
+  local globalName = getGlobalModuleName(name, workspace)
+  local gLoaded = package.globalLoaded[globalName]
+  if gLoaded then return gLoaded end
+
   if workspace.workspaceName == "internal" then
     local src =  advancedMacros.getResource("scripts/"..name:lower()..".lua")
               or advancedMacros.getResource("gui/"..name:lower()..".lua")
 
     if src then
-      return load(src, "resource:"..name, "t", _G)
+      return cacheGlobalModule(globalName, load(src, "resource:"..name, "t", _G))
     end
     return ([[resource "%s" doesn't exist]]):format(name)
   end
@@ -134,7 +184,7 @@ local function luaSearcher(name, workspaceName)
   for pattern in package.path:gsub("\\","/"):gmatch"[^;]+" do
     local file = workspace:navigate( pattern:gsub("?", name) )
     if file:exists() then
-      return load(file:readAll(), workspace.workspaceName.."::"..name, "bt", _G ) --TODO sandboxing options / access permissions
+      return cacheGlobalModule(globalName, load(file:readAll(), workspace.workspaceName.."::"..name, "bt", _G )) --TODO sandboxing options / access permissions
     end
     table.insert(attempts, ("'%s' not found"):format(file:getPath()))
   end

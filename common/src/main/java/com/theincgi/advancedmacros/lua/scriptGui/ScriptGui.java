@@ -236,9 +236,9 @@ public class ScriptGui extends LuaTable implements InputSubscriber {
                     gui.clearInputSubscribers();
                     gui.clearDrawables();
                     return NONE;
-                case setEventWorkspace:
-                	workspace = Workspaces.getWorkspaceByName( args.checkjstring(1) );
-                	return workspace.asTable();
+//                case setEventWorkspace: //TODO set workspace of gui on creation
+//                	workspace = Workspaces.getWorkspaceByName( args.checkjstring(1) );
+//                	return workspace.asTable();
                 case getEventWorkspace:
                 	return workspace.asTable();
                 

@@ -59,7 +59,7 @@ public class Settings {
         if(settings.get("chat").get("maxLines").isnil()) {
             settings.set("maxLines", 100);
         }
-        setupWorkspaces();
+//        setupWorkspaces();
     }
     //	private static void loadDefaults(boolean force) {
     //
@@ -83,12 +83,12 @@ public class Settings {
     //
     //	}
 
-	private static void setupWorkspaces() {
-		if(settings.get("workspaces").isnil()) {
-			settings.set("workspaces", new LuaTable());
-		}
-		settings.get("workspaces").set(AdvancedMacros.DEFAULT_WORKSPACE.name(), AdvancedMacros.DEFAULT_WORKSPACE.path());
-	}
+//	private static void setupWorkspaces() {
+//		if(settings.get("workspaces").isnil()) {
+//			settings.set("workspaces", new LuaTable());
+//		}
+//		settings.get("workspaces").set(AdvancedMacros.DEFAULT_WORKSPACE.name(), AdvancedMacros.DEFAULT_WORKSPACE.path());
+//	}
 
     public static void unloadTexture(String file) {
         LuaValue v = TEXTURES.get(file);
@@ -412,15 +412,15 @@ public class Settings {
 
     }
 
-	public static Optional<String> getWorkspacePath(String name) {
-		LuaTable workspaces = settings.get("workspaces").checktable();
-		
-		LuaValue path = workspaces.get( name );
-		if(name.equals(AdvancedMacros.DEFAULT_WORKSPACE_NAME) && path.isnil()) {
-			setupWorkspaces();
-			path = workspaces.get( name );
-		}
-		return Optional.ofNullable( path.isnil() ? null : path.checkjstring());
-	}
+//	public static Optional<String> getWorkspacePath(String name) {
+//		LuaTable workspaces = settings.get("workspaces").checktable();
+//		
+//		LuaValue path = workspaces.get( name );
+//		if(name.equals(AdvancedMacros.DEFAULT_WORKSPACE_NAME) && path.isnil()) {
+////			setupWorkspaces();
+//			path = workspaces.get( name );
+//		}
+//		return Optional.ofNullable( path.isnil() ? null : path.checkjstring());
+//	}
 
 }

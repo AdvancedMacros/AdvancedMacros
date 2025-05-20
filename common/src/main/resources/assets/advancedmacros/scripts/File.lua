@@ -78,6 +78,9 @@ function File:getPathParts()
 end
 
 function File:getPath()
+  if self.workspacePath == "resource:" then
+    return self.workspacePath .. self.path
+  end
   local full = self.workspacePath.."/"..self.path
   for folder, back in full:gmatch"([^/]+)(/%.%./)" do -- something/../
     if folder ~= ".." then --don't collapse /../..
@@ -323,7 +326,6 @@ File.static = {
   }
 }
 
-File.static.workspaceDir:mkDirs()
 package.preload["File"] = File
 
 return File

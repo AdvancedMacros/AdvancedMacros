@@ -21,31 +21,31 @@ public class Workspaces {
     	}
     }
     
-    public static class SetWorkspaceByName extends OneArgFunction {
-    	@Override
-    	public LuaValue call(LuaValue arg) {
-    		Workspace workspace = getWorkspaceByName(arg.checkjstring());
-    		if(Thread.currentThread() == AdvancedMacros.getMinecraftThread()) {
-    			Utils.setMCThreadWorkspace( workspace );
-    		} else {
-    			LuaDebug.LuaThread.getCurrent().workspace = workspace;
-    		}
-    		return NONE;
-    	}
-    }
+//    public static class SetWorkspaceByName extends OneArgFunction {
+//    	@Override
+//    	public LuaValue call(LuaValue arg) {
+//    		Workspace workspace = getWorkspaceByName(arg.checkjstring());
+//    		if(Thread.currentThread() == AdvancedMacros.getMinecraftThread()) {
+//    			Utils.setMCThreadWorkspace( workspace );
+//    		} else {
+//    			LuaDebug.LuaThread.getCurrent().workspace = workspace;
+//    		}
+//    		return NONE;
+//    	}
+//    }
     
-    /**
-     * @throws LuaError if workspace not defined
-     * */
-    public static Workspace getWorkspaceByName( String name ) {
-    	name = name.trim();
-		if(name.isBlank())
-			throw new LuaError("Invalid workspace name \""+name+"\"");
-		
-		Optional<String> path = Settings.getWorkspacePath( name );
-		if( path.isEmpty() )
-			throw new LuaError("Workspace '"+name+"' is not defined in getSettings().workspaces");
-		
-		return new Workspace(name, path.get());
-    }
+//    /**
+//     * @throws LuaError if workspace not defined
+//     * */
+//    public static Workspace getWorkspaceByName( String name ) {
+//    	name = name.trim();
+//		if(name.isBlank())
+//			throw new LuaError("Invalid workspace name \""+name+"\"");
+//		
+//		Optional<String> path = Settings.getWorkspacePath( name );
+//		if( path.isEmpty() )
+//			throw new LuaError("Workspace '"+name+"' is not defined in getSettings().workspaces");
+//		
+//		return new Workspace(name, path.get());
+//    }
 }
