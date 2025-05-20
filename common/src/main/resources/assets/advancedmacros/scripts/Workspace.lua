@@ -1,8 +1,7 @@
-local File = require"File"
-local Json = require"Json"
+local File = package.preload["File"]
+local Json = package.preload["Json"]
 local utils = advancedMacros.utils
-local JsonObject = require"JsonObject"
-local JsonArray = require"JsonArray"
+local JsonArray = package.preload["JsonArray"]
 
 local Workspace = newClass("Workspace", File)
 
@@ -23,9 +22,9 @@ function Workspace:new( ... )
   return obj
 end
 
---constructor <br>
---params: <br> 
---<code>name</code> - File or name of file without extension
+---constructor, throws error if file not found
+---@param name File|string Exact file to use or name of file without extension
+---@return Workspace
 function Workspace:load( name )
   local file
   if isClass(name) and name:isA(File) then
@@ -59,5 +58,7 @@ end
 function Workspace:getConfigFile()
   return File.static.workspaceDir:navigate(self.workspaceName..".json")
 end
+
+package.preload["Workspace"] = Workspace
 
 return Workspace

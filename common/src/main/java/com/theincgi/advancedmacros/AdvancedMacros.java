@@ -177,7 +177,7 @@ public class AdvancedMacros {
         ADVANCED_MACROS_TABLE.set("openChangeLog", new OpenChangeLog());
         ADVANCED_MACROS_TABLE.set("getResource", new GetResource());
         ADVANCED_MACROS_TABLE.set("getWorkspace", new Workspaces.GetWorkspace());
-        ADVANCED_MACROS_TABLE.set("setWorkspace", new Workspaces.SetWorkspaceByName());
+//        ADVANCED_MACROS_TABLE.set("setWorkspace", new Workspaces.SetWorkspaceByName()); //TODO remove
         editor.set("jumpToLine", new EditorControls.JumpToLine());
 
         globals.set("run", new Call());
@@ -367,19 +367,25 @@ public class AdvancedMacros {
     }
 
     private static void loadScripts() {
-
+    	Utils.setMCThreadWorkspace(Workspace.INTERNAL);
     	String[] scripts = new String[] {
-//    			"searcher",
-    			"resource_searcher",
+    			"searcher",
+//    			"resource_searcher",
     			"settings_fix",
     			"morefunc",
     			"easings",
-    			"httpquick",
     			"class",
-    			"utils"
+    			"utils",
+    			"file",       //class->package.preload
+    			"workspace",  //class->package.preload
+    			"json",       //class->package.preload
+    			"jsonobject", //class->package.preload
+    			"jsonarray",  //class->package.preload
+    			"httpquick"
 		};
 		for( String script : scripts ) {
 			try {
+				System.out.println("Loading built in script: "+script+".lua");
 				Optional<Resource> res = getMinecraft().getResourceManager().getResource(new Identifier(AdvancedMacros.MOD_ID, "scripts/"+script+".lua"));
 				if(res.isEmpty()) {
 					System.err.println("Couldn't load packaged script '"+script+"'");
@@ -405,6 +411,7 @@ public class AdvancedMacros {
 		} catch (Throwable e) {
 			e.printStackTrace();
     	}
+		Utils.setMCThreadWorkspace(null);
     }
 
     public static File[] getScriptList() {

@@ -1,5 +1,5 @@
 local Json = require"Json"
-local JsonArray = newClass("common.JsonArray", Json)
+local JsonArray = newClass("JsonArray", Json)
 
 function JsonArray:new( src )
   local obj = JsonArray._new( self )
@@ -98,5 +98,7 @@ function JsonArray:toTable()
   end
   return out
 end
+
+package.preload["JsonArray"] = JsonArray
 
 return JsonArray

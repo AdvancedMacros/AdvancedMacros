@@ -693,7 +693,7 @@ function utils.randomColor()
   return { utils.hsvToRgb( math.random() * 360, 1, .7, 1 ) }
 end
 
-function misc.colorToJsonValue( color )
+function utils.colorToJsonValue( color )
   if type(color) == "number" then
     return color
   elseif type(color) == "table" then

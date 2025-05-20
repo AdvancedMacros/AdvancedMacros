@@ -19,7 +19,7 @@ public class GetResource extends OneArgFunction {
 	public LuaValue call(LuaValue arg) {	
 		Optional<Resource> resource = AdvancedMacros.getMinecraft()
 			.getResourceManager()
-			.getResource(new Identifier(AdvancedMacros.MOD_ID, "scripts/"+arg.checkjstring()));
+			.getResource(new Identifier(AdvancedMacros.MOD_ID, arg.checkjstring()));
 		
 		if(resource.isEmpty())
 			return FALSE;

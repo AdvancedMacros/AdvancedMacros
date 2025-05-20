@@ -1,5 +1,5 @@
 local Json = require"Json"
-local JsonObject = newClass("common.JsonObject", Json)
+local JsonObject = newClass("JsonObject", Json)
 
 function JsonObject:new( src )
   local obj = JsonObject._new( self )
@@ -85,5 +85,7 @@ function JsonObject:toTable()
   end
   return out
 end
+
+package.preload["JsonObject"] = JsonObject
 
 return JsonObject

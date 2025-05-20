@@ -1,4 +1,4 @@
-local Json = newClass"common.Json"
+local Json = newClass"Json"
 
 Json.static = {}
 
@@ -135,4 +135,5 @@ function Json:toTable()
   return {}
 end
 
+package.preload["Json"] = Json
 return Json

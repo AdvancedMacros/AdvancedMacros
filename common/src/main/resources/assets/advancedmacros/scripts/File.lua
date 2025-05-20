@@ -1,7 +1,5 @@
 local utils = advancedMacros.utils
 
-local JsonObject = require"JsonObject"
-
 local File = newClass"File"
 
 local function lookupWorkspaceName( path )
@@ -22,7 +20,7 @@ function File:new( ... )
     local ws = advancedMacros.getWorkspace()
     workspacePath = ws.path
     workspaceName = ws.name
-    log("set path from no args: ", workspacePath)
+    -- log("set path from no args: ", workspacePath)
   end
 
   obj.workspaceName = workspaceName
@@ -302,6 +300,7 @@ function File:equals( otherFile )
 end
 
 function File:toJson()
+  local JsonObject = require"JsonObject"
   local out = JsonObject:new()
   out:put("workspaceName", self.workspaceName)
   out:put("workspacePath", self.workspacePath)
@@ -325,5 +324,6 @@ File.static = {
 }
 
 File.static.workspaceDir:mkDirs()
+package.preload["File"] = File
 
 return File

@@ -30,8 +30,8 @@ end
 local parseJSON = function(response)
   if response.type:match "application/json" then
       pcall(function()
-          local json = require 'json'
-          response.json = json.parse(response.response)
+          local Json = require"Json"
+          response.json = Json:new(response.response)
           return response.json
       end)
   else

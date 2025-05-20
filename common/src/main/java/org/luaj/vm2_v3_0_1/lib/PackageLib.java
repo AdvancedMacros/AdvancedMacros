@@ -227,12 +227,11 @@ public class PackageLib extends TwoArgFunction {
         public synchronized LuaValue call(LuaValue arg) {
         	//changes for AM to support multiple workspaces
         	String[] moduleParts = arg.checkjstring().split("::");
-            LuaString name, workspaceName, fullPath;
+            LuaString name, fullPath;
+            LuaValue workspaceName;
             if(moduleParts.length == 1) {
             	name = valueOf(moduleParts[0]);
-            	workspaceName = valueOf(
-            		Utils.currentWorkspace().name()
-            	);
+            	workspaceName = LuaValue.NIL;
             } else {
             	name = valueOf(moduleParts[1]);
             	workspaceName = valueOf(moduleParts[0]);
@@ -257,7 +256,7 @@ public class PackageLib extends TwoArgFunction {
             for (int i = 1; true; i++) {
                 LuaValue searcher = tbl.get(i);
                 if (searcher.isnil()) {
-                    error("module '" + name + "' not found: " + name + sb);
+                    error("module '" + name + "' not found: " + name + "\n" + sb);
                 }
 
                 /* call loader with module name as argument */
@@ -268,11 +267,14 @@ public class PackageLib extends TwoArgFunction {
                 if (loader.isstring(1)) {
                     sb.append(loader.tojstring(1));
                 }
+                if(loader.istable(i)) {
+                	break;
+                }
             }
             
             // load the module using the loader
-            fullPath = loader.checkstring(2);
-            result = loaded.get(fullPath);
+//            fullPath = loader.checkstring(2);
+            result = loaded.get(name);
             if (result.toboolean()) {
                 if (result == _SENTINEL) {
                     error("loop or previous error loading module '" + name + "'");
@@ -280,11 +282,15 @@ public class PackageLib extends TwoArgFunction {
                 return result;
             }
             
-            loaded.set(fullPath, _SENTINEL);
-            result = loader.arg1().call(name, loader.arg(2));
+            loaded.set(name, _SENTINEL);
+            if(loader.isfunction(1))
+            	result = loader.arg1().call(name, loader.arg(2));
+            else
+            	result = loader.checktable(1);
+            
             if (!result.isnil()) {
-                loaded.set(fullPath, result);
-            } else if ((result = loaded.get(fullPath)) == _SENTINEL) {
+                loaded.set(name, result);
+            } else if ((result = loaded.get(name)) == _SENTINEL) {
                 loaded.set(name, result = LuaValue.TRUE);
             }
             return result;

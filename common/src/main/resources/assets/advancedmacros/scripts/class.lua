@@ -127,6 +127,9 @@ function isClass( x )
   return false
 end
 
+function instanceOf(x, cls)
+  return isClass(x) and x:isA(cls)
+end
 
 --Bar = require.....
 -- local Foo = advancedMacros.class( "Foo", Bar )
