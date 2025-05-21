@@ -18,6 +18,8 @@ import com.theincgi.advancedmacros.lua.functions.GuiControls;
 import com.theincgi.advancedmacros.misc.HIDUtils;
 import com.theincgi.advancedmacros.misc.Pair;
 import com.theincgi.advancedmacros.misc.Utils;
+import com.theincgi.advancedmacros.misc.Workspace;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.ChatHud;
@@ -187,6 +189,7 @@ public class EventHandler {
                 showMenu(AdvancedMacros.scriptBrowser2, AdvancedMacros.macroMenuGui.getGui());
             } else if (HIDUtils.Keyboard.isAlt()) {
                 LuaDebug.LuaThread thread = new LuaDebug.LuaThread(AdvancedMacros.repl, "REPL");
+                thread.workspace = Workspace.DEFAULT;
                 thread.start();
             } else {
                 if (AdvancedMacros.lastGui != null) {

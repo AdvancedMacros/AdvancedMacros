@@ -202,7 +202,9 @@ public class MCTextBar extends ScriptGuiElement {
     public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
         if (textField.mouseClicked(x, y, buttonNum)) {
             if (onMouseClick != null) {
-                Utils.pcall(onMouseClick, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(buttonNum));
+            	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+            		Utils.pcall(onMouseClick, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(buttonNum));
+            	}
             }
             textField.setFocused(true);
             return true;
@@ -217,7 +219,9 @@ public class MCTextBar extends ScriptGuiElement {
         }
         textField.keyPressed(keyCode, scanCode, modifiers);
         if (onKeyPressed != null) {
-            Utils.pcall(onKeyPressed, valueOf(HIDUtils.Keyboard.nameOf(keyCode)), valueOf(scanCode), HIDUtils.Keyboard.modifiersToLuaTable(modifiers));
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+        		Utils.pcall(onKeyPressed, valueOf(HIDUtils.Keyboard.nameOf(keyCode)), valueOf(scanCode), HIDUtils.Keyboard.modifiersToLuaTable(modifiers));
+        	}
         }
         return true;
     }
@@ -229,7 +233,9 @@ public class MCTextBar extends ScriptGuiElement {
         }
         textField.charTyped(typedChar, mods);
         if (onCharTyped != null) {
-            Utils.pcall(onCharTyped, valueOf(typedChar), valueOf(typedChar), HIDUtils.Keyboard.modifiersToLuaTable(mods));
+    		try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+    			Utils.pcall(onCharTyped, valueOf(typedChar), valueOf(typedChar), HIDUtils.Keyboard.modifiersToLuaTable(mods));
+    		}
         }
         return true;
     }

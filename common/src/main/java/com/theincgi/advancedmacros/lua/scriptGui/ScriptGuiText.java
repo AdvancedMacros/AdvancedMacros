@@ -140,7 +140,9 @@ public class ScriptGuiText extends ScriptGuiElement {
     @Override
     public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
         if (onMouseClick != null && GuiButton.isInBounds(x, y, (int) this.x, (int) this.y, (int) getItemWidth(), (int) getItemHeight())) {
-            return Utils.pcall(onMouseClick, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(buttonNum)).toboolean();
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+        		return Utils.pcall(onMouseClick, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(buttonNum)).toboolean();
+        	}
         }
         return false;
     }
@@ -148,7 +150,9 @@ public class ScriptGuiText extends ScriptGuiElement {
     @Override
     public boolean onMouseRelease(Gui gui, double x, double y, int state) {
         if (onMouseRelease != null && GuiButton.isInBounds(x, y, (int) this.x, (int) this.y, (int) getItemWidth(), (int) getItemHeight())) {
-            return Utils.pcall(onMouseRelease, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(state)).toboolean();
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+        		return Utils.pcall(onMouseRelease, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(state)).toboolean();
+        	}
         }
         return false;
     }
@@ -162,7 +166,9 @@ public class ScriptGuiText extends ScriptGuiElement {
             args.set(3, buttonNum);
             args.set(4, q);
             args.set(5, r);
-            return Utils.pcall(onMouseDrag, args.unpack()).toboolean();
+            try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+            	return Utils.pcall(onMouseDrag, args.unpack()).toboolean();
+            }
         }
         return false;
     }

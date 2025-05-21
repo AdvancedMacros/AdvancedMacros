@@ -170,6 +170,11 @@ public class Workspace {
 		}
 	}
 	
+	public boolean isReservedWorkspace() {
+		return name.equals(AdvancedMacros.DEFAULT_WORKSPACE_NAME) ||
+				name.equals(AdvancedMacros.INTERNAL_WORKSPACE_NAME);
+	}
+	
 	public synchronized File getConfigFile() {
 		checkValid();
 		return new File(AdvancedMacros.WORKSPACES_FOLDER, name+".json");
@@ -180,7 +185,7 @@ public class Workspace {
 		controls.set("getName", new ZeroArgFunction() {
 			@Override public LuaValue call() {
 				if(!valid) throw new LuaError("Attempt to use/modify deleted workspace");
-				return valueOf(name);
+				return valueOf(Workspace.this.name);
 			}
 		});
 		controls.set("getPath", new ZeroArgFunction() {
@@ -230,6 +235,8 @@ public class Workspace {
 			@Override
 			public LuaValue call(LuaValue arg) {
 				var key = arg.checkjstring();
+				if(isReservedWorkspace())
+					throw new LuaError("Attempt to modify permissions of reserved workspace '%s'".formatted(name));
 				Permissions.check(Permission.MODIFY_PERMISSIONS);
 				Permissions.check(key);
 				permissions.grant(key);
@@ -245,6 +252,8 @@ public class Workspace {
 			@Override
 			public LuaValue call(LuaValue arg) {
 				var key = arg.checkjstring();
+				if(isReservedWorkspace())
+					throw new LuaError("Attempt to modify permissions of reserved workspace '%s'".formatted(name));
 				Permissions.check(Permission.MODIFY_PERMISSIONS);
 				permissions.revoke(key);
 				try {
@@ -253,6 +262,12 @@ public class Workspace {
 					e.printStackTrace(); //TODO Save failed err
 				}
 				return NONE;
+			}
+		});
+		controls.set("isReserved", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return valueOf(isReservedWorkspace());
 			}
 		});
 		

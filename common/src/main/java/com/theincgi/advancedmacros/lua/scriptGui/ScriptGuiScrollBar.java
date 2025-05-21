@@ -146,7 +146,9 @@ public class ScriptGuiScrollBar extends ScriptGuiElement {
     public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
         if (bar.onMouseClick(gui, x, y, buttonNum)) {
             if (onMouseClick != null) {
-                Utils.pcall(onMouseClick, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(buttonNum));
+            	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+            		Utils.pcall(onMouseClick, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(buttonNum));
+            	}
             }
             return true;
         }
@@ -163,7 +165,9 @@ public class ScriptGuiScrollBar extends ScriptGuiElement {
                 args.set(3, buttonNum);
                 args.set(4, q);
                 args.set(5, r);
-                Utils.pcall(onMouseDrag, args.unpack());
+                try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+                	Utils.pcall(onMouseDrag, args.unpack());
+                }
             }
             return true;
         }
@@ -174,7 +178,9 @@ public class ScriptGuiScrollBar extends ScriptGuiElement {
     public boolean onMouseRelease(Gui gui, double x, double y, int state) {
         if (bar.onMouseRelease(gui, x, y, state)) {
             if (onMouseRelease != null) {
-                Utils.pcall(onMouseRelease, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(state));
+            	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+            		Utils.pcall(onMouseRelease, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(state));
+            	}
             }
             return true;
         }

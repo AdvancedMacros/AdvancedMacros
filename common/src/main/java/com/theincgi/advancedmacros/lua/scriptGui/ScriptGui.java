@@ -369,8 +369,9 @@ public class ScriptGui extends LuaTable implements InputSubscriber {
     @Override
     public boolean onScroll(Gui gui, double i) {
         if (onScroll != null) {
-        	Utils.setMCThreadWorkspace(workspace);
-            return Utils.pcall(onScroll, LuaValue.valueOf(i)).optboolean(false);
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+        		return Utils.pcall(onScroll, LuaValue.valueOf(i)).optboolean(false);
+        	}
         }
         return false;
     }
@@ -378,8 +379,9 @@ public class ScriptGui extends LuaTable implements InputSubscriber {
     @Override
     public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
         if (onMouseClick != null) {
-        	Utils.setMCThreadWorkspace(workspace);
-            return Utils.pcall(onMouseClick, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(buttonNum)).optboolean(false);
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+        		return Utils.pcall(onMouseClick, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(buttonNum)).optboolean(false);
+        	}
         }
         return false;
     }
@@ -387,8 +389,9 @@ public class ScriptGui extends LuaTable implements InputSubscriber {
     @Override
     public boolean onMouseRelease(Gui gui, double x, double y, int state) {
         if (onMouseRelease != null) {
-        	Utils.setMCThreadWorkspace(workspace);
-            return Utils.pcall(onMouseRelease, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(state)).optboolean(false);
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+        		return Utils.pcall(onMouseRelease, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(state)).optboolean(false);
+        	}
         }
         return false;
     }
@@ -402,8 +405,9 @@ public class ScriptGui extends LuaTable implements InputSubscriber {
             args.set(3, buttonNum);
             args.set(4, q);
             args.set(5, r);
-            Utils.setMCThreadWorkspace(workspace);
-            return Utils.pcall(onMouseDrag, args.unpack()).arg1().optboolean(false);
+            try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+            	return Utils.pcall(onMouseDrag, args.unpack()).arg1().optboolean(false);
+            }
         }
         return false;
     }
@@ -411,12 +415,13 @@ public class ScriptGui extends LuaTable implements InputSubscriber {
     @Override
     public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
         if (onKeyPressed != null) {
-        	Utils.setMCThreadWorkspace(workspace);
-            return Utils.pcall(onKeyPressed,
-                    LuaValue.valueOf(HIDUtils.Keyboard.nameOf(keyCode)),
-                    LuaValue.valueOf(scanCode),
-                    HIDUtils.Keyboard.modifiersToLuaTable(modifiers)
-            ).optboolean(false);
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+	            return Utils.pcall(onKeyPressed,
+	                    LuaValue.valueOf(HIDUtils.Keyboard.nameOf(keyCode)),
+	                    LuaValue.valueOf(scanCode),
+	                    HIDUtils.Keyboard.modifiersToLuaTable(modifiers)
+	            ).optboolean(false);
+        	}
         }
         return false;
     }
@@ -424,11 +429,12 @@ public class ScriptGui extends LuaTable implements InputSubscriber {
     @Override
     public boolean onCharTyped(Gui gui, char typedChar, int mods) {
         if (onCharTyped != null) {
-        	Utils.setMCThreadWorkspace(workspace);
-            return Utils.pcall(onCharTyped,
-                    LuaValue.valueOf(typedChar),
-                    HIDUtils.Keyboard.modifiersToLuaTable(mods)
-            ).optboolean(false);
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+	            return Utils.pcall(onCharTyped,
+	                    LuaValue.valueOf(typedChar),
+	                    HIDUtils.Keyboard.modifiersToLuaTable(mods)
+	            ).optboolean(false);
+        	}
         }
         return false;
     }
@@ -436,8 +442,9 @@ public class ScriptGui extends LuaTable implements InputSubscriber {
     @Override
     public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
         if (onKeyRepeated != null) {
-        	Utils.setMCThreadWorkspace(workspace);
-            return Utils.pcall(onKeyRepeated, LuaValue.valueOf(HIDUtils.Keyboard.nameOf(keyCode)), LuaValue.valueOf(scanCode), LuaValue.valueOf(n), HIDUtils.Keyboard.modifiersToLuaTable(modifiers)).optboolean(false);
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+        		return Utils.pcall(onKeyRepeated, LuaValue.valueOf(HIDUtils.Keyboard.nameOf(keyCode)), LuaValue.valueOf(scanCode), LuaValue.valueOf(n), HIDUtils.Keyboard.modifiersToLuaTable(modifiers)).optboolean(false);
+        	}
         }
         return false;
     }
@@ -445,8 +452,9 @@ public class ScriptGui extends LuaTable implements InputSubscriber {
     @Override
     public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
         if (onKeyReleased != null) {
-        	Utils.setMCThreadWorkspace(workspace);
-            return Utils.pcall(onKeyReleased, LuaValue.valueOf(HIDUtils.Keyboard.nameOf(keyCode)), LuaValue.valueOf(scanCode), HIDUtils.Keyboard.modifiersToLuaTable(modifiers)).optboolean(false);
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+        		return Utils.pcall(onKeyReleased, LuaValue.valueOf(HIDUtils.Keyboard.nameOf(keyCode)), LuaValue.valueOf(scanCode), HIDUtils.Keyboard.modifiersToLuaTable(modifiers)).optboolean(false);
+        	}
         }
         return false;
     }
@@ -457,8 +465,9 @@ public class ScriptGui extends LuaTable implements InputSubscriber {
         public void close() {
             super.close();
             if (onGuiClose != null) {
-            	Utils.setMCThreadWorkspace(workspace);
-                Utils.pcall(onGuiClose);
+            	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+            		Utils.pcall(onGuiClose);
+            	}
             }
             isOpen = false;
             synchronized (getInputSubscribers()) {

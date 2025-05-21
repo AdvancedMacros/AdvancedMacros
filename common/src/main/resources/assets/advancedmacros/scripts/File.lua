@@ -18,8 +18,8 @@ function File:new( ... )
   local workspaceName, workspacePath = args.workspaceName, args.workspacePath
   if not args.workspaceName and not args.workspacePath then
     local ws = advancedMacros.getCurrentWorkspace()
-    workspacePath = ws.path
-    workspaceName = ws.name
+    workspacePath = ws:getPath()
+    workspaceName = ws:getName()
     -- log("set path from no args: ", workspacePath)
   end
 
@@ -32,7 +32,7 @@ function File:new( ... )
   elseif isClass( workspacePath ) and workspacePath:isA(File) then
     workspacePath = args.workspacePath:getPath()
   elseif not workspacePath then
-    workspacePath = (args.workspacePath or advancedMacros.getCurrentWorkspace().path):gsub(filesystem.separator,"/"):match("(.+)[^/]?") --don't include ending slash if present
+    workspacePath = (args.workspacePath or advancedMacros.getCurrentWorkspace():getPath()):gsub(filesystem.separator,"/"):match("(.+)[^/]?") --don't include ending slash if present
   end
 
   obj.workspacePath = workspacePath

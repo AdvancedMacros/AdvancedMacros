@@ -1631,7 +1631,22 @@ public class Utils {
     			LuaDebug.LuaThread.mcThreadWorkspace : LuaDebug.LuaThread.getCurrent().workspace;
 	}
     
-	public static void setMCThreadWorkspace( Workspace workspace ) {
+	public static AutoResetMCWorkspace setMCThreadWorkspace( Workspace workspace ) {
+		if(!Thread.currentThread().equals(AdvancedMacros.getMinecraftThread()))
+			throw new IllegalStateException("Attempt to change MC thread workspace from other thread");
+		
+		var reset = new AutoResetMCWorkspace();
 		LuaDebug.LuaThread.mcThreadWorkspace = workspace;
+		return reset;
+	}
+	
+	public static class AutoResetMCWorkspace implements AutoCloseable {
+		private final Workspace resetTo;
+		public AutoResetMCWorkspace() {
+			this.resetTo = LuaDebug.LuaThread.mcThreadWorkspace;
+		}
+		public void close() {
+			LuaDebug.LuaThread.mcThreadWorkspace = resetTo;
+		};
 	}
 }

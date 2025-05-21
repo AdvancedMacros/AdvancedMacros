@@ -445,15 +445,17 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
 
     private void onMouseExit() {
         if (onMouseExit != null) {
-        	Utils.setMCThreadWorkspace(workspace);
-            Utils.pcall(onMouseExit);
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+        		Utils.pcall(onMouseExit);
+        	}
         }
     }
 
     private void onMouseEnter() {
         if (onMouseEnter != null) {
-        	Utils.setMCThreadWorkspace(workspace);
-            Utils.pcall(onMouseEnter);
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+        		Utils.pcall(onMouseEnter);
+        	}
         }
     }
 
@@ -504,8 +506,9 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
     @Override
     public boolean onScroll(Gui gui, double i) {
         if (onScroll != null) {
-        	Utils.setMCThreadWorkspace(workspace);
-            return Utils.pcall(onScroll, LuaValue.valueOf(i)).toboolean();
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+        		return Utils.pcall(onScroll, LuaValue.valueOf(i)).toboolean();
+        	}
         }
         return false;
     }
@@ -513,8 +516,9 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
     @Override
     public boolean onMouseClick(Gui gui, double x, double y, int buttonNum) {
         if (onMouseClick != null && GuiButton.isInBounds(x, y, (int) this.x, (int) this.y, (int) wid, (int) hei)) {
-        	Utils.setMCThreadWorkspace(workspace);
-            return Utils.pcall(onMouseClick, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(buttonNum)).toboolean();
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+        		return Utils.pcall(onMouseClick, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(buttonNum)).toboolean();
+        	}
         }
         return false;
     }
@@ -522,8 +526,9 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
     @Override
     public boolean onMouseRelease(Gui gui, double x, double y, int state) {
         if (onMouseRelease != null && GuiButton.isInBounds(x, y, (int) this.x, (int) this.y, (int) wid, (int) hei)) {
-        	Utils.setMCThreadWorkspace(workspace);
-            return Utils.pcall(onMouseRelease, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(state)).toboolean();
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+        		return Utils.pcall(onMouseRelease, LuaValue.valueOf(x), LuaValue.valueOf(y), LuaValue.valueOf(state)).toboolean();
+        	}
         }
         return false;
     }
@@ -537,8 +542,9 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
             args.set(3, buttonNum);
             args.set(4, q);
             args.set(5, r);
-            Utils.setMCThreadWorkspace(workspace);
-            return Utils.pcall(onMouseDrag, args.unpack()).toboolean();
+            try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+            	return Utils.pcall(onMouseDrag, args.unpack()).toboolean();
+            }
         }
         return false;
     }
@@ -546,12 +552,13 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
     @Override
     public boolean onKeyPressed(Gui gui, int keyCode, int scanCode, int modifiers) {
         if (onKeyPressed != null) {
-        	Utils.setMCThreadWorkspace(workspace);
-            return Utils.pcall(onKeyPressed,
-                    LuaValue.valueOf(HIDUtils.Keyboard.nameOf(keyCode)),
-                    LuaValue.valueOf(scanCode),
-                    HIDUtils.Keyboard.modifiersToLuaTable(modifiers)
-            ).toboolean();
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+	            return Utils.pcall(onKeyPressed,
+	                    LuaValue.valueOf(HIDUtils.Keyboard.nameOf(keyCode)),
+	                    LuaValue.valueOf(scanCode),
+	                    HIDUtils.Keyboard.modifiersToLuaTable(modifiers)
+	            ).toboolean();
+        	}
         }
         return false;
     }
@@ -559,11 +566,12 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
     @Override
     public boolean onCharTyped(Gui gui, char typedChar, int mods) {
         if (onCharTyped != null) {
-        	Utils.setMCThreadWorkspace(workspace);
-            return Utils.pcall(onCharTyped,
-                    LuaValue.valueOf(typedChar),
-                    HIDUtils.Keyboard.modifiersToLuaTable(mods)
-            ).toboolean();
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+	            return Utils.pcall(onCharTyped,
+	                    LuaValue.valueOf(typedChar),
+	                    HIDUtils.Keyboard.modifiersToLuaTable(mods)
+	            ).toboolean();
+        	}
         }
         return false;
     }
@@ -571,8 +579,9 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
     @Override
     public boolean onKeyRelease(Gui gui, int keyCode, int scanCode, int modifiers) {
         if (onKeyReleased != null) {
-        	Utils.setMCThreadWorkspace(workspace);
-            return Utils.pcall(onKeyReleased, LuaValue.valueOf(HIDUtils.Keyboard.nameOf(keyCode)), LuaValue.valueOf(scanCode), HIDUtils.Keyboard.modifiersToLuaTable(modifiers)).toboolean();
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+        		return Utils.pcall(onKeyReleased, LuaValue.valueOf(HIDUtils.Keyboard.nameOf(keyCode)), LuaValue.valueOf(scanCode), HIDUtils.Keyboard.modifiersToLuaTable(modifiers)).toboolean();
+        	}
         }
         return false;
     }
@@ -580,8 +589,9 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
     @Override
     public boolean onKeyRepeat(Gui gui, int keyCode, int scanCode, int modifiers, int n) {
         if (onKeyRepeated != null) {
-        	Utils.setMCThreadWorkspace(workspace);
-            return Utils.pcall(onKeyRepeated, LuaValue.valueOf(HIDUtils.Keyboard.nameOf(keyCode)), LuaValue.valueOf(scanCode), HIDUtils.Keyboard.modifiersToLuaTable(modifiers), LuaValue.valueOf(n)).toboolean();
+        	try(var reset = Utils.setMCThreadWorkspace(workspace)) {
+        		return Utils.pcall(onKeyRepeated, LuaValue.valueOf(HIDUtils.Keyboard.nameOf(keyCode)), LuaValue.valueOf(scanCode), HIDUtils.Keyboard.modifiersToLuaTable(modifiers), LuaValue.valueOf(n)).toboolean();
+        	}
         }
         return false;
     }

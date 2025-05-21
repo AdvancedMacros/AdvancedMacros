@@ -101,7 +101,7 @@ end
 local workspaceLoads = {}
 ---@return table loaded unique table for the thread's workspace
 local function getWorkspaceLoads()
-  local workspacePath = getCurrentWorkspace().workspacePath
+  local workspacePath = getCurrentWorkspace():getPath()
   if not workspaceLoads[workspacePath] then
     workspaceLoads[workspacePath] = {}
   end
@@ -168,7 +168,7 @@ local function luaSearcher(name, workspaceName)
   local gLoaded = package.globalLoaded[globalName]
   if gLoaded then return gLoaded end
 
-  if workspace.workspaceName == "internal" then
+  if workspace:getName() == "internal" then
     local src =  advancedMacros.getResource("scripts/"..name:lower()..".lua")
               or advancedMacros.getResource("gui/"..name:lower()..".lua")
 
@@ -181,9 +181,10 @@ local function luaSearcher(name, workspaceName)
   local attempts = {}
   --search package.path options
   for pattern in package.path:gsub("\\","/"):gmatch"[^;]+" do
-    local file = workspace:navigate( pattern:gsub("?", name) )
+    local file = workspace:toFile():navigate( pattern:gsub("?", name) )
     if file:exists() then
-      return cacheGlobalModule(globalName, load(file:readAll(), workspace.workspaceName.."::"..name, "bt", _G )) --TODO sandboxing options / access permissions
+      local modes = "bt" --workspace:hasPermission"load.binary" and "bt" or "t"
+      return cacheGlobalModule(globalName, load(file:readAll(), workspace:getName().."::"..name, modes, _G )) --TODO sandboxing options / access permissions
     end
     table.insert(attempts, ("'%s' not found"):format(file:getPath()))
   end

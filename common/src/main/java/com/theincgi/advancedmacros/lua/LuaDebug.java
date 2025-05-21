@@ -166,10 +166,7 @@ public class LuaDebug extends DebugLib {
             this.label = label;
             this.varagrs = varagrs;
             
-            LuaThread parent = LuaThread.getCurrent();
-            if( parent != null ) {
-            	this.workspace = parent.workspace;
-            }
+            workspace = Utils.currentWorkspace();
         }
 
         public static LuaThread getCurrent() {
