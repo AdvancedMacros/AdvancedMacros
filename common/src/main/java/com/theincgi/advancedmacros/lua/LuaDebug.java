@@ -3,6 +3,9 @@ package com.theincgi.advancedmacros.lua;
 import com.theincgi.advancedmacros.AdvancedMacros;
 import com.theincgi.advancedmacros.gui.Color;
 import com.theincgi.advancedmacros.lua.util.LuaMutex;
+import com.theincgi.advancedmacros.misc.LuaClassUtils;
+import com.theincgi.advancedmacros.misc.Permissions;
+import com.theincgi.advancedmacros.misc.Permissions.Permission;
 import com.theincgi.advancedmacros.misc.Settings;
 import com.theincgi.advancedmacros.misc.Utils;
 import com.theincgi.advancedmacros.misc.Workspace;
@@ -144,7 +147,7 @@ public class LuaDebug extends DebugLib {
         protected Status status = Status.NEW;
         private String label;
         protected Thread thread;
-        public Workspace workspace = AdvancedMacros.DEFAULT_WORKSPACE;
+        public Workspace workspace = Workspace.DEFAULT;
         public static Workspace mcThreadWorkspace;
 
         private LuaThread() {
@@ -494,27 +497,30 @@ public class LuaDebug extends DebugLib {
         class GetWorkspace extends ZeroArgFunction {
         	@Override
         	public LuaValue call() {
-        		return t.workspace.asTable();
+        		return t.workspace.toLuaValue();
         	}
         }
         
-        class SetWorkspace extends VarArgFunction {
+        class SetWorkspace extends OneArgFunction {
         	@Override
-        	public Varargs invoke(Varargs args) {
-        		if(args.istable(1)) {
-        			var arg = args.checktable(1);
-        			var name = arg.get(1).or(arg.get("workspaceName")).or(arg.get("name")).tojstring();
-        			var path = arg.get(2).or(arg.get("workspacePath")).or(arg.get("path")).tojstring();
-        			t.workspace = new Workspace(
-        				name, 
-        				path
-        			);
-        		} else if(args.narg() >= 2) {
-        			t.workspace = new Workspace(
-    					args.checkjstring(1), //name 
-    					args.checkjstring(2)  //path
-					);
+        	public LuaValue call(LuaValue arg) {
+        		String name;
+        		if(LuaClassUtils.instanceOf(arg, "Workspace")) {
+        			name = arg.get("getName").call(arg).checkjstring();
+        		} else if(arg.isstring()) {
+        			name = arg.checkjstring();
+        		} else {
+        			throw new LuaError("Expected arg type string or class:Workspace, got " + arg.typename());
         		}
+        		
+        		var target = Workspace.get(name);
+        		if(target == null)
+        			throw new LuaError("Workspace '%s' doesn't exist".formatted(name));
+        		
+        		Permissions.check(Permission.RUN_WORKSPACE, name);
+        		
+        		t.workspace = target;
+        		
         		return NONE;
         	}
         }

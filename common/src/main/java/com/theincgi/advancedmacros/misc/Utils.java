@@ -982,10 +982,14 @@ public class Utils {
     }
     
     public static File parseFileLocation(LuaValue arg0) {
+    	if(LuaClassUtils.instanceOf(arg0, "File"))
+    		return new File( arg0.get("getPath").call(arg0).checkjstring() );
         return parseFileLocation(arg0.isnil() ? "" : arg0.tojstring(), 1);
     }
 
     public static File parseFileLocation(LuaValue arg0, LuaValue level) {
+    	if(LuaClassUtils.instanceOf(arg0, "File"))
+    		return new File( arg0.get("getPath").call(arg0).checkjstring() );
         return parseFileLocation(arg0.isnil() ? "" : arg0.tojstring(), level.optint(1));
     }
 

@@ -1,25 +1,29 @@
 package com.theincgi.advancedmacros.lua.functions;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.lib.OneArgFunction;
+import org.luaj.vm2_v3_0_1.lib.TwoArgFunction;
 import org.luaj.vm2_v3_0_1.lib.ZeroArgFunction;
 
 import com.theincgi.advancedmacros.AdvancedMacros;
 import com.theincgi.advancedmacros.lua.LuaDebug;
+import com.theincgi.advancedmacros.misc.LuaClassUtils;
 import com.theincgi.advancedmacros.misc.Settings;
 import com.theincgi.advancedmacros.misc.Utils;
 import com.theincgi.advancedmacros.misc.Workspace;
 
 public class Workspaces {
-	public static class GetWorkspace extends ZeroArgFunction {
-    	@Override
-    	public LuaValue call() {
-    		return Utils.currentWorkspace().asTable();
-    	}
-    }
+	
+	
+	
+	
     
 //    public static class SetWorkspaceByName extends OneArgFunction {
 //    	@Override

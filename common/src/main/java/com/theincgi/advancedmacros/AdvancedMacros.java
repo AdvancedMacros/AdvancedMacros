@@ -83,7 +83,6 @@ public class AdvancedMacros {
     public static final File WORKSPACES_FOLDER = new File(MACROS_ROOT_FOLDER, "workspaces");
     public static final File MACRO_SOUNDS_FOLDER = new File(MACROS_ROOT_FOLDER, "sounds");
     public static final File CUSTOM_DOCS_FOLDER = new File(MACROS_ROOT_FOLDER, "docs");
-    public static final Workspace DEFAULT_WORKSPACE = new Workspace(DEFAULT_WORKSPACE_NAME, MACROS_FOLDER.getAbsolutePath().replace(File.separator, "/"));
     public static KeyBinding modKeybind;
     public static IBindingsGui macroMenuGui;
     public static EditorGUI editorGUI;
@@ -178,13 +177,15 @@ public class AdvancedMacros {
         ADVANCED_MACROS_TABLE.set("editor", editor);
         ADVANCED_MACROS_TABLE.set("openChangeLog", new OpenChangeLog());
         ADVANCED_MACROS_TABLE.set("getResource", new GetResource());
-        ADVANCED_MACROS_TABLE.set("getWorkspace", new Workspaces.GetWorkspace());
-//        ADVANCED_MACROS_TABLE.set("setWorkspace", new Workspaces.SetWorkspaceByName()); //TODO remove
+        ADVANCED_MACROS_TABLE.set("getWorkspace", new Workspace.GetWorkspace());
+        ADVANCED_MACROS_TABLE.set("newWorkspace", new Workspace.CreateWorkspace());
+        ADVANCED_MACROS_TABLE.set("listWorkspaces", new Workspace.ListWorkspaces());
+        ADVANCED_MACROS_TABLE.set("getCurrentWorkspace", new Workspace.GetCurrentWorkspace());
         editor.set("jumpToLine", new EditorControls.JumpToLine());
 
-        globals.set("run", new Call());
+        globals.set("run", new Run());
         globals.set("runOnMC", new RunOnMC());
-        globals.set("pRun", new PCall());
+        globals.set("pRun", new ProtectedRun());
         globals.set("runThread", new RunThread());
         LuaTable thread = new LuaTable();
         thread.set("new", new NewThread());

@@ -1,7 +1,10 @@
 package com.theincgi.advancedmacros.lua.functions;
 
 import com.theincgi.advancedmacros.AdvancedMacros;
+import com.theincgi.advancedmacros.misc.Permissions;
 import com.theincgi.advancedmacros.misc.Utils;
+import com.theincgi.advancedmacros.misc.Permissions.Permission;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.Text;
@@ -16,6 +19,7 @@ public class Toast {
 
         @Override
         public LuaValue call(LuaValue arg1, LuaValue arg2) {
+        	Permissions.check(Permission.TOAST_NOTIFICATION);
             toast(arg1, arg2);
             return NONE;
         }
@@ -26,6 +30,7 @@ public class Toast {
 
         @Override
         public Varargs invoke(Varargs args) {
+        	Permissions.check(Permission.TOAST_ACTION_BAR);
             toastActionBar(args.checkjstring(1), args.optboolean(2, false));
             return NONE;
         }
@@ -36,6 +41,7 @@ public class Toast {
 
         @Override
         public Varargs invoke(Varargs args) {
+        	Permissions.check(Permission.TOAST_TITLE);
             toastTitle(args.checkjstring(1), args.optjstring(2, null), args.optint(3, -1), args.optint(4, -1), args.optint(5, -1));
             return NONE;
         }

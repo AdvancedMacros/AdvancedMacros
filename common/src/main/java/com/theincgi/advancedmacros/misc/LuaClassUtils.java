@@ -20,4 +20,9 @@ public class LuaClassUtils {
 		return iClass.get("new").call(iClass, arg);
 	}
 	
+	public static boolean instanceOf(LuaValue v, String className) {
+		var cls = require(className);
+		return AdvancedMacros.globals.get("instanceOf").call(v, cls).checkboolean();
+	}
+	
 }

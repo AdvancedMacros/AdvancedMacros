@@ -1,13 +1,9 @@
 package com.theincgi.advancedmacros.lua.scriptGui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.theincgi.advancedmacros.AdvancedMacros;
 import com.theincgi.advancedmacros.event.TaskDispatcher;
 import com.theincgi.advancedmacros.gui.Gui;
 import com.theincgi.advancedmacros.gui.Gui.InputSubscriber;
 import com.theincgi.advancedmacros.gui.elements.GuiScrollBar.Orientation;
-import com.theincgi.advancedmacros.lua.LuaDebug;
-import com.theincgi.advancedmacros.lua.functions.Workspaces;
 import com.theincgi.advancedmacros.misc.CallableTable;
 import com.theincgi.advancedmacros.misc.HIDUtils;
 import com.theincgi.advancedmacros.misc.HIDUtils.Mouse;
@@ -236,11 +232,11 @@ public class ScriptGui extends LuaTable implements InputSubscriber {
                     gui.clearInputSubscribers();
                     gui.clearDrawables();
                     return NONE;
-//                case setEventWorkspace: //TODO set workspace of gui on creation
-//                	workspace = Workspaces.getWorkspaceByName( args.checkjstring(1) );
-//                	return workspace.asTable();
+//                case setEventWorkspace: //TODO [!!!] set workspace of gui on creation
+//                	
+//                	return NONE;
                 case getEventWorkspace:
-                	return workspace.asTable();
+                	return workspace.toLuaValue();
                 
                 default:
                     throw new LuaError("This function hasn't been implemented D:");
@@ -273,7 +269,8 @@ public class ScriptGui extends LuaTable implements InputSubscriber {
         isOpen,
         getMousePos,
         grabMouse, ungrabMouse, isPausesGame, setPausesGame,
-        setEventWorkspace, getEventWorkspace;
+//        setEventWorkspace, 
+        getEventWorkspace;
 
         public String[] getDocLocation() {
             String[] out = new String[3];

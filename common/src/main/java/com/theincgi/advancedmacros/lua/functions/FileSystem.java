@@ -1,7 +1,10 @@
 package com.theincgi.advancedmacros.lua.functions;
 
 import com.theincgi.advancedmacros.AdvancedMacros;
+import com.theincgi.advancedmacros.misc.Permissions;
 import com.theincgi.advancedmacros.misc.Utils;
+import com.theincgi.advancedmacros.misc.Permissions.Permission;
+
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
@@ -55,6 +58,14 @@ public class FileSystem extends LuaTable {
 		});
     }
 
+    private static void checkFilePermission(Permission permission, File file) {
+    	try {
+			Permissions.check(permission, file.getCanonicalPath());
+		} catch (IOException e) {
+			throw new LuaError(e);
+		}
+    }
+    
     private static class Open extends TwoArgFunction {
 
         @Override
@@ -64,6 +75,21 @@ public class FileSystem extends LuaTable {
             //assertAddress(arg0);
 
             File file = Utils.parseFileLocation(arg0);
+            
+			switch(mode) {
+				case "r":
+					checkFilePermission(Permission.FILEIO_READ, file);
+					break;
+				case "w": 
+				case "a": 
+					checkFilePermission(Permission.FILEIO_WRITE, file);
+					break;
+				case "raf":
+					checkFilePermission(Permission.FILEIO_READ, file);
+					checkFilePermission(Permission.FILEIO_WRITE, file);
+					break;
+				default:
+			}
 
             if (!mode.equals("r")) {
                 file.getParentFile().mkdirs();
@@ -436,7 +462,9 @@ public class FileSystem extends LuaTable {
         public LuaValue call(LuaValue arg0, LuaValue arg1) {
             File from = Utils.parseFileLocation(arg0);
             File to = Utils.parseFileLocation(arg1);
-
+            
+            checkFilePermission(Permission.FILEIO_WRITE, to);
+            
             try {
                 if (Files.isSameFile(from.toPath(), to.toPath())) {
                     throw new LuaError("Source and destination can not be the same.");
@@ -456,6 +484,9 @@ public class FileSystem extends LuaTable {
         @Override
         public LuaValue call(LuaValue arg0) {
             File file = Utils.parseFileLocation(arg0);
+            
+            checkFilePermission(Permission.FILEIO_WRITE, file);
+            
             return LuaValue.valueOf(file.delete());
         }
 
@@ -467,6 +498,9 @@ public class FileSystem extends LuaTable {
         public LuaValue call(LuaValue arg0, LuaValue arg1) {
             File from = Utils.parseFileLocation(arg0);
             File to = Utils.parseFileLocation(arg1);
+            
+            checkFilePermission(Permission.FILEIO_WRITE, to);
+            
             return LuaValue.valueOf(from.renameTo(to));
         }
 
@@ -477,6 +511,9 @@ public class FileSystem extends LuaTable {
         @Override
         public LuaValue call(LuaValue arg0) {
             File f = Utils.parseFileLocation(arg0);
+            
+            checkFilePermission(Permission.FILEIO_WRITE, f);
+            
             return LuaValue.valueOf(f.mkdir());
         }
 
@@ -487,6 +524,9 @@ public class FileSystem extends LuaTable {
         @Override
         public LuaValue call(LuaValue arg0) {
             File f = Utils.parseFileLocation(arg0);
+
+            checkFilePermission(Permission.FILEIO_WRITE, f);
+            
             return LuaValue.valueOf(f.mkdirs());
         }
 

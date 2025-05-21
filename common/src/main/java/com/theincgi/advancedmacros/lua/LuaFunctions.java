@@ -3,7 +3,10 @@ package com.theincgi.advancedmacros.lua;
 import com.theincgi.advancedmacros.AdvancedMacros;
 import com.theincgi.advancedmacros.misc.CallableTable;
 import com.theincgi.advancedmacros.misc.Pair;
+import com.theincgi.advancedmacros.misc.Permissions;
 import com.theincgi.advancedmacros.misc.Utils;
+import com.theincgi.advancedmacros.misc.Permissions.Permission;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.text.MutableText;
@@ -60,6 +63,7 @@ public class LuaFunctions {
     public static class GetMinecraft extends ZeroArgFunction {
         @Override
         public LuaValue call() {
+        	Permissions.check(Permission.LUAJAVA, MinecraftClient.class.getName());
             return LuaValue.userdataOf(MinecraftClient.getInstance());
         }
 
@@ -67,11 +71,14 @@ public class LuaFunctions {
 
     public static class Say extends OneArgFunction {
 
-        @Override
+		@Override
+		@SuppressWarnings("resource")
         public LuaValue call(LuaValue arg) {
             if (arg.tojstring().startsWith("/")) {
+            	Permissions.check(Permission.RUN_COMMAND, arg.tojstring());
                 MinecraftClient.getInstance().getNetworkHandler().sendChatCommand(arg.tojstring().substring(1));
             } else {
+            	Permissions.check(Permission.SPEAK, arg.tojstring());
                 MinecraftClient.getInstance().getNetworkHandler().sendChatMessage(arg.tojstring());
             }
             MinecraftClient.getInstance().inGameHud.getChatHud().addToMessageHistory(arg.tojstring());

@@ -31,8 +31,12 @@ public class RunOnMC extends VarArgFunction {
         final LuaFunction theFunction = arg1.checkfunction();
         Workspace workspace = Utils.currentWorkspace();
         ListenableFuture<Varargs> f = TaskDispatcher.addTask(() -> {
-        	Utils.setMCThreadWorkspace(workspace);
-            return theFunction.invoke(fArgs);
+        	try {
+        		Utils.setMCThreadWorkspace(workspace);
+            	return theFunction.invoke(fArgs);
+        	} finally {
+        		Utils.setMCThreadWorkspace(null);
+        	}
         });
         try {
             return f.get();
