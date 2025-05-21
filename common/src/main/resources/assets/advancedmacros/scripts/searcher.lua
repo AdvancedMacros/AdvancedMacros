@@ -55,8 +55,7 @@ function package.unload(module, workspace)
 end
 
 local function getCurrentWorkspace()
-  local Workspace = package.preload["Workspace"]
-  return Workspace:new(advancedMacros.getWorkspace())
+  return advancedMacros.getCurrentWorkspace()
 end
 
 ---Get Workspace by name, throws error if workspace file doesn't exist
@@ -67,16 +66,16 @@ local function getWorkspaceByName(name)
   local cached = workspaceCache[name]
   if cached then return cached end
   local Workspace = package.preload["Workspace"]
-  local workspace
-  if name == "internal" then
-    workspace = Workspace:new{
-      workspaceName = "internal",
-      workspacePath = "resource:"
-    }
-  else 
-    workspace = Workspace:load(name)
-  end
-  workspaceCache[name] = workspace
+  local workspace = advancedMacros.getWorkspace(name)
+  -- if name == "internal" then
+  --   workspace = Workspace:new{
+  --     workspaceName = "internal",
+  --     workspacePath = "resource:"
+  --   }
+  -- else 
+  --   workspace = Workspace:load(name)
+  -- end
+  workspaceCache[name] = workspace --TODO remove caching feature?
   return workspace
 end
 

@@ -35,7 +35,7 @@ public class Workspace {
 			for(var name : Workspace.listWorkspaceNames()) {
 				try {
 					workspaces.put(name, Workspace.load(name));
-				} catch (IOException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -50,6 +50,11 @@ public class Workspace {
 	
 	public static final Workspace INTERNAL = new Workspace("internal", "resource:", true);
 	public static final Workspace DEFAULT = new Workspace(AdvancedMacros.DEFAULT_WORKSPACE_NAME, AdvancedMacros.MACROS_FOLDER.getAbsolutePath(), true);
+	
+	static {
+		workspaces.put(INTERNAL.name, INTERNAL);
+		workspaces.put(DEFAULT.name, DEFAULT);
+	}
 	
 	private Workspace(String name, String path) {
 		this(name, path, false);
@@ -97,6 +102,8 @@ public class Workspace {
 	}
 	
 	public static Workspace load(File file) throws IOException {
+		if(!file.exists())
+			throw new FileNotFoundException(file.toString());
 		String contents = new String(Files.readAllBytes(file.toPath()));
 		var json = JsonParser.parseString(contents).getAsJsonObject();
 		var name = json.get("workspaceName").getAsString();
@@ -117,6 +124,9 @@ public class Workspace {
 	}
 
 	public void save() throws FileNotFoundException, IOException {
+		if(name.equals(AdvancedMacros.DEFAULT_WORKSPACE_NAME) ||  
+		   name.equals(AdvancedMacros.INTERNAL_WORKSPACE_NAME)) return;
+		
 		checkValid();
 		File file = getConfigFile();
 		JsonObject obj = new JsonObject();
@@ -130,6 +140,8 @@ public class Workspace {
 	}
 
 	private synchronized void checkValid() {
+		if(name.equals(AdvancedMacros.DEFAULT_WORKSPACE_NAME) ||  
+				   name.equals(AdvancedMacros.INTERNAL_WORKSPACE_NAME)) return;
 		if(!valid) throw new IllegalStateException("attempt to use/modify deleted resourced");
 	}
 	
@@ -148,6 +160,8 @@ public class Workspace {
 	}
 	
 	public synchronized void delete() {
+		if(name.equals(AdvancedMacros.DEFAULT_WORKSPACE_NAME) ||  
+				   name.equals(AdvancedMacros.INTERNAL_WORKSPACE_NAME)) throw new IllegalStateException("Attempt to delete required workspace");
 		checkValid();
 		synchronized (workspaces) {
 			workspaces.remove(name);
@@ -242,7 +256,7 @@ public class Workspace {
 			}
 		});
 		
-		return LuaClassUtils.newInstance("Workspace", controls);
+		return AdvancedMacros.workspaceLuaClass.get("new").call(AdvancedMacros.workspaceLuaClass, controls);
 		
 		
 	}

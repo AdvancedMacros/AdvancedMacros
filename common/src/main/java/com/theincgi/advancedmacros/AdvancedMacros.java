@@ -78,6 +78,7 @@ public class AdvancedMacros {
     public static final String GAME_VERSION = "1.20.4";
 
     public static final String DEFAULT_WORKSPACE_NAME = "AM Default";
+    public static final String INTERNAL_WORKSPACE_NAME = "internal";
     public static final File MACROS_ROOT_FOLDER = getRootFolder();
     public static final File MACROS_FOLDER = new File(MACROS_ROOT_FOLDER, "macros");
     public static final File WORKSPACES_FOLDER = new File(MACROS_ROOT_FOLDER, "workspaces");
@@ -101,6 +102,8 @@ public class AdvancedMacros {
     private static MinecraftClient mc;
     public static final boolean COLOR_SPACE_IS_255 = false;
     public static LuaValue repl;
+    public static LuaValue workspaceLuaClass;
+    public static LuaValue fileLuaClass;
 
     public static final EventHandler EVENT_HANDLER = new EventHandler();
 
@@ -379,8 +382,8 @@ public class AdvancedMacros {
     			"easings",
     			"class",
     			"utils",
-    			"file",       //class->package.preload
     			"workspace",  //class->package.preload
+    			"file",       //class->package.preload
     			"json",       //class->package.preload
     			"jsonobject", //class->package.preload
     			"jsonarray",  //class->package.preload
@@ -395,7 +398,11 @@ public class AdvancedMacros {
 					continue;
 				}
 				InputStream in = res.get().getInputStream();
-				globals.load(in, script, "t", globals).call();
+				var value = globals.load(in, script, "t", globals).call();
+				switch(script) {
+					case "workspace": workspaceLuaClass = value; break;
+					case "file":      fileLuaClass      = value; break;
+				}
 				in.close();
 			} catch (Throwable e) {
 				e.printStackTrace();

@@ -284,7 +284,7 @@ public abstract class ScriptGuiElement extends LuaTable implements Drawable, Inp
         this.set("getEventWorkspace", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return workspace.asTable();
+				return workspace.toLuaValue();
 			}
 		});
 
