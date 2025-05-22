@@ -8,7 +8,7 @@ local ContextMenu = require"ui/ContextMenu"
 
 local Element = require"ui/Element"
 -- log(utils.keys(Element))
-assert(Element, "ELEMENT!!!!!!1")
+
 local ProfileSelect = newClass("ui/ProfileSelect", Element)
 
 function ProfileSelect:new( ... )
@@ -48,6 +48,8 @@ function ProfileSelect:new( ... )
   obj:loadProfiles()
   obj:buildContextMenu()
 
+  obj.events.resize:addListener(obj.onResize)
+
   if self == ProfileSelect then
     obj:_postConstruct()
   end
@@ -55,10 +57,15 @@ function ProfileSelect:new( ... )
   return obj
 end
 
+function ProfileSelect:onResize(w, h)
+  self.elements.comboBox:setWidth( w )
+end
+
+
 function ProfileSelect:loadProfiles()
   local options = {}
   local profiles = {}
-  local files = File.static.profileDir:list".json$"
+  local files = File.static.profilesDir:list".json$"
   -- local settings = getSettings()
   -- local profiles = {} --settings.profilesV2 or {}
 
@@ -140,7 +147,7 @@ end
 function ProfileSelect:newProfile( name, _fromUI )
   name = name:trim()
   --check if exists
-  local file = File.static.profileDir:navigate(name..".json")
+  local file = File.static.profilesDir:navigate(name..".json")
   if file:exists() then
     if not _fromUI then
       error('Profile "'..name..'" already exists', 2)
@@ -171,7 +178,7 @@ function ProfileSelect:newProfile( name, _fromUI )
 end
 
 function ProfileSelect:clearProfile()
-  local file = File.static.profileDir:navigate(self:getProfile()..".json")
+  local file = File.static.profilesDir:navigate(self:getProfile()..".json")
   file:write"[]"
   self.events.profileChanged:notify( self, name )
 end

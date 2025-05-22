@@ -21,7 +21,10 @@
  ******************************************************************************/
 package org.luaj.vm2_v3_0_1.lib.jse;
 
+import com.theincgi.advancedmacros.misc.Permissions;
 import com.theincgi.advancedmacros.misc.Utils;
+import com.theincgi.advancedmacros.misc.Permissions.Permission;
+
 import org.luaj.vm2_v3_0_1.Globals;
 import org.luaj.vm2_v3_0_1.LuaError;
 import org.luaj.vm2_v3_0_1.LuaString;
@@ -92,6 +95,8 @@ public class JseIoLib extends IoLib {
     protected File openFile(String filename, boolean readMode, boolean appendMode, boolean updateMode, boolean binaryMode) throws IOException {
         //TheIncgi's Edit
         filename = Utils.parseFileLocation(filename, 1).toString();
+        if(readMode) Permissions.check(Permission.FILEIO_READ, filename);
+        if(appendMode || updateMode) Permissions.check(Permission.FILEIO_WRITE, filename);
         //End of edit
         RandomAccessFile f = new RandomAccessFile(filename, readMode ? "r" : "rw");
         if (appendMode) {
@@ -106,6 +111,8 @@ public class JseIoLib extends IoLib {
 
     @Override
     protected File openProgram(String prog, String mode) throws IOException {
+    	Permissions.check(Permission.EXEC, prog); //TheIncgi's edit
+    	
         final Process p = Runtime.getRuntime().exec(prog);
         return "w".equals(mode) ?
                 new FileImpl(p.getOutputStream()) :

@@ -98,7 +98,7 @@ function FileBrowser:updateWorkspaceList(newSelection)
     }
   }
 
-  for i, f in ipairs(File.static.workspaceDir:list".json$") do
+  for i, f in ipairs(File.static.workspacesDir:list".json$") do
     local workspace = Workspace:load(f)
     table.insert( list, {
       text = workspace.workspaceName,
@@ -138,7 +138,7 @@ function FileBrowser:newWorkspace(path)
         workspacePath = path
       }
 
-      if name == "AM Default" then
+      if name == "AM Default" or name == "internal" then
         self:_confirmationTryRename("is reserved", self.newWorkspace, path)
         return
       end
@@ -242,7 +242,7 @@ function FileBrowser:openRenamePrompt()
     title  = "Rename workspace",
     prompt = "Current name:\n"..self.activeWorkspace.text,
     callback = function(name)
-      if name == "AM Default" then
+      if name == "AM Default" or name == "internal" then
         self:_confirmationTryRename("is reserved", self.openRenamePrompt)
         return
       end
@@ -279,7 +279,7 @@ function FileBrowser:deleteWorkspace()
     title = "Confirm delete",
     msg = "Are you sure you want to delete this workspace?\n&e"..self.activeWorkspace.text,
     yes = function()
-      File.static.workspaceDir:navigate(self.activeWorkspace.text..".json"):delete()
+      File.static.workspacesDir:navigate(self.activeWorkspace.text..".json"):delete()
       self:updateWorkspaceList("AM Default")
     end,
     no = function() end

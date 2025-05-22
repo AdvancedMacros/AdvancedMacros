@@ -1,7 +1,4 @@
-local File = package.preload["File"]
-local Json = package.preload["Json"]
 local utils = advancedMacros.utils
-local JsonArray = package.preload["JsonArray"]
 
 local Workspace = newClass("Workspace")
 
@@ -20,6 +17,7 @@ function Workspace:new( controls )
 end
 
 function Workspace:toFile()
+  local File = package.preload["File"]
   return File:new{
     workspaceName = self:getName(),
     workspacePath = self:getPath(),

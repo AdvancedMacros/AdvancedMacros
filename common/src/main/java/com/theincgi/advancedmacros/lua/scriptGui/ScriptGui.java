@@ -517,6 +517,7 @@ public class ScriptGui extends LuaTable implements InputSubscriber {
 
         @Override
         public void resize(MinecraftClient mcIn, int w, int h) {
+        	super.resize(mcIn, w, h);
             ScriptGui.this.resize(mcIn, w, h);
         }
 

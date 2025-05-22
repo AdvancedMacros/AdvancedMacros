@@ -37,12 +37,13 @@ function File:new( ... )
 
   obj.workspacePath = workspacePath
   if not obj.workspaceName then 
-    obj.workspaceName = lookupWorkspaceName( workspacePath )
+    -- obj.workspaceName = lookupWorkspaceName( workspacePath )
+    error("Workspace name missing")
   end
 
   local path = args.path
   if type( path ) == "string" then
-    obj.path = path:match"^/?(.+)$"
+    obj.path = path:match"^/?(.+)$" --remove starting / if present
   elseif isClass(path) then
     error("path arg can not be class, should be list of strings",2)
   else
@@ -50,11 +51,20 @@ function File:new( ... )
       if type(v) ~= "string" then
         error("expected string in table of arg path at index "..k..", got "..type(v), 2)
       end
-      path[k] = v:gsub(filesystem.separator, "/"):match"^/?(.+)/?$"
+      path[k] = v:gsub(filesystem.separator, "/"):match"^/?(.+)/?$" --prefer forward slash, remove starting and ending / if present
     end
     obj.path = table.concat(path, "/")
   end
   
+  local count
+  repeat
+    obj.path, count = obj.path:gsub("/%./", "/")
+  until not count or count == 0
+
+  if obj.path:match"^%./" then
+    obj.path = obj.path:sub(3)
+  end
+
   --simplfy path if possible
   for folder, back in obj.path:gmatch"([^/]+)(/%.%./)" do -- something/../
     if folder ~= ".." then --don't collapse /../..
@@ -82,10 +92,21 @@ function File:getPath()
     return self.workspacePath .. self.path
   end
   local full = self.workspacePath.."/"..self.path
+  full = full:gsub("\\", "/")
+
+  local count
+  repeat
+    full, count = full:gsub("/%./", "/")
+  until not count or count == 0
+
   for folder, back in full:gmatch"([^/]+)(/%.%./)" do -- something/../
     if folder ~= ".." then --don't collapse /../..
       full = full:gsub( folder..back, "", 1 )
     end
+  end
+  
+  if full:match"/.$" then
+    full = full:sub(1,-3)
   end
   return full
 end
@@ -202,12 +223,15 @@ function File:isImage()
     end, true )[ self:getExtension() ]
 end
 
+---@return table names string list
 function File:listNames()
   local names = filesystem.list( self:getPath() )
   table.sort( names )
   return names
 end
 
+---@param filter function|string|nil return true, or string.match to keep in list, nil keeps all
+---@return table files File list
 function File:list( filter )
   local files = self:listNames()
   local out = {}
@@ -229,7 +253,7 @@ end
 
 --if the workspace is exited the workspace is the same, but the path will contain /..
 function File:getParentDir( workspaceExitAllowed )
-  if pcall( filesystem.getParentDir( self:getPath() )) then
+  if pcall( filesystem.getParentDir, self:getPath() ) then
     return File:new{
       workspaceName = self.workspaceName,
       workspacePath = self.workspacePath,
@@ -311,21 +335,15 @@ function File:toJson()
   return out
 end
 
-File.static = {
-  profileDir = File:new{
-    --workspacePath default to macros address,
-    path = "../profiles"
-  },
-  macrosDir = File:new{
-    --workspacePath default to macros address,
-    path = "../macros"
-  },
-  workspaceDir = File:new{
-    --workspacePath default to macros address,
-    path = "../workspaces"
-  }
-}
 
 package.preload["File"] = File
+
+local amWorkspace = advancedMacros.getWorkspace("AM Default")
+File.static = {
+  macrosDir    = amWorkspace:toFile(),
+  profilesDir   = amWorkspace:toFile():navigate"../profiles",
+  workspacesDir = amWorkspace:toFile():navigate"../workspaces",
+}
+
 
 return File

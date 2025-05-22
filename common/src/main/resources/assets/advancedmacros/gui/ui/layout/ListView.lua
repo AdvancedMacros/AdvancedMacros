@@ -100,6 +100,7 @@ function ListView:setWidth( width, ... )
   for i, cell in ipairs( self.cells ) do
     cell:setWidth( width - 6 )
   end
+  self.elements.listView.background.setWidth(width - 6)
   self.elements.listView.scrollbar.setX( self:getX() + width - 6 )
   self:updateCells()
   ListView:super().setWidth( self, width, ... )

@@ -49,7 +49,7 @@ function ScrollView:new( ... )
   
   obj.children = {}
 
-  obj.events.resize:addListener(function() obj:onResize() end)
+  obj.events.resize:addListener(obj.onResize)
   obj.elements.vScrollBar.setOnMouseDrag(function() obj:onScroll() end)
   obj.elements.hScrollBar.setOnMouseDrag(function() obj:onScroll() end)
   --TODO scroll wheel event on bg with shift check
@@ -75,7 +75,6 @@ function ScrollView:add( child )
     child.events.resize:addListener(function() self:updateContentBounds() end, self)
   end
 end
-
 
 function ScrollView:remove( child )
   table.remove( self.children, child )
@@ -162,10 +161,19 @@ function ScrollView:getContentSize()
   
 end
 
-function ScrollView:onResize()
+function ScrollView:onResize(w, h)
   --update clipping area
   self.group.setScissor(0,0,self.width, self.height)
-  --TODO reposition/resize scroll bars and bg/frame
+
+  self.elements.background.setWidth(self.width - self.frameThickness*2)
+  self.elements.frame.setWidth(self.width)
+  self.elements.vScrollBar.setX( self:getY() + self.width - 8 )
+  self.elements.hScrollBar.setWidth( self.width - 1 )
+
+  self.elements.background.setHeight(self.height - self.frameThickness*2)
+  self.elements.frame.setHeight(self.height)
+  self.elements.hScrollBar.setY(self:getY() + self.height - 8)
+  self.elements.vScrollBar.setHeight(self.height - 1)
 end
 
 return ScrollView

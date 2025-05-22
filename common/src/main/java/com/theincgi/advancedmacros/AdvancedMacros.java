@@ -9,6 +9,7 @@ import com.theincgi.advancedmacros.gui.InputGUI;
 import com.theincgi.advancedmacros.gui.MacroMenuGui;
 import com.theincgi.advancedmacros.gui.RunningScriptsGui;
 import com.theincgi.advancedmacros.gui2.ScriptBrowser2;
+import com.theincgi.advancedmacros.guiScripts.BindingsMenu;
 import com.theincgi.advancedmacros.hud.hud2D.Hud2D;
 import com.theincgi.advancedmacros.hud.hud3D.Hud3D;
 import com.theincgi.advancedmacros.lua.DocumentationManager;
@@ -90,6 +91,7 @@ public class AdvancedMacros {
     public static final LuaTable ADVANCED_MACROS_TABLE = new LuaTable();
     public static ScriptBrowser2 scriptBrowser2;
     public static RunningScriptsGui runningScriptsGui;
+    public static BindingsMenu bindingsMenu; //Lua based
     public static Gui lastGui;
     public static Gui prevGui;
     public static InputGUI inputGUI;
@@ -104,6 +106,7 @@ public class AdvancedMacros {
     public static LuaValue repl;
     public static LuaValue workspaceLuaClass;
     public static LuaValue fileLuaClass;
+    
 
     public static final EventHandler EVENT_HANDLER = new EventHandler();
 
@@ -157,6 +160,7 @@ public class AdvancedMacros {
 
         MinecraftClient.getInstance().getSoundManager().registerListener(EVENT_HANDLER.SOUND_LISTENER);
 
+        bindingsMenu = new BindingsMenu();
     }
 
     public static LuaFunctions.Log logFunc;
@@ -184,6 +188,7 @@ public class AdvancedMacros {
         ADVANCED_MACROS_TABLE.set("newWorkspace", new Workspace.CreateWorkspace());
         ADVANCED_MACROS_TABLE.set("listWorkspaces", new Workspace.ListWorkspaces());
         ADVANCED_MACROS_TABLE.set("getCurrentWorkspace", new Workspace.GetCurrentWorkspace());
+        ADVANCED_MACROS_TABLE.set("wrapWorkspaceTask", new Workspace.WrapTask());
         editor.set("jumpToLine", new EditorControls.JumpToLine());
 
         globals.set("run", new Run());

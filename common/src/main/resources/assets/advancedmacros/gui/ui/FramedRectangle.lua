@@ -33,6 +33,8 @@ function FramedRectangle:new( ... )
   obj.elements.frame.setParent( obj.group )
   obj.interiorGroup.setParent( obj.group )
   
+  obj.events.resize:addListener(self.onResize)
+
   if self == FramedRectangle then
     obj:_postConstruct()
   end
@@ -40,30 +42,21 @@ function FramedRectangle:new( ... )
   return obj
 end
 
-function FramedRectangle:setWidth( width, ... )
-  self.elements.background.setWidth( width - self.frameThickness * 2 )
-  self.elements.frame.setWidth( width )
+function FramedRectangle:onResize( width, height )
+  self.elements.background.setSize( width - self.frameThickness * 2, height - self.frameThickness * 2 )
+  self.elements.frame.setSize( width, height )
+  
   if self.clipping then
     self.interiorGroup.setScissor( self:getInteriorSize() )
   end
-  FramedRectangle:super().setWidth( self, width, ... )
-end
-
-function FramedRectangle:setHeight( height, ... )
-  self.elements.background.setHeight( height - self.frameThickness * 2 )
-  self.elements.frame.setHeight( height )
-  if self.clipping then
-    self.interiorGroup.setScissor( self:getInteriorSize() )
-  end
-  FramedRectangle:super().setHeight( self, height, ... )
 end
 
 function FramedRectangle:getInteriorWidth()
-  return self.width - self.frameThickness * 2
+  return self:getWidth() - self.frameThickness * 2
 end
 
 function FramedRectangle:getInteriorHeight()
-  return self.height - self.frameThickness * 2
+  return self:getHeight() - self.frameThickness * 2
 end
 
 function FramedRectangle:getInteriorSize()

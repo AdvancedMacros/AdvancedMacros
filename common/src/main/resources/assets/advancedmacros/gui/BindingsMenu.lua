@@ -172,9 +172,20 @@ function BindingsMenu:new( ... )
   obj.tip = obj.screen.newText("&a&BTip:&f Context menu available &7(RMB)", 8, 0, 12)
   obj.tip.setParent( obj.footerGroup )
 
+  obj.screen.setOnResize(function(w, h) obj:onResize(w, h) end)
+
   obj:loadProfile("DEFAULT")
 
   return obj
+end
+
+function BindingsMenu:onResize(w, h)
+  self.profileSelect:setWidth(w - self.profileText.getWidth() - 14)
+  self.toolbarFlow:setWidth(w - 12)
+  self.bindingsScrollView:setWidth(w - 12)
+  self.bindingsScrollView:setHeight(h - self.bindingsGroup.getY() - 14 - 14 - 10)
+  self.bindingsFlow:setWidth(self.bindingsScrollView:getViewportWidth())
+  self.footerGroup.setY(h - 12 - 6)
 end
 
 function BindingsMenu:open()
@@ -220,7 +231,7 @@ function BindingsMenu:loadProfile( name, previous )
   previous = previous or "DEFAULT"
   utils.tryCatch{
     try = function()
-      local profileJson = File.static.profileDir:navigate( name..".json" )
+      local profileJson = File.static.profilesDir:navigate( name..".json" )
       if not profileJson:exists() and name ~= "DEFAULT" then
         error(("File not found: %s"):format(name, profileJson:getPath()), 2)
       end
@@ -278,7 +289,7 @@ function BindingsMenu:save()
   end
 
   thread.new(function()
-    local file = File.static.profileDir:navigate( self:getProfileName()..".json" )
+    local file = File.static.profilesDir:navigate( self:getProfileName()..".json" )
     -- file:write(utils.serializeOrdered(bindings, nil, 2))
     file:write( array:toString() )
   end).start()
@@ -421,9 +432,9 @@ function BindingsMenu:trigger( ...)
   t.start()
 end
 
-local menu = BindingsMenu:new{}
-menu:open()
-MENU = menu --TODO remove debug
+-- local menu = BindingsMenu:new{}
+-- menu:open()
+-- MENU = menu --TODO remove debug
 
 return BindingsMenu
 

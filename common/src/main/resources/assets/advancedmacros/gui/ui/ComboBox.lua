@@ -25,6 +25,7 @@ function ComboBox:new( ... )
   obj.focusScreen.setParentGui( obj.screen )
   obj.cellClass = args.cellClass
   obj.viewTransformer = args.viewTransformer
+  obj.frameThickness = args.frameThickness
 
   obj.events.optionUnselected = EventChannel:new{}
   obj.events.optionSelected = EventChannel:new{}
@@ -91,11 +92,26 @@ function ComboBox:new( ... )
   obj.elements.popup.listView.events.cellClicked:addListener(function(x,y,b,model) obj:setSelection( model ) end)
   obj.focusScreen.setOnMouseClick(function(x,y,b) obj:close() end)
 
+  obj.events.resize:addListener(obj.onResize)
+
   if self == ComboBox then
     obj:_postConstruct()
   end
 
   return obj
+end
+
+function ComboBox:onResize( w, h )
+  log(("&4CB: &f%d %d"):format(w, h))
+  self.elements.widget.box:setSize(w, h)
+
+  local interiorWidth, interiorHeight = self.elements.widget.box:getInteriorSize()
+  self.elements.widget.selected:setSize(interiorWidth, interiorHeight)
+  self.elements.widget.triangleButton.setX(self:getX() + w - self.frameThickness - interiorHeight)
+  self.elements.widget.triangleButton.setSize(interiorHeight, interiorHeight)
+
+  local screenWidth, screenHeight = self.screen.getSize()
+  self.elements.popup.listView:setSize( w, self.popupMaxHeight or (screenHeight / 3 - 4) )
 end
 
 function ComboBox:setOptions( options )

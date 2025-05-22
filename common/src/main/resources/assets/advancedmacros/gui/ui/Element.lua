@@ -87,15 +87,15 @@ function Element:setWidth( width, notify )
   self.events.resize:notify( self, self.width, self.height )
 end
 
-function Element:setHeight( width, notify )
-  self.width = width
+function Element:setHeight( height, notify )
+  self.height = height
   if notify == false then return end
   self.events.resize:notify( self, self.width, self.height )
 end
 
 function Element:setSize( width, height )
-  self:setWidth( width )
-  self:setHeight( height )
+  self:setWidth( width, false )
+  self:setHeight( height, false )
   self.events.resize:notify( self, self.width, self.height )
 end
 

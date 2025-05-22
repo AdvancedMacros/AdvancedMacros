@@ -45,6 +45,7 @@ public class Workspace {
 	private String name;
 	private final String path;
 	private boolean valid = true;
+	private boolean caseSensitiveModules = true;
 	
 	public Permissions permissions;
 	
@@ -54,6 +55,7 @@ public class Workspace {
 	static {
 		workspaces.put(INTERNAL.name, INTERNAL);
 		workspaces.put(DEFAULT.name, DEFAULT);
+		INTERNAL.caseSensitiveModules = false;
 	}
 	
 	private Workspace(String name, String path) {
@@ -270,6 +272,28 @@ public class Workspace {
 				return valueOf(isReservedWorkspace());
 			}
 		});
+		controls.set("wrap", new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg) {
+				Permissions.check(Permission.RUN_WORKSPACE, name);
+				return new WrappedTask(arg, Workspace.this);
+			}
+		});
+		controls.set("setModuleCaseSensitivity", new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg) {
+				if(isReservedWorkspace())
+					throw new LuaError("attempt to modify case sensitivity of reserved workspace '%s'".formatted(name));
+				caseSensitiveModules = arg.checkboolean();
+				return NONE;
+			}
+		});
+		controls.set("isModuleCaseSensitive", new ZeroArgFunction() { //added as a helper for development. workspace can be set to the repo's resource folder so reloading isn't needed
+			@Override
+			public LuaValue call() {
+				return valueOf(caseSensitiveModules);
+			}
+		});
 		
 		return AdvancedMacros.workspaceLuaClass.get("new").call(AdvancedMacros.workspaceLuaClass, controls);
 		
@@ -282,8 +306,6 @@ public class Workspace {
 			Permission.TOAST_NOTIFICATION,
 			Permission.TOAST_ACTION_BAR,
 			Permission.TOAST_TITLE,
-			Permission.HUD_2D,
-			Permission.HUD_3D
 		};
 		var currentWorkspace = Utils.currentWorkspace();
 		for(var p : add) {
@@ -371,5 +393,35 @@ public class Workspace {
 			return NIL;
 		}
 	}
-
+	
+	/**
+	 * Wraps a function so when it's called it always runs in the workspace the wrapper was run from 
+	 * */
+	public static class WrapTask extends OneArgFunction {
+		@Override
+		public LuaValue call(LuaValue arg) {
+			return new WrappedTask(arg);
+		}
+	}
+	
+	public static class WrappedTask extends VarArgFunction {
+			private final Workspace workspace;
+			private final LuaValue callable;
+			
+			public WrappedTask(LuaValue callable) {
+				this(callable, Utils.currentWorkspace());
+			}
+			
+			public WrappedTask(LuaValue callable, Workspace workspace) {
+				this.workspace = workspace;
+				this.callable = callable;
+			}
+			
+			@Override
+			public Varargs invoke(Varargs args) {
+				try(var reset = Utils.tempSetCurrentWorkspace(workspace)) {
+					return callable.invoke(args);
+				}
+			}
+		}
 }

@@ -24,7 +24,7 @@ end
 ---@param name string name of module
 ---@param workspace Workspace the workspace
 local function getGlobalModuleName(name, workspace)
-  return workspace:navigate(name):getPath()
+  return workspace:toFile():navigate(name):getPath()
 end
 
 ---unloads all instances of `module` across all workspaces & removes from package.globalLoaded
@@ -168,9 +168,13 @@ local function luaSearcher(name, workspaceName)
   local gLoaded = package.globalLoaded[globalName]
   if gLoaded then return gLoaded end
 
-  if workspace:getName() == "internal" then
-    local src =  advancedMacros.getResource("scripts/"..name:lower()..".lua")
-              or advancedMacros.getResource("gui/"..name:lower()..".lua")
+  if not workspace:isModuleCaseSensitive() then
+    name = name:lower()
+  end
+
+  if workspace:getPath() == "resource:" then
+    local src =  advancedMacros.getResource("scripts/"..name..".lua")
+              or advancedMacros.getResource("gui/"..name..".lua")
 
     if src then
       return cacheGlobalModule(globalName, load(src, "resource:"..name, "t", _G))
@@ -183,7 +187,7 @@ local function luaSearcher(name, workspaceName)
   for pattern in package.path:gsub("\\","/"):gmatch"[^;]+" do
     local file = workspace:toFile():navigate( pattern:gsub("?", name) )
     if file:exists() then
-      local modes = "bt" --workspace:hasPermission"load.binary" and "bt" or "t"
+      local modes = workspace:hasPermission"load.binary" and "bt" or "t"
       return cacheGlobalModule(globalName, load(file:readAll(), workspace:getName().."::"..name, modes, _G )) --TODO sandboxing options / access permissions
     end
     table.insert(attempts, ("'%s' not found"):format(file:getPath()))

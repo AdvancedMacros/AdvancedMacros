@@ -21,6 +21,7 @@ public class Permissions {
 		FILEIO_WRITE("fileIO.write", ListMode.PATTERN),
 		RUN_WORKSPACE("run.workspace", ListMode.EXACT),
 		LUAJAVA("luajava", ListMode.PATTERN),
+		EXEC("exec", ListMode.PATTERN), //run a program (non lua)
 		DEBUG("debug"),
 		CONTROL_PLAYER("controlPlayer"),
 		MANAGE_INVENTORY("manageInventory"),
@@ -31,8 +32,6 @@ public class Permissions {
 		TOAST_NOTIFICATION("toast.notification"),
 		TOAST_TITLE("toast.title"),
 		TOAST_ACTION_BAR("toast.actionBar"),
-		HUD_2D("hud2D"),
-		HUD_3D("hud3D"),
 		INTERNET("internet"),
 		SETTINGS("settings"),
 		LOAD_BINARY("load.binary"),

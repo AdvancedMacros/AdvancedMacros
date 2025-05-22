@@ -10,6 +10,7 @@ import com.theincgi.advancedmacros.gui.MacroMenuGui;
 import com.theincgi.advancedmacros.gui.RunningScriptsGui;
 import com.theincgi.advancedmacros.gui.elements.ColorTextArea;
 import com.theincgi.advancedmacros.gui2.ScriptBrowser2;
+import com.theincgi.advancedmacros.guiScripts.BindingsMenu;
 import com.theincgi.advancedmacros.hud.hud2D.Hud2DItem;
 import com.theincgi.advancedmacros.hud.hud3D.WorldHudItem;
 import com.theincgi.advancedmacros.lua.LuaDebug;
@@ -187,6 +188,7 @@ public class EventHandler {
                 }
             } else if (ColorTextArea.isShiftDown()) {
                 showMenu(AdvancedMacros.scriptBrowser2, AdvancedMacros.macroMenuGui.getGui());
+                
             } else if (HIDUtils.Keyboard.isAlt()) {
                 LuaDebug.LuaThread thread = new LuaDebug.LuaThread(AdvancedMacros.repl, "REPL");
                 thread.workspace = Workspace.DEFAULT;
@@ -197,7 +199,8 @@ public class EventHandler {
                         AdvancedMacros.lastGui.showGui();
                     }, 85);
                 } else {
-                    MacroMenuGui.showMenu();
+//                    MacroMenuGui.showMenu();
+                	AdvancedMacros.bindingsMenu.openBindingsMenu();
                 }
             }
             return;
