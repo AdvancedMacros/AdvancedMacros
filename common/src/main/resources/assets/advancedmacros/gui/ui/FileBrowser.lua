@@ -87,25 +87,19 @@ function FileBrowser:new( ... )
 end
 
 function FileBrowser:updateWorkspaceList(newSelection)
-  local list = {
-    {
-      text = "AM Default",
-      path = filesystem.getMacrosAddress(),
-      workspace = Workspace:new{
-        workspaceName = "AM Default",
-        workspacePath = File.static.macrosDir:getPath()
-      }
-    }
-  }
-
-  for i, f in ipairs(File.static.workspacesDir:list".json$") do
-    local workspace = Workspace:load(f)
-    table.insert( list, {
-      text = workspace.workspaceName,
-      path = workspace.workspacePath,
+  local list = {}
+  local workspaces = advancedMacros.listWorkspaces()
+  workspaces["internal"] = nil --hide
+  
+  local keys = utils.keys(workspaces)
+  table.sort(keys)
+  for i, name in ipairs(keys) do
+    local workspace = workspaces[name]
+    list[i] = {
+      text = name,
+      path = workspace:getPath(),
       workspace = workspace
-      -- backgroundColor = 0x440077FF
-    })
+    }
   end
 
   for i, w in ipairs(list) do
@@ -133,21 +127,19 @@ function FileBrowser:newWorkspace(path)
     title     = "Name workspace",
     prompt    = "Add current directory as a workspace",
     callback  = function( name )
-      local workspace = Workspace:new{
-        workspaceName = name,
-        workspacePath = path
-      }
-
+      
       if name == "AM Default" or name == "internal" then
         self:_confirmationTryRename("is reserved", self.newWorkspace, path)
         return
       end
 
-      if workspace:getConfigFile():exists() then
+      local workspace = advancedMacros.getWorkspace(name)
+      if workspaace then
         self:_confirmationTryRename("is already in use", self.newWorkspace, path)
         return
       end --!exists
-      workspace:save()
+      workspace = advancedMacros.newWorkspace(name, path)
+      
       this:updateWorkspaceList(name)
     end --callback
   }:open()
@@ -204,7 +196,7 @@ function FileBrowser:onWorkspaceClicked( x, y, b, model )
     self.workspaceList:updateCells()
   end
 
-  if b == utils.RMB and model.text ~= "AM Default" then
+  if b == utils.RMB and not model.workspace:isReserved() then
     local x, y = self.screen.getMousePos()
     self.workspaceContextMenu:open(x, y)
   end
@@ -221,11 +213,8 @@ function FileBrowser:getWorkspaceContextMenuLayout()
       label = "Edit Permissions...",
       icon  = "resource:white_gear_64.png",
       onClick = function()
-        require("ui/WorkspacePermissionEditor"):new{
-          parentGui = self.screen,
-          workspace = self.activeWorkspace.workspace
-        }:open()
-       end
+        self:openWorkspacePermissionsEditor()  
+      end
     },
     {
       label = "Delete...",
@@ -246,28 +235,24 @@ function FileBrowser:openRenamePrompt()
         self:_confirmationTryRename("is reserved", self.openRenamePrompt)
         return
       end
-
-      local newWorkspace = Workspace:new{
-        workspaceName = name,
-        workspacePath = self.activeWorkspace.path
-      }
-
-      if newWorkspace:getConfigFile():exists() then
+      
+      if advancedMacros.getWorkspace(name) then
         self:_confirmationTryRename("is already in use", self.openRenamePrompt)
         return
       end
 
-      local current = Workspace:load(self.activeWorkspace.text)
-      newWorkspace.permissions = current.permissions
-      newWorkspace:save()
-      current:getConfigFile():delete()
+      self.activeWorkspace.workspace:rename(name)
+
       self:updateWorkspaceList(name)
     end
   }:open()
 end
 
 function FileBrowser:openWorkspacePermissionsEditor()
-  
+  require("ui/WorkspacePermissionEditor"):new{
+    parentGui = self.screen,
+    workspace = self.activeWorkspace.workspace
+  }:open()
 end
 
 --deletes activeWorkspace after confirmation prompt
@@ -279,7 +264,7 @@ function FileBrowser:deleteWorkspace()
     title = "Confirm delete",
     msg = "Are you sure you want to delete this workspace?\n&e"..self.activeWorkspace.text,
     yes = function()
-      File.static.workspacesDir:navigate(self.activeWorkspace.text..".json"):delete()
+      self.activeWorkspace.workspace:delete()
       self:updateWorkspaceList("AM Default")
     end,
     no = function() end

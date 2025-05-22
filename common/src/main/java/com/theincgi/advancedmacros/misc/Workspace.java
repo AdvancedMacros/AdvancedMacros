@@ -67,7 +67,7 @@ public class Workspace {
 		this.name = name;
 		this.path = path;
 		permissions = new Permissions(allPermissions);
-		if(!getConfigFile().exists())
+		if(!getConfigFile().exists() && !isReservedWorkspace())
 			try {
 				save();
 			} catch (IOException e) {
@@ -215,7 +215,9 @@ public class Workspace {
 		controls.set("rename", new OneArgFunction() {
 			@Override public LuaValue call(LuaValue arg) {
 				if(!valid) throw new LuaError("Attempt to use/modify deleted workspace");
+				if(isReservedWorkspace()) throw new LuaError("Attempt to modify reserved workspace");
 				Permissions.check(Permission.MODIFY_WORKSPACE);
+				
 				try {
 					rename(arg.checkjstring());
 				} catch(IllegalStateException | IOException e) {
@@ -227,6 +229,7 @@ public class Workspace {
 		controls.set("delete", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
+				if(isReservedWorkspace()) throw new LuaError("Attempt to delete reserved workspace");
 				Permissions.check(Permission.MODIFY_WORKSPACE);
 				if(valid)
 					delete();
