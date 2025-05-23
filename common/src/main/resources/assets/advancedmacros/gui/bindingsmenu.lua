@@ -153,6 +153,7 @@ function BindingsMenu:new( ... )
     height = 0,
     hgap = 6,
     vgap = 6,
+    debug = true
   }
 
   obj.bindingsScrollView:add( obj.bindingsFlow )
@@ -184,6 +185,13 @@ function BindingsMenu:onResize(w, h)
   self.toolbarFlow:setWidth(w - 12)
   self.bindingsScrollView:setWidth(w - 12)
   self.bindingsScrollView:setHeight(h - self.bindingsGroup.getY() - 14 - 14 - 10)
+
+  for i, item in ipairs(self.bindingsFlow.children) do
+    if instanceOf(item, GroupCard) then
+      item:setWidth(w - 24)
+    end
+  end
+
   self.bindingsFlow:setWidth(self.bindingsScrollView:getViewportWidth())
   self.footerGroup.setY(h - 12 - 6)
 end
@@ -328,7 +336,7 @@ function BindingsMenu:newGroup( group )
     label = "Test Group",
     x = 0,
     y = 0,
-    width = width - 12,
+    width = width - 24,
     height = 120,
     color = utils.randomColor(),
   }

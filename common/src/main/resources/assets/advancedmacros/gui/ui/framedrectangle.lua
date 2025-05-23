@@ -32,8 +32,6 @@ function FramedRectangle:new( ... )
   obj.elements.background.setParent( obj.group )
   obj.elements.frame.setParent( obj.group )
   obj.interiorGroup.setParent( obj.group )
-  
-  obj.events.resize:addListener(self.onResize)
 
   if self == FramedRectangle then
     obj:_postConstruct()
@@ -43,6 +41,7 @@ function FramedRectangle:new( ... )
 end
 
 function FramedRectangle:onResize( width, height )
+  FramedRectangle:super().onResize( self, width, height )
   self.elements.background.setSize( width - self.frameThickness * 2, height - self.frameThickness * 2 )
   self.elements.frame.setSize( width, height )
   

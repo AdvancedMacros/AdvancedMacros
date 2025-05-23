@@ -92,8 +92,6 @@ function ComboBox:new( ... )
   obj.elements.popup.listView.events.cellClicked:addListener(function(x,y,b,model) obj:setSelection( model ) end)
   obj.focusScreen.setOnMouseClick(function(x,y,b) obj:close() end)
 
-  obj.events.resize:addListener(obj.onResize)
-
   if self == ComboBox then
     obj:_postConstruct()
   end
@@ -102,6 +100,7 @@ function ComboBox:new( ... )
 end
 
 function ComboBox:onResize( w, h )
+  ComboBox:super().onResize( self, w, h )
   self.elements.widget.box:setSize(w, h)
 
   local interiorWidth, interiorHeight = self.elements.widget.box:getInteriorSize()

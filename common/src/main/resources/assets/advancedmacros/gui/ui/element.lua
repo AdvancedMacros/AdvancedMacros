@@ -81,22 +81,33 @@ function Element:move( dx, dy )
   self:setPos( x + dx, y + dy )
 end
 
+function Element:onResize( width, height )
+end
+
 function Element:setWidth( width, notify )
+  local changed = self.width ~= width
   self.width = width
-  if notify == false then return end
+  if notify == false or not changed then return end
+  self:onResize( width, self.height )
   self.events.resize:notify( self, self.width, self.height )
 end
 
 function Element:setHeight( height, notify )
+  local changed = self.height ~= height 
   self.height = height
-  if notify == false then return end
+  if notify == false or not changed then return end
+  self:onResize( self.width, height )
   self.events.resize:notify( self, self.width, self.height )
 end
 
 function Element:setSize( width, height )
+  local changed = self.width ~= width or self.height ~= height
   self:setWidth( width, false )
   self:setHeight( height, false )
-  self.events.resize:notify( self, self.width, self.height )
+  if changed then
+    self:onResize( width, self.height )
+    self.events.resize:notify( self, self.width, self.height )
+  end
 end
 
 function Element:notifyResize()

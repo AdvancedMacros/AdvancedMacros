@@ -26,7 +26,8 @@ function GroupCard:new( ... )
     width = obj.width - 12,
     height = 1,
     hGap = 4, vGap = 4,
-    hAlign = "center"
+    hAlign = "center",
+    debug = true
   }
 
   obj.flow.events.resize:addListener(function() obj:onFlowResize() end)
@@ -105,6 +106,16 @@ function GroupCard:addChildEnableChangeListener( card )
   self.events.enableChanged:addListener(function( parent, enabled ) 
     card:setParentEnabled( enabled )
   end)
+end
+
+function GroupCard:onResize( width, height )
+  GroupCard:super().onResize( self, width, height )
+  for i, item in ipairs(self.flow) do
+    if instanceOf(item, GroupCard) then
+      item:setWidth( width )
+    end
+  end
+  self.flow:setWidth(width - 12) --triggers onFlowResize via event
 end
 
 function GroupCard:onFlowResize()

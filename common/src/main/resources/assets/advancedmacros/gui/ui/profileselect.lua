@@ -48,8 +48,6 @@ function ProfileSelect:new( ... )
   obj:loadProfiles()
   obj:buildContextMenu()
 
-  obj.events.resize:addListener(obj.onResize)
-
   if self == ProfileSelect then
     obj:_postConstruct()
   end
@@ -57,8 +55,9 @@ function ProfileSelect:new( ... )
   return obj
 end
 
-function ProfileSelect:onResize(w, h)
-  self.elements.comboBox:setWidth( w )
+function ProfileSelect:onResize(width, height)
+  ProfileSelect:super().onResize( self, width, height )
+  self.elements.comboBox:setWidth( width )
 end
 
 

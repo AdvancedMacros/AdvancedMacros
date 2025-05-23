@@ -31,8 +31,6 @@ function Flow:new( ... )
     obj.mode = args("hbox"):lower() --kwargs name used
   end
 
-  obj.events.resize:addListener(obj.onResize)
-
   if self == Flow then
     obj:_postConstruct()
   end
@@ -52,6 +50,8 @@ function Flow:add( element )
 end
 
 function Flow:onResize( width, height )
+  log("Flow: onResize")
+  Flow:super().onResize( self, width, height )
   self.elements.debug.bounds.setSize( width, height )
   self:arrange()
 end

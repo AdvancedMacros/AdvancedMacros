@@ -49,13 +49,12 @@ function ScrollView:new( ... )
   
   obj.children = {}
 
-  obj.events.resize:addListener(obj.onResize)
   obj.elements.vScrollBar.setOnMouseDrag(function() obj:onScroll() end)
   obj.elements.hScrollBar.setOnMouseDrag(function() obj:onScroll() end)
   --TODO scroll wheel event on bg with shift check
 
   obj:updateContentBounds()
-  obj:onResize()
+  obj:onResize(self:getSize())
 
   if self == ScrollView then
     obj:_postConstruct()
@@ -162,6 +161,7 @@ function ScrollView:getContentSize()
 end
 
 function ScrollView:onResize(w, h)
+  ScrollView:super().onResize( self, w, h )
   --update clipping area
   self.group.setScissor(0,0,self.width, self.height)
 
@@ -174,6 +174,8 @@ function ScrollView:onResize(w, h)
   self.elements.frame.setHeight(self.height)
   self.elements.hScrollBar.setY(self:getY() + self.height - 8)
   self.elements.vScrollBar.setHeight(self.height - 1)
+
+  self:updateContentBounds()
 end
 
 return ScrollView
