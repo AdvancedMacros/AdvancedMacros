@@ -102,7 +102,6 @@ function ComboBox:new( ... )
 end
 
 function ComboBox:onResize( w, h )
-  log(("&4CB: &f%d %d"):format(w, h))
   self.elements.widget.box:setSize(w, h)
 
   local interiorWidth, interiorHeight = self.elements.widget.box:getInteriorSize()

@@ -41,7 +41,10 @@ end
 function EventChannel:notify( ... )
   self:cleanup()
   for i, listener in ipairs( self.listeners ) do
-    local result = listener( ... )
+    local ok, result = pcall( listener, ... )
+    if not ok then 
+      log(result)
+    end
     if self.consumable and result ~= nil then
       return result
     end

@@ -35,6 +35,7 @@ public class BindingsMenu {
 			try(var reset = Utils.tempSetCurrentWorkspace(Workspace.INTERNAL)) {
 				menuClass = AdvancedMacros.globals.load(in, "BindingsMenu", "t", AdvancedMacros.globals).call();
 				menu = menuClass.get("new").call(menuClass);
+				AdvancedMacros.globals.get("advancedMacros").set("bindingsMenu", menu);
 			}
 			in.close();
 		} catch (Throwable e) {

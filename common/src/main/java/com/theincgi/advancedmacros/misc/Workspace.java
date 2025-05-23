@@ -108,11 +108,10 @@ public class Workspace {
 			throw new FileNotFoundException(file.toString());
 		String contents = new String(Files.readAllBytes(file.toPath()));
 		var json = JsonParser.parseString(contents).getAsJsonObject();
-		var name = json.get("workspaceName").getAsString();
-		var path = json.get("workspacePath").getAsString();
+		var name = json.get("name").getAsString();
+		var path = json.get("path").getAsString();
 		var workspace = new Workspace(name, path);
 		workspace.permissions.load(json.get("permissions").getAsJsonArray());
-		//TODO deserialize permissions
 		return workspace;
 	}
 	
