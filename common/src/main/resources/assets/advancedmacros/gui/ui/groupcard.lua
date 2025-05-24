@@ -30,7 +30,7 @@ function GroupCard:new( ... )
     debug = true
   }
 
-  obj.flow.events.resize:addListener(function() obj:onFlowResize() end)
+  obj.flow.events.resize:addListener(function() obj:onResize(obj.width, obj.height) end)
 
   obj.elements.newBindingButton.setOnMouseClick(function() obj:addBinding() end)
   obj.elements.newGroupButton.setOnMouseClick(function() obj:addGroup() end)
@@ -80,7 +80,7 @@ end
 function GroupCard:addGroup( model )
   local groupCard = GroupCard:new{
     screen = self.screen,
-    label = "Test Group",
+    label = "Unnamed Group",
     x = 0,
     y = 0,
     width = self.width - 12,
@@ -96,7 +96,7 @@ function GroupCard:addGroup( model )
     groupCard:applyModel( model )
   end
   groupCard:onFlowResize()
-  groupCard.events.resize:addListener(function() self:onFlowResize() end)
+  groupCard.events.resize:addListener(function() self:onFlowResize() end) --height change in child group
   self:addChildEnableChangeListener( groupCard )
   self.flow:add( groupCard )
   self:bindCardCloseAction(groupCard, self.flow)
@@ -110,12 +110,13 @@ end
 
 function GroupCard:onResize( width, height )
   GroupCard:super().onResize( self, width, height )
-  for i, item in ipairs(self.flow) do
+  for i, item in ipairs(self.flow.children) do
     if instanceOf(item, GroupCard) then
-      item:setWidth( width )
+      item:setWidth( width - 12 )
     end
   end
   self.flow:setWidth(width - 12) --triggers onFlowResize via event
+  self:onFlowResize()
 end
 
 function GroupCard:onFlowResize()
@@ -123,7 +124,7 @@ function GroupCard:onFlowResize()
   local flowHeight = self.flow:getHeight()
   local y = self:getY()
   self.height = flowY - y + flowHeight + 6
-  self:resizeCard()
+  self:resizeCard() --triggers resize event
 end
 
 function GroupCard:getContextMenuLayout()

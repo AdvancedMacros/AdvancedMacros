@@ -270,7 +270,12 @@ function Card:resizeCard()
     )
   end
   self.group.setPos(x,y)
-  self.events.resize:notify( self, self:getWidth(), self:getHeight() )
+  self:notifyResize()
+end
+
+function Card:onResize(width, height)
+  Card:super().onResize( self, width, height )
+  self:resizeCard();
 end
 
 function Card:setColor( color )
@@ -364,6 +369,7 @@ end
 function Card:setWidth( newWidth, _notify )
   self.width = newWidth
   if _notify ~= false then
+    self:onResize( self.width, self.height )
     self:resizeCard()
   end
 end
@@ -371,6 +377,7 @@ end
 function Card:setHeight( newHeight, _notify )
   self.height = newHeight
   if _notify ~= false then
+    self:onResize( self.width, self.height )
     self:resizeCard()
   end
 end
@@ -378,6 +385,7 @@ end
 function Card:setSize( width, height )
   self:setWidth( width, false )
   self:setHeight( height, false )
+  self:onResize( self.width, self.height )
   self:resizeCard()
 end
 

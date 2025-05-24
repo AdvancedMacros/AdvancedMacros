@@ -89,7 +89,7 @@ function Element:setWidth( width, notify )
   self.width = width
   if notify == false or not changed then return end
   self:onResize( width, self.height )
-  self.events.resize:notify( self, self.width, self.height )
+  self:notifyResize()
 end
 
 function Element:setHeight( height, notify )
@@ -97,7 +97,7 @@ function Element:setHeight( height, notify )
   self.height = height
   if notify == false or not changed then return end
   self:onResize( self.width, height )
-  self.events.resize:notify( self, self.width, self.height )
+  self:notifyResize()
 end
 
 function Element:setSize( width, height )
@@ -106,12 +106,12 @@ function Element:setSize( width, height )
   self:setHeight( height, false )
   if changed then
     self:onResize( width, self.height )
-    self.events.resize:notify( self, self.width, self.height )
+    self:notifyResize()
   end
 end
 
 function Element:notifyResize()
-  self.events.resize:notify( self, self.width, self.height )
+  self.events.resize:notify( self, self:getWidth(), self:getHeight() )
 end
 
 --expose group functions as card functions

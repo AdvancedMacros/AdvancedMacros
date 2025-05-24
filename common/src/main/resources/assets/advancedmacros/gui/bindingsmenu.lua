@@ -330,13 +330,13 @@ function BindingsMenu:newBinding( binding )
 end
 
 function BindingsMenu:newGroup( group )
-  local width = self.bindingsScrollView:getViewportWidth() - 12
+  local width = self.bindingsScrollView:getViewportWidth()
   local groupCard = GroupCard:new{
     screen = self.screen,
     label = "Test Group",
     x = 0,
     y = 0,
-    width = width - 24,
+    width = width - 12,
     height = 120,
     color = utils.randomColor(),
   }
