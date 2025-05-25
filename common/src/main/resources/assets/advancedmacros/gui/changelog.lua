@@ -68,17 +68,13 @@ end
 
 function ChangeLog:readChangeLog()
   thread.new(function()
-    local file = filesystem.open("changelog.txt", "r")
-    local lines = {}
-  
-    while true do
-      local line = file.readLine()
-      if not line then break end
-      table.insert(lines, {
-        text = line
-      })
-    end
-    file.close()
+    local text = advancedMacros.getResource("gui/changelog.txt")
+    local lines = utils.split(text, "\n")
+    
+    lines = utils.map(lines, function(k, v)
+      return {text = v}
+    end)
+    
     self.listView:setData( lines )
   end).start()
 end
