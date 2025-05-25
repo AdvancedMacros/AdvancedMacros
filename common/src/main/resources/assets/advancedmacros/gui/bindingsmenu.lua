@@ -402,7 +402,7 @@ function BindingsMenu:_triggerBinding(binding, eventType, value, ...)
   end
 
   if action and not isConsumable then
-    local t = thread.new(action)
+    local t = thread.new(function() action(eventType, value, table.unpack(args)) end)
     t.setLabel(binding:getLabel())
     t.setWorkspace(workspace)
     -- t.setWorkspace(file)
