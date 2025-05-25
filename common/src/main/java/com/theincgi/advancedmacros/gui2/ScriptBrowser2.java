@@ -1,7 +1,7 @@
 package com.theincgi.advancedmacros.gui2;
 
 import com.theincgi.advancedmacros.AdvancedMacros;
-import com.theincgi.advancedmacros.event.EventHandler;
+import com.theincgi.advancedmacros.event.CombinedEventHandler;
 import com.theincgi.advancedmacros.gui.Color;
 import com.theincgi.advancedmacros.gui.Gui;
 import com.theincgi.advancedmacros.gui.elements.ColorTextArea;
@@ -120,7 +120,7 @@ public class ScriptBrowser2 extends Gui {
         resize(MinecraftClient.getInstance(), width, height);
 
         returnButton.setOnClick((int mouseButton, GuiButton b) -> {
-            EventHandler.showPrevMenu();
+            CombinedEventHandler.showPrevMenu();
         });
 
         createFileButton.setOnClick((int mouseButton, GuiButton b) -> {
@@ -614,7 +614,7 @@ public class ScriptBrowser2 extends Gui {
                                 r.result = ScriptBrowser2.getScriptPath(selectedFile).replace('\\', '/');
                                 rh.onResult(r);
                             } else {
-                                EventHandler.showMenu(AdvancedMacros.editorGUI, ScriptBrowser2.this);
+                                CombinedEventHandler.showMenu(AdvancedMacros.editorGUI, ScriptBrowser2.this);
                                 AdvancedMacros.editorGUI.openScript(getScriptPath());
                                 selectedFile = null; //unselect so when you go back if you click it the file preview updates //FIXME detect return to gui
                             }

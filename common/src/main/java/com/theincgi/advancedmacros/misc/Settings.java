@@ -59,6 +59,8 @@ public class Settings {
         if(settings.get("chat").get("maxLines").isnil()) {
             settings.set("maxLines", 100);
         }
+        if(settings.get("eventTimeout").isnil())
+        	settings.set("eventTimeout", 3000);
 //        setupWorkspaces();
     }
     //	private static void loadDefaults(boolean force) {

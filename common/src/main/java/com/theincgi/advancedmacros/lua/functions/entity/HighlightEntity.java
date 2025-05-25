@@ -1,7 +1,7 @@
 package com.theincgi.advancedmacros.lua.functions.entity;
 
 import com.theincgi.advancedmacros.AdvancedMacros;
-import com.theincgi.advancedmacros.event.EventHandler.RenderFlags;
+import com.theincgi.advancedmacros.event.CombinedEventHandler.RenderFlags;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import org.luaj.vm2_v3_0_1.LuaError;

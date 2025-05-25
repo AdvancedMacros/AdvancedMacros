@@ -1,7 +1,7 @@
 package com.theincgi.advancedmacros;
 
 import com.theincgi.advancedmacros.access.IMinecraftClient;
-import com.theincgi.advancedmacros.event.EventHandler;
+import com.theincgi.advancedmacros.event.CombinedEventHandler;
 import com.theincgi.advancedmacros.gui.EditorGUI;
 import com.theincgi.advancedmacros.gui.Gui;
 import com.theincgi.advancedmacros.gui.IBindingsGui;
@@ -108,7 +108,7 @@ public class AdvancedMacros {
     public static LuaValue fileLuaClass;
     
 
-    public static final EventHandler EVENT_HANDLER = new EventHandler();
+    public static final CombinedEventHandler EVENT_HANDLER = new CombinedEventHandler();
 
 
     public AdvancedMacros() {

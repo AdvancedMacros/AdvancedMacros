@@ -1,7 +1,7 @@
 package com.theincgi.advancedmacros.gui;
 
 import com.theincgi.advancedmacros.AdvancedMacros;
-import com.theincgi.advancedmacros.event.EventHandler;
+import com.theincgi.advancedmacros.event.CombinedEventHandler;
 import com.theincgi.advancedmacros.gui.elements.ColorTextArea;
 import com.theincgi.advancedmacros.gui.elements.GuiButton;
 import com.theincgi.advancedmacros.gui.elements.OnClickHandler;
@@ -59,14 +59,14 @@ public class EditorGUI extends Gui {
                 //not gonna do anything
             } else {
                 //either overridden for exit or saved, so all good
-                EventHandler.showPrevMenu();
+                CombinedEventHandler.showPrevMenu();
             }
         });
         quickRun.setOnClick(new OnClickHandler() {//TODO shift to save and run? or run with args?
             @Override
             public void onClick(int button, GuiButton sButton) {
                 save.getOnClickHandler().onClick(button, save);
-                EventHandler.closeMenu();
+                CombinedEventHandler.closeMenu();
                 AdvancedMacros.runScript(ScriptBrowser2.getScriptPath(cta.getScriptFile()));
             }
         });

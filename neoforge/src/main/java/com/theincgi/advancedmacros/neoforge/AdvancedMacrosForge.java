@@ -1,7 +1,7 @@
 package com.theincgi.advancedmacros.neoforge;
 
 import com.theincgi.advancedmacros.AdvancedMacros;
-import com.theincgi.advancedmacros.event.EventHandler;
+import com.theincgi.advancedmacros.event.CombinedEventHandler;
 import net.minecraft.client.MinecraftClient;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -26,7 +26,7 @@ public class AdvancedMacrosForge {
 
     public static void onTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
-            EventHandler.onTick(MinecraftClient.getInstance());
+            CombinedEventHandler.onTick(MinecraftClient.getInstance());
         }
     }
 

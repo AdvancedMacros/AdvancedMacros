@@ -10,15 +10,8 @@ if(#package.path <= #("?.lua"))then
   end
 end
 
---{name: Workspace} loaded from file
-local workspaceCache = {}
-
 --{fullFilePath: module}
 package.globalLoaded = {}
-
-function package.invalidateWorkspaceCache()
-  workspaceCache = {}
-end
 
 ---path to workspace + / + module name
 ---@param name string name of module
@@ -34,7 +27,7 @@ function package.unload(module, workspace)
   if workspace == nil then
     workspace = getCurrentWorkspace()
   elseif type(workspace)=="string" then
-    workspace = getWorkspaceByName(workspace)
+    workspace = advancedMacros.getWorkspace(workspace)
   elseif instanceOf(workspace, package.preload["Workspace"]) then
     --no action needed
   else
@@ -57,29 +50,6 @@ end
 local function getCurrentWorkspace()
   return advancedMacros.getCurrentWorkspace()
 end
-
----Get Workspace by name, throws error if workspace file doesn't exist
----Workspace is cached in workspaceCache
----@param name string
----@return Workspace|nil
-local function getWorkspaceByName(name)
-  local cached = workspaceCache[name]
-  if cached then return cached end
-  local Workspace = package.preload["Workspace"]
-  local workspace = advancedMacros.getWorkspace(name)
-  -- if name == "internal" then
-  --   workspace = Workspace:new{
-  --     workspaceName = "internal",
-  --     workspacePath = "resource:"
-  --   }
-  -- else 
-  --   workspace = Workspace:load(name)
-  -- end
-  workspaceCache[name] = workspace --TODO remove caching feature?
-  return workspace
-end
-
-
 
 ---wrapper function to pull from `package.globalLoaded`
 ---makes it so if nested workspaces refer to the same file it's only loaded once
@@ -157,7 +127,7 @@ local function luaSearcher(name, workspaceName)
   if not workspaceName then
     workspace = getCurrentWorkspace()
   else
-    workspace = getWorkspaceByName(workspaceName)
+    workspace = advancedMacros.getWorkspace(workspaceName)
   end
 
   if not workspace then
@@ -171,6 +141,8 @@ local function luaSearcher(name, workspaceName)
   if not workspace:isModuleCaseSensitive() then
     name = name:lower()
   end
+
+  print("luaSearcher workspace: "..tostring(workspaceName)..", module: "..name)
 
   if workspace:getPath() == "resource:" then
     local src =  advancedMacros.getResource("scripts/"..name..".lua")

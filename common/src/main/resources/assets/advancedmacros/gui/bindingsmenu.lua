@@ -216,7 +216,7 @@ function BindingsMenu:openREPL( x, y, b )
 end
 
 function BindingsMenu:openChangeLog( x, y, b )
-  local ChangeLog = require"ChangeLog"
+  local ChangeLog = require"internal::ChangeLog"
   ChangeLog:new({}):open()
 end
 
@@ -351,8 +351,8 @@ end
 
 function BindingsMenu:listBindings(bindings)
   local bindings = bindings or {}
-  local BindingCard = require"ui/BindingCard"
-  local GroupCard   = require"ui/GroupCard"
+  local BindingCard = require"internal::ui/BindingCard"
+  local GroupCard   = require"internal::ui/GroupCard"
   
   for i, child in ipairs( self.bindingsFlow.children ) do
     if isClass(child) then
@@ -402,31 +402,76 @@ function BindingsMenu:_triggerBinding(binding, eventType, value, ...)
   end
 end
 
-function BindingsMenu:trigger( ...)
+function BindingsMenu:listMatchingBindings(...)
+  local args = utils.kwargs({
+    {eventType = "string"},
+    {value     = "string"},
+    {eventArgs = "table", {}},
+    {includeAnything = "boolean", true},
+  },...)
+  local bindings = self:listBindings()
+  local eventType = args.eventType
+  local value     = args.value
+
+  local bindingQueue = {}
+
+  for i, binding in ipairs( bindings ) do
+    local trigMode = binding:getTriggerMode()
+    local trigVal = binding:getTriggerValue()
+    local keyCheck = true
+    if trigMode == "key up" then
+      trigMode = "key"
+      keyCheck = args.eventArgs[1] == "up"
+    elseif trigMode == "key down" then
+      trigMode = "key"
+      keyCheck = args.eventArgs[1] == "down"
+    elseif trigMode == "key all" then
+      trigMode = "key"
+    end
+
+    -- log{
+    --   label = binding:getLabel(), 
+    --   args = {
+    --     argEventType = args.eventType, 
+    --     argsValue = args.value,
+    --     argsIncludeAnything = args.includeAnything, 
+    --   },
+    --   locals = {
+    --     trigMode = trigMode, 
+    --     eventType = eventType, 
+    --     keyCheck = keyCheck, 
+    --     enable = binding:isEnabled()
+    --   },
+    --   ["..."] = {...}
+    -- }
+
+    if trigMode == eventType 
+    and keyCheck
+    and (trigVal == value or (args.includeAnything and trigVal == "Anything"))
+    and binding:isEnabled() then
+      table.insert(bindingQueue, binding)
+    end
+  end
+
+  return bindingQueue
+end
+
+function BindingsMenu:trigger(...)
+  local bindingQueue = self:listMatchingBindings(...)
+
   local args = utils.kwargs({
     {eventType = "string"},
     {value     = "string"},
     {eventArgs = "table", {}},
     {callback  = {"nil", "function"}} --for filter results
   },...)
-  local bindings = self:listBindings()
-  local eventType = args.eventType
-  local value     = args.value
-  local eventArgs = args.eventArgs
 
-  local bindingQueue = {}
-  for i, binding in ipairs( bindings ) do
-    local trigMode = binding:getTriggerMode()
-    local trigVal = binding:getTriggerValue()
-    if trigMode == eventType 
-    and (trigVal == value or trigValue == "Anything") then
-      table.insert(bindingQueue, binding)
-    end
-  end
+  local eventArgs = args.eventArgs
 
   local t = thread.new(function()
     for i, binding in ipairs(bindingQueue) do
-      local done, newArgs = self:_triggerBinding(binding, eventType, value, table.unpack(eventArgs))
+      log("&7Triggering binding with label &B"..binding:getLabel())
+      local done, newArgs = self:_triggerBinding(binding, args.eventType, args.value, table.unpack(eventArgs))
       if done then
         break
       end
@@ -436,7 +481,7 @@ function BindingsMenu:trigger( ...)
       args.callback(table.unpack(eventArgs))
     end
   end)
-  t.setLabel("event-dispatch:"..eventType..":"..value)
+  t.setLabel("event-dispatch:"..args.eventType..":"..args.value)
   t.start()
 end
 

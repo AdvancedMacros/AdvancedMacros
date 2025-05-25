@@ -1,8 +1,8 @@
 package com.theincgi.advancedmacros.gui.elements;
 
 import com.theincgi.advancedmacros.AdvancedMacros;
-import com.theincgi.advancedmacros.event.EventHandler;
-import com.theincgi.advancedmacros.event.EventHandler.EventName;
+import com.theincgi.advancedmacros.event.CombinedEventHandler;
+import com.theincgi.advancedmacros.event.CombinedEventHandler.EventName;
 import com.theincgi.advancedmacros.gui.Color;
 import com.theincgi.advancedmacros.gui.Gui;
 import com.theincgi.advancedmacros.gui.Gui.InputSubscriber;
@@ -122,7 +122,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber, IBinding
                         AdvancedMacros.editorGUI.updateKeywords();
                         AdvancedMacros.editorGUI.openScript(script);
                         ((MacroMenuGui) gui).updateProfileChanges();
-                        EventHandler.showMenu(AdvancedMacros.editorGUI, AdvancedMacros.macroMenuGui.getGui());
+                        CombinedEventHandler.showMenu(AdvancedMacros.editorGUI, AdvancedMacros.macroMenuGui.getGui());
                     }
                 } else if (sButton.equals(moveButton)) {
                     container.grab(GuiBinding.this);
@@ -168,7 +168,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber, IBinding
                         eventSelector.close();
                     } else {
                         eventSelector.clear(true);
-                        for (EventName string : EventHandler.EventName.values()) {
+                        for (EventName string : CombinedEventHandler.EventName.values()) {
                             eventSelector.addOption(string.name());
                         }
 
@@ -646,7 +646,7 @@ public class GuiBinding implements Moveable, Drawable, InputSubscriber, IBinding
         ((MacroMenuGui) gui).markDirty();
         if (!eventMode.isKeyType()) {
             eventSelector.clear(true);
-            for (EventName string : EventHandler.EventName.values()) {
+            for (EventName string : CombinedEventHandler.EventName.values()) {
                 eventSelector.addOption(string.name());
             }
             eventSelector.select(tojstring);

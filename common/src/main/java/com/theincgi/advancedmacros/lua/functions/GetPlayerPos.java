@@ -1,6 +1,6 @@
 package com.theincgi.advancedmacros.lua.functions;
 
-import com.theincgi.advancedmacros.event.EventHandler;
+import com.theincgi.advancedmacros.event.CombinedEventHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -22,9 +22,9 @@ public class GetPlayerPos extends VarArgFunction {
             PlayerEntity player = MinecraftClient.getInstance().player;
             LuaTable t = new LuaTable();
             float pt = MinecraftClient.getInstance().getTickDelta();
-            t.set(1, LuaValue.valueOf(EventHandler.accuPlayerX(pt, player)));
-            t.set(2, LuaValue.valueOf(EventHandler.accuPlayerY(pt, player)));
-            t.set(3, LuaValue.valueOf(EventHandler.accuPlayerZ(pt, player)));
+            t.set(1, LuaValue.valueOf(CombinedEventHandler.accuPlayerX(pt, player)));
+            t.set(2, LuaValue.valueOf(CombinedEventHandler.accuPlayerY(pt, player)));
+            t.set(3, LuaValue.valueOf(CombinedEventHandler.accuPlayerZ(pt, player)));
             return t.unpack();
         } else {
             final String sPlayer = args.checkjstring(1);
@@ -39,9 +39,9 @@ public class GetPlayerPos extends VarArgFunction {
                 //for(EntityPlayer player : MinecraftClient.getInstance().world.playerEntities){
                 if (player != null && player.getName().equals(sPlayer)) {
                     float pt = MinecraftClient.getInstance().getTickDelta();
-                    t.set(1, LuaValue.valueOf(EventHandler.accuPlayerX(pt, player)));
-                    t.set(2, LuaValue.valueOf(EventHandler.accuPlayerY(pt, player)));
-                    t.set(3, LuaValue.valueOf(EventHandler.accuPlayerZ(pt, player)));
+                    t.set(1, LuaValue.valueOf(CombinedEventHandler.accuPlayerX(pt, player)));
+                    t.set(2, LuaValue.valueOf(CombinedEventHandler.accuPlayerY(pt, player)));
+                    t.set(3, LuaValue.valueOf(CombinedEventHandler.accuPlayerZ(pt, player)));
                     break;
                 }
             }

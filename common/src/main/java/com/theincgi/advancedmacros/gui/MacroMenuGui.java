@@ -1,8 +1,8 @@
 package com.theincgi.advancedmacros.gui;
 
 import com.theincgi.advancedmacros.AdvancedMacros;
-import com.theincgi.advancedmacros.event.EventHandler;
-import com.theincgi.advancedmacros.event.EventHandler.EventName;
+import com.theincgi.advancedmacros.event.CombinedEventHandler;
+import com.theincgi.advancedmacros.event.CombinedEventHandler.EventName;
 import com.theincgi.advancedmacros.gui.elements.Drawable;
 import com.theincgi.advancedmacros.gui.elements.GuiBinding;
 import com.theincgi.advancedmacros.gui.elements.GuiBinding.EventMode;
@@ -127,7 +127,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui {
             public void onClick(int button, GuiButton sButton) {
                 //if(Gui.isAltKeyDown())
                 updateProfileChanges();
-                EventHandler.showMenu(AdvancedMacros.scriptBrowser2);
+                CombinedEventHandler.showMenu(AdvancedMacros.scriptBrowser2);
                 //else
                 //	ForgeEventHandler.showMenu(AdvancedMacros.scriptBrowser);
                 //MinecraftClient.getInstance().setScreen(AdvancedMacros.scriptBrowser);
@@ -280,7 +280,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui {
                 if (b.isDisabled()) {
                     continue; //disabled, skip
                 }
-                boolean override = b.getEventMode().equals(EventMode.EVENT) && b.getEventName().equals(EventHandler.EventName.Anything.name());
+                boolean override = b.getEventMode().equals(EventMode.EVENT) && b.getEventName().equals(CombinedEventHandler.EventName.Anything.name());
                 if (eventName.equals(EventName.Chat.name())) {
                     override = false;
                 }
@@ -371,7 +371,7 @@ public class MacroMenuGui extends Gui implements IBindingsGui {
                 //				g.setScript(t.get("script").tojstring());
                 bindingsList.add(g);
             }
-            LuaTable args = EventHandler.createEvent(EventName.ProfileLoaded);
+            LuaTable args = CombinedEventHandler.createEvent(EventName.ProfileLoaded);
             args.set(3, LuaValue.valueOf(profile));
             AdvancedMacros.EVENT_HANDLER.fireEvent(EventName.ProfileLoaded, args);
 

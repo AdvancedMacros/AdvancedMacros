@@ -2,7 +2,7 @@ package com.theincgi.advancedmacros.gui.elements;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.theincgi.advancedmacros.AdvancedMacros;
-import com.theincgi.advancedmacros.event.EventHandler;
+import com.theincgi.advancedmacros.event.CombinedEventHandler;
 import com.theincgi.advancedmacros.gui.Color;
 import com.theincgi.advancedmacros.gui.Gui;
 import com.theincgi.advancedmacros.gui.Gui.Focusable;
@@ -1141,7 +1141,7 @@ public class ColorTextArea implements Drawable, InputSubscriber, Moveable, Focus
                         System.out.println("Goto line");
                     } else if (keyCode == GLFW.GLFW_KEY_R && isEditable) {
                         save();
-                        EventHandler.closeMenu();
+                        CombinedEventHandler.closeMenu();
                         AdvancedMacros.runScript(ScriptBrowser2.getScriptPath(getScriptFile()));
                     } else if (keyCode == GLFW.GLFW_KEY_SPACE && isEditable) {
                         //TODO autocomplete!

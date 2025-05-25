@@ -46,16 +46,34 @@ public class BindingsMenu {
 	public void openBindingsMenu() {
 		call("open");
 	}
+
+	public boolean hasBindingsForEvent(String eventType, String value, boolean includeAnything) {
+		var args = new LuaTable();
+		args.set("eventType", eventType);
+		args.set("value", value);
+		args.set("includeAnything", includeAnything);
+		return call("listMatchingBindings", args).length() > 0;
+	}
 	
 	public Varargs triggerEvent(String eventType, String value) {
 		LuaTable args = new LuaTable();
-		args.set(1, eventType);
-		args.set(2, value);
+		args.set("eventType", eventType);
+		args.set("value", value);
+		return triggerEvent(args);
+	}
+	
+	public Varargs triggerEvent(String eventType, String value, LuaTable eventArgs) {
+		LuaTable args = new LuaTable();
+		args.set("eventType", eventType);
+		args.set("value", value);
+		args.set("eventArgs", eventArgs);
 		return triggerEvent(args);
 	}
 	
 	public Varargs triggerEvent(LuaTable args) {
-		return invoke("trigger", args.unpack());
+		try(var reset = Utils.tempSetCurrentWorkspace(Workspace.INTERNAL)) {
+			return invoke("trigger", args);
+		}
 	}
 	
 	protected LuaValue call(String func) {
@@ -68,4 +86,7 @@ public class BindingsMenu {
 		return menu.get(func).invoke(menu, args);
 	}
 	
+	public static BindingsMenu getBindingsMenu() {
+		return AdvancedMacros.bindingsMenu;
+	}
 }

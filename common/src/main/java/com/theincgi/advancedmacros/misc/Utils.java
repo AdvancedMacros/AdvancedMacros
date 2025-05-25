@@ -3,7 +3,7 @@ package com.theincgi.advancedmacros.misc;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.theincgi.advancedmacros.AdvancedMacros;
-import com.theincgi.advancedmacros.event.EventHandler;
+import com.theincgi.advancedmacros.event.CombinedEventHandler;
 import com.theincgi.advancedmacros.gui.Color;
 import com.theincgi.advancedmacros.lua.LuaDebug;
 import com.theincgi.advancedmacros.lua.LuaValTexture;
@@ -239,7 +239,7 @@ public class Utils {
                 //TODO check for unsaved changes first or use tab'd editor instead
                 AdvancedMacros.editorGUI.openScript(file);
                 AdvancedMacros.editorGUI.getCta().jumpToLine(0, lineNum - 1);
-                EventHandler.showMenu(AdvancedMacros.editorGUI, AdvancedMacros.macroMenuGui.getGui());
+                CombinedEventHandler.showMenu(AdvancedMacros.editorGUI, AdvancedMacros.macroMenuGui.getGui());
                 return null;
             }
         });

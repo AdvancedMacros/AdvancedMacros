@@ -265,9 +265,11 @@ public class PackageLib extends TwoArgFunction {
                     break;
                 }
                 if (loader.isstring(1)) {
+                	if(i > 1)
+                		sb.append("\n");
                     sb.append(loader.tojstring(1));
                 }
-                if(loader.istable(i)) {
+                if(loader.istable(1)) {
                 	break;
                 }
             }
