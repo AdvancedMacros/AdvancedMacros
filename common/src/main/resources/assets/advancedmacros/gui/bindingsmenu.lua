@@ -374,13 +374,26 @@ function BindingsMenu:_triggerBinding(binding, eventType, value, ...)
   local isConsumable = eventType == "event" and value:match"Filter$"
   local action
   local srcMode = binding:getScriptMode()
+  local workspace = advancedMacros.getWorkspace"AM Default" --TODO sandbox direct access of this function away from other workspaces
   
   if srcMode == Binding.static.scriptModes.FILE then
     local file = binding:getScriptValue()
     if file:exists() then
+      if not file.workspaceName then
+        log(("&6Couldn't trigger binding with name '&f%s&6' because the File is missing a workspace name"):format(binding:getLabel()))
+        return
+      end
+      workspace = advancedMacros.getWorkspace(file.workspaceName)
+      if not workspace then
+        log(("&6Couldn't trigger binding with name '&f%s&6' because it has no valid workspace set"):format(binding:getLabel()))
+        return
+      end
       action = function(...)
         return run( file:getPath(), ... )
       end
+    else
+      log(("&6Couldn't trigger binding with name '&f%s&6' because the &U&NFile&6 doesn't exist"):format(binding:getLabel()), file:getPath())
+      return false
     end
 
   elseif srcMode == Binding.static.scriptModes.LUA then
@@ -391,6 +404,7 @@ function BindingsMenu:_triggerBinding(binding, eventType, value, ...)
   if action and not isConsumable then
     local t = thread.new(action)
     t.setLabel(binding:getLabel())
+    t.setWorkspace(workspace)
     -- t.setWorkspace(file)
     t.start()
     return false
@@ -482,6 +496,7 @@ function BindingsMenu:trigger(...)
     end
   end)
   t.setLabel("event-dispatch:"..args.eventType..":"..args.value)
+  t.setWorkspace(advancedMacros.getWorkspace"AM Default") --filter events use this workspace
   t.start()
 end
 
