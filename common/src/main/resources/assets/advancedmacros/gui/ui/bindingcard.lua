@@ -192,7 +192,7 @@ function BindingCard:applyModel( binding )
   if binding.color then
     self:setColor( binding.color ) --inherited from ui/Card
   end
-  if binding.enabled then
+  if binding.enabled ~= nil then
     self:setEnabled( binding.enabled ) --inherited from ui/Card
   end
 end
@@ -200,7 +200,7 @@ end
 --for export/saving
 function BindingCard:exportModel()
   return Binding:new{
-    enabled     = self:isEnabled(),
+    enabled     = self.elements.cardHead.enableButton.enabled, --excludes parent value
     triggerMode = self:getTriggerMode(),
     triggerName = self:getTriggerValue(),
     scriptMode  = self:getScriptMode(),
