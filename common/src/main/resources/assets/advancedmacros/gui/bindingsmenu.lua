@@ -144,6 +144,8 @@ function BindingsMenu:new( ... )
     y = 14,
     width = width - 12,
     height = height - obj.bindingsGroup.getY() - 14 - 14 - 10,
+    horizontalScrollMode = ScrollView.static.scrollModes.HIDE,
+    verticalScrollMode = ScrollView.static.scrollModes.SHOW
   }
   obj.bindingsFlow = Flow:new{
     screen = obj.screen,
@@ -152,11 +154,13 @@ function BindingsMenu:new( ... )
     width = obj.bindingsScrollView:getViewportWidth(),
     height = 0,
     hgap = 6,
-    vgap = 6,
-    debug = true
+    vgap = 6
   }
 
   obj.bindingsScrollView:add( obj.bindingsFlow )
+  obj.screen.setOnScroll( function(d)
+    obj.bindingsScrollView:scroll(d)
+  end)
 
   obj.newBindingButton.setParent( obj.bindingsGroup )
   obj.newGroupButton.setParent( obj.bindingsGroup )

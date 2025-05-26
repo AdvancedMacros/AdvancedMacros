@@ -77,7 +77,7 @@ public class ScriptGuiScrollBar extends ScriptGuiElement {
             @Override
             public LuaValue call(LuaValue arg) {
                 bar.setScrollSpeed(arg.checkdouble());
-                return null;
+                return NONE;
             }
         });
         this.set("getScrollSpeed", new ZeroArgFunction() {

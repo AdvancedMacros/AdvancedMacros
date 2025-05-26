@@ -26,6 +26,9 @@ function ScrollView:new( ... )
   obj.contentGroup = obj.screen.newGroup()
   obj.contentWidth = obj.width
   obj.contentHeight = obj.height
+
+  obj.horizontalScrollMode = args.horizontalScrollMode
+  obj.verticalScrollMode   = args.verticalScrollMode
   
   obj.elements.background = obj.screen.newRectangle(args.frameThickness, args.frameThickness,obj.width-args.frameThickness*2,obj.height-args.frameThickness*2)
   obj.elements.frame = obj.screen.newBox(0,0,obj.width,obj.height, args.frameThickness)
@@ -112,7 +115,7 @@ function ScrollView:updateContentBounds()
 
   self.viewportWidth = self.width - (vVis and 8 or 0)
   self.viewportHeight = self.height - (hVis and 8 or 0)
-  local lenOffset = hVis and vVis and -8 or -1
+  local lenOffset = hVis and vVis and -8 or 0
   local widOffset = hVis and vVis and -8 or 0 --AM bug related
 
   self.elements.hScrollBar.setWidth( self.width + widOffset )
@@ -128,6 +131,11 @@ function ScrollView:updateContentBounds()
   self.elements.vScrollBar.setVisible( vVis )
 end
 
+function ScrollView:scroll(d)
+  self.elements.vScrollBar.scroll(d)
+  self:onScroll()
+end
+
 function ScrollView:onScroll()
   local hScroll = self.elements.hScrollBar.getScrollPos()
   local vScroll = self.elements.vScrollBar.getScrollPos()
@@ -139,12 +147,12 @@ function ScrollView:getViewportWidth()
   return self.viewportWidth
 end
 
-function ScrollView:getViewPortHeight()
+function ScrollView:getViewportHeight()
   return self.viewportHeight  
 end
 
 function ScrollView:getViewportSize()
-  return self:getViewPortWidth(), self:getViewportHeight()
+  return self:getViewportWidth(), self:getViewportHeight()
 end
 
 function ScrollView:getContentWidth()
@@ -167,15 +175,19 @@ function ScrollView:onResize(w, h)
 
   self.elements.background.setWidth(self.width - self.frameThickness*2)
   self.elements.frame.setWidth(self.width)
-  self.elements.vScrollBar.setX( self:getY() + self.width - 8 )
-  self.elements.hScrollBar.setWidth( self.width - 1 )
+  self.elements.vScrollBar.setX( self:getX() + self.width - 8 )
+  self.elements.hScrollBar.setWidth( self.width )
 
   self.elements.background.setHeight(self.height - self.frameThickness*2)
   self.elements.frame.setHeight(self.height)
   self.elements.hScrollBar.setY(self:getY() + self.height - 8)
-  self.elements.vScrollBar.setHeight(self.height - 1)
-
+  self.elements.vScrollBar.setHeight(self.height)
+  
   self:updateContentBounds()
+
+  self.elements.hScrollBar.setScrollSpeed( math.ceil(self.viewportWidth / 20) )
+  self.elements.vScrollBar.setScrollSpeed( math.ceil(self.viewportHeight / 20) )
+
 end
 
 return ScrollView

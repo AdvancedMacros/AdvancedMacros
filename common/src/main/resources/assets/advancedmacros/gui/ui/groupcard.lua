@@ -26,8 +26,7 @@ function GroupCard:new( ... )
     width = obj.width - 12,
     height = 1,
     hGap = 4, vGap = 4,
-    hAlign = "center",
-    debug = true
+    hAlign = "center"
   }
 
   obj.flow.events.resize:addListener(function() obj:onResize(obj.width, obj.height) end)
