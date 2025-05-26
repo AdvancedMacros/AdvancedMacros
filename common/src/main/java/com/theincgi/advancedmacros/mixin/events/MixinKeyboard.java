@@ -1,5 +1,7 @@
 package com.theincgi.advancedmacros.mixin.events;
 
+import static com.theincgi.advancedmacros.event.handlers.OnKey.onKey;
+
 import java.util.HashMap;
 
 import org.lwjgl.glfw.GLFW;
@@ -11,7 +13,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.theincgi.advancedmacros.AdvancedMacros;
-import com.theincgi.advancedmacros.event.EventHandlers;
 import com.theincgi.advancedmacros.event.events.KeyEvent;
 import com.theincgi.advancedmacros.gui.Gui;
 
@@ -51,7 +52,7 @@ public class MixinKeyboard {
         }
         
         var event = new KeyEvent(window, key, scancode, action, mods, info);
-        EventHandlers.onKey.onEvent(event);
+        onKey.onEvent(event);
         
 //        AdvancedMacros.EVENT_HANDLER.onKeyInput(key, scancode, action, mods);
     }

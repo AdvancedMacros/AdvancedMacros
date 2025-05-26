@@ -140,9 +140,9 @@ function BindingsMenu:new( ... )
   obj.newGroupButton   = obj.screen.newImage( "resource:newgroup.png",        6 + 4 + 14 * 3,  0, 14 * 3, 14 )
   obj.bindingsScrollView = ScrollView:new{
     screen = obj.screen,
-    x = 6,
+    x = 24,
     y = 14,
-    width = width - 12,
+    width = width - 48,
     height = height - obj.bindingsGroup.getY() - 14 - 14 - 10,
     horizontalScrollMode = ScrollView.static.scrollModes.HIDE,
     verticalScrollMode = ScrollView.static.scrollModes.SHOW
@@ -187,12 +187,12 @@ end
 function BindingsMenu:onResize(w, h)
   self.profileSelect:setWidth(w - self.profileText.getWidth() - 14)
   self.toolbarFlow:setWidth(w - 12)
-  self.bindingsScrollView:setWidth(w - 12)
+  self.bindingsScrollView:setWidth(w - 48)
   self.bindingsScrollView:setHeight(h - self.bindingsGroup.getY() - 14 - 14 - 10)
 
   for i, item in ipairs(self.bindingsFlow.children) do
     if instanceOf(item, GroupCard) then
-      item:setWidth(w - 24)
+      item:setWidth(self.bindingsScrollView:getViewportWidth())
     end
   end
 
@@ -201,6 +201,7 @@ function BindingsMenu:onResize(w, h)
 end
 
 function BindingsMenu:open()
+  self:onResize(self.screen.getSize())
   self.screen.open()
 end
 
@@ -340,7 +341,7 @@ function BindingsMenu:newGroup( group )
     label = "Test Group",
     x = 0,
     y = 0,
-    width = width - 12,
+    width = width - 48,
     height = 120,
     color = utils.randomColor(),
   }
@@ -382,6 +383,9 @@ function BindingsMenu:_triggerBinding(binding, eventType, value, ...)
   
   if srcMode == Binding.static.scriptModes.FILE then
     local file = binding:getScriptValue()
+    if not file then
+      return false
+    end
     if file:exists() then
       if not file.workspaceName then
         log(("&6Couldn't trigger binding with name '&f%s&6' because the File is missing a workspace name"):format(binding:getLabel()))

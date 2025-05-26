@@ -1,5 +1,7 @@
 package com.theincgi.advancedmacros.mixin.events;
 
+import static com.theincgi.advancedmacros.event.handlers.OnArrowFired.onArrowFired;
+
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -8,7 +10,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import com.theincgi.advancedmacros.event.EventHandlers;
 import com.theincgi.advancedmacros.event.events.ArrowFiredEvent;
 
 import net.minecraft.entity.LivingEntity;
@@ -37,7 +38,7 @@ abstract public class MixinArrowFired {
 		boolean infiniteArrows = bl;
 		int charge = this.getMaxUseTime(stack) - remainingUseTicks;
 		
-		EventHandlers.onArrowFired.onEvent(new ArrowFiredEvent((PlayerEntity)user, charge, stack, itemStack, remainingUseTicks, infiniteArrows, ci));
+		onArrowFired.onEvent(new ArrowFiredEvent((PlayerEntity)user, charge, stack, itemStack, remainingUseTicks, infiniteArrows, ci));
 	}
 		
 	 @Shadow

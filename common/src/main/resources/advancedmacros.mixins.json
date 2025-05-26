@@ -11,6 +11,7 @@
     "MixinTextFieldWidget",
     "MixinChatHud",
     "events.MixinArrowFired",
+    "events.MixinAttackEntity",
     "events.MixinChatHud",
     "events.MixinGameRenderer",
     "events.MixinInGameHud",

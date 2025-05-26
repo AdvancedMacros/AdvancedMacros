@@ -11,10 +11,14 @@ import com.theincgi.advancedmacros.gui.elements.ColorTextArea;
 import com.theincgi.advancedmacros.lua.LuaDebug;
 import com.theincgi.advancedmacros.misc.HIDUtils;
 import com.theincgi.advancedmacros.misc.Workspace;
+import com.theincgi.advancedmacros.mixin.events.MixinKeyboard;
 
 import net.minecraft.client.MinecraftClient;
 
 public class OnKey extends EventHandler<KeyEvent> {
+	
+	/**{@link MixinKeyboard}*/
+	public static OnKey onKey  = new OnKey();
 	
 	@Override
 	public String getEventValue(KeyEvent event) {

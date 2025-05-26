@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.theincgi.advancedmacros.event.Event;
-import com.theincgi.advancedmacros.event.EventHandlers;
 import com.theincgi.advancedmacros.misc.Utils;
 
 import net.minecraft.client.gui.hud.ChatHud;
@@ -26,7 +25,7 @@ public class MixinChatHud {
 //            ci.cancel();
 //            return;
 //        }
-//        AdvancedMacros.EVENT_HANDLER.onChatEvent(message, CombinedEventHandler.EventName.Chat);
+//        OnChat.onChat.onEvent(message, CombinedEventHandler.EventName.Chat);
     }
     
     public class ChatEvent extends Event {

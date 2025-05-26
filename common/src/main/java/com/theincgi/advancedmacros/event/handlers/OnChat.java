@@ -7,6 +7,8 @@ import com.theincgi.advancedmacros.mixin.events.MixinChatHud.ChatEvent;
 
 public class OnChat extends FilterEvent<ChatEvent> {
 	
+	public static OnChat onChat = new OnChat();
+	
 	@Override
 	public String getEventValue(ChatEvent event) {
 		return EventName.ChatFilter.name();
