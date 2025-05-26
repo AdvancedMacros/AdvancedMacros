@@ -1625,18 +1625,24 @@ public class Utils {
 		return color;
 	}*/
     
+    
     public static AutoResetMCWorkspace tempSetCurrentWorkspace(Workspace workspace) {
     	if(AdvancedMacros.getMinecraftThread().equals(Thread.currentThread()))
     		return setMCThreadWorkspace(workspace);
     	var reset = new AutoResetMCWorkspace();
-    	LuaDebug.LuaThread.getCurrent().workspace = workspace;
+    	var luaThread = LuaDebug.LuaThread.getCurrent();
+    	if(luaThread != null)
+    		luaThread.workspace = workspace;
+    	else
+    		AdvancedMacros.otherThreadWorkspaces.set(workspace);
     	return reset;
 	}
     
     
     public static Workspace currentWorkspace() {
 		return AdvancedMacros.getMinecraftThread().equals(Thread.currentThread()) ?
-    			LuaDebug.LuaThread.mcThreadWorkspace : LuaDebug.LuaThread.getCurrent().workspace;
+    			LuaDebug.LuaThread.mcThreadWorkspace : 
+    				LuaDebug.LuaThread.getCurrent() == null ? AdvancedMacros.otherThreadWorkspaces.get() : LuaDebug.LuaThread.getCurrent().workspace;
 	}
     
 	public static AutoResetMCWorkspace setMCThreadWorkspace( Workspace workspace ) {

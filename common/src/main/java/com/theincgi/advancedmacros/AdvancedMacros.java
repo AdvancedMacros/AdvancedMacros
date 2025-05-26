@@ -80,6 +80,7 @@ public class AdvancedMacros {
 
     public static final String DEFAULT_WORKSPACE_NAME = "AM Default";
     public static final String INTERNAL_WORKSPACE_NAME = "internal";
+    public static final ThreadLocal<Workspace> otherThreadWorkspaces = new ThreadLocal<Workspace>(); //Not MC or Lua
     public static final File MACROS_ROOT_FOLDER = getRootFolder();
     public static final File MACROS_FOLDER = new File(MACROS_ROOT_FOLDER, "macros");
     public static final File WORKSPACES_FOLDER = new File(MACROS_ROOT_FOLDER, "workspaces");

@@ -39,7 +39,12 @@ abstract public class FilterEvent<T extends Event> extends EventHandler<T> {
 				new EventProcessor(event) {
 					Varargs task() {
 						var eventArgs = event.createArgsTable();					
-						return getBindingsMenu().triggerEvent(EVENT_TYPE, getEventValue(event), eventArgs);
+						try {
+							return getBindingsMenu().triggerEvent(EVENT_TYPE, getEventValue(event), eventArgs).waitForResult();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+							return eventArgs;
+						}
 					}
 				};
 			} catch(Exception e) {

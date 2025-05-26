@@ -1,7 +1,9 @@
 package com.theincgi.advancedmacros.event;
 
+import com.theincgi.advancedmacros.event.handlers.OnArrowFired;
 import com.theincgi.advancedmacros.event.handlers.OnChat;
 import com.theincgi.advancedmacros.event.handlers.OnKey;
+import com.theincgi.advancedmacros.mixin.events.MixinArrowFired;
 import com.theincgi.advancedmacros.mixin.events.MixinKeyboard;
 
 public class EventHandlers {
@@ -10,5 +12,9 @@ public class EventHandlers {
 	
 	/**{@link MixinKeyboard}*/
 	public static OnKey onKey  = new OnKey();
+	
+	
+	/**{@link MixinArrowFired}*/
+	public static OnArrowFired onArrowFired = new OnArrowFired();
 	
 }

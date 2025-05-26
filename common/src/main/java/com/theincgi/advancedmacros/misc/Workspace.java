@@ -370,7 +370,12 @@ public class Workspace {
 	public static class GetCurrentWorkspace extends ZeroArgFunction {
     	@Override
     	public LuaValue call() {
-    		return Utils.currentWorkspace().toLuaValue();
+    		var workspace = Utils.currentWorkspace();
+    		if(workspace == null) {
+    			throw new LuaError("Thread %s is missing a workspace".formatted(Thread.currentThread().getName()));
+    		}
+    			
+    		return workspace.toLuaValue();
     	}
     }
 	

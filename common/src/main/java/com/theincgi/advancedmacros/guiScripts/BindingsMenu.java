@@ -3,12 +3,20 @@ package com.theincgi.advancedmacros.guiScripts;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.luaj.vm2_v3_0_1.LuaTable;
 import org.luaj.vm2_v3_0_1.LuaValue;
 import org.luaj.vm2_v3_0_1.Varargs;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.theincgi.advancedmacros.AdvancedMacros;
+import com.theincgi.advancedmacros.event.TaskDispatcher;
+import com.theincgi.advancedmacros.lua.LuaDebug;
+import com.theincgi.advancedmacros.misc.SimpleListenableFuture;
 import com.theincgi.advancedmacros.misc.Utils;
 import com.theincgi.advancedmacros.misc.Workspace;
 
@@ -55,14 +63,14 @@ public class BindingsMenu {
 		return call("listMatchingBindings", args).length() > 0;
 	}
 	
-	public Varargs triggerEvent(String eventType, String value) {
+	public SimpleListenableFuture<Varargs> triggerEvent(String eventType, String value) {
 		LuaTable args = new LuaTable();
 		args.set("eventType", eventType);
 		args.set("value", value);
 		return triggerEvent(args);
 	}
 	
-	public Varargs triggerEvent(String eventType, String value, LuaTable eventArgs) {
+	public SimpleListenableFuture<Varargs> triggerEvent(String eventType, String value, LuaTable eventArgs) {
 		LuaTable args = new LuaTable();
 		args.set("eventType", eventType);
 		args.set("value", value);
@@ -70,10 +78,14 @@ public class BindingsMenu {
 		return triggerEvent(args);
 	}
 	
-	public Varargs triggerEvent(LuaTable args) {
-		try(var reset = Utils.tempSetCurrentWorkspace(Workspace.INTERNAL)) {
-			return invoke("trigger", args);
-		}
+	public SimpleListenableFuture<Varargs> triggerEvent(LuaTable args) {
+		final var future = new SimpleListenableFuture<Varargs>();
+		var thread = new LuaDebug.JavaThread(()->{
+			future.setResult(invoke("trigger", args));
+		});
+		thread.workspace = Workspace.INTERNAL;
+		thread.start();
+		return future;
 	}
 	
 	protected LuaValue call(String func) {

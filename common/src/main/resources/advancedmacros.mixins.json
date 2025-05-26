@@ -9,6 +9,8 @@
     "MixinMinecraftClient",
     "MixinSignEditScreen",
     "MixinTextFieldWidget",
+    "MixinChatHud",
+    "events.MixinArrowFired",
     "events.MixinChatHud",
     "events.MixinGameRenderer",
     "events.MixinInGameHud",
