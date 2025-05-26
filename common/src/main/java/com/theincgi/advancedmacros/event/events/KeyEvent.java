@@ -29,8 +29,10 @@ public class KeyEvent extends Event {
 	@Override
 	public LuaTable createArgsTable() {
 		LuaTable args = new LuaTable();
-        args.set(1, LuaValue.valueOf(action == GLFW.GLFW_PRESS ? "down" : "up"));
-        args.set(2, LuaValue.valueOf(key));
+        args.set("action", LuaValue.valueOf(action == GLFW.GLFW_PRESS ? "down" : "up"));
+        args.set("keyCode", LuaValue.valueOf(key));
+        args.set("scanCode", LuaValue.valueOf(scancode));
+        args.set("mods", HIDUtils.Keyboard.modifiersToLuaTable(mods));
         return args;
 	}
 }

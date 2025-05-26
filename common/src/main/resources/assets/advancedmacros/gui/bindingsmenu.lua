@@ -374,8 +374,7 @@ end
 
 
 ---@return `true if event consumed`, `<filter results>`
-function BindingsMenu:_triggerBinding(binding, eventType, value, ...)
-  local args = {...}
+function BindingsMenu:_triggerBinding(binding, eventType, value, args)
   local isConsumable = eventType == "event" and value:match"Filter$"
   local action
   local srcMode = binding:getScriptMode()
@@ -410,14 +409,14 @@ function BindingsMenu:_triggerBinding(binding, eventType, value, ...)
   end
 
   if action and not isConsumable then
-    local t = thread.new(function() action(eventType, value, table.unpack(args)) end)
+    local t = thread.new(function() action(eventType, value, args) end)
     t.setLabel(binding:getLabel())
     t.setWorkspace(workspace)
     -- t.setWorkspace(file)
     t.start()
     return false
   elseif action then
-    local results = {action(eventType, value, ...)}
+    local results = {action(eventType, value, args)}
     if #results == 0 then
       return true, results
     end
@@ -443,10 +442,10 @@ function BindingsMenu:listMatchingBindings(...)
     local keyCheck = true
     if trigMode == "key up" then
       trigMode = "key"
-      keyCheck = args.eventArgs[1] == "up"
+      keyCheck = args.eventArgs.action == "up"
     elseif trigMode == "key down" then
       trigMode = "key"
-      keyCheck = args.eventArgs[1] == "down"
+      keyCheck = args.eventArgs.action == "down"
     elseif trigMode == "key all" then
       trigMode = "key"
     end
@@ -493,14 +492,14 @@ function BindingsMenu:trigger(...)
   local t = thread.new(function()
     for i, binding in ipairs(bindingQueue) do
       log("&7Triggering binding with label &B"..binding:getLabel())
-      local done, newArgs = self:_triggerBinding(binding, args.eventType, args.value, table.unpack(eventArgs))
+      local done, newArgs = self:_triggerBinding(binding, args.eventType, args.value, eventArgs)
       if done then
         break
       end
       eventArgs = newArgs or eventArgs
     end
     if args.callback then
-      args.callback(table.unpack(eventArgs))
+      args.callback(eventArgs)
     end
   end)
   t.setLabel("event-dispatch:"..args.eventType..":"..args.value)

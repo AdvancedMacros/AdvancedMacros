@@ -32,11 +32,11 @@ public class ArrowFiredEvent extends Event {
 	public LuaTable createArgsTable() {
 		LuaTable args = new LuaTable();
 		
-		args.set(1, Utils.itemStackToLuatable(bowStack));
-		args.set(2, chargeTime);
-		args.set(3, !arrowStack.isEmpty() || isInfinite);
-		args.set(4, Utils.codedFromTextComponent(player.getName(), false).a);
-		args.set(5, Utils.itemStackToLuatable(arrowStack));
+		args.set("bow", Utils.itemStackToLuatable(bowStack));
+		args.set("chargeTime", chargeTime);
+		args.set("hadArrow", !arrowStack.isEmpty() || isInfinite);
+		args.set("playerName", Utils.codedFromTextComponent(player.getName(), false).a);
+		args.set("arrow", Utils.itemStackToLuatable(arrowStack));
 		
 		return args;
 	}

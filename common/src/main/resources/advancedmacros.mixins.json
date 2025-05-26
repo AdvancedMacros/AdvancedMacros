@@ -12,6 +12,7 @@
     "MixinChatHud",
     "events.MixinArrowFired",
     "events.MixinAttackEntity",
+    "events.MixinBlockInteract",
     "events.MixinChatHud",
     "events.MixinGameRenderer",
     "events.MixinInGameHud",

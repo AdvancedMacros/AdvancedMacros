@@ -25,8 +25,8 @@ public class AttackEntityEvent extends Event {
 	@Override
 	public LuaTable createArgsTable() {
 		var args = new LuaTable();
-		args.set(1, Utils.entityToTable(entity));
-		args.set(2, Utils.entityToTable(attacker));
+		args.set("target", Utils.entityToTable(entity));
+		args.set("attacker", Utils.entityToTable(attacker));
 		return args;
 	}
 

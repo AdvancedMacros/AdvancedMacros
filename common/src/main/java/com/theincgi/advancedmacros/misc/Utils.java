@@ -613,6 +613,23 @@ public class Utils {
                         dt.equals(DimensionType.THE_NETHER) ? "nether" : "unknown");  //TESTME check if name is reasonable too*/
         return out;
     }
+    
+    public static LuaValue blockHitResultToLuaValue(BlockHitResult hitResult) {
+    	if(hitResult == null)
+    		return LuaValue.FALSE;
+    	
+    	LuaTable table = new LuaTable();
+    	
+    	table.set("blockPos", blockPosToTable(hitResult.getBlockPos()));
+    	table.set("hitPos", toTable(hitResult.getPos()));
+    	table.set("hitType", hitResult.getType().name());
+    	if(hitResult.getSide() != null)
+    		table.set("side", hitResult.getSide().getName());
+		else
+			table.set("side", LuaValue.FALSE);
+    	
+    	return table;
+    }
 
     public static Text luaTableToComponentJson(LuaTable table) {
         String msg = "[\"\","; //["",
@@ -1289,6 +1306,9 @@ public class Utils {
 
         LuaTable actions = new LuaTable();
         int actionNum = 1;
+        if(message.getLiteralString() != null)
+        	out.append(message.getLiteralString());
+        
         for (Text com : message.getSiblings()) {
             if (com.getString().isEmpty()) {
                 continue;
@@ -1377,17 +1397,7 @@ public class Utils {
             default -> null;
         };
     }
-
-    //	//why is there also runOnMCAndWait...
-    //	@Deprecated
-    //	public static void runOnMCThreadAndWait(Runnable r){
-    //		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {
-    //			r.run();
-    //			return;
-    //		}
-    //		ListenableFuture<Object> f = MinecraftClient.getInstance().addScheduledTask(r);
-    //		while(!f.isDone()) try{Thread.sleep(5);}catch (InterruptedException ie) {return;}
-    //	}
+    
     public static LuaValue toTable(Inventory container) {
         return toTable(container, false);
     }
@@ -1488,49 +1498,6 @@ public class Utils {
         return result;
     }
 
-    //	/**Returns null when done if already on MC thread*/
-    //	public static Object runOnMCAndWait(Runnable r) {
-    //		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {
-    //			r.run();
-    //			return null;
-    //		}
-    //		ListenableFuture<Object> a = MinecraftClient.getInstance().addScheduledTask(r);
-    //		while(!a.isDone())
-    //			try {Thread.sleep(1);}catch (Exception e) {break;}
-    //		try {
-    //			return a.get();
-    //		} catch (InterruptedException | ExecutionException e) {
-    //			e.printStackTrace();
-    //			return null;
-    //		}
-    //	}
-    //
-    //	public static <T> T  runOnMCAndWait(Callable<T> c) {
-    //		if(AdvancedMacros.getMinecraftThread() == Thread.currentThread()) {
-    //			try {
-    //				return c.call();
-    //			} catch (InterruptedException | ExecutionException | ClassCastException e) {
-    //				e.printStackTrace();
-    //				return null;
-    //			} catch (Exception e) {
-    //				Utils.logError(e);
-    //			}
-    //		}
-    //		ListenableFuture<T> a = MinecraftClient.getInstance().addScheduledTask(c);
-    //		while(!a.isDone())
-    //			try {Thread.sleep(1);}catch (Exception e) {break;}
-    //		try {
-    //			return (T) a.get();
-    //		} catch (InterruptedException | ExecutionException | ClassCastException e) {
-    //			e.printStackTrace();
-    //			return null;
-    //		}
-    //	}
-    //
-    //	public static void runOnMCLater(Runnable r) {
-    //		//TODO
-    //	}
-
     public static void waitTick() {
         if (AdvancedMacros.getMinecraftThread().equals(Thread.currentThread())) {
             return;
@@ -1562,11 +1529,11 @@ public class Utils {
         return LuaValue.varargsOf(args);
     }
 
-    public static LuaTable toTable(Vec3d motion) {
+    public static LuaTable toTable(Vec3d vec) {
         LuaTable out = new LuaTable();
-        out.set(1, motion.x);
-        out.set(2, motion.y);
-        out.set(3, motion.z);
+        out.set(1, vec.x);
+        out.set(2, vec.y);
+        out.set(3, vec.z);
         return out;
     }
 
