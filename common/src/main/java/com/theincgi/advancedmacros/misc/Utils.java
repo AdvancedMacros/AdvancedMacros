@@ -19,6 +19,7 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.command.argument.ItemStringReader;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -485,6 +486,22 @@ public class Utils {
         return table;
     }
 
+    public static LuaValue damageSourceToLuaValue(DamageSource damageSource) {
+    	LuaTable table = new LuaTable();
+    	
+    	table.set("name", damageSource.getName());
+    	table.set("attacker", entityToTable(damageSource.getAttacker()));
+    	table.set("isIndirect", damageSource.isIndirect());
+    	table.set("exhaustion", damageSource.getExhaustion());
+    	table.set("isScaledWithDifficulty", damageSource.isScaledWithDifficulty());
+    	table.set("isSourceCreativePlayer", damageSource.isSourceCreativePlayer());
+    	table.set("pos", Utils.toTable(damageSource.getPosition()));
+    	table.set("source", Utils.entityToTable(damageSource.getSource()));
+//    	table.set("type", damageSource.getType().); //not enum
+    	
+    	return table;
+    }
+    
     public static AbstractClientPlayerEntity findPlayerByName(String toFind) {
         return MinecraftClient.getInstance().world.getPlayers().stream()
                 .filter(player -> player.getName().getString().equals(toFind))

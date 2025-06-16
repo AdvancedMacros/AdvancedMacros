@@ -13,7 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 
 @Mixin(PlayerEntity.class)
-public class MixinAttackEntity {
+public class MixinPlayerEntity {
 
 	@Inject(
 		method = "attack(Lnet/minecraft/entity/Entity;)V",
@@ -23,5 +23,6 @@ public class MixinAttackEntity {
 		PlayerEntity player = (PlayerEntity)(Object)this;
 		onAttackEntity.onEvent(new AttackEntityEvent(player, target, ci));
 	}
+	
 	
 }

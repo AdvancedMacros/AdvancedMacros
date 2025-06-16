@@ -19,7 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
 @Mixin(BowItem.class)
-abstract public class MixinArrowFired {
+abstract public class MixinBowItem {
 
 	@Inject(
 		method = "onStoppedUsing",

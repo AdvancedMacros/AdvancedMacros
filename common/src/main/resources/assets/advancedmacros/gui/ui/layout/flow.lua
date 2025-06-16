@@ -11,7 +11,7 @@ function Flow:new( ... )
     {hGap = "number", 1, "hgap","horizontalGap","horizontalSpacing","hSpacing"},
     {vGap = "number", 1, "vgap","verticalGap", "verticalSpacing","vSpacing"},
     {hbox = "boolean", false, "vbox", "hBox", "vBox"},
-    {debug = "boolean", false, "showBounds"},
+    {debug = "boolean", true, "showBounds"},
   }, ...)
 
   obj.vAlign = args.vAlign
@@ -107,7 +107,7 @@ function Flow:arrange()
   local maxRowWidth = 0
   -- log("&eArrange with mode: ", mode)
   if self.scrollbar and self.scrollbar.isVisible() then
-    WIDTH = WIDTH - self.scrollbar.getWidth()
+    WIDTH = WIDTH - self.scrollbar.getWidth()             --TODO content size?
   end
 
   for index, element in ipairs( self.children ) do
@@ -133,7 +133,8 @@ function Flow:arrange()
     rowHeight = math.max( rowHeight, element:getHeight() )
     itemsInRow = itemsInRow + 1
   end
-  local widthChagned = false
+
+  local widthChanged = false
   local reArrange = false
   maxRowWidth = math.max( maxRowWidth, rowWidth - self.hGap )
   if mode == "hbox" then
